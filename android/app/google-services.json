@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "926673539070",
+    "project_id": "geo-hub-ba554",
+    "storage_bucket": "geo-hub-ba554.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:926673539070:android:9e29ea21f5a16b379fbaaf",
+        "android_client_info": {
+          "package_name": "com.club.geohub"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATuw8I_C-ET-sRCK96yUi0HZft-bimavQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

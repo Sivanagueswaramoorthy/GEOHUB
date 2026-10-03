@@ -1,0 +1,27 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'admin' || request.auth.token.role == 'super_admin');
+    }
+    
+    function isDocumentationTeam() {
+      return isAuthenticated() && 
+        (isAdmin() || request.auth.token.team == 'Documentation');
+    }
+
+    // Media & Documents storage hierarchy: {academicYear}/{eventId}/{category}/{fileId}
+    match /{academicYear}/{eventId}/{category}/{fileId} {
+      // Authenticated users can read photos, videos, and reports
+      allow read: if isAuthenticated() && (category != 'bills' || isAdmin());
+      // Documentation team and admins can upload
+      allow write: if isDocumentationTeam();
+    }
+  }
+}

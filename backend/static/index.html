@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GeoHub - Club Orchestration & Smart QR Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- QRCode.js CDN for dynamic attendance QR generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🌐</div>
+      <div class="brand-text">
+        <h1>GeoHub</h1>
+        <span>CAMPUS CLUBS</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <div class="nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">
+        <span>📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="switchTab('events')" id="nav-events">
+        <span>📅</span> Events
+      </div>
+      <div class="nav-item" onclick="switchTab('teams')" id="nav-teams">
+        <span>👥</span> Teams & Members
+      </div>
+      <div class="nav-item" onclick="switchTab('tasks')" id="nav-tasks">
+        <span>📋</span> Tasks & Proofs
+      </div>
+      <div class="nav-item" onclick="switchTab('qr')" id="nav-qr">
+        <span>📱</span> Smart QR Attendance
+      </div>
+      <div class="nav-item" onclick="switchTab('gallery')" id="nav-gallery">
+        <span>🖼️</span> Gallery & Media
+      </div>
+      <div class="nav-item" onclick="switchTab('profile')" id="nav-profile">
+        <span>👤</span> Role & Profile
+      </div>
+    </nav>
+
+    <div class="nav-footer">
+      <div class="user-badge">
+        <div class="user-avatar" id="avatar-initial">S</div>
+        <div class="user-info">
+          <div class="user-name" id="display-user-name">Dr. Faculty Advisor</div>
+          <div class="user-role" id="display-user-role">Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Viewport -->
+  <main class="main-viewport">
+
+    <!-- 1. DASHBOARD TAB -->
+    <section id="tab-dashboard" class="content-tab">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Executive Command Center</h2>
+          <p class="page-desc">Real-time telemetry, membership analytics, and event attendance</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('create-event-modal')">
+          + Create Event
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Registered Members</span>
+            <div class="stat-icon" style="background: rgba(79, 70, 229, 0.2); color: #818cf8;">👥</div>
+          </div>
+          <div class="stat-val" id="stat-members">--</div>
+          <div class="stat-footer">Active across 4 core departments</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Club Events</span>
+            <div class="stat-icon" style="background: rgba(13, 148, 136, 0.2); color: #2dd4bf;">📅</div>
+          </div>
+          <div class="stat-val" id="stat-events">--</div>
+          <div class="stat-footer">Academic Year 2025-26</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">QR Check-Ins</span>
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">🎟️</div>
+          </div>
+          <div class="stat-val" id="stat-checkins">--</div>
+          <div class="stat-footer">Verified attendance entries</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Active Volunteers</span>
+            <div class="stat-icon" style="background: rgba(124, 58, 237, 0.2); color: #a78bfa;">⚡</div>
+          </div>
+          <div class="stat-val" id="stat-volunteers">--</div>
+          <div class="stat-footer">Authorized QR scanner leads</div>
+        </div>
+      </div>
+
+      <!-- Department Breakdown -->
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="margin-bottom: 16px;">Department Distribution</h3>
+        <div id="department-bars" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. EVENTS TAB -->
+    <section id="tab-events" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Campus Events</h2>
+          <p class="page-desc">Academic symposia, cultural fests, workshops, and registrations</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('create-event-modal')">
+          + New Event
+        </button>
+      </div>
+
+      <div class="cards-grid" id="events-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- 3. TEAMS TAB -->
+    <section id="tab-teams" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Departments & Teams</h2>
+          <p class="page-desc">Management, Promotion, Documentation, and Entertainment rosters</p>
+        </div>
+        <button class="btn btn-outline" onclick="openModal('join-team-modal')">
+          Request to Join Team
+        </button>
+      </div>
+
+      <div class="cards-grid" id="teams-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- 4. TASKS TAB -->
+    <section id="tab-tasks" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Task Deliverables</h2>
+          <p class="page-desc">Track deadlines, assign student roles, and submit proofs</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('create-task-modal')">
+          + Assign Task
+        </button>
+      </div>
+
+      <div class="cards-grid" id="tasks-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- 5. SMART QR ATTENDANCE TAB -->
+    <section id="tab-qr" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Smart QR Attendance</h2>
+          <p class="page-desc">Dynamic 60s single-use tokens with anti-fraud verification</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Left: Student QR Generator -->
+        <div class="card" style="text-align: center;">
+          <h3 style="margin-bottom: 8px;">Show My Attendance QR</h3>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+            Choose your registered event to generate a dynamic attendance token.
+          </p>
+          <div class="form-group" style="max-width: 320px; margin: 0 auto 20px auto;">
+            <select class="form-select" id="qr-event-selector">
+              <option value="">Select Event...</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="margin-bottom: 24px;" onclick="generateQrToken()">
+            Generate Fresh QR
+          </button>
+
+          <div class="qr-container" id="qr-wrapper">
+            <div id="qrcode"></div>
+            <div class="qr-timer" id="qr-timer-text">Expires in 60s</div>
+          </div>
+        </div>
+
+        <!-- Right: Volunteer Scanner & Verifier -->
+        <div class="card">
+          <h3 style="margin-bottom: 8px;">Volunteer Scanner Simulator</h3>
+          <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+            Test checking in students by scanning or pasting the dynamic token.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Event</label>
+            <select class="form-select" id="scanner-event-selector">
+              <option value="">Select Event...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Scanned Token Code</label>
+            <input type="text" class="form-input" id="scanner-token-input" placeholder="e.g. GEO-AB12CD34EF56">
+          </div>
+          <button class="btn btn-success" style="width: 100%; margin-top: 10px;" onclick="verifyScannedToken()">
+            Verify & Check-In Attendee
+          </button>
+          <div id="scan-feedback" style="margin-top: 16px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. GALLERY TAB -->
+    <section id="tab-gallery" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Gallery & Records</h2>
+          <p class="page-desc">Event photos, reports, bills, and media stored on local disk</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('upload-modal')">
+          + Upload File
+        </button>
+      </div>
+
+      <div class="cards-grid" id="gallery-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+    <!-- 7. PROFILE & ROLE SIMULATOR -->
+    <section id="tab-profile" class="content-tab" style="display: none;">
+      <div class="header-row">
+        <div>
+          <h2 class="page-title">Profile & Role Simulator</h2>
+          <p class="page-desc">Switch between the 5 system roles to test permissions and navigation</p>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 600px;">
+        <h3 style="margin-bottom: 16px;">Current User Details</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">
+          FastAPI Backend Connected: <code style="color: var(--secondary)">http://127.0.0.1:8000/api</code>
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Active Role</label>
+          <select class="form-select" id="role-selector" onchange="switchRole(this.value)">
+            <option value="super_admin">super_admin (Faculty In-Charge / Full Access)</option>
+            <option value="admin">admin (Club President / VP)</option>
+            <option value="team_admin">team_admin (Department Lead)</option>
+            <option value="member">member (Active Student)</option>
+            <option value="volunteer">volunteer (Member + QR Scanner Access)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Assigned Department</label>
+          <select class="form-select" id="team-selector" onchange="switchTeam(this.value)">
+            <option value="Management">Management</option>
+            <option value="Promotion">Promotion</option>
+            <option value="Documentation">Documentation</option>
+            <option value="Entertainment">Entertainment</option>
+          </select>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: CREATE EVENT -->
+  <div class="modal-overlay" id="create-event-modal">
+    <div class="modal-card">
+      <h3 style="margin-bottom: 16px;">Create Club Event</h3>
+      <div class="form-group">
+        <label class="form-label">Event Title</label>
+        <input type="text" class="form-input" id="event-title" placeholder="e.g. Hackathon 2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Event Type</label>
+        <select class="form-select" id="event-type">
+          <option>Academic</option>
+          <option>Cultural</option>
+          <option>Technical Workshop</option>
+          <option>Sports</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Venue</label>
+        <input type="text" class="form-input" id="event-venue" placeholder="Main Auditorium">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="event-desc" rows="3" placeholder="Overview and rules..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-outline" onclick="closeModal('create-event-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCreateEvent()">Create Event</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ASSIGN TASK -->
+  <div class="modal-overlay" id="create-task-modal">
+    <div class="modal-card">
+      <h3 style="margin-bottom: 16px;">Assign Department Task</h3>
+      <div class="form-group">
+        <label class="form-label">Task Title</label>
+        <input type="text" class="form-input" id="task-title" placeholder="e.g. Design Event Banner">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Department / Team</label>
+        <select class="form-select" id="task-team">
+          <option>Promotion</option>
+          <option>Management</option>
+          <option>Documentation</option>
+          <option>Entertainment</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Instructions</label>
+        <textarea class="form-textarea" id="task-desc" rows="3" placeholder="Deliverable details..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-outline" onclick="closeModal('create-task-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCreateTask()">Assign Task</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
