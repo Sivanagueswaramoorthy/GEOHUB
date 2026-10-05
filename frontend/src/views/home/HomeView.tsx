@@ -542,10 +542,7 @@ export const HomeView: React.FC = () => {
       {isTreasurer ? (
         <>
           {/* 1) Four StatTiles: Total Budget (mint), Spent (amber), Remaining (teal), Pending Entries (lavender), amounts in INR (en-IN) */}
-          <div
-            className="grid grid-cols-2 gap-3"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}
-          >
+          <div className="stat-tiles-grid">
             <StatTile
               label="Total Budget"
               value={formatINR(450000)}
@@ -958,10 +955,7 @@ export const HomeView: React.FC = () => {
       ) : isPromotion ? (
         <>
           {/* 1) Four StatTiles for Promotion Lead: Events to Promote (mint), Scheduled Posts (lavender), Published This Month (teal), Drafts (amber) */}
-          <div
-            className="grid grid-cols-2 gap-3"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}
-          >
+          <div className="stat-tiles-grid">
             <StatTile
               label="Events to Promote"
               value={String(campaigns.filter((c) => c.status !== 'completed').length || 4)}
@@ -1298,10 +1292,7 @@ export const HomeView: React.FC = () => {
       ) : isDocLead ? (
         <>
           {/* 1) Four StatTiles for Documentation Lead */}
-          <div
-            className="grid grid-cols-2 gap-3"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}
-          >
+          <div className="stat-tiles-grid">
             <StatTile
               label="Events to Document"
               value="4"
@@ -1587,10 +1578,7 @@ export const HomeView: React.FC = () => {
            ========================================================================= */
         <>
           {/* 2) Four StatTiles in a 2x2 card */}
-          <div
-            className="grid grid-cols-2 gap-3"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}
-          >
+          <div className="stat-tiles-grid">
             <StatTile
               label="Total Members"
               value="128"

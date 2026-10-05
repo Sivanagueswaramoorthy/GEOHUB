@@ -78,6 +78,21 @@ html, body {
   box-sizing: border-box;
 }
 
+/* StatTiles 2x2 Square Boxes Grid */
+.stat-tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .fullscreen-mode .stat-tiles-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
 /* Subroute Navigation Bar */
 .subroute-bar {
   position: sticky;
