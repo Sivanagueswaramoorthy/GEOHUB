@@ -28,18 +28,34 @@ migrate_working_dir/
 .packages
 .pub-cache/
 .pub/
-/build/
+build/
+**/build/
+*.apk
 
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
+.gradle/
+**/.gradle/
 **/android/captures/
 **/android/gradlew
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
-# Node / Cloud Functions
+# Python & Backend
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+backend/geohub.db-journal
+
+# Node / Frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
 functions/node_modules/
 firebase-debug.log
 firebase-debug.*.log
+

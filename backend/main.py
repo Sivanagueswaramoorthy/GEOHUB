@@ -41,6 +41,16 @@ from fastapi.responses import FileResponse
 
 # Static Web Application Files
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+FRONTEND_DIST = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "frontend", "dist"))
+
+# Mount assets directory for modern React bundle
+assets_dir = os.path.join(STATIC_DIR, "assets")
+if not os.path.exists(assets_dir) and os.path.exists(FRONTEND_DIST):
+    assets_dir = os.path.join(FRONTEND_DIST, "assets")
+
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
 if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -81,9 +91,39 @@ def seed_default_teams():
     finally:
         db.close()
 
+@app.get("/geo-hub-logo.png")
+def get_logo():
+    path = os.path.join(STATIC_DIR, "geo-hub-logo.png")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return FileResponse(os.path.join(FRONTEND_DIST, "geo-hub-logo.png"))
+
+@app.get("/app-logo.png")
+def get_app_logo():
+    path = os.path.join(STATIC_DIR, "app-logo.png")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return FileResponse(os.path.join(FRONTEND_DIST, "app-logo.png"))
+
+@app.get("/geo-hub-logo-hd.png")
+def get_hd_logo():
+    path = os.path.join(STATIC_DIR, "geo-hub-logo-hd.png")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return FileResponse(os.path.join(FRONTEND_DIST, "geo-hub-logo-hd.png"))
+
+@app.get("/favicon.svg")
+def get_favicon():
+    path = os.path.join(STATIC_DIR, "favicon.svg")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return FileResponse(os.path.join(FRONTEND_DIST, "favicon.svg"))
+
 @app.get("/")
 def serve_frontend():
     index_file = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(index_file) and os.path.exists(FRONTEND_DIST):
+        index_file = os.path.join(FRONTEND_DIST, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)
     return {

@@ -1,0 +1,73 @@
+:root {
+  /* ==========================================================================
+     Green Eco Organization - Exact Design System Tokens
+     ========================================================================== */
+
+  /* Backgrounds: Strictly White Scaffold, Sheets, and Modals */
+  --bg-scaffold: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-sheet: #FFFFFF;
+  --bg-modal: #FFFFFF;
+
+  /* Brand Greens */
+  --brand-green: #10B981;
+  --dark-green: #064E3B;
+  --mint-tint: #E7F9F1;
+  --mint-border: #A7F3D0;
+  --mint-text: #065F46;
+
+  /* Pastel Stat Tints */
+  --stat-mint-bg: #E7F9F1;
+  --stat-mint-border: #A7F3D0;
+  --stat-mint-text: #065F46;
+  --stat-mint-num: #064E3B;
+
+  --stat-lavender-bg: #F3EEFF;
+  --stat-lavender-border: #DDD1FF;
+  --stat-lavender-text: #5B21B6;
+  --stat-lavender-num: #5B21B6;
+
+  --stat-amber-bg: #FFF8E6;
+  --stat-amber-border: #FDE68A;
+  --stat-amber-text: #92400E;
+  --stat-amber-num: #7C2D12;
+
+  --stat-teal-bg: #E8FBF8;
+  --stat-teal-border: #99F6E4;
+  --stat-teal-text: #0F766E;
+  --stat-teal-num: #115E59;
+
+  /* Neutrals & Dividers */
+  --text-main: #0F172A;
+  --text-secondary: #64748B;
+  --text-tertiary: #94A3B8;
+  --divider: #EEF1F5;
+  --card-border: #EEF1F5;
+
+  /* Special / Danger */
+  --danger-red: #EF4444;
+  --danger-bg: #FEF2F2;
+  --danger-border: #FECACA;
+  --danger-text: #DC2626;
+
+  /* Typography */
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Radii */
+  --radius-card: 24px;
+  --radius-tile: 20px;
+  --radius-pill: 999px;
+  --radius-input: 16px;
+  --radius-btn: 999px;
+
+  /* Shadows */
+  --shadow-card: 0 6px 24px rgba(15, 23, 42, 0.06);
+  --shadow-floating-nav: 0 10px 30px rgba(15, 23, 42, 0.12);
+  --shadow-sheet: 0 -10px 40px rgba(15, 23, 42, 0.14);
+  --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.18);
+
+  /* Layout Spacing */
+  --page-padding-x: 20px;
+  --page-padding-bottom: 112px;
+  --mobile-max-width: 480px;
+}

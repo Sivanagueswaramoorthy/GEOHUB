@@ -13,8 +13,13 @@ class Settings:
     # Allowed College Domain
     ALLOWED_EMAIL_DOMAIN: str = "@college.edu"
 
-    # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./geohub.db")
+    # Database Configuration (MySQL / SQLite)
+    # Format: mysql+pymysql://<user>:<password>@localhost:3306/<database_name>
+    # Default for XAMPP: mysql+pymysql://root:@localhost:3306/geohub
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "mysql+pymysql://root:@localhost:3306/geohub"
+    )
 
     # Local Uploads Directory
     UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
