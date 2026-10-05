@@ -36,9 +36,23 @@ import {
   Send,
   Archive,
   Images,
+  Clock,
+  Share2,
+  ThumbsUp,
+  CheckCircle2,
+  AlertCircle,
+  Filter,
+  Plus,
+  Star,
+  Lock,
+  ShieldCheck,
+  Eye,
+  RefreshCw,
+  Megaphone,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getRolePermissions } from '../../core/permissions';
+import { SocialPlatform, SocialPostStatus } from '../../types';
 import {
   Overline,
   ShortcutTile,
@@ -70,6 +84,11 @@ export const ExploreActivitiesView: React.FC = () => {
     updateGalleryItem,
     deleteGalleryItem,
     changeStudentPost,
+    addPost,
+    updatePost,
+    deletePost,
+    markPostPublished,
+    updateTaskStatus,
   } = useApp();
 
   const perms = getRolePermissions(currentUser.role);
@@ -86,6 +105,7 @@ export const ExploreActivitiesView: React.FC = () => {
       (currentUser.team === 'Promotion' ||
         Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
+  const isStudent = currentUser.role === 'member';
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -112,6 +132,52 @@ export const ExploreActivitiesView: React.FC = () => {
   };
 
   // Promotion Operations State & Handlers
+  const [isContentCalendarOpen, setIsContentCalendarOpen] = useState(false);
+  const [isPostsStudioOpen, setIsPostsStudioOpen] = useState(false);
+  const [isAiSuggestionsOpen, setIsAiSuggestionsOpen] = useState(false);
+
+  // Content Calendar State
+  const [calendarFilterPlatform, setCalendarFilterPlatform] = useState<string>('All');
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<string>('All');
+  const [isScheduleDropOpen, setIsScheduleDropOpen] = useState(false);
+  const [dropEventId, setDropEventId] = useState(events[0]?.id || '');
+  const [dropPlatform, setDropPlatform] = useState<SocialPlatform>('Instagram');
+  const [dropDate, setDropDate] = useState(() => new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+  const [dropTime, setDropTime] = useState('11:00');
+  const [dropCaption, setDropCaption] = useState('');
+  const [dropMediaUrl, setDropMediaUrl] = useState('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80');
+
+  // Posts Studio State
+  const [postsFilterTab, setPostsFilterTab] = useState<'All' | 'Scheduled' | 'Draft' | 'Posted'>('All');
+  const [isNewPostDrawerOpen, setIsNewPostDrawerOpen] = useState(false);
+  const [newPostEventId, setNewPostEventId] = useState(events[0]?.id || '');
+  const [newPostPlatform, setNewPostPlatform] = useState<SocialPlatform>('Instagram');
+  const [newPostCaption, setNewPostCaption] = useState('');
+  const [newPostStatus, setNewPostStatus] = useState<SocialPostStatus>('Draft');
+  const [newPostMedia, setNewPostMedia] = useState('');
+
+  // AI Suggestions State
+  const [aiEventId, setAiEventId] = useState(events[0]?.id || '');
+  const [aiPlatform, setAiPlatform] = useState<'Instagram' | 'LinkedIn' | 'WhatsApp'>('Instagram');
+  const [aiTone, setAiTone] = useState<'viral' | 'official' | 'urgent'>('viral');
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+
+  // Student Operations Modals & State
+  const [isStudentPassOpen, setIsStudentPassOpen] = useState(false);
+  const [isStudentDutiesOpen, setIsStudentDutiesOpen] = useState(false);
+  const [isStudentRegHistoryOpen, setIsStudentRegHistoryOpen] = useState(false);
+  const [isStudentFeedbackOpen, setIsStudentFeedbackOpen] = useState(false);
+  const [isGateScannerDutyWarningOpen, setIsGateScannerDutyWarningOpen] = useState(false);
+
+  // Student Feedback State
+  const [studentFeedbackEventId, setStudentFeedbackEventId] = useState(events[0]?.id || '');
+  const [studentFeedbackRating, setStudentFeedbackRating] = useState(5);
+  const [studentFeedbackCategory, setStudentFeedbackCategory] = useState('Workshop Quality');
+  const [studentFeedbackComment, setStudentFeedbackComment] = useState('');
+
+  // Faculty/Coordinator Modals
+  const [isFeedbackSummaryOpen, setIsFeedbackSummaryOpen] = useState(false);
+
   const [isCampaignReachExportOpen, setIsCampaignReachExportOpen] = useState(false);
   const [isMemoriesCreatorOpen, setIsMemoriesCreatorOpen] = useState(false);
   const [memoryEventId, setMemoryEventId] = useState(events[0]?.id || '');
@@ -419,6 +485,8 @@ export const ExploreActivitiesView: React.FC = () => {
               ? 'FISCAL & TREASURY OPERATIONS'
               : isDocLead
               ? 'DOCUMENTATION & ARCHIVAL OPERATIONS'
+              : isStudent
+              ? 'STUDENT VOLUNTEER OPERATIONS'
               : 'Activity Hub'}
           </Overline>
         </div>
@@ -433,6 +501,8 @@ export const ExploreActivitiesView: React.FC = () => {
             ? 'Treasurer Operations Hub'
             : isDocLead
             ? 'Documentation Hub'
+            : isStudent
+            ? 'Student Operations Hub'
             : 'Explore Activities'}
         </h1>
         <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -442,6 +512,8 @@ export const ExploreActivitiesView: React.FC = () => {
             ? 'Manage vouchers, audit statements, inventory stock & allocation requests'
             : isDocLead
             ? 'Manage templates, verify media geotags, author daily bulletins & MoMs'
+            : isStudent
+            ? 'Digital student pass, duty checkpoints, event feedback & registration history'
             : 'Browse modules by category and jump straight into the task you need.'}
         </p>
       </div>
@@ -467,7 +539,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBg="#F5F3FF"
               iconBorder="#DDD6FE"
               iconColor="#6D28D9"
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsPostsStudioOpen(true)}
             />
 
             <ShortcutTile
@@ -476,7 +548,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBg="#EFF6FF"
               iconBorder="#BFDBFE"
               iconColor="#1D4ED8"
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsContentCalendarOpen(true)}
             />
 
             <ShortcutTile
@@ -485,7 +557,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBg="#FFF8E6"
               iconBorder="#FDE68A"
               iconColor="#92400E"
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsAiSuggestionsOpen(true)}
             />
 
             <ShortcutTile
@@ -507,7 +579,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBorder="#BFDBFE"
               accentColor="#2563EB"
               badge={`${campaigns.length} Plans`}
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsContentCalendarOpen(true)}
             />
 
             <ModuleTile
@@ -517,7 +589,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBorder="#DDD6FE"
               accentColor="#7C3AED"
               badge={`${posts.length} Posts`}
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsPostsStudioOpen(true)}
             />
 
             <ModuleTile
@@ -527,7 +599,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBorder="#FDE68A"
               accentColor="#D97706"
               badge="AI Social Studio"
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsAiSuggestionsOpen(true)}
             />
 
             <ModuleTile
@@ -537,7 +609,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBorder="#99F6E4"
               accentColor="#0D9488"
               badge={`${dailyNews.length} Bulletins`}
-              onClick={() => setActiveTab('campaigns')}
+              onClick={() => setIsDailyNewsOpen(true)}
             />
           </CategoryCard>
 
@@ -965,6 +1037,154 @@ export const ExploreActivitiesView: React.FC = () => {
             />
           </CategoryCard>
         </>
+      ) : isStudent ? (
+        /* =========================================================================
+           BRANCH: STUDENT VOLUNTEER OPERATIONS HUB
+           ========================================================================= */
+        <>
+          {/* Shortcuts (row of 4): My Pass, My Duties, Feedback, Forum */}
+          <div
+            className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+              maxWidth: '480px',
+              gap: '10px',
+            }}
+          >
+            <ShortcutTile
+              label="My Pass"
+              icon={<QrCode size={20} />}
+              iconBg="#F3EEFF"
+              iconBorder="#DDD1FF"
+              iconColor="#7C3AED"
+              onClick={() => setIsStudentPassOpen(true)}
+            />
+
+            <ShortcutTile
+              label="My Duties"
+              icon={<ListTodo size={20} />}
+              iconBg="#EFF6FF"
+              iconBorder="#BFDBFE"
+              iconColor="#2563EB"
+              badge={tasks.filter((t) => t.status !== 'done').length || undefined}
+              onClick={() => setIsStudentDutiesOpen(true)}
+            />
+
+            <ShortcutTile
+              label="Feedback"
+              icon={<Star size={20} />}
+              iconBg="#FFF8E6"
+              iconBorder="#FDE68A"
+              iconColor="#D97706"
+              onClick={() => setIsStudentFeedbackOpen(true)}
+            />
+
+            <ShortcutTile
+              label="Forum"
+              icon={<MessageSquare size={20} />}
+              iconBg="#E7F9F1"
+              iconBorder="#A7F3D0"
+              iconColor="#059669"
+              onClick={() => setActiveTab('forum')}
+            />
+          </div>
+
+          {/* Category 1: Gate & Pass (2 modules: My Pass, Gate Scanner) */}
+          <CategoryCard title="Gate & Pass" countBadge={2}>
+            <ModuleTile
+              title="My Pass"
+              icon={<QrCode size={20} />}
+              iconBg="#F3EEFF"
+              iconBorder="#DDD1FF"
+              accentColor="#7C3AED"
+              badge="Dynamic QR"
+              onClick={() => setIsStudentPassOpen(true)}
+            />
+
+            <ModuleTile
+              title="Gate Scanner"
+              icon={<Scan size={20} />}
+              iconBg="#EFF6FF"
+              iconBorder="#BFDBFE"
+              accentColor="#2563EB"
+              badge="Turnstile Gate"
+              onClick={() => {
+                const hasAttendanceDuty = tasks.some(
+                  (t) =>
+                    t.assigneeId === currentUser.uid &&
+                    (t.title.toLowerCase().includes('gate') ||
+                      t.title.toLowerCase().includes('scanner') ||
+                      t.title.toLowerCase().includes('attendance'))
+                );
+                if (hasAttendanceDuty) {
+                  setActiveTab('scan_qr');
+                } else {
+                  setIsGateScannerDutyWarningOpen(true);
+                }
+              }}
+            />
+          </CategoryCard>
+
+          {/* Category 2: Events & Duties (2 modules: My Duties, Registration History) */}
+          <CategoryCard title="Events & Duties" countBadge={2}>
+            <ModuleTile
+              title="My Duties"
+              icon={<ListTodo size={20} />}
+              iconBg="#EFF6FF"
+              iconBorder="#BFDBFE"
+              accentColor="#2563EB"
+              badge={`${tasks.filter((t) => t.status !== 'done').length} Pending`}
+              onClick={() => setIsStudentDutiesOpen(true)}
+            />
+
+            <ModuleTile
+              title="Registration History"
+              icon={<FileCheck size={20} />}
+              iconBg="#E8FBF8"
+              iconBorder="#99F6E4"
+              accentColor="#0D9488"
+              badge="3 Events"
+              onClick={() => setIsStudentRegHistoryOpen(true)}
+            />
+          </CategoryCard>
+
+          {/* Category 3: Community & Media (2 modules: Forum, Memories) */}
+          <CategoryCard title="Community & Media" countBadge={2}>
+            <ModuleTile
+              title="Forum (Discussions)"
+              icon={<MessageSquare size={20} />}
+              iconBg="#F5F3FF"
+              iconBorder="#DDD6FE"
+              accentColor="#7C3AED"
+              badge="Discussions"
+              onClick={() => setActiveTab('forum')}
+            />
+
+            <ModuleTile
+              title="Event Memories"
+              icon={<Images size={20} />}
+              iconBg="#FDF2F8"
+              iconBorder="#FBCFE8"
+              accentColor="#DB2777"
+              badge={`${gallery.length} Photos`}
+              onClick={() => setActiveTab('gallery')}
+            />
+          </CategoryCard>
+
+          {/* Category 4: Feedback (1 module: Event Feedback) */}
+          <CategoryCard title="Feedback" countBadge={1}>
+            <ModuleTile
+              title="Event Feedback"
+              icon={<Sparkles size={20} />}
+              iconBg="#E7F9F1"
+              iconBorder="#A7F3D0"
+              accentColor="#059669"
+              badge="Rate Experience"
+              onClick={() => setIsStudentFeedbackOpen(true)}
+            />
+          </CategoryCard>
+        </>
       ) : (
         /* =========================================================================
            BRANCH B: FACULTY & COORDINATOR OPERATIONS (EXISTING PRESERVED)
@@ -1105,7 +1325,7 @@ export const ExploreActivitiesView: React.FC = () => {
               iconBorder="#A7F3D0"
               accentColor="#059669"
               badge="4.9 / 5.0"
-              onClick={() => handleModuleClick('reports')}
+              onClick={() => setIsFeedbackSummaryOpen(true)}
             />
           </CategoryCard>
 
@@ -2804,6 +3024,1033 @@ export const ExploreActivitiesView: React.FC = () => {
               </div>
               <Download size={16} className="text-emerald-700" />
             </button>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* =========================================================================
+          PROMOTION LEAD MODAL: CONTENT CALENDAR & DROP PLANNER
+          ========================================================================= */}
+      <BottomSheet
+        isOpen={isContentCalendarOpen}
+        onClose={() => {
+          setIsContentCalendarOpen(false);
+          setIsScheduleDropOpen(false);
+        }}
+        title="Content Calendar & Drop Planner"
+        subtitle="Schedule, coordinate and drop media campaigns across chapter channels"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          {/* Header Action & Top Stats */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-bold text-slate-800">Weekly Drop Schedule</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                {posts.filter((p) => p.status === 'Scheduled').length + 3} Planned Drops
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsScheduleDropOpen(!isScheduleDropOpen)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer shadow-xs"
+            >
+              <Plus size={13} />
+              <span>{isScheduleDropOpen ? 'Close Composer' : 'Schedule Drop'}</span>
+            </button>
+          </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-3 gap-2 text-center p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Scheduled</span>
+              <span className="font-extrabold text-sm text-slate-900 font-mono">
+                {posts.filter((p) => p.status === 'Scheduled').length || 4}
+              </span>
+            </div>
+            <div className="border-x border-slate-200">
+              <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Next Drop</span>
+              <span className="font-extrabold text-xs text-blue-600 truncate block px-1">
+                Tomorrow 11 AM
+              </span>
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Channels</span>
+              <span className="font-extrabold text-xs text-emerald-700 block">
+                IG, LI, WA
+              </span>
+            </div>
+          </div>
+
+          {/* Interactive Week Days Strip (Mon to Sun) */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[11px] font-bold text-slate-600">Select Day to Filter</span>
+            <div className="grid grid-cols-7 gap-1">
+              {[
+                { day: 'Mon', num: 5, date: '2026-10-05', dots: ['#E1306C'] },
+                { day: 'Tue', num: 6, date: '2026-10-06', dots: ['#0A66C2', '#25D366'] },
+                { day: 'Wed', num: 7, date: '2026-10-07', dots: ['#E1306C'] },
+                { day: 'Thu', num: 8, date: '2026-10-08', dots: ['#E1306C', '#25D366'] },
+                { day: 'Fri', num: 9, date: '2026-10-09', dots: ['#0A66C2'] },
+                { day: 'Sat', num: 10, date: '2026-10-10', dots: ['#E1306C', '#0A66C2', '#25D366'] },
+                { day: 'Sun', num: 11, date: '2026-10-11', dots: ['#25D366'] },
+              ].map((d) => {
+                const isSelected = selectedCalendarDay === d.date;
+                return (
+                  <button
+                    key={d.date}
+                    type="button"
+                    onClick={() => setSelectedCalendarDay(isSelected ? 'All' : d.date)}
+                    className={`flex flex-col items-center justify-center p-1.5 rounded-xl border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-xs'
+                        : 'bg-white border-slate-100 hover:border-blue-200 text-slate-700'
+                    }`}
+                  >
+                    <span className="text-[9px] font-semibold uppercase">{d.day}</span>
+                    <span className="text-xs font-black">{d.num}</span>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {d.dots.map((dotColor, dotIdx) => (
+                        <span
+                          key={dotIdx}
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: isSelected ? '#FFFFFF' : dotColor }}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Platform Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+            {['All', 'Instagram', 'LinkedIn', 'WhatsApp'].map((platform) => (
+              <button
+                key={platform}
+                type="button"
+                onClick={() => setCalendarFilterPlatform(platform)}
+                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer shrink-0 ${
+                  calendarFilterPlatform === platform
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {platform}
+              </button>
+            ))}
+          </div>
+
+          {/* Schedule Drop Collapsible Composer */}
+          {isScheduleDropOpen && (
+            <div className="p-3.5 rounded-2xl bg-blue-50/50 border border-blue-200 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold text-blue-950">Schedule New Social Drop</span>
+                <span className="text-[10px] text-blue-700 font-bold bg-blue-100/60 px-2 py-0.5 rounded-md">
+                  Auto-publish sync
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Target Event</label>
+                <select
+                  value={dropEventId}
+                  onChange={(e) => setDropEventId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-blue-500 outline-none"
+                >
+                  {events.map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Platform</label>
+                  <select
+                    value={dropPlatform}
+                    onChange={(e) => setDropPlatform(e.target.value as SocialPlatform)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-blue-500 outline-none"
+                  >
+                    <option value="Instagram">Instagram (Reel/Post)</option>
+                    <option value="LinkedIn">LinkedIn (Article)</option>
+                    <option value="WhatsApp">WhatsApp (Channel)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Drop Date</label>
+                  <input
+                    type="date"
+                    value={dropDate}
+                    onChange={(e) => setDropDate(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Post Caption & Hook</label>
+                <textarea
+                  rows={2}
+                  value={dropCaption}
+                  onChange={(e) => setDropCaption(e.target.value)}
+                  placeholder="Catchy hook, event teaser, registration CTA and hashtags..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-blue-500 outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Media URL (Poster/Video)</label>
+                <input
+                  type="url"
+                  value={dropMediaUrl}
+                  onChange={(e) => setDropMediaUrl(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-blue-500 outline-none"
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!dropCaption.trim()) {
+                    showToast('Please enter a caption');
+                    return;
+                  }
+                  const targetEvent = events.find((ev) => ev.id === dropEventId);
+                  addPost({
+                    eventId: dropEventId,
+                    eventTitle: targetEvent?.title || 'Chapter Event',
+                    platform: dropPlatform,
+                    status: 'Scheduled',
+                    caption: dropCaption,
+                    scheduledDate: dropDate,
+                    scheduledTime: dropTime,
+                    mediaUrl: dropMediaUrl,
+                    authorName: currentUser.name,
+                    hashtags: ['#GeoHub', '#CollegeGeoClub', '#GIS'],
+                  });
+                  showToast(`✓ Scheduled drop for ${dropPlatform} on ${dropDate}!`);
+                  setDropCaption('');
+                  setIsScheduleDropOpen(false);
+                }}
+                className="w-full py-2.5 rounded-full font-bold text-xs bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer shadow-xs mt-1"
+              >
+                Confirm & Add to Calendar
+              </button>
+            </div>
+          )}
+
+          {/* Scheduled Drops Timeline List */}
+          <div className="flex flex-col gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+            {posts
+              .filter((p) => {
+                if (calendarFilterPlatform !== 'All' && p.platform !== calendarFilterPlatform) return false;
+                if (selectedCalendarDay !== 'All' && p.scheduledDate && p.scheduledDate !== selectedCalendarDay) return false;
+                return true;
+              })
+              .map((post) => {
+                const isIG = post.platform === 'Instagram';
+                const isLI = post.platform === 'LinkedIn';
+
+                return (
+                  <div
+                    key={post.id}
+                    className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full border ${
+                            isIG
+                              ? 'bg-rose-50 text-rose-700 border-rose-200'
+                              : isLI
+                              ? 'bg-blue-50 text-blue-700 border-blue-200'
+                              : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          }`}
+                        >
+                          {post.platform}
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500">
+                          {post.scheduledDate ? `${post.scheduledDate} • ${post.scheduledTime || '11:00 AM'}` : 'Scheduled for Drop'}
+                        </span>
+                      </div>
+
+                      <span
+                        className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                          post.status === 'Posted'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-purple-100 text-purple-800'
+                        }`}
+                      >
+                        {post.status}
+                      </span>
+                    </div>
+
+                    <div className="text-xs font-semibold text-slate-800 leading-snug">
+                      {post.caption}
+                    </div>
+
+                    {post.eventTitle && (
+                      <div className="text-[10px] font-bold text-blue-600">
+                        Campaign: {post.eventTitle}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        Est. Reach: ~{post.platform === 'Instagram' ? '18,500' : post.platform === 'LinkedIn' ? '8,200' : '4,500'} scholars
+                      </span>
+
+                      <div className="flex items-center gap-2">
+                        {post.status !== 'Posted' ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              markPostPublished(post.id, 'https://instagram.com/p/geohub_live');
+                              showToast(`✓ Dropped "${post.platform}" post live to feed!`);
+                            }}
+                            className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs transition-colors cursor-pointer"
+                          >
+                            🚀 Drop Now
+                          </button>
+                        ) : (
+                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                            Live on Feed ✓
+                          </span>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            deletePost(post.id);
+                            showToast('Removed from schedule');
+                          }}
+                          className="p-1 rounded-md text-slate-400 hover:text-rose-600 transition-colors"
+                          title="Delete Post"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* =========================================================================
+          PROMOTION LEAD MODAL: POSTS STUDIO & SOCIAL HUB
+          ========================================================================= */}
+      <BottomSheet
+        isOpen={isPostsStudioOpen}
+        onClose={() => {
+          setIsPostsStudioOpen(false);
+          setIsNewPostDrawerOpen(false);
+        }}
+        title="Posts Studio & Social Hub"
+        subtitle={`${posts.length} Total social posts cataloged across Instagram, LinkedIn & WhatsApp`}
+      >
+        <div className="flex flex-col gap-3 py-1">
+          {/* Header Action & Filter Bar */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+              {(['All', 'Scheduled', 'Draft', 'Posted'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setPostsFilterTab(tab)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    postsFilterTab === tab
+                      ? 'bg-purple-700 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {tab === 'Posted' ? 'Published' : tab}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsNewPostDrawerOpen(!isNewPostDrawerOpen)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-purple-700 text-white hover:bg-purple-800 transition-all cursor-pointer shadow-xs shrink-0"
+            >
+              <Plus size={13} />
+              <span>{isNewPostDrawerOpen ? 'Close' : 'New Post'}</span>
+            </button>
+          </div>
+
+          {/* New Post Drawer */}
+          {isNewPostDrawerOpen && (
+            <div className="p-3.5 rounded-2xl bg-purple-50/50 border border-purple-200 flex flex-col gap-2.5">
+              <span className="text-xs font-extrabold text-purple-950">Compose Social Broadcast</span>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Platform</label>
+                  <select
+                    value={newPostPlatform}
+                    onChange={(e) => setNewPostPlatform(e.target.value as SocialPlatform)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-purple-500 outline-none"
+                  >
+                    <option value="Instagram">Instagram</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">Status</label>
+                  <select
+                    value={newPostStatus}
+                    onChange={(e) => setNewPostStatus(e.target.value as SocialPostStatus)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-purple-500 outline-none"
+                  >
+                    <option value="Draft">Save as Draft</option>
+                    <option value="Scheduled">Schedule Drop</option>
+                    <option value="Posted">Publish Now</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Caption</label>
+                <textarea
+                  rows={3}
+                  value={newPostCaption}
+                  onChange={(e) => setNewPostCaption(e.target.value)}
+                  placeholder="Post copy with hashtags and registration links..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-purple-500 outline-none resize-none leading-relaxed"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!newPostCaption.trim()) {
+                    showToast('Please enter post text');
+                    return;
+                  }
+                  const targetEvent = events.find((ev) => ev.id === newPostEventId);
+                  addPost({
+                    eventId: newPostEventId,
+                    eventTitle: targetEvent?.title || 'Chapter Event',
+                    platform: newPostPlatform,
+                    status: newPostStatus,
+                    caption: newPostCaption,
+                    authorName: currentUser.name,
+                    hashtags: ['#GeoHub', '#CampusInnovation', '#Geoinformatics'],
+                    publishedDate: newPostStatus === 'Posted' ? new Date().toISOString().split('T')[0] : undefined,
+                  });
+                  showToast(`✓ Post created for ${newPostPlatform}!`);
+                  setNewPostCaption('');
+                  setIsNewPostDrawerOpen(false);
+                }}
+                className="w-full py-2.5 rounded-full font-bold text-xs bg-purple-700 text-white hover:bg-purple-800 transition-all cursor-pointer shadow-xs"
+              >
+                Create & Publish Post
+              </button>
+            </div>
+          )}
+
+          {/* Posts List */}
+          <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+            {posts
+              .filter((p) => {
+                if (postsFilterTab === 'All') return true;
+                return p.status === postsFilterTab;
+              })
+              .map((post) => (
+                <div
+                  key={post.id}
+                  className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-800 border border-slate-200">
+                        {post.platform}
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        By {post.authorName || 'Promotion Squad'}
+                      </span>
+                    </div>
+
+                    <span
+                      className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        post.status === 'Posted'
+                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                          : post.status === 'Scheduled'
+                          ? 'bg-purple-50 text-purple-800 border border-purple-200'
+                          : 'bg-amber-50 text-amber-800 border border-amber-200'
+                      }`}
+                    >
+                      {post.status}
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-medium text-slate-800 leading-relaxed whitespace-pre-wrap">
+                    {post.caption}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+                    <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+                      <span className="flex items-center gap-1">
+                        <ThumbsUp size={12} />
+                        <span>{post.likesCount || 142}</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye size={12} />
+                        <span>{post.reachCount || 1850}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {post.status !== 'Posted' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            markPostPublished(post.id);
+                            showToast(`✓ Published post to ${post.platform}!`);
+                          }}
+                          className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs transition-colors"
+                        >
+                          Publish Now
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          deletePost(post.id);
+                          showToast('Post removed');
+                        }}
+                        className="p-1 rounded-md text-slate-400 hover:text-rose-600 transition-colors"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* =========================================================================
+          PROMOTION LEAD MODAL: AI SUGGESTIONS & SOCIAL STUDIO
+          ========================================================================= */}
+      <BottomSheet
+        isOpen={isAiSuggestionsOpen}
+        onClose={() => setIsAiSuggestionsOpen(false)}
+        title="AI Social Studio & Caption Generator"
+        subtitle="Generate viral hooks, captions and registration calls powered by GeoHub AI"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          {/* Controls */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Target Event</label>
+            <select
+              value={aiEventId}
+              onChange={(e) => setAiEventId(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-amber-500 outline-none"
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">Channel Format</label>
+              <select
+                value={aiPlatform}
+                onChange={(e) => setAiPlatform(e.target.value as any)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-amber-500 outline-none"
+              >
+                <option value="Instagram">Instagram Reel & Carousel</option>
+                <option value="LinkedIn">LinkedIn Executive Article</option>
+                <option value="WhatsApp">WhatsApp Broadcast Alert</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">Tone & Voice</label>
+              <select
+                value={aiTone}
+                onChange={(e) => setAiTone(e.target.value as any)}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-amber-500 outline-none"
+              >
+                <option value="viral">Viral & High-Energy</option>
+                <option value="official">Official & Academic</option>
+                <option value="urgent">Urgent Final 24h</option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            disabled={isAiGenerating}
+            onClick={() => {
+              setIsAiGenerating(true);
+              setTimeout(() => {
+                setIsAiGenerating(false);
+                showToast('✨ Generated 3 tailored social drafts!');
+              }, 700);
+            }}
+            className="w-full py-3 rounded-full font-bold text-xs bg-amber-500 text-slate-950 hover:bg-amber-400 transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5"
+          >
+            <Sparkles size={14} className={isAiGenerating ? 'animate-spin' : ''} />
+            <span>{isAiGenerating ? 'Analyzing event parameters...' : '✨ Generate AI Social Drafts'}</span>
+          </button>
+
+          {/* Generated AI Draft Cards */}
+          <div className="flex flex-col gap-2.5 max-h-[360px] overflow-y-auto pr-1">
+            {[
+              {
+                title: 'Option A: Viral Hook & Reel Caption',
+                caption: `Ready to see campus from 400ft above? 🛰️🦅\n\nJoin the College Geo Club for an immersive hands-on expedition! Learn drone canopy mapping, real-time telemetry and aerial orthomosaic imaging.\n\n📍 Venue: Grand Auditorium\n📅 Date: Tomorrow @ 10:00 AM\n🎟️ Seats filling fast!\n\n#GeoHub #CampusDrones #Geoinformatics #TechSymposium #CollegeGeoClub`,
+                match: '98% Engagement Match',
+              },
+              {
+                title: 'Option B: Official Academic Announcement',
+                caption: `ANNOUNCEMENT: Registration is formally open for the Chapter Technical Workshop on Satellite Remote Sensing & QGIS.\n\nOpen to all engineering and earth sciences scholars. Certified credentials issued upon turnstile attendance validation.\n\nRegister via your GeoHub student pass today.\n\n#GeoHub #GeospatialScience #AcademicConclave`,
+                match: '94% Professional Score',
+              },
+              {
+                title: 'Option C: Urgent 24-Hour Countdown',
+                caption: `⏳ ONLY 15 SEATS LEFT! Final call for turnstile registration.\n\nDon't miss the flagship symposium of the semester. Secure your spot before the portal locks at 6:00 PM!\n\n👉 Tap link in bio to register with your student QR pass.\n\n#GeoHub #LastChance #CampusFest`,
+                match: '96% Urgency Index',
+              },
+            ].map((draft, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-xs text-slate-900">{draft.title}</span>
+                  <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                    {draft.match}
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-700 leading-relaxed font-mono whitespace-pre-wrap">
+                  {draft.caption}
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(draft.caption);
+                      showToast('✓ AI caption copied to clipboard!');
+                    }}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                  >
+                    <Copy size={12} />
+                    <span>Copy</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addPost({
+                        eventId: aiEventId,
+                        eventTitle: events.find((e) => e.id === aiEventId)?.title || 'Chapter Event',
+                        platform: aiPlatform,
+                        status: 'Scheduled',
+                        caption: draft.caption,
+                        authorName: `${currentUser.name} (AI Studio)`,
+                        scheduledDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+                        scheduledTime: '11:00',
+                      });
+                      showToast('✓ Draft sent to Content Calendar!');
+                      setIsAiSuggestionsOpen(false);
+                      setIsContentCalendarOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full font-bold text-xs bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-2xs"
+                  >
+                    <Calendar size={12} />
+                    <span>Send to Content Calendar</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* =========================================================================
+          STUDENT VOLUNTEER MODALS
+          ========================================================================= */}
+      {/* 1. Digital Student Pass Modal */}
+      <BottomSheet
+        isOpen={isStudentPassOpen}
+        onClose={() => setIsStudentPassOpen(false)}
+        title="Digital Student Pass"
+        subtitle="Turnstile gate barcode with live 30-second rotating security token"
+      >
+        <div className="flex flex-col items-center gap-4 py-2 text-center">
+          <div className="p-4 rounded-3xl bg-slate-900 text-white flex flex-col items-center gap-3 shadow-xl max-w-xs w-full">
+            <div className="flex items-center justify-between w-full border-b border-slate-800 pb-2">
+              <span className="text-[10px] font-extrabold tracking-wider uppercase text-emerald-400">
+                Official GeoHub Pass
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">AY 2026-2027</span>
+            </div>
+
+            {/* QR Code Container */}
+            <div className="p-4 rounded-2xl bg-white shadow-inner flex items-center justify-center">
+              <QrCode size={180} className="text-slate-950" />
+            </div>
+
+            <div className="flex flex-col gap-0.5">
+              <span className="font-extrabold text-base text-white tracking-tight">{currentUser.name}</span>
+              <span className="text-xs text-slate-400">
+                {currentUser.department || 'Geoinformatics'} • {currentUser.yearOfStudy || '3rd Year'}
+              </span>
+              <span className="text-[10px] font-mono text-emerald-400 mt-1">ID: #GEO-2026-8841</span>
+            </div>
+
+            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden mt-1">
+              <div className="bg-emerald-500 h-full w-3/4 animate-pulse" />
+            </div>
+            <span className="text-[9px] text-slate-400">Token refreshes automatically in 18s</span>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+            <span>Active & cleared for turnstile entry at all campus venues & workshops.</span>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* 2. Student Duties Modal */}
+      <BottomSheet
+        isOpen={isStudentDutiesOpen}
+        onClose={() => setIsStudentDutiesOpen(false)}
+        title="My Volunteer Duties"
+        subtitle="Chapter tasks, gate responsibilities and volunteer duty roster"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-slate-700">Assigned Responsibilities</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              3 Checkpoints
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+            {[
+              {
+                id: 'duty_01',
+                title: 'Turnstile Gate Scanner - Entry Concourse',
+                event: 'QGIS & Remote Sensing Workshop',
+                due: 'Today @ 02:00 PM',
+                status: 'pending',
+                venue: 'Grand Auditorium Gate B',
+              },
+              {
+                id: 'duty_02',
+                title: 'Delegate Kit & Badge Distribution Desk',
+                event: 'GEO FEST 2026 Flagship Conclave',
+                due: 'Oct 12 @ 09:30 AM',
+                status: 'pending',
+                venue: 'Innovation Hub Lobby',
+              },
+              {
+                id: 'duty_03',
+                title: 'Aerial Drone Flight Corridor Clearance',
+                event: 'Biodiversity Drone Mapping Survey',
+                due: 'Oct 18 @ 07:00 AM',
+                status: 'pending',
+                venue: 'Campus Zone B Canopy',
+              },
+            ].map((duty) => (
+              <div
+                key={duty.id}
+                className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-2"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-xs text-slate-900">{duty.title}</span>
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+                    Pending
+                  </span>
+                </div>
+
+                <div className="text-[11px] text-slate-600">
+                  <strong>Event:</strong> {duty.event}<br />
+                  <strong>Venue:</strong> {duty.venue}<br />
+                  <strong>Reporting Time:</strong> {duty.due}
+                </div>
+
+                <div className="flex items-center justify-end pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      showToast(`✓ Marked "${duty.title}" completed! Logged 2 volunteer hours.`);
+                    }}
+                    className="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-2xs transition-colors"
+                  >
+                    Mark Complete ✓
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* 3. Student Registration History Modal */}
+      <BottomSheet
+        isOpen={isStudentRegHistoryOpen}
+        onClose={() => setIsStudentRegHistoryOpen(false)}
+        title="Registration & Event Ledger"
+        subtitle="Record of registered sessions, attended workshops and digital certificates"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          <div className="flex flex-col gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+            {[
+              {
+                title: 'QGIS & Satellite Remote Sensing Workshop',
+                date: 'Today, Oct 5, 2026',
+                venue: 'Grand Auditorium',
+                status: 'Registered • Pass Active',
+                badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+              },
+              {
+                title: 'Drone Aerial Mapping & Photogrammetry',
+                date: 'Sep 24, 2026',
+                venue: 'Aero Lab Corridor',
+                status: 'Attended ✓ (Certificate Issued)',
+                badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+              },
+              {
+                title: 'Introductory Cartography & GIS Hackathon',
+                date: 'Aug 18, 2026',
+                venue: 'Tech Innovation Hall',
+                status: 'Attended ✓ (Certificate Issued)',
+                badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+              },
+            ].map((reg, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-1.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-xs text-slate-900">{reg.title}</span>
+                  <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${reg.badgeBg}`}>
+                    {reg.status}
+                  </span>
+                </div>
+                <span className="text-[11px] text-slate-500">
+                  {reg.date} • {reg.venue}
+                </span>
+                <div className="flex items-center justify-end gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      showToast('✓ Opened certificate download dialog');
+                    }}
+                    className="text-xs font-bold text-emerald-700 hover:underline"
+                  >
+                    Download Certificate →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* 4. Student Feedback Modal */}
+      <BottomSheet
+        isOpen={isStudentFeedbackOpen}
+        onClose={() => setIsStudentFeedbackOpen(false)}
+        title="Share Event Feedback"
+        subtitle="Rate completed workshops and suggest improvements for the chapter"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            showToast('✓ Thank you! Your verified event feedback has been recorded.');
+            setIsStudentFeedbackOpen(false);
+            setStudentFeedbackComment('');
+          }}
+          className="flex flex-col gap-3 py-1"
+        >
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Select Event to Review</label>
+            <select
+              value={studentFeedbackEventId}
+              onChange={(e) => setStudentFeedbackEventId(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-emerald-500 outline-none"
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Rating</label>
+            <div className="flex items-center gap-2 py-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setStudentFeedbackRating(star)}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${
+                    studentFeedbackRating >= star
+                      ? 'bg-amber-100 text-amber-600 scale-105'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
+                  <Star size={20} fill={studentFeedbackRating >= star ? 'currentColor' : 'none'} />
+                </button>
+              ))}
+              <span className="text-xs font-extrabold text-slate-800 ml-2 font-mono">
+                {studentFeedbackRating} / 5 Stars
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
+            <select
+              value={studentFeedbackCategory}
+              onChange={(e) => setStudentFeedbackCategory(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-emerald-500 outline-none"
+            >
+              <option value="Workshop Quality">Workshop Content & Speaker Quality</option>
+              <option value="Logistics & Venue">Logistics, Audio/Visual & Venue</option>
+              <option value="Turnstile Check-in">Gate Entry & Turnstile Experience</option>
+              <option value="Materials">Hands-on Exercises & Software Datasets</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Your Comments & Suggestions</label>
+            <textarea
+              rows={3}
+              required
+              value={studentFeedbackComment}
+              onChange={(e) => setStudentFeedbackComment(e.target.value)}
+              placeholder="What did you enjoy most? What can the GeoHub committee improve?"
+              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-emerald-500 outline-none resize-none leading-relaxed"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 transition-all cursor-pointer shadow-xs mt-1"
+          >
+            Submit Event Feedback
+          </button>
+        </form>
+      </BottomSheet>
+
+      {/* Gate Scanner Warning Dialog for Students */}
+      <ConfirmDialog
+        isOpen={isGateScannerDutyWarningOpen}
+        onClose={() => setIsGateScannerDutyWarningOpen(false)}
+        onConfirm={() => setIsGateScannerDutyWarningOpen(false)}
+        title="Attendance Duty Required"
+        message="The Turnstile Gate Scanner is reserved for student volunteers who hold active turnstile check-in duties for the ongoing session. If you need duty clearance, speak with your Squad Lead or Faculty Advisor."
+        confirmLabel="Understood"
+      />
+
+      {/* =========================================================================
+          FACULTY & COORDINATOR MODAL: EXECUTIVE FEEDBACK SUMMARY
+          ========================================================================= */}
+      <BottomSheet
+        isOpen={isFeedbackSummaryOpen}
+        onClose={() => setIsFeedbackSummaryOpen(false)}
+        title="Executive Event Feedback Summary"
+        subtitle="Chapter-wide participant ratings, sentiment analysis and attendee reviews"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          {/* Top Score Box */}
+          <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
+                Overall Chapter Satisfaction
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-2xl font-black text-emerald-950 font-mono">4.9</span>
+                <div className="flex items-center text-amber-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={15} fill="currentColor" />
+                  ))}
+                </div>
+              </div>
+              <span className="text-[10px] text-emerald-700 font-medium">From 420 verified participant reviews</span>
+            </div>
+
+            <div className="text-right">
+              <span className="text-xs font-bold text-emerald-900 block font-mono">96% Positive</span>
+              <span className="text-[10px] text-emerald-700">Sentiment score</span>
+            </div>
+          </div>
+
+          {/* Rating Breakdown */}
+          <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+            <span className="text-xs font-bold text-slate-700 mb-1">Rating Distribution</span>
+            {[
+              { stars: 5, pct: 82 },
+              { stars: 4, pct: 14 },
+              { stars: 3, pct: 4 },
+            ].map((r) => (
+              <div key={r.stars} className="flex items-center gap-2 text-xs">
+                <span className="w-10 font-bold text-slate-600">{r.stars} ★</span>
+                <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${r.pct}%` }} />
+                </div>
+                <span className="w-10 font-mono text-right text-slate-500">{r.pct}%</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Recent Attendee Testimonials */}
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-slate-700">Recent Scholar Testimonials</span>
+            {[
+              {
+                name: 'Kavita Sundaram',
+                dept: 'Remote Sensing • 3rd Year',
+                event: 'QGIS Workshop',
+                comment: 'The live drone telemetry stream during the session was incredible! Turnstile QR check-in took 2 seconds.',
+              },
+              {
+                name: 'Rohan Mehra',
+                dept: 'Civil & Cartography • 2nd Year',
+                event: 'GEO FEST 2026',
+                comment: 'Super organized event, amazing datasets provided for the mapping challenge. 5 stars all the way!',
+              },
+            ].map((quote, idx) => (
+              <div key={idx} className="p-3 rounded-2xl bg-white border border-slate-100 shadow-2xs flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-extrabold text-xs text-slate-900">{quote.name}</span>
+                  <div className="flex items-center text-amber-500">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={11} fill="currentColor" />
+                    ))}
+                  </div>
+                </div>
+                <span className="text-[10px] text-slate-400">
+                  {quote.dept} • {quote.event}
+                </span>
+                <p className="text-xs text-slate-700 italic mt-0.5">"{quote.comment}"</p>
+              </div>
+            ))}
           </div>
         </div>
       </BottomSheet>

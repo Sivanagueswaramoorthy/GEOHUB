@@ -30,6 +30,7 @@ import {
 } from '../../data/mockData';
 import { AppAvatar } from '../../components/common/AppAvatar';
 import { Modal } from '../../components/common/Modal';
+import { ForgotPasswordModal } from '../../components/auth/ForgotPasswordModal';
 
 // Official 4-color Google G icon SVG
 const GoogleGIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
@@ -61,6 +62,7 @@ export const LoginView: React.FC = () => {
   const [password, setPassword] = useState('••••••••••••');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
   // Google Modal State
   const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
@@ -682,7 +684,10 @@ export const LoginView: React.FC = () => {
               <div className="input-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label className="input-label">Password</label>
-                  <span style={{ fontSize: '12px', color: '#0F766E', fontWeight: 600, cursor: 'pointer' }}>
+                  <span
+                    onClick={() => setIsForgotPasswordOpen(true)}
+                    style={{ fontSize: '12px', color: '#0F766E', fontWeight: 600, cursor: 'pointer' }}
+                  >
                     Forgot?
                   </span>
                 </div>
@@ -861,6 +866,13 @@ export const LoginView: React.FC = () => {
           </form>
         )}
       </Modal>
+
+      {/* Forgot Password BottomSheet Modal */}
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={() => setIsForgotPasswordOpen(false)}
+        defaultEmail={email}
+      />
     </div>
   );
 };

@@ -34,6 +34,8 @@ import { DocumentationStudioView } from './views/docs/DocumentationStudioView';
 import { AiSocialStudioView } from './views/social/AiSocialStudioView';
 import { CampaignsView } from './views/campaigns/CampaignsView';
 import { NotificationsView } from './views/notifications/NotificationsView';
+import { PendingApprovalView } from './views/auth/PendingApprovalView';
+import { NotFoundView } from './views/auth/NotFoundView';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -50,6 +52,10 @@ const MainAppContent: React.FC = () => {
 
   if (!isAuthenticated || activeTab === 'login') {
     return <LoginView />;
+  }
+
+  if (currentUser?.status === 'pending' || activeTab === 'pending-approval') {
+    return <PendingApprovalView />;
   }
 
   const navTabs = getRoleNavTabs(currentUser.role, currentUser.post);
@@ -175,7 +181,7 @@ const MainAppContent: React.FC = () => {
         return <NotificationsView />;
 
       default:
-        return <HomeView />;
+        return <NotFoundView attemptedRoute={activeTab} onGoHome={() => setActiveTab('home')} />;
     }
   };
 

@@ -18,6 +18,8 @@ import {
   Send,
   Sparkles,
   Copy,
+  QrCode,
+  Star,
 } from 'lucide-react';
 import { BottomSheet } from './BottomSheet';
 import { useApp } from '../context/AppContext';
@@ -51,6 +53,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
     users,
     currentUser,
     setActiveTab,
+    registerForEvent,
   } = useApp();
 
   const perms = getRolePermissions(currentUser.role);
@@ -61,6 +64,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
     currentUser.role === 'social_media' ||
     (currentUser.role === 'team_admin' && (currentUser.team === 'Promotion' || Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
+  const isStudent = currentUser.role === 'member';
 
   const [activeModalAction, setActiveModalAction] = useState<
     | 'event'
@@ -77,10 +81,18 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
     | 'promo_post'
     | 'promo_campaign'
     | 'promo_ai_draft'
+    | 'student_register'
+    | 'student_feedback'
     | null
   >(null);
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Student Quick Action Form State
+  const [studentRegEventId, setStudentRegEventId] = useState(events[0]?.id || '');
+  const [studentFeedbackEventId, setStudentFeedbackEventId] = useState(events[0]?.id || '');
+  const [studentFeedbackRating, setStudentFeedbackRating] = useState(5);
+  const [studentFeedbackComment, setStudentFeedbackComment] = useState('');
 
   // Form States (Faculty/Coordinator)
   const [eventTitle, setEventTitle] = useState('');
@@ -222,6 +234,16 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
         break;
       case 'add_student':
         setActiveModalAction('student');
+        break;
+      case 'student_pass':
+        onClose();
+        setActiveTab('my_qr');
+        break;
+      case 'student_register':
+        setActiveModalAction('student_register');
+        break;
+      case 'student_feedback':
+        setActiveModalAction('student_feedback');
         break;
       default:
         setActiveTab(actionKey);
@@ -701,12 +723,44 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
     },
   ].filter((act) => act.key !== 'assign_post' || perms.canAssignPosts);
 
+  const studentActions = [
+    {
+      key: 'student_pass',
+      title: 'Show My Pass',
+      desc: 'Dynamic 30-second turnstile QR pass',
+      icon: <QrCode size={22} />,
+      bg: '#F3EEFF',
+      border: '#DDD1FF',
+      color: '#7C3AED',
+    },
+    {
+      key: 'student_register',
+      title: 'Register for Event',
+      desc: 'One-tap enrollment for upcoming workshops',
+      icon: <CalendarPlus size={22} />,
+      bg: '#E7F9F1',
+      border: '#A7F3D0',
+      color: '#065F46',
+    },
+    {
+      key: 'student_feedback',
+      title: 'Give Feedback',
+      desc: 'Rate completed workshops & sessions',
+      icon: <Sparkles size={22} />,
+      bg: '#FFF8E6',
+      border: '#FDE68A',
+      color: '#92400E',
+    },
+  ];
+
   const actions = isPromotion
     ? promoActions
     : isTreasurer
     ? treasurerActions
     : isDocLead
     ? docActions
+    : isStudent
+    ? studentActions
     : facultyCoordActions;
 
   return (
@@ -729,6 +783,8 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
             ? 'Treasurer Quick Actions'
             : isDocLead
             ? 'Documentation Quick Actions'
+            : isStudent
+            ? 'Student Volunteer Actions'
             : isFaculty
             ? 'Faculty Quick Actions'
             : 'Coordinator Quick Actions'
@@ -740,6 +796,8 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
             ? `Fiscal management, vouchers and inventory shortcuts for ${currentUser.name}`
             : isDocLead
             ? `Archival, report authoring and media actions for ${currentUser.name}`
+            : isStudent
+            ? `Turnstile pass, event enrollment & feedback for ${currentUser.name}`
             : isFaculty
             ? 'Executive management shortcuts for Dr. Sarah Jenkins'
             : `Executive management shortcuts for ${currentUser.name}`
@@ -1840,6 +1898,132 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
             </div>
           )}
         </div>
+      </BottomSheet>
+
+      {/* Student Modal 1: Register for Event */}
+      <BottomSheet
+        isOpen={activeModalAction === 'student_register'}
+        onClose={() => setActiveModalAction(null)}
+        title="One-Tap Event Registration"
+        subtitle="Enroll for upcoming chapter workshops with your digital student pass"
+      >
+        <div className="flex flex-col gap-3 py-1">
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Select Event</label>
+            <select
+              value={studentRegEventId}
+              onChange={(e) => setStudentRegEventId(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-emerald-500 outline-none"
+            >
+              {events
+                .filter((ev) => ev.status !== 'completed' && ev.status !== 'cancelled')
+                .map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} ({ev.venue})
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs text-emerald-950 flex flex-col gap-1">
+            <span className="font-extrabold text-emerald-900">
+              Verified Turnstile Access:
+            </span>
+            <span>
+              Your digital student pass (ID: #GEO-2026-8841) will automatically clear the gate scanners for this session.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              registerForEvent(studentRegEventId);
+              showToast('✓ Successfully registered! Turnstile pass active.');
+              setActiveModalAction(null);
+              onClose();
+              setActiveTab('events');
+            }}
+            className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 transition-all cursor-pointer shadow-xs mt-1"
+          >
+            Confirm Event Registration
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Student Modal 2: Event Feedback */}
+      <BottomSheet
+        isOpen={activeModalAction === 'student_feedback'}
+        onClose={() => setActiveModalAction(null)}
+        title="Submit Event Feedback"
+        subtitle="Rate sessions and share feedback with the club executive committee"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            showToast('✓ Thank you! Your feedback has been recorded.');
+            setActiveModalAction(null);
+            onClose();
+            setStudentFeedbackComment('');
+          }}
+          className="flex flex-col gap-3 py-1"
+        >
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Event</label>
+            <select
+              value={studentFeedbackEventId}
+              onChange={(e) => setStudentFeedbackEventId(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold bg-white focus:border-emerald-500 outline-none"
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Rating</label>
+            <div className="flex items-center gap-2 py-1">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStudentFeedbackRating(s)}
+                  className={`p-2 rounded-xl transition-all cursor-pointer ${
+                    studentFeedbackRating >= s
+                      ? 'bg-amber-100 text-amber-600'
+                      : 'bg-slate-100 text-slate-400'
+                  }`}
+                >
+                  <Star size={18} fill={studentFeedbackRating >= s ? 'currentColor' : 'none'} />
+                </button>
+              ))}
+              <span className="text-xs font-extrabold text-slate-800 ml-1 font-mono">
+                {studentFeedbackRating} Stars
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Comments</label>
+            <textarea
+              rows={3}
+              required
+              value={studentFeedbackComment}
+              onChange={(e) => setStudentFeedbackComment(e.target.value)}
+              placeholder="What went well? Any suggestions for next time?"
+              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:border-emerald-500 outline-none resize-none leading-relaxed"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 transition-all cursor-pointer shadow-xs mt-1"
+          >
+            Submit Feedback
+          </button>
+        </form>
       </BottomSheet>
     </>
   );

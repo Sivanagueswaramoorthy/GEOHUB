@@ -27,34 +27,83 @@ export const ModuleTile: React.FC<ModuleTileProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`relative overflow-hidden flex flex-col justify-between p-4 rounded-[20px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer group transition-all duration-150 hover:border-[#10B981] hover:scale-[1.01] ${className}`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={`relative overflow-hidden flex flex-col justify-between p-4 sm:p-[18px] rounded-[22px] bg-white border border-[#E2E8F0] shadow-[0_2px_12px_rgba(15,23,42,0.03)] cursor-pointer group transition-all duration-200 hover:border-slate-300 hover:shadow-[0_8px_24px_rgba(15,23,42,0.07)] hover:scale-[1.015] active:scale-[0.985] text-left select-none ${className}`}
       style={{
-        minHeight: '132px',
+        aspectRatio: '1 / 0.95',
+        minHeight: '144px',
         ...style,
       }}
     >
-      {/* Faint concentric-circle decoration in the top-right corner */}
+      {/* Decorative radiating arcs emanating from behind the top-left icon */}
       <div
-        className="absolute -top-6 -right-6 pointer-events-none opacity-40"
-        style={{ width: '80px', height: '80px' }}
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        style={{ zIndex: 0 }}
       >
-        <svg viewBox="0 0 80 80" fill="none">
-          <circle cx="80" cy="0" r="70" stroke={accentColor} strokeWidth="1" strokeDasharray="2 3" opacity="0.4" />
-          <circle cx="80" cy="0" r="50" stroke={accentColor} strokeWidth="1" opacity="0.3" />
-          <circle cx="80" cy="0" r="30" stroke={accentColor} strokeWidth="1.2" opacity="0.5" />
+        <svg
+          className="w-full h-full"
+          viewBox="0 0 160 144"
+          fill="none"
+          preserveAspectRatio="none"
+        >
+          {/* Inner solid arc brushing outer edge of icon box */}
+          <circle
+            cx="38"
+            cy="40"
+            r="44"
+            stroke={accentColor}
+            strokeWidth="1.2"
+            opacity="0.38"
+          />
+          {/* Middle solid arc curving towards badge */}
+          <circle
+            cx="38"
+            cy="40"
+            r="70"
+            stroke={accentColor}
+            strokeWidth="1.2"
+            opacity="0.32"
+          />
+          {/* Prominent dashed ripple curving behind title */}
+          <circle
+            cx="38"
+            cy="40"
+            r="98"
+            stroke={accentColor}
+            strokeWidth="1.4"
+            strokeDasharray="3 4"
+            opacity="0.45"
+          />
+          {/* Outer soft dashed ripple */}
+          <circle
+            cx="38"
+            cy="40"
+            r="128"
+            stroke={accentColor}
+            strokeWidth="1.1"
+            strokeDasharray="2 4"
+            opacity="0.22"
+          />
         </svg>
       </div>
 
-      {/* Top Row: Tinted Icon Square and Optional Badge */}
-      <div className="flex items-start justify-between z-10">
+      {/* Top Row: Tinted Squircle Icon and Badge */}
+      <div className="flex items-start justify-between relative z-10 w-full">
         <div
-          className="flex items-center justify-center shrink-0"
+          className="flex items-center justify-center shrink-0 shadow-xs"
           style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '12px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '14px',
             backgroundColor: iconBg,
-            border: `1px solid ${iconBorder}`,
+            border: `1.5px solid ${iconBorder}`,
             color: accentColor,
           }}
         >
@@ -63,7 +112,7 @@ export const ModuleTile: React.FC<ModuleTileProps> = ({
 
         {badge && (
           <span
-            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+            className="text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs truncate max-w-[95px]"
             style={{
               backgroundColor: iconBg,
               color: accentColor,
@@ -76,20 +125,20 @@ export const ModuleTile: React.FC<ModuleTileProps> = ({
       </div>
 
       {/* Bottom Area: Title and Open module > link */}
-      <div className="z-10 mt-3">
+      <div className="relative z-10 mt-3 w-full">
         <h4
-          className="font-extrabold text-slate-900 text-sm leading-tight mb-1.5"
-          style={{ fontFamily: 'var(--font-family)' }}
+          className="font-extrabold text-slate-900 text-[15px] sm:text-base leading-snug mb-1.5 line-clamp-2"
+          style={{ fontFamily: 'var(--font-family)', wordBreak: 'break-word' }}
         >
           {title}
         </h4>
 
         <div
-          className="inline-flex items-center gap-1 font-bold text-xs group-hover:translate-x-0.5 transition-transform"
+          className="inline-flex items-center gap-1 font-bold text-xs sm:text-[13px] group-hover:translate-x-1 transition-transform"
           style={{ color: accentColor }}
         >
           <span>Open module</span>
-          <ChevronRight size={13} strokeWidth={2.5} />
+          <ChevronRight size={14} strokeWidth={2.5} />
         </div>
       </div>
     </div>
