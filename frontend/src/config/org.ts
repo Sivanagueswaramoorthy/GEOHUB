@@ -26,7 +26,7 @@ export const orgConfig: OrgBrandingConfig = {
   mintTint: '#E7F9F1',
   mintBorder: '#A7F3D0',
   appTitle: 'GeoHub',
-  logoUrl: '/geo-hub-logo-hd.png',
+  logoUrl: './geo-hub-logo-hd.png',
   version: 'v2.4.0',
 };
 
@@ -49,7 +49,7 @@ export const OrgLogoIcon: React.FC<{ size?: number; className?: string }> = ({ s
       },
     },
     React.createElement('img', {
-      src: '/geo-hub-logo-hd.png',
+      src: './geo-hub-logo-hd.png',
       alt: orgConfig.orgName,
       style: {
         width: '100%',

@@ -41,7 +41,7 @@ export const OrgLogoIcon: React.FC<{ size?: number; className?: string }> = ({ s
     }}
   >
     <img
-      src="/geo-hub-logo-hd.png"
+      src="./geo-hub-logo-hd.png"
       alt={orgConfig.orgName}
       style={{
         width: '100%',

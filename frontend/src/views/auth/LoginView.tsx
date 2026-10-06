@@ -409,7 +409,7 @@ export const LoginView: React.FC = () => {
             }}
           >
             <img
-              src="/geo-hub-logo-hd.png"
+              src="./geo-hub-logo-hd.png"
               alt="Green Eco Organization Logo"
               style={{
                 width: '100%',
