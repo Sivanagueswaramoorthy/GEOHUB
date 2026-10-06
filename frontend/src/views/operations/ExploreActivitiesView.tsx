@@ -1240,39 +1240,142 @@ export const ExploreActivitiesView: React.FC = () => {
             />
           </div>
 
-          {/* Department Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 mb-1">
-            {[
-              { id: 'All', label: 'All Modules', count: 20 },
-              { id: 'Documentation', label: 'Documentation', count: 7 },
-              { id: 'Promotion', label: 'Promotion', count: 4 },
-              { id: 'Management', label: 'Management', count: perms.canManageSettings ? 5 : 4 },
-              { id: 'Treasurer', label: 'Treasurer', count: 6 },
-              { id: 'Attendance', label: 'Gates & Attendance', count: 3 },
-            ].map((tab) => {
-              const active = adminDeptFilter === tab.id;
-              return (
+          {/* Rebuilt Premium Department & Operations Filter */}
+          <div className="mt-4 mb-3 space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-3.5 bg-emerald-500 rounded-full" />
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Operations By Domain
+                </span>
+              </div>
+              {adminDeptFilter !== 'All' ? (
                 <button
-                  key={tab.id}
                   type="button"
-                  onClick={() => setAdminDeptFilter(tab.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                    active
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
+                  onClick={() => setAdminDeptFilter('All')}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 transition-colors cursor-pointer"
                 >
-                  <span>{tab.label}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
-                      active ? 'bg-emerald-700/60 text-white' : 'bg-slate-200 text-slate-700'
+                  <span>Show All Modules</span>
+                  <X size={12} />
+                </button>
+              ) : (
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  20 Modules
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5">
+              {[
+                {
+                  id: 'All',
+                  label: 'All Modules',
+                  count: 20,
+                  icon: Layers,
+                  color: 'emerald',
+                },
+                {
+                  id: 'Documentation',
+                  label: 'Documentation',
+                  count: 7,
+                  icon: FileText,
+                  color: 'teal',
+                },
+                {
+                  id: 'Promotion',
+                  label: 'Promotion',
+                  count: 4,
+                  icon: Megaphone,
+                  color: 'rose',
+                },
+                {
+                  id: 'Management',
+                  label: 'Management',
+                  count: perms.canManageSettings ? 5 : 4,
+                  icon: ShieldCheck,
+                  color: 'indigo',
+                },
+                {
+                  id: 'Treasurer',
+                  label: 'Treasurer',
+                  count: 6,
+                  icon: DollarSign,
+                  color: 'amber',
+                },
+                {
+                  id: 'Attendance',
+                  label: 'Gates & Attendance',
+                  count: 3,
+                  icon: QrCode,
+                  color: 'blue',
+                },
+              ].map((tab) => {
+                const active = adminDeptFilter === tab.id;
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setAdminDeptFilter(tab.id as any)}
+                    className={`group shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
+                      active
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-1 ring-emerald-500/30'
+                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700/80 hover:border-emerald-300 dark:hover:border-emerald-600 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50/30 shadow-2xs'
                     }`}
                   >
-                    {tab.count}
+                    <IconComponent
+                      size={15}
+                      className={`shrink-0 transition-colors ${
+                        active
+                          ? 'text-white'
+                          : tab.color === 'teal'
+                          ? 'text-teal-600'
+                          : tab.color === 'rose'
+                          ? 'text-rose-500'
+                          : tab.color === 'indigo'
+                          ? 'text-indigo-500'
+                          : tab.color === 'amber'
+                          ? 'text-amber-600'
+                          : tab.color === 'blue'
+                          ? 'text-blue-500'
+                          : 'text-emerald-600'
+                      }`}
+                    />
+                    <span className="whitespace-nowrap leading-none font-bold">
+                      {tab.label}
+                    </span>
+                    <span
+                      className={`shrink-0 inline-flex items-center justify-center min-w-[20px] px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none whitespace-nowrap transition-colors ${
+                        active
+                          ? 'bg-white/20 text-white border border-white/25 backdrop-blur-xs'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 group-hover:bg-emerald-100 group-hover:text-emerald-700'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Contextual Filter Breadcrumb Banner */}
+            {adminDeptFilter !== 'All' && (
+              <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/70 text-xs text-emerald-900 dark:text-emerald-200 animate-in fade-in duration-200">
+                <div className="flex items-center gap-2 truncate">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span className="font-semibold truncate">
+                    Filtered to <span className="font-bold underline decoration-emerald-500">{adminDeptFilter}</span> modules
                   </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAdminDeptFilter('All')}
+                  className="shrink-0 ml-2 px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
+                >
+                  Clear (Show 20)
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
 
           {/* 1. DOCUMENTATION & MEDIA ARCHIVES */}
@@ -1606,7 +1709,7 @@ export const ExploreActivitiesView: React.FC = () => {
                 key={tpl.id}
                 type="button"
                 onClick={() => setActiveTemplateIdx(idx)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   activeTemplateIdx === idx
                     ? 'bg-slate-900 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -3537,7 +3640,7 @@ export const ExploreActivitiesView: React.FC = () => {
                   key={tab}
                   type="button"
                   onClick={() => setPostsFilterTab(tab)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  className={`shrink-0 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                     postsFilterTab === tab
                       ? 'bg-purple-700 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

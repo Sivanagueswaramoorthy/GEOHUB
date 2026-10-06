@@ -179,7 +179,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 setPasswordError(null);
                 onClearError?.();
               }}
-              className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
+              className="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
             >
               <span className="font-extrabold">{item.label}</span>
               <span className="text-[10px] text-emerald-600/80">({item.tag})</span>
