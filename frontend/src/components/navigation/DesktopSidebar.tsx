@@ -213,7 +213,7 @@ export const DesktopSidebar: React.FC = () => {
             }}
           >
             <img
-              src="/app-logo.png"
+              src="/geo-hub-logo-hd.png"
               alt="GeoHub Logo"
               style={{ width: '100%', height: '100%', objectFit: 'contain' }}
             />

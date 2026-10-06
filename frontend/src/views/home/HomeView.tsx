@@ -533,11 +533,11 @@ export const HomeView: React.FC = () => {
         {/* Org Logo Card on the Right */}
         <div
           onClick={() => setActiveTab('profile')}
-          className="flex items-center justify-center p-2 rounded-2xl bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.06)] cursor-pointer hover:border-emerald-300 transition-all shrink-0"
+          className="flex items-center justify-center p-1.5 rounded-2xl bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.06)] cursor-pointer hover:border-emerald-300 hover:scale-105 active:scale-95 transition-all shrink-0"
           style={{ width: '56px', height: '56px' }}
           title={orgConfig.orgName}
         >
-          <OrgLogoIcon size={38} />
+          <OrgLogoIcon size={42} />
         </div>
       </div>
 

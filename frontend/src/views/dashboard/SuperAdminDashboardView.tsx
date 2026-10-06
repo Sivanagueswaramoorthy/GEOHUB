@@ -202,7 +202,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           }}
         >
           <img
-            src="/geo-hub-logo.png"
+            src="/geo-hub-logo-hd.png"
             alt="Green Eco Organization Logo"
             style={{
               width: '100%',

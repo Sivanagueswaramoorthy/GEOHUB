@@ -398,16 +398,26 @@ export const LoginView: React.FC = () => {
               width: '64px',
               height: '64px',
               borderRadius: '18px',
-              background: 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)',
+              backgroundColor: '#E7F9F1',
+              border: '1.5px solid #A7F3D0',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FFFFFF',
-              boxShadow: '0 12px 28px rgba(15, 118, 110, 0.25)',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.16)',
               marginBottom: '16px',
+              padding: '6px',
             }}
           >
-            <Globe size={32} />
+            <img
+              src="/geo-hub-logo-hd.png"
+              alt="Green Eco Organization Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block',
+              }}
+            />
           </div>
           <h1
             style={{
