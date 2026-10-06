@@ -42,54 +42,78 @@ export const ModuleTile: React.FC<ModuleTileProps> = ({
         ...style,
       }}
     >
-      {/* Decorative radiating arcs emanating from behind the top-left icon */}
+      {/* Decorative radiating concentric pattern centered precisely at the top-left icon */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden"
         style={{ zIndex: 0 }}
       >
         <svg
-          className="w-full h-full"
-          viewBox="0 0 160 144"
+          className="absolute pointer-events-none"
+          style={{
+            top: '38px',
+            left: '38px',
+            width: '400px',
+            height: '400px',
+            transform: 'translate(-50%, -50%)',
+          }}
+          viewBox="0 0 400 400"
           fill="none"
-          preserveAspectRatio="none"
         >
-          {/* Inner solid arc brushing outer edge of icon box */}
+          {/* Ring 1 (Inner solid): brushes outer border of the squircle icon */}
           <circle
-            cx="38"
-            cy="40"
-            r="44"
+            cx="200"
+            cy="200"
+            r="34"
             stroke={accentColor}
-            strokeWidth="1.2"
-            opacity="0.38"
-          />
-          {/* Middle solid arc curving towards badge */}
-          <circle
-            cx="38"
-            cy="40"
-            r="70"
-            stroke={accentColor}
-            strokeWidth="1.2"
+            strokeWidth="1"
             opacity="0.32"
           />
-          {/* Prominent dashed ripple curving behind title */}
+          {/* Ring 2 (Middle solid): curves outward */}
           <circle
-            cx="38"
-            cy="40"
-            r="98"
+            cx="200"
+            cy="200"
+            r="58"
             stroke={accentColor}
-            strokeWidth="1.4"
+            strokeWidth="1"
+            opacity="0.28"
+          />
+          {/* Ring 3 (Outer solid): passes through badge zone */}
+          <circle
+            cx="200"
+            cy="200"
+            r="84"
+            stroke={accentColor}
+            strokeWidth="1"
+            opacity="0.22"
+          />
+          {/* Ring 4 (DASHED / DOTTED): prominent ripple sweeping behind title */}
+          <circle
+            cx="200"
+            cy="200"
+            r="112"
+            stroke={accentColor}
+            strokeWidth="1.3"
             strokeDasharray="3 4"
             opacity="0.45"
           />
-          {/* Outer soft dashed ripple */}
+          {/* Ring 5 (Outer faint solid): curves near card edge */}
           <circle
-            cx="38"
-            cy="40"
-            r="128"
+            cx="200"
+            cy="200"
+            r="142"
             stroke={accentColor}
-            strokeWidth="1.1"
+            strokeWidth="1"
+            opacity="0.18"
+          />
+          {/* Ring 6 (Outer faint dashed): soft ripple in corner */}
+          <circle
+            cx="200"
+            cy="200"
+            r="176"
+            stroke={accentColor}
+            strokeWidth="1"
             strokeDasharray="2 4"
-            opacity="0.22"
+            opacity="0.12"
           />
         </svg>
       </div>
