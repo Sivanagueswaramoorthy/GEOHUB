@@ -5,14 +5,49 @@ const allowedDomain = (typeof import.meta !== 'undefined' && import.meta.env?.VI
 export const createLoginSchema = (domainConstraint?: string) => {
   const activeDomain = domainConstraint ?? allowedDomain;
 
+  const roleKeywords = [
+    'superadmin',
+    'super_admin',
+    'super',
+    'faculty',
+    'advisor',
+    'admin',
+    'coordinator',
+    'president',
+    'pres',
+    'vp',
+    'doc',
+    'doclead',
+    'documentation',
+    'tres',
+    'treas',
+    'treasurer',
+    'treasury',
+    'promo',
+    'promolead',
+    'promotion',
+    'volunteer',
+    'member',
+    'student',
+  ];
+
   return z.object({
     email: z
       .string()
       .trim()
       .min(1, { message: 'Institutional email is required' })
-      .email({ message: 'Enter a valid email address (e.g. name@college.edu)' })
       .refine(
         (val) => {
+          const lower = val.toLowerCase().trim();
+          if (roleKeywords.includes(lower)) return true;
+          return z.string().email().safeParse(val).success;
+        },
+        { message: 'Enter a valid email address (e.g. name@college.edu)' }
+      )
+      .refine(
+        (val) => {
+          const lower = val.toLowerCase().trim();
+          if (roleKeywords.includes(lower)) return true;
           if (!activeDomain) return true;
           return val.toLowerCase().endsWith(`@${activeDomain.toLowerCase()}`);
         },

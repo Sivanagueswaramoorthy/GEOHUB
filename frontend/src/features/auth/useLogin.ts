@@ -239,7 +239,9 @@ export const useLogin = (options?: UseLoginOptions) => {
           return false;
         }
 
-        if (password === 'wrongpassword' || password === 'invalid123') {
+        const normalizedPass = password.trim().replace(/\s+/g, '');
+
+        if (normalizedPass === 'wrongpassword' || normalizedPass === 'invalid123') {
           setErrorState({
             code: '401',
             message: 'Incorrect email or password.',
@@ -248,23 +250,74 @@ export const useLogin = (options?: UseLoginOptions) => {
           return false;
         }
 
-        // Match known demo users
+        const id = trimmedEmail.toLowerCase().replace(/[\s_\-.]+/g, '');
+
+        // Match known demo users by email
         let found = demoUsersList.find((u) => u.email.toLowerCase() === trimmedEmail);
 
         if (!found) {
-          if (trimmedEmail.includes('sarah')) found = demoSuperAdmin;
-          else if (trimmedEmail.includes('alex')) found = demoAdmin;
-          else if (trimmedEmail.includes('aarav')) found = demoDocLead;
-          else if (trimmedEmail.includes('ananya')) found = demoTreasurer;
-          else if (trimmedEmail.includes('david')) found = demoTeamAdmin;
-          else if (trimmedEmail.includes('liam')) found = demoVolunteer;
-          else {
+          if (
+            id === 'superadmin' ||
+            id === 'super' ||
+            id.includes('superadmin') ||
+            id === 'faculty' ||
+            id.includes('advisor') ||
+            trimmedEmail.includes('sarah')
+          ) {
+            found = demoSuperAdmin;
+          } else if (
+            id === 'admin' ||
+            id.includes('coordinator') ||
+            id.includes('president') ||
+            id === 'pres' ||
+            id === 'vp' ||
+            trimmedEmail.includes('alex') ||
+            trimmedEmail.includes('elena')
+          ) {
+            found = demoAdmin;
+          } else if (
+            id === 'doc' ||
+            id.startsWith('doc') ||
+            id.includes('documentation') ||
+            trimmedEmail.includes('aarav')
+          ) {
+            found = demoDocLead;
+          } else if (
+            id === 'tres' ||
+            id === 'treas' ||
+            id.startsWith('tres') ||
+            id.startsWith('treas') ||
+            id.includes('treasurer') ||
+            trimmedEmail.includes('ananya')
+          ) {
+            found = demoTreasurer;
+          } else if (
+            id === 'promo' ||
+            id.startsWith('promo') ||
+            id.includes('promotion') ||
+            trimmedEmail.includes('david')
+          ) {
+            found = demoTeamAdmin;
+          } else if (
+            id === 'volunteer' ||
+            id.startsWith('volunt') ||
+            trimmedEmail.includes('volunteer') ||
+            trimmedEmail.includes('liam')
+          ) {
+            found = demoVolunteer;
+          } else if (
+            id === 'member' ||
+            id === 'student' ||
+            trimmedEmail.includes('maya')
+          ) {
+            found = demoMember;
+          } else {
             // General valid student scholar account
             found = {
               ...demoMember,
               uid: `u_${Date.now().toString(36)}`,
-              email: trimmedEmail,
-              name: trimmedEmail.split('@')[0].replace('.', ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+              email: trimmedEmail.includes('@') ? trimmedEmail : `${trimmedEmail}@college.edu`,
+              name: trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
             };
           }
         }

@@ -155,10 +155,43 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       noValidate
       className={`login-form ${shouldShake ? 'shake-animation' : ''}`}
     >
-      {/* Email Input */}
+      {/* Quick Role Fill Chips */}
+      <div className="login-quick-roles fade-up-item stagger-1 mb-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">
+            Quick roles:
+          </span>
+          {[
+            { label: 'superadmin', user: 'superadmin', pass: 'admin123', tag: 'Faculty' },
+            { label: 'admin', user: 'admin', pass: 'admin123', tag: 'President' },
+            { label: 'doc', user: 'doc', pass: 'admin123', tag: 'Documentation' },
+            { label: 'tres', user: 'tres', pass: 'admin123', tag: 'Treasurer' },
+            { label: 'promo', user: 'promo', pass: 'admin123', tag: 'Promotion' },
+          ].map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              disabled={isLoading || isSuccess}
+              onClick={() => {
+                setEmail(item.user);
+                setPassword(item.pass);
+                setEmailError(null);
+                setPasswordError(null);
+                onClearError?.();
+              }}
+              className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
+            >
+              <span className="font-extrabold">{item.label}</span>
+              <span className="text-[10px] text-emerald-600/80">({item.tag})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Email / Username Input */}
       <div className="login-field-group fade-up-item stagger-1">
         <label htmlFor="login-email" className="login-label">
-          Institutional Email
+          Institutional Email or Role Username
         </label>
         <div className="login-input-wrapper">
           <span className="login-input-icon" aria-hidden="true">
@@ -167,8 +200,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <input
             ref={emailRef}
             id="login-email"
-            type="email"
-            inputMode="email"
+            type="text"
             autoComplete="username"
             autoCapitalize="off"
             spellCheck={false}
@@ -176,7 +208,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             onChange={handleEmailChange}
             onBlur={handleEmailBlur}
             disabled={isLoading || isSuccess}
-            placeholder="name@college.edu"
+            placeholder="superadmin, admin, doc, tres, promo or name@college.edu"
             className={`login-input ${emailError ? 'has-error' : ''}`}
             aria-invalid={Boolean(emailError)}
             aria-describedby={[
