@@ -14,7 +14,7 @@ import { MembersDirectoryView } from './views/members/MembersDirectoryView';
 import { ProfileView } from './views/profile/ProfileView';
 
 // Sub-feature Views (accessible from Activities & Quick Actions)
-import { LoginView } from './views/auth/LoginView';
+import { LoginPage } from './features/auth/LoginPage';
 import { MyQrView } from './views/qr/MyQrView';
 import { VolunteerScanView } from './views/qr/VolunteerScanView';
 import { AttendanceView } from './views/attendance/AttendanceView';
@@ -50,8 +50,40 @@ const MainAppContent: React.FC = () => {
     isPhoneFrame,
   } = useApp();
 
+  // Route guarding for /login and protected routes
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    const path = window.location.pathname.replace(/^\//, '').trim();
+    const isLogin = hash === 'login' || path === 'login';
+
+    if (isAuthenticated) {
+      if (isLogin) {
+        // Authenticated users visiting /login are redirected to their role home
+        setActiveTab('home');
+        if (window.location.hash.includes('login')) {
+          window.location.hash = '';
+        }
+        if (path === 'login') {
+          window.history.replaceState(null, '', '/');
+        }
+      }
+    } else {
+      // Unauthenticated users hitting any protected route are redirected to /login?next=<path>
+      if (!isLogin) {
+        const attemptedRoute = hash || (path && path !== 'index.html' ? path : '');
+        if (attemptedRoute && attemptedRoute !== 'login') {
+          const nextUrl = `/login?next=${encodeURIComponent(attemptedRoute)}`;
+          window.history.replaceState(null, '', nextUrl);
+          setActiveTab('login');
+        }
+      }
+    }
+  }, [isAuthenticated, activeTab, setActiveTab]);
+
   if (!isAuthenticated || activeTab === 'login') {
-    return <LoginView />;
+    return <LoginPage />;
   }
 
   if (currentUser?.status === 'pending' || activeTab === 'pending-approval') {

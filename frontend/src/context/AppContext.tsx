@@ -160,7 +160,20 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<UserModel>(demoSuperAdmin);
+  const [currentUser, setCurrentUser] = useState<UserModel>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.user) return parsed.user;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return demoSuperAdmin;
+  });
   const [users, setUsers] = useState<UserModel[]>(demoUsersList);
   const [teams, setTeams] = useState<TeamModel[]>(initialTeams);
   const [events, setEvents] = useState<EventModel[]>(initialEvents);
@@ -181,7 +194,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [campaigns, setCampaigns] = useState<CampaignPlan[]>(initialCampaignPlans);
   const [dailyNews, setDailyNews] = useState<DailyNewsItem[]>(initialDailyNews);
 
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const hash = window.location.hash.replace(/^#\/?/, '').trim();
+        const path = window.location.pathname.replace(/^\//, '').trim();
+        if (hash === 'login' || path === 'login') return false;
+        const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return Boolean(parsed?.user);
+        }
+        return false;
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  });
   const [activeTab, setActiveTabState] = useState<string>('home');
   const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
 
@@ -320,6 +350,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedTeamId(null);
     setSelectedUserId(null);
     setIsRoleSwitcherOpen(false);
+    try {
+      localStorage.removeItem('geohub_auth_session');
+      sessionStorage.removeItem('geohub_auth_session');
+    } catch {
+      // ignore
+    }
+    if (typeof window !== 'undefined') {
+      window.location.hash = 'login';
+    }
   };
 
   const switchRole = (role: UserRole) => {
