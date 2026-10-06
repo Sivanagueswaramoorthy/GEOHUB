@@ -108,6 +108,7 @@ export const ExploreActivitiesView: React.FC = () => {
   const isStudent = currentUser.role === 'member';
 
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [adminDeptFilter, setAdminDeptFilter] = useState<'All' | 'Documentation' | 'Promotion' | 'Management' | 'Treasurer' | 'Attendance'>('All');
 
   // Treasurer Operations Modals & State
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
@@ -503,7 +504,7 @@ export const ExploreActivitiesView: React.FC = () => {
             ? 'Documentation Hub'
             : isStudent
             ? 'Student Operations Hub'
-            : 'Explore Activities'}
+            : 'Club Operations Hub'}
         </h1>
         <p className="text-xs text-slate-500 font-medium mt-0.5">
           {isPromotion
@@ -514,7 +515,7 @@ export const ExploreActivitiesView: React.FC = () => {
             ? 'Manage templates, verify media geotags, author daily bulletins & MoMs'
             : isStudent
             ? 'Digital student pass, duty checkpoints, event feedback & registration history'
-            : 'Browse modules by category and jump straight into the task you need.'}
+            : 'Executive command suite: Documentation, Promotion, Management, and Treasurer modules.'}
         </p>
       </div>
 
@@ -1187,10 +1188,10 @@ export const ExploreActivitiesView: React.FC = () => {
         </>
       ) : (
         /* =========================================================================
-           BRANCH B: FACULTY & COORDINATOR OPERATIONS (EXISTING PRESERVED)
+           BRANCH B: ADMIN & COORDINATOR (PRESIDENT, VP & FACULTY) FULL OPERATIONS
            ========================================================================= */
         <>
-          {/* Shortcuts (row of 4): Team Leaders, Approvals / Join Requests, Reports, Squads */}
+          {/* Shortcuts Row: Templates, Approvals/Join Requests, Calendar, Fiscal Audit */}
           <div
             className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1"
             style={{
@@ -1201,216 +1202,388 @@ export const ExploreActivitiesView: React.FC = () => {
             }}
           >
             <ShortcutTile
-              label="Team Leaders"
-              icon={<Award size={20} />}
-              iconBg="#F3EEFF"
-              iconBorder="#DDD1FF"
-              iconColor="#5B21B6"
-              onClick={() => handleModuleClick('teams')}
-            />
-
-            {perms.canReviewExecutiveApprovals ? (
-              <ShortcutTile
-                label="Approvals"
-                icon={<CheckSquare size={20} />}
-                iconBg="#FFF8E6"
-                iconBorder="#FDE68A"
-                iconColor="#92400E"
-                badge={approvals.filter((a) => a.status === 'pending').length}
-                onClick={() => handleModuleClick('approvals')}
-              />
-            ) : (
-              <ShortcutTile
-                label="Join Requests"
-                icon={<UserCheck size={20} />}
-                iconBg="#FFF8E6"
-                iconBorder="#FDE68A"
-                iconColor="#92400E"
-                badge={3}
-                onClick={() => handleModuleClick('members')}
-              />
-            )}
-
-            <ShortcutTile
-              label="Reports"
-              icon={<BarChart3 size={20} />}
+              label="Templates"
+              icon={<FileText size={20} />}
               iconBg="#E7F9F1"
               iconBorder="#A7F3D0"
               iconColor="#065F46"
-              onClick={() => handleModuleClick('reports')}
+              badge="Prefilled"
+              onClick={() => setIsTemplatesModalOpen(true)}
             />
 
             <ShortcutTile
-              label="Squads"
-              icon={<Users2 size={20} />}
+              label={perms.canReviewExecutiveApprovals ? 'Approvals' : 'Join Requests'}
+              icon={<CheckSquare size={20} />}
+              iconBg="#FFF8E6"
+              iconBorder="#FDE68A"
+              iconColor="#92400E"
+              badge={approvals.filter((a) => a.status === 'pending').length || 3}
+              onClick={() => handleModuleClick(perms.canReviewExecutiveApprovals ? 'approvals' : 'members')}
+            />
+
+            <ShortcutTile
+              label="Calendar"
+              icon={<Calendar size={20} />}
               iconBg="#EFF6FF"
               iconBorder="#BFDBFE"
               iconColor="#1D4ED8"
-              onClick={() => handleModuleClick('teams')}
+              onClick={() => setIsContentCalendarOpen(true)}
+            />
+
+            <ShortcutTile
+              label="Fiscal Audit"
+              icon={<BarChart3 size={20} />}
+              iconBg="#F3EEFF"
+              iconBorder="#DDD1FF"
+              iconColor="#5B21B6"
+              onClick={() => setIsAuditReportExportOpen(true)}
             />
           </div>
 
-          {/* Category 1: Attendance & Gates (2 modules) */}
-          <CategoryCard title="Attendance & Gates" countBadge={2}>
-            <ModuleTile
-              title="Gate Scanner"
-              icon={<Scan size={20} />}
-              iconBg="#EFF6FF"
-              iconBorder="#BFDBFE"
-              accentColor="#2563EB"
-              badge="Camera"
-              onClick={() => handleModuleClick('scan_qr')}
-            />
+          {/* Department Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 mb-1">
+            {[
+              { id: 'All', label: 'All Modules', count: 20 },
+              { id: 'Documentation', label: 'Documentation', count: 7 },
+              { id: 'Promotion', label: 'Promotion', count: 4 },
+              { id: 'Management', label: 'Management', count: perms.canManageSettings ? 5 : 4 },
+              { id: 'Treasurer', label: 'Treasurer', count: 6 },
+              { id: 'Attendance', label: 'Gates & Attendance', count: 3 },
+            ].map((tab) => {
+              const active = adminDeptFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setAdminDeptFilter(tab.id as any)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                    active
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                      active ? 'bg-emerald-700/60 text-white' : 'bg-slate-200 text-slate-700'
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-            <ModuleTile
-              title={isFaculty ? 'Advisor Pass' : 'My Pass'}
-              icon={<QrCode size={20} />}
-              iconBg="#F3EEFF"
-              iconBorder="#DDD1FF"
-              accentColor="#7C3AED"
-              badge="30s Token"
-              onClick={() => handleModuleClick('my_qr')}
-            />
-          </CategoryCard>
+          {/* 1. DOCUMENTATION & MEDIA ARCHIVES */}
+          {(adminDeptFilter === 'All' || adminDeptFilter === 'Documentation') && (
+            <>
+              <CategoryCard title="DOCUMENTATION" countBadge={4}>
+                <ModuleTile
+                  title="Templates"
+                  icon={<FileText size={20} />}
+                  iconBg="#E7F9F1"
+                  iconBorder="#A7F3D0"
+                  accentColor="#059669"
+                  badge="Prefilled"
+                  onClick={() => setIsTemplatesModalOpen(true)}
+                />
 
-          {/* Category 2: Gate Logs & Archives (2 modules) */}
-          <CategoryCard title="Gate Logs & Archives" countBadge={2}>
-            <ModuleTile
-              title="Live Gate Logs"
-              icon={<ClipboardList size={20} />}
-              iconBg="#E8FBF8"
-              iconBorder="#99F6E4"
-              accentColor="#0D9488"
-              badge={`${attendance.length} records`}
-              onClick={() => handleModuleClick('attendance')}
-            />
+                <ModuleTile
+                  title="Documentation Update"
+                  icon={<FileCheck size={20} />}
+                  iconBg="#E8FBF8"
+                  iconBorder="#99F6E4"
+                  accentColor="#0D9488"
+                  badge="Status Audit"
+                  onClick={() => setIsDocUpdateOpen(true)}
+                />
 
-            <ModuleTile
-              title="Media Archives"
-              icon={<Image size={20} />}
-              iconBg="#FFF8E6"
-              iconBorder="#FDE68A"
-              accentColor="#92400E"
-              badge="Photo/Video"
-              onClick={() => handleModuleClick('gallery')}
-            />
-          </CategoryCard>
+                <ModuleTile
+                  title="Daily News editor"
+                  icon={<Newspaper size={20} />}
+                  iconBg="#FFF8E6"
+                  iconBorder="#FDE68A"
+                  accentColor="#92400E"
+                  badge="Publish"
+                  onClick={() => setIsDailyNewsOpen(true)}
+                />
 
-          {/* Category 3: Events & Duties (3 modules) */}
-          <CategoryCard title="Events & Duties" countBadge={3}>
-            <ModuleTile
-              title="Duty Roster"
-              icon={<ListTodo size={20} />}
-              iconBg="#EFF6FF"
-              iconBorder="#BFDBFE"
-              accentColor="#2563EB"
-              badge={`${tasks.filter((t) => t.status !== 'done').length} tasks`}
-              onClick={() => handleModuleClick('tasks')}
-            />
+                <ModuleTile
+                  title="MoM Author"
+                  icon={<Calendar size={20} />}
+                  iconBg="#F3EEFF"
+                  iconBorder="#DDD1FF"
+                  accentColor="#5B21B6"
+                  badge="Full Author"
+                  onClick={() => setIsMomAuthorOpen(true)}
+                />
+              </CategoryCard>
 
-            <ModuleTile
-              title="Meetings & MoM"
-              icon={<Calendar size={20} />}
-              iconBg="#F5F3FF"
-              iconBorder="#DDD1FF"
-              accentColor="#6D28D9"
-              badge="Agendas"
-              onClick={() => handleModuleClick('meetings')}
-            />
+              <CategoryCard title="MEDIA ARCHIVES" countBadge={3}>
+                <ModuleTile
+                  title="Photo Upload"
+                  icon={<Camera size={20} />}
+                  iconBg="#EFF6FF"
+                  iconBorder="#BFDBFE"
+                  accentColor="#2563EB"
+                  badge="Geotagged / Normal"
+                  onClick={() => setIsPhotoUploadOpen(true)}
+                />
 
-            <ModuleTile
-              title="Feedback Summary"
-              icon={<Sparkles size={20} />}
-              iconBg="#E7F9F1"
-              iconBorder="#A7F3D0"
-              accentColor="#059669"
-              badge="4.9 / 5.0"
-              onClick={() => setIsFeedbackSummaryOpen(true)}
-            />
-          </CategoryCard>
+                <ModuleTile
+                  title="Video Links"
+                  icon={<Video size={20} />}
+                  iconBg="#F5F3FF"
+                  iconBorder="#DDD1FF"
+                  accentColor="#7C3AED"
+                  badge="Validated Links"
+                  onClick={() => setIsVideoLinksOpen(true)}
+                />
 
-          {/* Category 4: Governance */}
-          <CategoryCard title="Governance" countBadge={perms.canManageSettings ? 4 : 2}>
-            <ModuleTile
-              title={perms.canAssignPosts ? 'Posts & Squad Leads' : 'Squad Leads'}
-              icon={<Award size={20} />}
-              iconBg="#F3EEFF"
-              iconBorder="#DDD1FF"
-              accentColor="#5B21B6"
-              badge={perms.canAssignPosts ? '5 Leads' : 'Read-only'}
-              onClick={() => setIsPostsModalOpen(true)}
-            />
+                <ModuleTile
+                  title="Gallery Manager"
+                  icon={<Image size={20} />}
+                  iconBg="#FFF8E6"
+                  iconBorder="#FDE68A"
+                  accentColor="#B45309"
+                  badge={`${gallery.length} items`}
+                  onClick={() => setIsGalleryManagerOpen(true)}
+                />
+              </CategoryCard>
+            </>
+          )}
 
-            <ModuleTile
-              title={perms.canEditBudget ? 'Budget Audit' : 'Budget View'}
-              icon={<DollarSign size={20} />}
-              iconBg="#ECFDF5"
-              iconBorder="#A7F3D0"
-              accentColor="#059669"
-              badge={perms.canEditBudget ? '₹45k Total' : 'View only'}
-              onClick={() => handleModuleClick('treasurer')}
-            />
-
-            {perms.canReviewExecutiveApprovals && (
+          {/* 2. PROMOTION & OUTREACH */}
+          {(adminDeptFilter === 'All' || adminDeptFilter === 'Promotion') && (
+            <CategoryCard title="PROMOTION & OUTREACH" countBadge={4}>
               <ModuleTile
-                title="Join Requests"
-                icon={<UserCheck size={20} />}
+                title="Content Calendar"
+                icon={<Calendar size={20} />}
+                iconBg="#EFF6FF"
+                iconBorder="#BFDBFE"
+                accentColor="#2563EB"
+                badge={`${campaigns.length} Plans`}
+                onClick={() => setIsContentCalendarOpen(true)}
+              />
+
+              <ModuleTile
+                title="Posts Studio"
+                icon={<Send size={20} />}
+                iconBg="#F5F3FF"
+                iconBorder="#DDD1FF"
+                accentColor="#7C3AED"
+                badge={`${posts.length} Posts`}
+                onClick={() => setIsPostsStudioOpen(true)}
+              />
+
+              <ModuleTile
+                title="AI Suggestions"
+                icon={<Sparkles size={20} />}
+                iconBg="#FFF8E6"
+                iconBorder="#FDE68A"
+                accentColor="#D97706"
+                badge="Auto Copy"
+                onClick={() => setIsAiSuggestionsOpen(true)}
+              />
+
+              <ModuleTile
+                title="Campaign Reach export"
+                icon={<Download size={20} />}
+                iconBg="#E7F9F1"
+                iconBorder="#A7F3D0"
+                accentColor="#059669"
+                badge="PDF, Word, Excel"
+                onClick={() => setIsCampaignReachExportOpen(true)}
+              />
+            </CategoryCard>
+          )}
+
+          {/* 3. MANAGEMENT & GOVERNANCE */}
+          {(adminDeptFilter === 'All' || adminDeptFilter === 'Management') && (
+            <CategoryCard title="MANAGEMENT & GOVERNANCE" countBadge={perms.canManageSettings ? 5 : 4}>
+              <ModuleTile
+                title={perms.canAssignPosts ? 'Squad Leads & Posts' : 'Squad Leads'}
+                icon={<Award size={20} />}
+                iconBg="#F3EEFF"
+                iconBorder="#DDD1FF"
+                accentColor="#5B21B6"
+                badge={perms.canAssignPosts ? '5 Leads' : 'Read-only'}
+                onClick={() => setIsPostsModalOpen(true)}
+              />
+
+              <ModuleTile
+                title="Master Duty Roster"
+                icon={<ListTodo size={20} />}
+                iconBg="#EFF6FF"
+                iconBorder="#BFDBFE"
+                accentColor="#2563EB"
+                badge={`${tasks.filter((t) => t.status !== 'done').length} tasks`}
+                onClick={() => handleModuleClick('tasks')}
+              />
+
+              <ModuleTile
+                title="Meetings & MoM"
+                icon={<Calendar size={20} />}
+                iconBg="#F5F3FF"
+                iconBorder="#DDD1FF"
+                accentColor="#6D28D9"
+                badge="Agendas"
+                onClick={() => handleModuleClick('meetings')}
+              />
+
+              <ModuleTile
+                title={perms.canReviewExecutiveApprovals ? 'Approvals' : 'Join Requests'}
+                icon={<CheckSquare size={20} />}
                 iconBg="#FFF8E6"
                 iconBorder="#FDE68A"
                 accentColor="#B45309"
-                badge="3 Pending"
-                onClick={() => handleModuleClick('approvals')}
+                badge={`${approvals.filter((a) => a.status === 'pending').length} Pending`}
+                onClick={() => handleModuleClick(perms.canReviewExecutiveApprovals ? 'approvals' : 'members')}
               />
-            )}
 
-            {perms.canManageSettings && (
+              {perms.canManageSettings && (
+                <ModuleTile
+                  title="Settings"
+                  icon={<Settings size={20} />}
+                  iconBg="#F8FAFC"
+                  iconBorder="#E2E8F0"
+                  accentColor="#475569"
+                  badge="Tenure"
+                  onClick={() => setIsSettingsOpen(true)}
+                />
+              )}
+            </CategoryCard>
+          )}
+
+          {/* 4. TREASURER & FINANCE */}
+          {(adminDeptFilter === 'All' || adminDeptFilter === 'Treasurer') && (
+            <>
+              <CategoryCard title="TREASURER & FINANCE" countBadge={3}>
+                <ModuleTile
+                  title="Expenses & Claims"
+                  icon={<DollarSign size={20} />}
+                  iconBg="#E7F9F1"
+                  iconBorder="#A7F3D0"
+                  accentColor="#059669"
+                  badge={`${expenses.length} Vouchers`}
+                  onClick={() => setActiveTab('treasurer')}
+                />
+
+                <ModuleTile
+                  title="Budget Overview"
+                  icon={<BarChart3 size={20} />}
+                  iconBg="#EFF6FF"
+                  iconBorder="#BFDBFE"
+                  accentColor="#2563EB"
+                  badge="₹4,50,000"
+                  onClick={() => setActiveTab('treasurer')}
+                />
+
+                <ModuleTile
+                  title="Allocation Requests"
+                  icon={<Layers size={20} />}
+                  iconBg="#F3EEFF"
+                  iconBorder="#DDD1FF"
+                  accentColor="#7C3AED"
+                  badge="Allocation Hub"
+                  onClick={() => setIsAllocationModalOpen(true)}
+                />
+              </CategoryCard>
+
+              <CategoryCard title="STOCK & AUDITS" countBadge={3}>
+                <ModuleTile
+                  title="Stock Items"
+                  icon={<PackagePlus size={20} />}
+                  iconBg="#FFF8E6"
+                  iconBorder="#FDE68A"
+                  accentColor="#92400E"
+                  badge={`${stockItems.length} Cataloged`}
+                  onClick={() => setIsOpsStockModalOpen(true)}
+                />
+
+                <ModuleTile
+                  title="Purchase History"
+                  icon={<FileText size={20} />}
+                  iconBg="#E8FBF8"
+                  iconBorder="#99F6E4"
+                  accentColor="#0D9488"
+                  badge="Ledger"
+                  onClick={() => setIsOpsPurchaseHistoryOpen(true)}
+                />
+
+                <ModuleTile
+                  title="Fiscal Audit export"
+                  icon={<Download size={20} />}
+                  iconBg="#E7F9F1"
+                  iconBorder="#A7F3D0"
+                  accentColor="#059669"
+                  badge="PDF, Word, Excel"
+                  onClick={() => setIsAuditReportExportOpen(true)}
+                />
+              </CategoryCard>
+            </>
+          )}
+
+          {/* 5. ATTENDANCE & GATES */}
+          {(adminDeptFilter === 'All' || adminDeptFilter === 'Attendance') && (
+            <CategoryCard title="ATTENDANCE & GATES" countBadge={3}>
               <ModuleTile
-                title="Settings"
-                icon={<Settings size={20} />}
-                iconBg="#F8FAFC"
-                iconBorder="#E2E8F0"
-                accentColor="#475569"
-                badge="Tenure"
-                onClick={() => setIsSettingsOpen(true)}
+                title="Gate Scanner"
+                icon={<Scan size={20} />}
+                iconBg="#EFF6FF"
+                iconBorder="#BFDBFE"
+                accentColor="#2563EB"
+                badge="Camera"
+                onClick={() => handleModuleClick('scan_qr')}
               />
-            )}
-          </CategoryCard>
 
-          {/* Category 5: Communication (2 modules) */}
-          <CategoryCard title="Communication" countBadge={2}>
-            <ModuleTile
-              title="Forum"
-              icon={<MessageSquare size={20} />}
-              iconBg="#EFF6FF"
-              iconBorder="#BFDBFE"
-              accentColor="#1D4ED8"
-              badge="Pin & Post"
-              onClick={() => handleModuleClick('forum')}
-            />
+              <ModuleTile
+                title="Live Gate Logs"
+                icon={<ClipboardList size={20} />}
+                iconBg="#E8FBF8"
+                iconBorder="#99F6E4"
+                accentColor="#0D9488"
+                badge={`${attendance.length} records`}
+                onClick={() => handleModuleClick('attendance')}
+              />
 
-            <ModuleTile
-              title="Notifications"
-              icon={<Bell size={20} />}
-              iconBg="#FEF2F2"
-              iconBorder="#FECACA"
-              accentColor="#DC2626"
-              badge="Advisories"
-              onClick={() => handleModuleClick('notifications')}
-            />
-          </CategoryCard>
+              <ModuleTile
+                title={isFaculty ? 'Advisor Pass' : 'My Pass'}
+                icon={<QrCode size={20} />}
+                iconBg="#F3EEFF"
+                iconBorder="#DDD1FF"
+                accentColor="#7C3AED"
+                badge="30s Token"
+                onClick={() => handleModuleClick('my_qr')}
+              />
+            </CategoryCard>
+          )}
 
-          {/* Category 6: Reports (1 module) */}
-          <CategoryCard title="Reports Center" countBadge={1}>
-            <ModuleTile
-              title="Reports Center"
-              icon={<BarChart3 size={20} />}
-              iconBg="#E7F9F1"
-              iconBorder="#A7F3D0"
-              accentColor="#059669"
-              badge="PDF, Word, Excel"
-              onClick={() => handleModuleClick('reports')}
-            />
-          </CategoryCard>
+          {/* 6. COMMUNICATION (Only in All tab) */}
+          {adminDeptFilter === 'All' && (
+            <CategoryCard title="COMMUNICATION" countBadge={2}>
+              <ModuleTile
+                title="Forum (Discussions)"
+                icon={<MessageSquare size={20} />}
+                iconBg="#EFF6FF"
+                iconBorder="#BFDBFE"
+                accentColor="#1D4ED8"
+                badge="Pin & Post"
+                onClick={() => handleModuleClick('forum')}
+              />
+
+              <ModuleTile
+                title="Notifications"
+                icon={<Bell size={20} />}
+                iconBg="#FEF2F2"
+                iconBorder="#FECACA"
+                accentColor="#DC2626"
+                badge="Advisories"
+                onClick={() => handleModuleClick('notifications')}
+              />
+            </CategoryCard>
+          )}
         </>
       )}
 
