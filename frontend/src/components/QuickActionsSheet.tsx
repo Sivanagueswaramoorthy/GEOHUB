@@ -563,7 +563,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'add_expense',
       title: 'Add Expense',
       desc: 'Log voucher, vendor invoice, receipt, and line item',
-      icon: <Receipt size={22} />,
+      icon: <Receipt size={24} strokeWidth={1.75} />,
       bg: '#E7F9F1',
       border: '#A7F3D0',
       color: '#065F46',
@@ -572,7 +572,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'add_stock',
       title: 'Add Stock Item',
       desc: 'Catalog equipment, logistics gear, or supplies',
-      icon: <PackagePlus size={22} />,
+      icon: <PackagePlus size={24} strokeWidth={1.75} />,
       bg: '#FFF8E6',
       border: '#FDE68A',
       color: '#92400E',
@@ -581,7 +581,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'request_budget',
       title: 'Request Budget Change',
       desc: 'Petition faculty advisor for squad allocation rebalance',
-      icon: <Layers size={22} />,
+      icon: <Layers size={24} strokeWidth={1.75} />,
       bg: '#F3EEFF',
       border: '#DDD1FF',
       color: '#5B21B6',
@@ -590,7 +590,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Verify delegate check-ins via turnstile QR scanner',
-      icon: <Scan size={22} />,
+      icon: <Scan size={24} strokeWidth={1.75} />,
       bg: '#EFF6FF',
       border: '#BFDBFE',
       color: '#1D4ED8',
@@ -602,7 +602,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'new_report',
       title: 'New Report',
       desc: 'Author event summary or institutional brief',
-      icon: <FileText size={22} />,
+      icon: <FileText size={24} strokeWidth={1.75} />,
       bg: '#E7F9F1',
       border: '#A7F3D0',
       color: '#065F46',
@@ -611,7 +611,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'upload_media',
       title: 'Upload Media',
       desc: 'Upload photos (geotagged/normal) & videos',
-      icon: <Upload size={22} />,
+      icon: <Upload size={24} strokeWidth={1.75} />,
       bg: '#F3EEFF',
       border: '#DDD1FF',
       color: '#5B21B6',
@@ -620,7 +620,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'write_news',
       title: 'Write Daily News',
       desc: 'Publish daily chapter news bulletin & digest',
-      icon: <Newspaper size={22} />,
+      icon: <Newspaper size={24} strokeWidth={1.75} />,
       bg: '#FFF8E6',
       border: '#FDE68A',
       color: '#92400E',
@@ -629,7 +629,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Gate attendance scanner for active session',
-      icon: <Scan size={22} />,
+      icon: <Scan size={24} strokeWidth={1.75} />,
       bg: '#EFF6FF',
       border: '#BFDBFE',
       color: '#1D4ED8',
@@ -641,7 +641,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'promo_post',
       title: 'New Post',
       desc: 'Create post for Instagram, LinkedIn, WhatsApp',
-      icon: <Send size={22} />,
+      icon: <Send size={24} strokeWidth={1.75} />,
       bg: '#F5F3FF',
       border: '#DDD6FE',
       color: '#6D28D9',
@@ -650,7 +650,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'promo_campaign',
       title: 'Plan Campaign',
       desc: 'Launch multichannel event outreach campaign',
-      icon: <Megaphone size={22} />,
+      icon: <Megaphone size={24} strokeWidth={1.75} />,
       bg: '#E7F9F1',
       border: '#A7F3D0',
       color: '#065F46',
@@ -659,7 +659,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'promo_ai_draft',
       title: 'AI Draft',
       desc: 'Generate viral copy with AI Studio',
-      icon: <Sparkles size={22} />,
+      icon: <Sparkles size={24} strokeWidth={1.75} />,
       bg: '#FFF8E6',
       border: '#FDE68A',
       color: '#92400E',
@@ -668,7 +668,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Gate attendance scanner for active session',
-      icon: <Scan size={22} />,
+      icon: <Scan size={24} strokeWidth={1.75} />,
       bg: '#EFF6FF',
       border: '#BFDBFE',
       color: '#1D4ED8',
@@ -680,7 +680,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'create_event',
       title: 'Create Event',
       desc: 'Charter a new workshop, expedition or lab',
-      icon: <CalendarPlus size={22} />,
+      icon: <CalendarPlus size={24} strokeWidth={1.75} />,
       bg: '#E7F9F1',
       border: '#A7F3D0',
       color: '#065F46',
@@ -689,7 +689,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'schedule_meeting',
       title: 'Schedule Meeting',
       desc: 'Core committee or advisory standup',
-      icon: <Calendar size={22} />,
+      icon: <Calendar size={24} strokeWidth={1.75} />,
       bg: '#F3EEFF',
       border: '#DDD1FF',
       color: '#5B21B6',
@@ -698,7 +698,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'assign_post',
       title: 'Assign Post',
       desc: 'Designate squad leads & officer positions',
-      icon: <Award size={22} />,
+      icon: <Award size={24} strokeWidth={1.75} />,
       bg: '#FFF8E6',
       border: '#FDE68A',
       color: '#92400E',
@@ -707,7 +707,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'post_announcement',
       title: 'Post Announcement',
       desc: 'Broadcast chapter advisory to all scholars',
-      icon: <Megaphone size={22} />,
+      icon: <Megaphone size={24} strokeWidth={1.75} />,
       bg: '#FEF2F2',
       border: '#FECACA',
       color: '#DC2626',
@@ -716,7 +716,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'add_student',
       title: 'Add Student',
       desc: 'Enroll new scholar directly to a squad',
-      icon: <UserPlus size={22} />,
+      icon: <UserPlus size={24} strokeWidth={1.75} />,
       bg: '#E8FBF8',
       border: '#99F6E4',
       color: '#0F766E',
@@ -728,7 +728,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'student_pass',
       title: 'Show My Pass',
       desc: 'Dynamic 30-second turnstile QR pass',
-      icon: <QrCode size={22} />,
+      icon: <QrCode size={24} strokeWidth={1.75} />,
       bg: '#F3EEFF',
       border: '#DDD1FF',
       color: '#7C3AED',
@@ -737,7 +737,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'student_register',
       title: 'Register for Event',
       desc: 'One-tap enrollment for upcoming workshops',
-      icon: <CalendarPlus size={22} />,
+      icon: <CalendarPlus size={24} strokeWidth={1.75} />,
       bg: '#E7F9F1',
       border: '#A7F3D0',
       color: '#065F46',
@@ -746,7 +746,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       key: 'student_feedback',
       title: 'Give Feedback',
       desc: 'Rate completed workshops & sessions',
-      icon: <Sparkles size={22} />,
+      icon: <Sparkles size={24} strokeWidth={1.75} />,
       bg: '#FFF8E6',
       border: '#FDE68A',
       color: '#92400E',
@@ -1231,7 +1231,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
             <div className="flex flex-col gap-1.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                 <span className="flex items-center gap-1.5">
-                  <Loader2 size={13} className="animate-spin text-purple-600" />
+                  <Loader2 size={16} strokeWidth={1.75} className="animate-spin text-purple-600" />
                   <span>Processing & Ingesting Media...</span>
                 </span>
                 <span>{uploadProgress}%</span>
@@ -1698,7 +1698,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
           {promoPostStatus === 'Scheduled' && (
             <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-purple-50/50 border border-purple-200/60">
               <div>
-                <label className="block text-[10px] font-bold text-purple-900 mb-1">Date</label>
+                <label className="block text-xs font-semibold text-purple-900 mb-1">Date</label>
                 <input
                   type="date"
                   required
@@ -1708,7 +1708,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-purple-900 mb-1">Time</label>
+                <label className="block text-xs font-semibold text-purple-900 mb-1">Time</label>
                 <input
                   type="time"
                   required
@@ -1847,12 +1847,12 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
           >
             {promoAiLoading ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 size={16} strokeWidth={1.75} className="animate-spin" />
                 <span>Generating Copy...</span>
               </>
             ) : (
               <>
-                <Sparkles size={14} className="text-amber-300" />
+                <Sparkles size={16} strokeWidth={1.75} className="text-amber-300" />
                 <span>Generate Suggestion</span>
               </>
             )}
@@ -1872,7 +1872,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
                   }}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-200 text-slate-700 hover:bg-white"
                 >
-                  <Copy size={12} />
+                  <Copy size={16} strokeWidth={1.75} />
                   <span>Copy</span>
                 </button>
                 <button
@@ -1996,7 +1996,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
                       : 'bg-slate-100 text-slate-400'
                   }`}
                 >
-                  <Star size={18} fill={studentFeedbackRating >= s ? 'currentColor' : 'none'} />
+                  <Star size={20} strokeWidth={1.75} fill={studentFeedbackRating >= s ? 'currentColor' : 'none'} />
                 </button>
               ))}
               <span className="text-xs font-extrabold text-slate-800 ml-1 font-mono">

@@ -226,9 +226,9 @@ export const LoginView: React.FC = () => {
             boxShadow: '0 10px 24px rgba(22, 163, 74, 0.2)',
           }}
         >
-          <CheckCircle2 size={40} />
+          <CheckCircle2 size={48} strokeWidth={1.75} />
         </div>
-        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+        <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
           Membership Application Submitted!
         </h2>
         <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '380px', lineHeight: 1.5, marginBottom: '24px' }}>
@@ -269,10 +269,10 @@ export const LoginView: React.FC = () => {
 
         <div style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0F766E', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Sparkles size={14} color="#14B8A6" />
+            <Sparkles size={16} strokeWidth={1.75} color="#14B8A6" />
             <span>Club Induction 2026</span>
           </div>
-          <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#0F172A', marginTop: '4px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', marginTop: '4px' }}>
             Join GeoHub Club
           </h1>
           <p style={{ fontSize: '14px', color: '#64748B' }}>
@@ -385,7 +385,7 @@ export const LoginView: React.FC = () => {
           style={{ background: '#F1F5F9', color: '#0F172A', border: '1px solid #E8ECF2' }}
           onClick={() => setIsPhoneFrame((prev) => !prev)}
         >
-          {isPhoneFrame ? <Monitor size={15} /> : <Smartphone size={15} />}
+          {isPhoneFrame ? <Monitor size={16} strokeWidth={1.75} /> : <Smartphone size={16} strokeWidth={1.75} />}
           <span>{isPhoneFrame ? 'Fullscreen Mode' : 'Mobile Frame'}</span>
         </button>
       </div>
@@ -467,7 +467,7 @@ export const LoginView: React.FC = () => {
               transition: 'all 150ms ease',
             }}
           >
-            <GoogleGIcon size={14} />
+            <GoogleGIcon size={16} />
             <span>Google Sign-In</span>
           </button>
 
@@ -490,7 +490,7 @@ export const LoginView: React.FC = () => {
               transition: 'all 150ms ease',
             }}
           >
-            <ShieldCheck size={15} />
+            <ShieldCheck size={16} strokeWidth={1.75} />
             <span>Select Role</span>
           </button>
 
@@ -513,7 +513,7 @@ export const LoginView: React.FC = () => {
               transition: 'all 150ms ease',
             }}
           >
-            <Mail size={15} />
+            <Mail size={16} strokeWidth={1.75} />
             <span>College Email</span>
           </button>
         </div>
@@ -621,7 +621,7 @@ export const LoginView: React.FC = () => {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                    <AppAvatar name={p.user.name} size={38} />
+                    <AppAvatar name={p.user.name} size={48} strokeWidth={1.75} />
                     <div style={{ textAlign: 'left', minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontWeight: 700, fontSize: '13px', color: '#0F172A', whiteSpace: 'nowrap' }}>
@@ -664,7 +664,7 @@ export const LoginView: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   <Mail
-                    size={18}
+                    size={20} strokeWidth={1.75}
                     color="#94A3B8"
                     style={{ position: 'absolute', left: '12px', top: '14px' }}
                   />
@@ -712,7 +712,7 @@ export const LoginView: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <Lock
-                    size={18}
+                    size={20} strokeWidth={1.75}
                     color="#94A3B8"
                     style={{ position: 'absolute', left: '12px', top: '14px' }}
                   />
@@ -721,7 +721,7 @@ export const LoginView: React.FC = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     style={{ position: 'absolute', right: '12px', top: '14px', color: '#94A3B8', padding: 0 }}
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={20} strokeWidth={1.75} /> : <Eye size={20} strokeWidth={1.75} />}
                   </button>
                 </div>
               </div>
@@ -741,7 +741,7 @@ export const LoginView: React.FC = () => {
 
               <button type="submit" className="btn btn-primary btn-block">
                 Sign In as {detectedUser.name.split(' ')[0]}
-                <ArrowRight size={18} />
+                <ArrowRight size={20} strokeWidth={1.75} />
               </button>
             </form>
           </div>
@@ -794,7 +794,7 @@ export const LoginView: React.FC = () => {
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                    <AppAvatar name={p.user.name} size={38} />
+                    <AppAvatar name={p.user.name} size={48} strokeWidth={1.75} />
                     <div style={{ textAlign: 'left', minWidth: 0 }}>
                       <div style={{ fontWeight: 700, fontSize: '13px', color: '#0F172A', whiteSpace: 'nowrap' }}>
                         {p.user.name}
@@ -838,7 +838,7 @@ export const LoginView: React.FC = () => {
                 color: '#0F766E',
               }}
             >
-              <GoogleGIcon size={18} />
+              <GoogleGIcon size={20} />
               <span>Use another @college.edu Google account</span>
             </div>
 

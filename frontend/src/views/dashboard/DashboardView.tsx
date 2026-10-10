@@ -36,7 +36,7 @@ export const DashboardView: React.FC = () => {
       <ScreenTwoModel
         quickActionTitle="Create New Event"
         quickActionSubtitle="Schedule a symposium, workshop, or field expedition"
-        quickActionIcon={<Calendar size={22} />}
+        quickActionIcon={<Calendar size={24} strokeWidth={1.75} />}
         onQuickActionClick={() => setActiveTab('events')}
         metrics={[
           {
@@ -111,12 +111,9 @@ export const DashboardView: React.FC = () => {
             </span>
           </div>
 
-          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '4px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '12px' }}>
             {liveEvent.title}
           </h3>
-          <p style={{ fontSize: '12px', color: '#64748B', marginBottom: '12px' }}>
-            Dynamic 30s tokens rotating across 6 volunteer tablets in Grand Auditorium
-          </p>
 
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
@@ -136,7 +133,7 @@ export const DashboardView: React.FC = () => {
                 gap: '6px',
               }}
             >
-              <ClipboardList size={14} /> Full Terminal Logs
+              <ClipboardList size={16} strokeWidth={1.75} /> Full Terminal Logs
             </button>
             <button
               onClick={() => setActiveTab('scan_qr')}
@@ -154,7 +151,7 @@ export const DashboardView: React.FC = () => {
                 gap: '6px',
               }}
             >
-              <Scan size={14} /> Scan
+              <Scan size={16} strokeWidth={1.75} /> Scan
             </button>
           </div>
         </div>

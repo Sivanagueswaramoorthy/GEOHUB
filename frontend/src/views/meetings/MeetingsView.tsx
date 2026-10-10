@@ -169,12 +169,9 @@ export const MeetingsView: React.FC = () => {
               GOVERNANCE & PLANNING
             </span>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
             Meetings & Minutes of Meeting (MoM)
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-            Pre-event briefings, volunteer task alignments & post-event outcome reviews
-          </p>
         </div>
 
         {(currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'team_admin') && (
@@ -246,7 +243,7 @@ export const MeetingsView: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+        <Search size={20} strokeWidth={1.75} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
       </div>
 
       {/* Meetings List Feed */}
@@ -261,7 +258,7 @@ export const MeetingsView: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            <Calendar size={32} color="#10B981" style={{ margin: '0 auto 10px' }} />
+            <Calendar size={48} strokeWidth={1.75} color="#10B981" style={{ margin: '0 auto 10px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
               No meetings found
             </h3>
@@ -295,7 +292,7 @@ export const MeetingsView: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span
                       style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         fontWeight: 800,
                         textTransform: 'uppercase',
                         padding: '3px 8px',
@@ -340,18 +337,18 @@ export const MeetingsView: React.FC = () => {
                 {/* Date & Logistics */}
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '12px', color: '#64748B' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={14} color="#10B981" />
+                    <Clock size={16} strokeWidth={1.75} color="#10B981" />
                     <strong style={{ color: '#1E293B' }}>
                       {mDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </strong>{' '}
                     at {mDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={14} color="#10B981" />
+                    <MapPin size={16} strokeWidth={1.75} color="#10B981" />
                     {m.venue}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={14} color="#10B981" />
+                    <ShieldCheck size={16} strokeWidth={1.75} color="#10B981" />
                     Host: {m.organizerName}
                   </span>
                 </div>
@@ -366,7 +363,7 @@ export const MeetingsView: React.FC = () => {
                 {m.momNotes && (
                   <div style={{ backgroundColor: '#ECFDF5', padding: '12px 14px', borderRadius: '12px', fontSize: '12px', color: '#065F46', border: '1px solid #A7F3D0' }}>
                     <div style={{ fontWeight: 800, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <FileText size={14} /> Recorded Minutes of Meeting (MoM):
+                      <FileText size={16} strokeWidth={1.75} /> Recorded Minutes of Meeting (MoM):
                     </div>
                     {m.momNotes}
                   </div>
@@ -375,7 +372,7 @@ export const MeetingsView: React.FC = () => {
                 {/* Action Items status pill */}
                 {totalActionCount > 0 && (
                   <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={13} color="#10B981" />
+                    <CheckCircle2 size={16} strokeWidth={1.75} color="#10B981" />
                     <span>Action Items Progress:</span>
                     <strong style={{ color: '#0F172A' }}>{actionCompletedCount} of {totalActionCount} completed</strong>
                   </div>
@@ -399,7 +396,7 @@ export const MeetingsView: React.FC = () => {
                       gap: '6px',
                     }}
                   >
-                    <FileText size={14} />
+                    <FileText size={16} strokeWidth={1.75} />
                     {isCompleted ? 'View / Edit MoM Record' : 'Record Minutes of Meeting (MoM)'}
                   </button>
                 </div>

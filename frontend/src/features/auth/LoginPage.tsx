@@ -210,7 +210,7 @@ export const LoginPage: React.FC = () => {
                   className="demo-roles-trigger-btn"
                   id="demo-roles-trigger"
                 >
-                  <Shield size={14} className="text-emerald-600" />
+                  <Shield size={16} strokeWidth={1.75} className="text-emerald-600" />
                   <span>Demo roles</span>
                 </button>
               )}
@@ -257,7 +257,7 @@ export const LoginPage: React.FC = () => {
                 onClick={() => setIsHelpOpen(false)}
                 aria-label="Close dialog"
               >
-                <X size={18} />
+                <X size={20} strokeWidth={1.75} />
               </button>
             </div>
             <div className="text-sm text-slate-600 space-y-3 mb-6">
@@ -304,7 +304,7 @@ export const LoginPage: React.FC = () => {
                 onClick={() => setIsPrivacyOpen(false)}
                 aria-label="Close dialog"
               >
-                <X size={18} />
+                <X size={20} strokeWidth={1.75} />
               </button>
             </div>
             <div className="text-sm text-slate-600 space-y-3 mb-6">
@@ -351,7 +351,7 @@ export const LoginPage: React.FC = () => {
                 }}
                 aria-label="Close dialog"
               >
-                <X size={18} />
+                <X size={20} strokeWidth={1.75} />
               </button>
             </div>
 
@@ -365,7 +365,7 @@ export const LoginPage: React.FC = () => {
                     color: 'var(--brand-green, #10B981)',
                   }}
                 >
-                  <CheckCircle2 size={32} />
+                  <CheckCircle2 size={48} strokeWidth={1.75} />
                 </div>
                 <h4 className="text-base font-bold text-slate-900 mb-1">
                   Application Submitted

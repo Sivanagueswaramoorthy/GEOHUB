@@ -93,7 +93,7 @@ export const RoleSwitcherModal: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <AppAvatar name={opt.name} size={42} />
+                <AppAvatar name={opt.name} size={48} strokeWidth={1.75} />
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>
@@ -121,7 +121,7 @@ export const RoleSwitcherModal: React.FC = () => {
                     color: '#FFFFFF',
                   }}
                 >
-                  <Check size={15} />
+                  <Check size={16} strokeWidth={1.75} />
                 </div>
               )}
             </div>

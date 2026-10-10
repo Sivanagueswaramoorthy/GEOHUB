@@ -19,6 +19,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { MemoryItem } from '../../types';
 import { Modal } from '../../components/common/Modal';
+import { SearchBar } from '../../components/SearchBar';
 
 export const MemoriesHubView: React.FC = () => {
   const { memories, currentUser } = useApp();
@@ -142,12 +143,9 @@ export const MemoriesHubView: React.FC = () => {
               DIGITAL CHAPTER ARCHIVE
             </span>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
             Memories Hub
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-            Geotagged field surveys, expedition photos, video highlights & campus memories
-          </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -178,7 +176,7 @@ export const MemoriesHubView: React.FC = () => {
                 boxShadow: viewMode === 'grid' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none',
               }}
             >
-              <Image size={14} /> Normal Grid
+              <Image size={16} strokeWidth={1.75} /> Normal Grid
             </button>
             <button
               onClick={() => setViewMode('geotag')}
@@ -197,7 +195,7 @@ export const MemoriesHubView: React.FC = () => {
                 boxShadow: viewMode === 'geotag' ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 'none',
               }}
             >
-              <Compass size={14} /> Geo-tag Mode
+              <Compass size={16} strokeWidth={1.75} /> Geo-tag Mode
             </button>
           </div>
 
@@ -252,31 +250,25 @@ export const MemoriesHubView: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <div style={{ position: 'relative' }}>
-        <input
-          type="text"
-          className="input-field"
-          style={{
-            paddingLeft: '40px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E8ECF2',
-            borderRadius: '16px',
-            fontSize: '13px',
-            height: '44px',
-          }}
-          placeholder="Search memory titles, events, or field locations..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
-      </div>
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search memory titles, events, or field locations..."
+        resultsCount={filteredMemories.length}
+        suggestions={[
+          'Western Ghats Drone Survey',
+          'LiDAR Terrain Mapping',
+          'Munnar Peak Survey',
+          'Campus Aerial Survey',
+        ]}
+      />
 
       {/* VIEW MODE 1: NORMAL PHOTO GRID */}
       {viewMode === 'grid' && (
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: '16px',
           }}
         >
@@ -321,7 +313,7 @@ export const MemoriesHubView: React.FC = () => {
                 <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px' }}>
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: '11px',
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       backgroundColor: 'rgba(15, 23, 42, 0.75)',
@@ -338,7 +330,7 @@ export const MemoriesHubView: React.FC = () => {
                   {mem.geotags && mem.geotags.length > 0 && (
                     <span
                       style={{
-                        fontSize: '10px',
+                        fontSize: '11px',
                         fontWeight: 800,
                         backgroundColor: '#10B981',
                         color: '#FFFFFF',
@@ -349,7 +341,7 @@ export const MemoriesHubView: React.FC = () => {
                         gap: '3px',
                       }}
                     >
-                      <MapPin size={10} /> Geotagged
+                      <MapPin size={16} strokeWidth={1.75} /> Geotagged
                     </span>
                   )}
                 </div>
@@ -377,12 +369,12 @@ export const MemoriesHubView: React.FC = () => {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {mem.socialLinks?.instagram && (
                       <span style={{ color: '#E1306C', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                        <ExternalLink size={11} /> Instagram
+                        <ExternalLink size={16} strokeWidth={1.75} /> Instagram
                       </span>
                     )}
                     {mem.socialLinks?.youtube && (
                       <span style={{ color: '#DC2626', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                        <Play size={11} /> Video
+                        <Play size={16} strokeWidth={1.75} /> Video
                       </span>
                     )}
                   </div>
@@ -416,7 +408,7 @@ export const MemoriesHubView: React.FC = () => {
                   SPATIAL GIS METRIC VIEW
                 </span>
               </div>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 6px 0' }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px 0' }}>
                 Geospatial Pinpoints & Coordinate Archive
               </h2>
               <p style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 16px 0', maxWidth: '600px' }}>
@@ -426,22 +418,22 @@ export const MemoriesHubView: React.FC = () => {
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>WGS84</div>
-                  <div style={{ fontSize: '10px', color: '#94A3B8' }}>Datum Reference</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>Datum Reference</div>
                 </div>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>5 cm</div>
-                  <div style={{ fontSize: '10px', color: '#94A3B8' }}>RTK Baseline Accuracy</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>RTK Baseline Accuracy</div>
                 </div>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>Munnar / Chennai</div>
-                  <div style={{ fontSize: '10px', color: '#94A3B8' }}>Primary Baselines</div>
+                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>Primary Baselines</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Coordinate Pinpoint Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
             {filteredMemories.map((mem) => (
               <div
                 key={`geo_${mem.id}`}
@@ -474,7 +466,7 @@ export const MemoriesHubView: React.FC = () => {
                       gap: '5px',
                     }}
                   >
-                    <MapPin size={12} />
+                    <MapPin size={16} strokeWidth={1.75} />
                     {mem.geotags?.[0] ? `${mem.geotags[0].lat}° N, ${mem.geotags[0].lng}° E` : 'Geotagged'}
                   </div>
                 </div>

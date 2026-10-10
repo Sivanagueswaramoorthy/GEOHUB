@@ -133,7 +133,7 @@ export const ProfileView: React.FC = () => {
           title="Open Dynamic QR Pass"
           aria-label="Open Dynamic QR Pass"
         >
-          <QrCode size={22} />
+          <QrCode size={24} strokeWidth={1.75} />
         </button>
 
         {/* Big Initials Avatar with Online Dot */}
@@ -142,8 +142,8 @@ export const ProfileView: React.FC = () => {
             <div
               className="flex items-center justify-center font-extrabold text-2xl"
               style={{
-                width: '84px',
-                height: '84px',
+                width: '72px',
+                height: '72px',
                 borderRadius: '50%',
                 backgroundColor: '#E7F9F1',
                 border: '2.5px solid #A7F3D0',
@@ -157,7 +157,7 @@ export const ProfileView: React.FC = () => {
 
             {/* Online Dot */}
             <span
-              className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-[#10B981] border-2 border-white"
+              className="absolute bottom-1 right-1 rounded-full bg-[#10B981]"
               title="Active Executive"
             />
           </div>
@@ -249,7 +249,7 @@ export const ProfileView: React.FC = () => {
                 </span>
                 {(currentUser.team || isPromotion || isTreasurer || isDocLead) && (
                   <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                     style={{
                       backgroundColor: isPromotion ? '#F5F3FF' : '#ECFDF5',
                       color: isPromotion ? '#6D28D9' : '#065F46',
@@ -338,7 +338,7 @@ export const ProfileView: React.FC = () => {
 
           {/* Countdown timer pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs mb-3">
-            <RotateCw size={13} className="animate-spin text-emerald-600" />
+            <RotateCw size={16} strokeWidth={1.75} className="animate-spin text-emerald-600" />
             <span>Refreshes in {secondsLeft}s</span>
           </div>
 
@@ -348,12 +348,12 @@ export const ProfileView: React.FC = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 cursor-pointer hover:bg-slate-100 mb-2"
           >
             <span>{qrToken}</span>
-            {copiedToken ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+            {copiedToken ? <Check size={16} strokeWidth={1.75} className="text-emerald-600" /> : <Copy size={16} strokeWidth={1.75} />}
           </div>
 
-          <p className="text-[11px] text-slate-400 font-medium max-w-xs">
-            Hold this pass under the entrance camera terminal. Tokens rotate automatically every 30 seconds to prevent replay.
-          </p>
+          <span className="text-[11px] font-bold text-slate-400">
+            Dynamic 30s Security Token
+          </span>
         </div>
       </BottomSheet>
     </div>

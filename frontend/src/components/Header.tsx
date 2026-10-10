@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Plus, Monitor, Smartphone } from 'lucide-react';
+import { Bell, Plus } from 'lucide-react';
 import { orgConfig } from '../config/org';
 import { QuickActionsSheet } from './QuickActionsSheet';
 import { useApp } from '../context/AppContext';
+import { COMPONENTS } from '../styles/tokens';
 
 export interface HeaderProps {
   onOpenNotifications?: () => void;
@@ -15,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   className = '',
   style,
 }) => {
-  const { notifications, setActiveTab, isPhoneFrame, setIsPhoneFrame } = useApp();
+  const { notifications, setActiveTab, isPhoneFrame } = useApp();
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -23,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
+      if (window.scrollY > 8) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -48,25 +49,35 @@ export const Header: React.FC<HeaderProps> = ({
         style={{
           backgroundColor: '#FFFFFF',
           borderBottom: isScrolled ? '1px solid #EEF1F5' : '1px solid transparent',
-          height: '64px',
+          height: `${COMPONENTS.header.height}px`,
+          minHeight: `${COMPONENTS.header.height}px`,
+          boxSizing: 'border-box',
           ...style,
         }}
       >
         <div
           className="mx-auto h-full flex items-center justify-between"
           style={{
-            maxWidth: isPhoneFrame ? '480px' : '1280px',
-            padding: '0 var(--page-padding-x)',
-            transition: 'max-width 0.25s ease',
+            maxWidth: isPhoneFrame ? '480px' : '1200px',
+            paddingLeft: 'var(--page-padding-x, 20px)',
+            paddingRight: 'var(--page-padding-x, 20px)',
+            boxSizing: 'border-box',
+            height: '100%',
           }}
         >
-          {/* Two-tone Wordmark Left */}
-          <div className="flex items-center select-none cursor-pointer" onClick={() => setActiveTab('home')}>
+          {/* Two-tone Wordmark Left (flush to gutter) */}
+          <div
+            className="flex items-center select-none cursor-pointer"
+            onClick={() => setActiveTab('home')}
+            style={{ cursor: 'pointer' }}
+          >
             <span
               className="font-extrabold tracking-tight"
               style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: '18px',
+                lineHeight: '24px',
+                fontWeight: 800,
                 color: orgConfig.darkGreen,
                 letterSpacing: '-0.02em',
               }}
@@ -78,6 +89,8 @@ export const Header: React.FC<HeaderProps> = ({
               style={{
                 fontFamily: 'var(--font-family)',
                 fontSize: '18px',
+                lineHeight: '24px',
+                fontWeight: 800,
                 color: orgConfig.brandGreen,
                 letterSpacing: '-0.02em',
               }}
@@ -86,52 +99,40 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-2">
-            {/* Viewport Frame Toggle: Fullscreen vs Mobile Frame */}
-            <button
-              type="button"
-              onClick={() => setIsPhoneFrame((prev) => !prev)}
-              className="relative flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95"
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #EEF1F5',
-                color: isPhoneFrame ? '#059669' : '#0F172A',
-                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
-              }}
-              title={isPhoneFrame ? 'Expand to Fullscreen View' : 'Switch to Mobile Frame'}
-              aria-label="Toggle Fullscreen"
-            >
-              {isPhoneFrame ? <Monitor size={18} /> : <Smartphone size={18} />}
-            </button>
-
-            {/* Bell Button (44px circular outlined button with green unread dot) */}
+          {/* Right Action Buttons (44px circles, 12px apart, right-aligned to gutter) */}
+          <div
+            className="flex items-center"
+            style={{
+              gap: `${COMPONENTS.header.buttonGap}px`,
+            }}
+          >
+            {/* Bell Button (44px circular white button) */}
             <button
               type="button"
               onClick={handleBellClick}
-              className="relative flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95"
+              className="relative flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95 rounded-full"
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
+                width: `${COMPONENTS.header.buttonSize}px`,
+                height: `${COMPONENTS.header.buttonSize}px`,
+                minWidth: `${COMPONENTS.header.buttonSize}px`,
+                minHeight: `${COMPONENTS.header.buttonSize}px`,
+                borderRadius: '999px',
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #EEF1F5',
                 color: '#0F172A',
                 boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
+                boxSizing: 'border-box',
               }}
               title="Notifications"
               aria-label="Notifications"
             >
-              <Bell size={20} className="text-slate-700" />
+              <Bell size={24} strokeWidth={1.75} className="text-slate-700" />
               {unreadCount > 0 && (
                 <span
                   className="absolute"
                   style={{
-                    top: '11px',
-                    right: '11px',
+                    top: '10px',
+                    right: '10px',
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
@@ -142,24 +143,27 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </button>
 
-            {/* Plus Button (44px mint circle with green border) */}
+            {/* Plus Button (44px mint circular action button) */}
             <button
               type="button"
               onClick={() => setIsQuickActionsOpen(true)}
-              className="flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95"
+              className="flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95 rounded-full"
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
+                width: `${COMPONENTS.header.buttonSize}px`,
+                height: `${COMPONENTS.header.buttonSize}px`,
+                minWidth: `${COMPONENTS.header.buttonSize}px`,
+                minHeight: `${COMPONENTS.header.buttonSize}px`,
+                borderRadius: '999px',
                 backgroundColor: '#E7F9F1',
                 border: '1px solid #A7F3D0',
                 color: '#065F46',
                 boxShadow: '0 2px 8px rgba(16, 185, 129, 0.16)',
+                boxSizing: 'border-box',
               }}
               title="Quick Actions"
               aria-label="Quick Actions"
             >
-              <Plus size={22} strokeWidth={2.5} />
+              <Plus size={24} strokeWidth={1.75} />
             </button>
           </div>
         </div>

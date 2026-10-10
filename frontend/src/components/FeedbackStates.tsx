@@ -26,7 +26,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       style={style}
     >
       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-3 border border-emerald-100">
-        {icon || <Inbox size={26} />}
+        {icon || <Inbox size={28} strokeWidth={1.75} />}
       </div>
       <h4 className="font-extrabold text-sm text-slate-800 mb-1">{title}</h4>
       {description && (
@@ -68,7 +68,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
       style={style}
     >
       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-red-50 text-red-500 mb-3 border border-red-100">
-        <AlertCircle size={26} />
+        <AlertCircle size={28} strokeWidth={1.75} />
       </div>
       <h4 className="font-extrabold text-sm text-slate-900 mb-1">{title}</h4>
       <p className="text-xs text-slate-500 max-w-xs leading-relaxed mb-4">{message}</p>
@@ -78,7 +78,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           onClick={onRetry}
           className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full font-bold text-xs bg-slate-900 text-white shadow-sm hover:bg-slate-800 transition-colors"
         >
-          <RefreshCw size={12} />
+          <RefreshCw size={16} strokeWidth={1.75} />
           <span>Retry</span>
         </button>
       )}

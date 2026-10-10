@@ -74,9 +74,6 @@ export const AddStudentsView: React.FC = () => {
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>
             Roster & Induction
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Review applicants & onboard students into the {currentTeamName} Team
-          </p>
         </div>
 
         <button className="btn btn-primary btn-sm" onClick={() => setIsAddModalOpen(true)}>
@@ -122,7 +119,7 @@ export const AddStudentsView: React.FC = () => {
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <AppAvatar name={req.applicantName} size={38} />
+                    <AppAvatar name={req.applicantName} size={48} strokeWidth={1.75} />
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>
                         {req.applicantName}
@@ -157,14 +154,14 @@ export const AddStudentsView: React.FC = () => {
                       });
                     }}
                   >
-                    <Check size={14} /> Approve & Onboard
+                    <Check size={16} strokeWidth={1.75} /> Approve & Onboard
                   </button>
                   <button
                     className="btn btn-secondary btn-sm"
                     style={{ color: '#DC2626' }}
                     onClick={() => rejectItem(req.id, 'Capacity reached for this semester')}
                   >
-                    <X size={14} /> Reject
+                    <X size={16} strokeWidth={1.75} /> Reject
                   </button>
                 </div>
               </div>

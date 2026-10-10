@@ -65,7 +65,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             height: '88px',
             borderRadius: '50%',
             backgroundColor: '#FEF3C7',
-            border: '2px solid #FDE68A',
+            border: '1px solid #FDE68A',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -74,7 +74,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             marginBottom: '24px',
           }}
         >
-          <Hourglass size={42} className="animate-pulse" />
+          <Hourglass size={48} strokeWidth={1.75} className="animate-pulse" />
         </div>
 
         {/* Overline Tag */}
@@ -82,31 +82,32 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '6px',
+            gap: '8px',
             padding: '4px 12px',
             borderRadius: '999px',
             backgroundColor: '#FFF8E6',
             border: '1px solid #FDE68A',
             color: '#92400E',
             fontSize: '11px',
+            lineHeight: '14px',
             fontWeight: 800,
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            letterSpacing: '0.08em',
             marginBottom: '12px',
           }}
         >
-          <Sparkles size={12} color="#D97706" />
+          <Sparkles size={16} strokeWidth={1.75} color="#D97706" />
           <span>Induction Status: Under Review</span>
         </div>
 
         {/* Heading */}
         <h1
           style={{
-            fontSize: '24px',
+            fontSize: '28px',
             fontWeight: 800,
             color: '#0F172A',
             letterSpacing: '-0.02em',
-            lineHeight: 1.25,
+            lineHeight: '34px',
             marginBottom: '8px',
             fontFamily: 'var(--font-family)',
           }}
@@ -115,17 +116,17 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
         </h1>
 
         {/* Explanation Copy */}
-        <p
+        <span
           style={{
-            fontSize: '13.5px',
+            fontSize: '13px',
             color: '#64748B',
-            lineHeight: 1.6,
-            marginBottom: '20px',
-            maxWidth: '380px',
+            fontWeight: 600,
+            marginBottom: '16px',
+            display: 'block',
           }}
         >
-          Hello <strong style={{ color: '#0F172A' }}>{currentUser.name || 'Scholar'}</strong>! Your induction registration for the <span style={{ color: '#065F46', fontWeight: 700 }}>{currentUser.team || 'Geo Club'} Squad</span> has been recorded. Club administrators are verifying your college credentials.
-        </p>
+          {currentUser.name || 'Scholar'} • {currentUser.team || 'Geo Club'} Squad
+        </span>
 
         {/* User Email Pill */}
         <div
@@ -136,14 +137,15 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             padding: '8px 16px',
             borderRadius: '12px',
             backgroundColor: '#F8FAFC',
-            border: '1px solid #EEF1F5',
+            border: '1px solid #E2E8F0',
             color: '#334155',
-            fontSize: '12.5px',
+            fontSize: '13px',
+            lineHeight: '18px',
             fontWeight: 600,
             marginBottom: '28px',
           }}
         >
-          <Mail size={15} color="#64748B" />
+          <Mail size={16} strokeWidth={1.75} color="#64748B" />
           <span>{currentUser.email || 'scholar@college.edu'}</span>
         </div>
 
@@ -153,13 +155,13 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             style={{
               width: '100%',
               padding: '12px 16px',
-              borderRadius: '14px',
+              borderRadius: '12px',
               backgroundColor: '#FEF3C7',
               border: '1px solid #FDE68A',
               color: '#92400E',
               fontSize: '12px',
               fontWeight: 600,
-              lineHeight: 1.45,
+              lineHeight: '16px',
               marginBottom: '20px',
               display: 'flex',
               alignItems: 'center',
@@ -167,24 +169,27 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
               textAlign: 'left',
             }}
           >
-            <ShieldAlert size={16} className="shrink-0" />
+            <ShieldAlert size={16} strokeWidth={1.75} className="shrink-0" />
             <span>{statusMessage}</span>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button
             type="button"
             onClick={handleRefresh}
             disabled={isRefreshing}
             style={{
               width: '100%',
-              padding: '12px 20px',
+              height: '52px',
+              minHeight: '52px',
+              padding: '0 24px',
               borderRadius: '999px',
               backgroundColor: '#10B981',
               color: '#FFFFFF',
-              fontSize: '13px',
+              fontSize: '15px',
+              lineHeight: '20px',
               fontWeight: 700,
               border: 'none',
               cursor: isRefreshing ? 'not-allowed' : 'pointer',
@@ -196,7 +201,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
               transition: 'all 150ms ease',
             }}
           >
-            <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={16} strokeWidth={1.75} className={isRefreshing ? 'animate-spin' : ''} />
             <span>{isRefreshing ? 'Checking Status...' : 'Check Status / Refresh'}</span>
           </button>
 
@@ -205,13 +210,16 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
             onClick={handleSignOut}
             style={{
               width: '100%',
-              padding: '12px 20px',
+              height: '48px',
+              minHeight: '48px',
+              padding: '0 20px',
               borderRadius: '999px',
               backgroundColor: '#FFFFFF',
               color: '#475569',
-              fontSize: '13px',
+              fontSize: '15px',
+              lineHeight: '20px',
               fontWeight: 700,
-              border: '1px solid #EEF1F5',
+              border: '1px solid #E2E8F0',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -220,7 +228,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
               transition: 'all 150ms ease',
             }}
           >
-            <LogOut size={16} />
+            <LogOut size={16} strokeWidth={1.75} />
             <span>Sign Out & Return</span>
           </button>
         </div>

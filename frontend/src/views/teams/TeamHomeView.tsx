@@ -37,7 +37,7 @@ export const TeamHomeView: React.FC = () => {
       <ScreenTwoModel
         quickActionTitle={`Assign ${team.name} Task`}
         quickActionSubtitle="Delegate deliverable to a squad member"
-        quickActionIcon={<CheckSquare size={22} />}
+        quickActionIcon={<CheckSquare size={24} strokeWidth={1.75} />}
         onQuickActionClick={() => setActiveTab('tasks')}
         metrics={[
           {
@@ -136,7 +136,7 @@ export const TeamHomeView: React.FC = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AppAvatar name={m.name} size={30} avatarUrl={m.avatarUrl} />
+                  <AppAvatar name={m.name} size={28} strokeWidth={1.75} avatarUrl={m.avatarUrl} />
                   <div>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
                       {m.name}

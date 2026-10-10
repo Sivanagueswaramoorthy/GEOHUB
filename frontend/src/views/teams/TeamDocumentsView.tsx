@@ -89,9 +89,6 @@ export const TeamDocumentsView: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Team Documents</h1>
-          <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Resource library, safety clearances & brand specifications
-          </p>
         </div>
 
         <button className="btn btn-primary btn-sm" onClick={() => setIsUploadOpen(true)}>
@@ -142,7 +139,7 @@ export const TeamDocumentsView: React.FC = () => {
               onClick={() => alert(`Downloading: ${doc.title}`)}
               title="Download file"
             >
-              <Download size={18} color="#0F766E" />
+              <Download size={20} strokeWidth={1.75} color="#0F766E" />
             </button>
           </div>
         ))}

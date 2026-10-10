@@ -45,7 +45,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             height: '84px',
             borderRadius: '50%',
             backgroundColor: '#E7F9F1',
-            border: '2px solid #A7F3D0',
+            border: '1px solid #A7F3D0',
             color: '#065F46',
             display: 'flex',
             alignItems: 'center',
@@ -54,22 +54,23 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             boxShadow: '0 8px 24px rgba(16, 185, 129, 0.15)',
           }}
         >
-          <Compass size={40} className="animate-spin-slow" />
+          <Compass size={48} strokeWidth={1.75} className="animate-spin-slow" />
         </div>
 
         {/* 404 Badge */}
         <span
           style={{
             display: 'inline-block',
-            padding: '4px 14px',
+            padding: '4px 12px',
             borderRadius: '999px',
             backgroundColor: '#FEF2F2',
             border: '1px solid #FECACA',
             color: '#DC2626',
             fontSize: '11px',
+            lineHeight: '14px',
             fontWeight: 800,
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
+            letterSpacing: '0.08em',
             marginBottom: '12px',
           }}
         >
@@ -79,11 +80,11 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
         {/* Title */}
         <h1
           style={{
-            fontSize: '24px',
+            fontSize: '28px',
             fontWeight: 800,
             color: '#0F172A',
             letterSpacing: '-0.02em',
-            lineHeight: 1.25,
+            lineHeight: '34px',
             marginBottom: '8px',
             fontFamily: 'var(--font-family)',
           }}
@@ -91,17 +92,17 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
           Coordinates Not Found
         </h1>
 
-        {/* Description */}
-        <p
+        <span
           style={{
-            fontSize: '13.5px',
+            fontSize: '13px',
             color: '#64748B',
-            lineHeight: 1.55,
             marginBottom: '24px',
+            display: 'block',
+            fontWeight: 600,
           }}
         >
-          The module or coordinates <code style={{ backgroundColor: '#F1F5F9', padding: '2px 6px', borderRadius: '6px', color: '#0F172A', fontWeight: 600 }}>{routeName || '#unknown'}</code> are not part of the active GeoHub chapter manifest.
-        </p>
+          Unrecognized route: <code style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px', color: '#0F172A' }}>{routeName || '#unknown'}</code>
+        </span>
 
         {/* Action Button */}
         <button
@@ -110,12 +111,16 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '8px',
-            padding: '12px 24px',
+            height: '52px',
+            minHeight: '52px',
+            padding: '0 24px',
             borderRadius: '999px',
             backgroundColor: '#10B981',
             color: '#FFFFFF',
-            fontSize: '13px',
+            fontSize: '15px',
+            lineHeight: '20px',
             fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
@@ -123,7 +128,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             transition: 'all 150ms ease',
           }}
         >
-          <Home size={16} />
+          <Home size={16} strokeWidth={1.75} />
           <span>Return to Dashboard</span>
         </button>
       </div>

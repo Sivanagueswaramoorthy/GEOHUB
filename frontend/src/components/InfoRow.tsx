@@ -48,13 +48,13 @@ export const InfoRow: React.FC<InfoRowProps> = ({
         <div className="flex flex-col">
           <span
             className="font-bold text-slate-400 uppercase tracking-wider"
-            style={{ fontSize: '10.5px', lineHeight: 1.2 }}
+            style={{ fontSize: '11px', lineHeight: 1.2 }}
           >
             {label}
           </span>
           <span
             className="font-bold text-slate-900 mt-0.5"
-            style={{ fontSize: '13.5px', lineHeight: 1.3 }}
+            style={{ fontSize: '13px', lineHeight: 1.3 }}
           >
             {value}
           </span>

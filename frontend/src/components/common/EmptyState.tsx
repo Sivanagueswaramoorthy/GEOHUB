@@ -1,12 +1,17 @@
 import React from 'react';
 import { FolderOpen } from 'lucide-react';
+import { Button } from '../Button';
+import { TYPOGRAPHY } from '../../styles/tokens';
 
-interface EmptyStateProps {
+export interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
   description: string;
   actionText?: string;
+  actionLabel?: string;
   onAction?: () => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -14,23 +19,74 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   description,
   actionText,
+  actionLabel,
   onAction,
+  className = '',
+  style,
 }) => {
+  const cta = actionText || actionLabel;
   return (
-    <div className="empty-state">
-      <div className="empty-state-icon">
-        {icon || <FolderOpen size={30} />}
+    <div
+      className={`flex flex-col items-center justify-center text-center py-12 px-6 w-full ${className}`}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: '48px 24px',
+        width: '100%',
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      {/* Centered 48px Icon */}
+      <div
+        className="flex items-center justify-center text-slate-300 mb-4"
+        style={{
+          width: '48px',
+          height: '48px',
+          color: '#94A3B8',
+          marginBottom: '16px',
+        }}
+      >
+        {icon || <FolderOpen size={48} strokeWidth={1.75} />}
       </div>
-      <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A', marginBottom: '6px' }}>
+
+      {/* Title (18/24 700) */}
+      <h3
+        style={{
+          fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
+          lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
+          fontWeight: TYPOGRAPHY.scale.title.fontWeight,
+          color: '#0F172A',
+          fontFamily: 'var(--font-family)',
+          margin: '0 0 8px 0',
+        }}
+      >
         {title}
       </h3>
-      <p style={{ fontSize: '13px', color: '#64748B', maxWidth: '300px', marginBottom: '16px' }}>
+
+      {/* Body (14/22 400) */}
+      <p
+        style={{
+          fontSize: `${TYPOGRAPHY.scale.body.fontSize}px`,
+          lineHeight: `${TYPOGRAPHY.scale.body.lineHeight}px`,
+          fontWeight: TYPOGRAPHY.scale.body.fontWeight,
+          color: '#64748B',
+          fontFamily: 'var(--font-family)',
+          maxWidth: '360px',
+          margin: '0 0 20px 0',
+        }}
+      >
         {description}
       </p>
-      {actionText && onAction && (
-        <button className="btn btn-primary btn-sm" onClick={onAction}>
-          {actionText}
-        </button>
+
+      {/* Action Button */}
+      {cta && onAction && (
+        <Button variant="primary" onClick={onAction}>
+          {cta}
+        </Button>
       )}
     </div>
   );

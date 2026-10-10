@@ -1,10 +1,13 @@
 import React from 'react';
+import { Avatar, AvatarProps } from '../Avatar';
 
-interface AppAvatarProps {
+export interface AppAvatarProps {
   name: string;
   avatarUrl?: string;
   size?: number;
   className?: string;
+  isOnline?: boolean;
+  strokeWidth?: number;
 }
 
 export const AppAvatar: React.FC<AppAvatarProps> = ({
@@ -12,30 +15,15 @@ export const AppAvatar: React.FC<AppAvatarProps> = ({
   avatarUrl,
   size = 40,
   className = '',
+  isOnline = false,
 }) => {
-  const getInitials = (str: string) => {
-    if (!str) return 'GH';
-    const parts = str.trim().split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return str.substring(0, 2).toUpperCase();
-  };
-
   return (
-    <div
-      className={`user-avatar ${className}`}
-      style={{
-        width: size,
-        height: size,
-        fontSize: Math.floor(size * 0.36),
-      }}
-    >
-      {avatarUrl ? (
-        <img src={avatarUrl} alt={name} />
-      ) : (
-        <span>{getInitials(name)}</span>
-      )}
-    </div>
+    <Avatar
+      name={name}
+      src={avatarUrl}
+      size={size as AvatarProps['size']}
+      className={className}
+      isOnline={isOnline}
+    />
   );
 };

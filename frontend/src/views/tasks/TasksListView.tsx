@@ -143,7 +143,7 @@ export const TasksListView: React.FC = () => {
                 Assignee
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                <AppAvatar name={selectedTask.assigneeName} size={22} />
+                <AppAvatar name={selectedTask.assigneeName} size={24} strokeWidth={1.75} />
                 <span style={{ fontWeight: 600, color: '#0F172A' }}>{selectedTask.assigneeName}</span>
               </div>
             </div>
@@ -195,7 +195,7 @@ export const TasksListView: React.FC = () => {
               <>Mark as In Progress</>
             ) : (
               <>
-                <CheckCircle2 size={18} /> Mark Complete & Submit Proof
+                <CheckCircle2 size={20} strokeWidth={1.75} /> Mark Complete & Submit Proof
               </>
             )}
           </button>
@@ -205,7 +205,7 @@ export const TasksListView: React.FC = () => {
         {(selectedTask.proofUrl || selectedTask.proofNote) && (
           <div className="app-card" style={{ backgroundColor: '#F0FDFA', border: '1px solid #99F6E4' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0F766E', marginBottom: '8px' }}>
-              <Paperclip size={18} />
+              <Paperclip size={20} strokeWidth={1.75} />
               <h4 style={{ fontWeight: 700, fontSize: '14px' }}>Proof of Completion Attached</h4>
             </div>
             {selectedTask.proofNote && (
@@ -229,7 +229,7 @@ export const TasksListView: React.FC = () => {
         {/* Comments & Discussion */}
         <div className="app-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-            <MessageSquare size={18} color="#0F766E" />
+            <MessageSquare size={20} strokeWidth={1.75} color="#0F766E" />
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A' }}>
               Activity & Comments ({selectedTask.comments.length})
             </h3>
@@ -327,9 +327,6 @@ export const TasksListView: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Club Tasks</h1>
-          <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Action items across club operations & event workflows
-          </p>
         </div>
         {(currentUser.role === 'team_admin' || currentUser.role === 'admin' || currentUser.role === 'super_admin') && (
           <button className="btn btn-primary btn-sm" onClick={() => setIsCreateModalOpen(true)}>
@@ -392,7 +389,7 @@ export const TasksListView: React.FC = () => {
       <div>
         {filteredTasks.length === 0 ? (
           <div className="empty-state">
-            <AlertCircle size={40} color="#94A3B8" style={{ marginBottom: '12px' }} />
+            <AlertCircle size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>No tasks found</h3>
             <p style={{ fontSize: '13px', color: '#64748B' }}>
               No tasks currently match this status or team filter.

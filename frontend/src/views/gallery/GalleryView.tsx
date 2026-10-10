@@ -171,18 +171,18 @@ export const GalleryView: React.FC = () => {
   const getMediaTypeIcon = (type?: string) => {
     switch (type) {
       case 'video':
-        return <Video size={13} className="text-purple-600" />;
+        return <Video size={16} strokeWidth={1.75} className="text-purple-600" />;
       case 'mom':
-        return <Calendar size={13} className="text-indigo-600" />;
+        return <Calendar size={16} strokeWidth={1.75} className="text-indigo-600" />;
       case 'news':
-        return <Newspaper size={13} className="text-amber-600" />;
+        return <Newspaper size={16} strokeWidth={1.75} className="text-amber-600" />;
       case 'sheet':
-        return <FileSpreadsheet size={13} className="text-emerald-600" />;
+        return <FileSpreadsheet size={16} strokeWidth={1.75} className="text-emerald-600" />;
       case 'report':
-        return <FileText size={13} className="text-teal-600" />;
+        return <FileText size={16} strokeWidth={1.75} className="text-teal-600" />;
       case 'photo':
       default:
-        return <ImageIcon size={13} className="text-blue-600" />;
+        return <ImageIcon size={16} strokeWidth={1.75} className="text-blue-600" />;
     }
   };
 
@@ -202,9 +202,6 @@ export const GalleryView: React.FC = () => {
           >
             Media Archives
           </h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Browse and verify geotagged photos, videos, reports & MoMs
-          </p>
         </div>
 
         <button
@@ -212,7 +209,7 @@ export const GalleryView: React.FC = () => {
           onClick={() => setIsUploadOpen(true)}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all shrink-0 mt-1 cursor-pointer active:scale-95"
         >
-          <Upload size={14} />
+          <Upload size={16} strokeWidth={1.75} />
           <span>Upload Media</span>
         </button>
       </div>
@@ -224,6 +221,8 @@ export const GalleryView: React.FC = () => {
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Search title, event, uploader, geotag..."
+            resultsCount={filteredItems.length}
+            suggestions={['GEO FEST 2026', 'Drone Survey', 'Field Expedition', 'RTK Calibration', 'Chapter Showcase']}
           />
         </div>
 
@@ -311,7 +310,7 @@ export const GalleryView: React.FC = () => {
 
       {/* Filter Row 3: Submission Status Filter */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
+        <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
           Status:
         </span>
         {[
@@ -352,7 +351,7 @@ export const GalleryView: React.FC = () => {
             }}
             className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer flex items-center gap-1"
           >
-            <X size={12} />
+            <X size={16} strokeWidth={1.75} />
             <span>Reset Filters</span>
           </button>
         )}
@@ -396,7 +395,7 @@ export const GalleryView: React.FC = () => {
                 {/* Status Badge */}
                 {item.submissionStatus && (
                   <span
-                    className={`absolute top-2 right-2 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full shadow-xs ${
+                    className={`absolute top-2 right-2 text-[11px] font-extrabold uppercase px-1.5 py-0.5 rounded-full shadow-xs ${
                       item.submissionStatus === 'verified'
                         ? 'bg-emerald-600 text-white'
                         : item.submissionStatus === 'submitted'
@@ -410,8 +409,8 @@ export const GalleryView: React.FC = () => {
 
                 {/* Geotag Chip on Image */}
                 {item.geotag && (
-                  <span className="absolute bottom-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-black/75 backdrop-blur-xs text-white flex items-center gap-1 max-w-[90%] truncate">
-                    <MapPin size={10} className="text-emerald-400 shrink-0" />
+                  <span className="absolute bottom-1.5 left-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded-md bg-black/75 backdrop-blur-xs text-white flex items-center gap-1 max-w-[90%] truncate">
+                    <MapPin size={16} strokeWidth={1.75} className="text-emerald-400 shrink-0" />
                     <span className="truncate">{item.geotag.locationName}</span>
                   </span>
                 )}
@@ -419,7 +418,7 @@ export const GalleryView: React.FC = () => {
 
               <div className="p-2.5 flex flex-col flex-1 justify-between gap-1">
                 <div>
-                  <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold mb-0.5">
+                  <div className="flex items-center gap-1 text-[11px] text-slate-400 font-bold mb-0.5">
                     {getMediaTypeIcon(item.mediaType)}
                     <span className="uppercase tracking-wider truncate">
                       {item.mediaType || item.category}
@@ -430,7 +429,7 @@ export const GalleryView: React.FC = () => {
                   </h4>
                 </div>
 
-                <div className="pt-1.5 border-t border-slate-100 flex flex-col gap-0.5 text-[10px]">
+                <div className="pt-1.5 border-t border-slate-100 flex flex-col gap-0.5 text-[11px]">
                   <span className="text-emerald-700 font-semibold truncate">
                     {item.eventTitle}
                   </span>
@@ -467,12 +466,12 @@ export const GalleryView: React.FC = () => {
                     {item.eventTitle}
                   </span>
                   {item.geotag && (
-                    <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium mt-0.5">
-                      <MapPin size={10} className="text-emerald-600 shrink-0" />
+                    <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium mt-0.5">
+                      <MapPin size={16} strokeWidth={1.75} className="text-emerald-600 shrink-0" />
                       <span className="truncate">{item.geotag.locationName}</span>
                     </div>
                   )}
-                  <span className="text-[10px] text-slate-400 mt-0.5">
+                  <span className="text-[11px] text-slate-400 mt-0.5">
                     By {item.uploadedByName} • {item.fileSizeBytes || '3 MB'} • {item.academicYear}
                   </span>
                 </div>
@@ -481,7 +480,7 @@ export const GalleryView: React.FC = () => {
               <div className="flex flex-col items-end shrink-0 gap-1.5">
                 {item.submissionStatus && (
                   <span
-                    className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
                       item.submissionStatus === 'verified'
                         ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : item.submissionStatus === 'submitted'
@@ -492,7 +491,7 @@ export const GalleryView: React.FC = () => {
                     {item.submissionStatus}
                   </span>
                 )}
-                <span className="text-[10px] text-emerald-700 font-bold underline">
+                <span className="text-[11px] text-emerald-700 font-bold underline">
                   View →
                 </span>
               </div>
@@ -539,19 +538,19 @@ export const GalleryView: React.FC = () => {
                     <div className="font-extrabold text-xs text-emerald-950">
                       {activeLightboxItem.geotag.locationName}
                     </div>
-                    <div className="text-[10px] font-mono text-emerald-700">
+                    <div className="text-[11px] font-mono text-emerald-700">
                       {activeLightboxItem.geotag.lat.toFixed(4)}° N, {activeLightboxItem.geotag.lng.toFixed(4)}° E
                     </div>
                   </div>
                 </div>
 
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span className="text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
                   GPS Verified
                 </span>
               </div>
             ) : (
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-500 font-medium flex items-center gap-1.5">
-                <MapPin size={14} className="text-slate-400" />
+                <MapPin size={16} strokeWidth={1.75} className="text-slate-400" />
                 <span>Normal Upload (No Geotag coordinates recorded)</span>
               </div>
             )}
@@ -559,7 +558,7 @@ export const GalleryView: React.FC = () => {
             {/* Caption */}
             {activeLightboxItem.caption && (
               <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                   Caption / Archival Description
                 </span>
                 <p className="text-xs text-slate-800 font-medium leading-relaxed">
@@ -571,28 +570,28 @@ export const GalleryView: React.FC = () => {
             {/* Metadata Grid */}
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Event</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase block">Event</span>
                 <span className="font-bold text-slate-800 truncate block mt-0.5">
                   {activeLightboxItem.eventTitle}
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Academic Year</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase block">Academic Year</span>
                 <span className="font-bold text-slate-800 block mt-0.5">
                   {activeLightboxItem.academicYear}
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Uploaded By</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase block">Uploaded By</span>
                 <span className="font-bold text-slate-800 block mt-0.5">
                   {activeLightboxItem.uploadedByName}
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Submission Status</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase block">Submission Status</span>
                 <span className="font-extrabold text-emerald-700 uppercase block mt-0.5">
                   {activeLightboxItem.submissionStatus || 'Verified'}
                 </span>
@@ -609,7 +608,7 @@ export const GalleryView: React.FC = () => {
                 }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
               >
-                <Copy size={13} />
+                <Copy size={16} strokeWidth={1.75} />
                 <span>Copy URL</span>
               </button>
 
@@ -621,7 +620,7 @@ export const GalleryView: React.FC = () => {
                 }}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition-all"
               >
-                <ExternalLink size={13} />
+                <ExternalLink size={16} strokeWidth={1.75} />
                 <span>Open Full Asset</span>
               </button>
             </div>
@@ -723,10 +722,10 @@ export const GalleryView: React.FC = () => {
           <div className="p-3 rounded-2xl bg-emerald-50/60 border border-emerald-200 flex items-center justify-between">
             <div>
               <div className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-950">
-                <MapPin size={15} className="text-emerald-600" />
+                <MapPin size={16} strokeWidth={1.75} className="text-emerald-600" />
                 <span>Store Geotag Coordinates</span>
               </div>
-              <span className="text-[10px] text-emerald-700 font-medium">
+              <span className="text-[11px] text-emerald-700 font-medium">
                 Embeds 13.0827° N, 80.2707° E (Main Campus)
               </span>
             </div>

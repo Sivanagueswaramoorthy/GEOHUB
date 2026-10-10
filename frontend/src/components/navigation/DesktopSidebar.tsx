@@ -48,13 +48,13 @@ export const DesktopSidebar: React.FC = () => {
   const unreadNotifCount = notifications.filter((n) => !n.isRead).length;
 
   const rolesList: { role: UserRole; label: string; icon: React.ReactNode; color: string; bg: string }[] = [
-    { role: 'faculty', label: 'Faculty Advisor', icon: <ShieldCheck size={14} />, color: '#B45309', bg: '#FEF3C7' },
-    { role: 'coordinator', label: 'Coordinator', icon: <Shield size={14} />, color: '#4338CA', bg: '#EEF2FF' },
-    { role: 'treasurer', label: 'Treasurer', icon: <DollarSign size={14} />, color: '#047857', bg: '#ECFDF5' },
-    { role: 'documentation', label: 'Documentation', icon: <FileText size={14} />, color: '#D97706', bg: '#FFFBEB' },
-    { role: 'social_media', label: 'Social Media', icon: <Share2 size={14} />, color: '#E11D48', bg: '#FFF1F2' },
-    { role: 'volunteer', label: 'Volunteer', icon: <QrCode size={14} />, color: '#BE185D', bg: '#FCE7F3' },
-    { role: 'member', label: 'Member', icon: <User size={14} />, color: '#15803D', bg: '#DCFCE7' },
+    { role: 'faculty', label: 'Faculty Advisor', icon: <ShieldCheck size={16} strokeWidth={1.75} />, color: '#B45309', bg: '#FEF3C7' },
+    { role: 'coordinator', label: 'Coordinator', icon: <Shield size={16} strokeWidth={1.75} />, color: '#4338CA', bg: '#EEF2FF' },
+    { role: 'treasurer', label: 'Treasurer', icon: <DollarSign size={16} strokeWidth={1.75} />, color: '#047857', bg: '#ECFDF5' },
+    { role: 'documentation', label: 'Documentation', icon: <FileText size={16} strokeWidth={1.75} />, color: '#D97706', bg: '#FFFBEB' },
+    { role: 'social_media', label: 'Social Media', icon: <Share2 size={16} strokeWidth={1.75} />, color: '#E11D48', bg: '#FFF1F2' },
+    { role: 'volunteer', label: 'Volunteer', icon: <QrCode size={16} strokeWidth={1.75} />, color: '#BE185D', bg: '#FCE7F3' },
+    { role: 'member', label: 'Member', icon: <User size={16} strokeWidth={1.75} />, color: '#15803D', bg: '#DCFCE7' },
   ];
 
   interface NavItem {
@@ -72,23 +72,23 @@ export const DesktopSidebar: React.FC = () => {
         {
           id: currentUser.role === 'super_admin' || currentUser.role === 'faculty' ? 'dashboard' : currentUser.role === 'team_admin' ? 'team_home' : currentUser.role === 'member' ? 'home' : 'dashboard',
           label: currentUser.role === 'faculty' ? 'Faculty Command' : currentUser.role === 'coordinator' ? 'Executive Dashboard' : currentUser.role === 'team_admin' ? 'Squad Command' : currentUser.role === 'member' ? 'Scholar Portal' : 'Club Dashboard',
-          icon: <LayoutDashboard size={18} />,
+          icon: <LayoutDashboard size={20} strokeWidth={1.75} />,
         },
         {
           id: 'events',
           label: 'Events & Operations',
-          icon: <Calendar size={18} />,
+          icon: <Calendar size={20} strokeWidth={1.75} />,
         },
         {
           id: 'memories',
           label: 'Memories Hub (GeoTag)',
-          icon: <Camera size={18} />,
+          icon: <Camera size={20} strokeWidth={1.75} />,
           badge: 'GPS',
         },
         {
           id: 'forum',
           label: 'Communication Forum',
-          icon: <MessageSquare size={18} />,
+          icon: <MessageSquare size={20} strokeWidth={1.75} />,
           badge: forumMessages.length > 0 ? `${forumMessages.length}` : undefined,
         },
       ],
@@ -99,27 +99,27 @@ export const DesktopSidebar: React.FC = () => {
         {
           id: 'meetings',
           label: 'Meetings & MoM Hub',
-          icon: <BookOpen size={18} />,
+          icon: <BookOpen size={20} strokeWidth={1.75} />,
         },
         {
           id: 'treasurer',
           label: 'Treasurer & Budget Ledger',
-          icon: <DollarSign size={18} />,
+          icon: <DollarSign size={20} strokeWidth={1.75} />,
         },
         {
           id: 'members',
           label: 'Student Directory & Posts',
-          icon: <Layers size={18} />,
+          icon: <Layers size={20} strokeWidth={1.75} />,
         },
         {
           id: 'teams',
           label: 'Squads & Teams',
-          icon: <Users2 size={18} />,
+          icon: <Users2 size={20} strokeWidth={1.75} />,
         },
         {
           id: 'approvals',
           label: 'Requests & Approvals',
-          icon: <ShieldCheck size={18} />,
+          icon: <ShieldCheck size={20} strokeWidth={1.75} />,
           badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
         },
       ],
@@ -130,18 +130,18 @@ export const DesktopSidebar: React.FC = () => {
         {
           id: 'my_qr',
           label: currentUser.role === 'faculty' || currentUser.role === 'coordinator' || currentUser.role === 'super_admin' || currentUser.role === 'admin' ? 'Smart Dynamic QR (20s)' : 'My QR Attendance Pass',
-          icon: <QrCode size={18} />,
+          icon: <QrCode size={20} strokeWidth={1.75} />,
         },
         {
           id: 'scan_qr',
           label: 'Volunteer Gate Terminal',
-          icon: <Scan size={18} />,
+          icon: <Scan size={20} strokeWidth={1.75} />,
           badge: currentUser.isVolunteer || currentUser.role === 'volunteer' ? 'Active' : undefined,
         },
         {
           id: 'attendance',
           label: 'Attendance Rosters',
-          icon: <UserCheck size={18} />,
+          icon: <UserCheck size={20} strokeWidth={1.75} />,
         },
       ],
     },
@@ -151,29 +151,29 @@ export const DesktopSidebar: React.FC = () => {
         {
           id: 'doc_studio',
           label: 'Documentation & Templates',
-          icon: <FileText size={18} />,
+          icon: <FileText size={20} strokeWidth={1.75} />,
           badge: 'PDF/Word/XLS',
         },
         {
           id: 'ai_social',
           label: 'AI Social Media Studio',
-          icon: <Share2 size={18} />,
+          icon: <Share2 size={20} strokeWidth={1.75} />,
           badge: 'AI',
         },
         {
           id: 'tasks',
           label: 'Tasks & Milestones',
-          icon: <CheckSquare size={18} />,
+          icon: <CheckSquare size={20} strokeWidth={1.75} />,
         },
         {
           id: 'gallery',
           label: 'Chapter Gallery',
-          icon: <Image size={18} />,
+          icon: <Image size={20} strokeWidth={1.75} />,
         },
         {
           id: 'reports',
           label: 'Analytics & Reports',
-          icon: <FileText size={18} />,
+          icon: <FileText size={20} strokeWidth={1.75} />,
         },
       ],
     },
@@ -225,7 +225,7 @@ export const DesktopSidebar: React.FC = () => {
               </span>
               <span
                 style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 700,
                   backgroundColor: '#ECFDF5',
                   color: '#059669',
@@ -257,7 +257,7 @@ export const DesktopSidebar: React.FC = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-            <AppAvatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size={36} />
+            <AppAvatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size={48} strokeWidth={1.75} />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {currentUser.name}
@@ -366,7 +366,7 @@ export const DesktopSidebar: React.FC = () => {
                       backgroundColor: isActive ? '#ECFDF5' : 'transparent',
                       color: isActive ? '#059669' : '#475569',
                       fontWeight: isActive ? 700 : 500,
-                      fontSize: '13.5px',
+                      fontSize: '13px',
                       border: isActive ? '1px solid #A7F3D0' : '1px solid transparent',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -429,7 +429,7 @@ export const DesktopSidebar: React.FC = () => {
             backgroundColor: '#FFFFFF',
             border: '1px solid #CBD5E1',
             color: '#334155',
-            fontSize: '12.5px',
+            fontSize: '12px',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.15s ease',
@@ -452,7 +452,7 @@ export const DesktopSidebar: React.FC = () => {
             backgroundColor: '#FEE2E2',
             border: '1px solid #FECACA',
             color: '#DC2626',
-            fontSize: '12.5px',
+            fontSize: '12px',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.15s ease',

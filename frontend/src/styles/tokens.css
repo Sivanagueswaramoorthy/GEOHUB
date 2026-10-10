@@ -1,22 +1,37 @@
 :root {
   /* ==========================================================================
-     Green Eco Organization - Exact Design System Tokens
+     GeoHub Design System - Normalized Tokens (Green Eco Organization Spec)
      ========================================================================== */
 
-  /* Backgrounds: Strictly White Scaffold, Sheets, and Modals */
+  /* --------------------------------------------------------------------------
+     1. Background Surfaces (Strict Pure White Invariant)
+     -------------------------------------------------------------------------- */
   --bg-scaffold: #FFFFFF;
   --bg-card: #FFFFFF;
   --bg-sheet: #FFFFFF;
   --bg-modal: #FFFFFF;
+  --bg-subtle: #F8FAFC;
+  --bg-input: #FFFFFF;
 
-  /* Brand Greens */
+  /* --------------------------------------------------------------------------
+     2. Brand Colors
+     -------------------------------------------------------------------------- */
   --brand-green: #10B981;
   --dark-green: #064E3B;
   --mint-tint: #E7F9F1;
   --mint-border: #A7F3D0;
   --mint-text: #065F46;
 
-  /* Pastel Stat Tints */
+  /* Primary compatibility aliases */
+  --primary: #10B981;
+  --primary-dark: #064E3B;
+  --primary-light: #E7F9F1;
+  --primary-border: #A7F3D0;
+  --accent: #10B981;
+
+  /* --------------------------------------------------------------------------
+     3. Pastel Stat Tile Color Sets
+     -------------------------------------------------------------------------- */
   --stat-mint-bg: #E7F9F1;
   --stat-mint-border: #A7F3D0;
   --stat-mint-text: #065F46;
@@ -37,37 +52,260 @@
   --stat-teal-text: #0F766E;
   --stat-teal-num: #115E59;
 
-  /* Neutrals & Dividers */
+  /* --------------------------------------------------------------------------
+     4. Neutrals, Text & Dividers
+     -------------------------------------------------------------------------- */
   --text-main: #0F172A;
+  --text-primary: #0F172A;
   --text-secondary: #64748B;
   --text-tertiary: #94A3B8;
+  --text-muted: #94A3B8;
   --divider: #EEF1F5;
   --card-border: #EEF1F5;
+  --border-soft: #EEF1F5;
+  --input-border: #E2E8F0;
 
-  /* Special / Danger */
+  /* --------------------------------------------------------------------------
+     5. Special / Danger / Status Colors
+     -------------------------------------------------------------------------- */
   --danger-red: #EF4444;
   --danger-bg: #FEF2F2;
   --danger-border: #FECACA;
   --danger-text: #DC2626;
 
-  /* Typography */
-  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --success-green: #10B981;
+  --success-bg: #E7F9F1;
+  --warning-amber: #F59E0B;
+  --warning-bg: #FFF8E6;
+  --info-blue: #3B82F6;
+  --info-bg: #EFF6FF;
 
-  /* Radii */
+  /* --------------------------------------------------------------------------
+     6. Typography Scale (Plus Jakarta Sans; sizes in px, line-height in px)
+     -------------------------------------------------------------------------- */
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Display 28/34, 800 */
+  --font-display-size: 28px;
+  --font-display-line: 34px;
+  --font-display-weight: 800;
+  --font-display-spacing: -0.02em;
+
+  /* Title-L 22/28, 800 */
+  --font-title-l-size: 22px;
+  --font-title-l-line: 28px;
+  --font-title-l-weight: 800;
+  --font-title-l-spacing: -0.01em;
+
+  /* Title 18/24, 700 */
+  --font-title-size: 18px;
+  --font-title-line: 24px;
+  --font-title-weight: 700;
+
+  /* Subtitle 16/24, 600 */
+  --font-subtitle-size: 16px;
+  --font-subtitle-line: 24px;
+  --font-subtitle-weight: 600;
+
+  /* Body 14/22, 400 (Default text, minimum body size) */
+  --font-body-size: 14px;
+  --font-body-line: 22px;
+  --font-body-weight: 400;
+
+  /* Body-strong 14/22, 600 */
+  --font-body-strong-size: 14px;
+  --font-body-strong-line: 22px;
+  --font-body-strong-weight: 600;
+
+  /* Small 13/18, 500 (Helper text, metadata) */
+  --font-small-size: 13px;
+  --font-small-line: 18px;
+  --font-small-weight: 500;
+  --font-small-label-weight: 600;
+
+  /* Caption 12/16, 500 (Chips, nav labels, timestamps) */
+  --font-caption-size: 12px;
+  --font-caption-line: 16px;
+  --font-caption-weight: 500;
+  --font-caption-strong-weight: 600;
+
+  /* Overline 11/14, 700, uppercase, letter-spacing .08em */
+  --font-overline-size: 11px;
+  --font-overline-line: 14px;
+  --font-overline-weight: 700;
+  --font-overline-spacing: 0.08em;
+
+  /* Stat number 32/36, 800 with tabular-nums */
+  --font-stat-number-size: 32px;
+  --font-stat-number-line: 36px;
+  --font-stat-number-weight: 800;
+
+  /* Button 15/20, 700 */
+  --font-button-size: 15px;
+  --font-button-line: 20px;
+  --font-button-weight: 700;
+
+  /* --------------------------------------------------------------------------
+     7. Spacing Scale (4px Base)
+     -------------------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  --space-11: 44px;
+  --space-12: 48px;
+  --space-13: 52px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-18: 72px;
+  --space-24: 96px;
+  --space-28: 112px;
+
+  /* Spacing aliases */
+  --page-gutter-mobile: 20px;
+  --page-gutter-desktop: 24px;
+  --page-padding-x: 20px;
+  --page-padding-bottom: 112px;
+  --content-max-width: 1200px;
+  --mobile-max-width: 480px;
+
+  --section-gap: 24px;
+  --card-padding: 16px;
+  --card-hero-padding: 20px;
+  --gap-icon-label: 8px;
+  --gap-chips: 8px;
+  --gap-stacked-cards: 16px;
+  --gap-stat-tiles: 12px;
+  --list-row-min-height: 56px;
+
+  /* --------------------------------------------------------------------------
+     8. Icon Sizes & Containers (Lucide only, Stroke 1.75)
+     -------------------------------------------------------------------------- */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 28px;
+  --icon-stroke-width: 1.75;
+
+  --icon-container-list: 40px;
+  --icon-container-tile: 44px;
+  --icon-container-chevron: 36px;
+  --radius-icon-container: 12px;
+
+  /* --------------------------------------------------------------------------
+     9. Images, Media & Avatars
+     -------------------------------------------------------------------------- */
+  --img-hero-aspect: 16 / 9;
+  --img-hero-radius: 24px;
+  --img-hero-overlay: linear-gradient(180deg, rgba(15, 23, 42, 0) 40%, rgba(15, 23, 42, 0.85) 100%);
+
+  --img-event-aspect: 16 / 9;
+  --img-event-radius: 24px 24px 0 0;
+  --img-badge-offset: 12px;
+
+  --avatar-sm: 32px;
+  --avatar-md: 40px;
+  --avatar-lg: 48px;
+  --avatar-xl: 72px;
+  --avatar-online-dot: 10px;
+
+  --org-logo-size: 72px;
+  --org-logo-radius: 22px;
+  --org-logo-padding: 12px;
+
+  --gallery-thumb-aspect: 1 / 1;
+  --gallery-thumb-gap: 8px;
+  --lightbox-ctrl-size: 44px;
+
+  /* --------------------------------------------------------------------------
+     10. Search Bars & Filter Pills
+     -------------------------------------------------------------------------- */
+  --search-height: 48px;
+  --search-radius: 16px;
+  --search-border: 1px solid #E2E8F0;
+  --search-bg: #FFFFFF;
+  --search-icon-size: 20px;
+  --search-icon-inset: 16px;
+  --search-clear-size: 24px;
+  --search-clear-hit: 44px;
+  --search-focus-ring: 0 0 0 2px #10B981, 0 0 0 4px rgba(16, 185, 129, 0.18);
+  --search-margin-top: 16px;
+  --search-margin-bottom: 12px;
+
+  --filter-pill-height: 40px;
+  --filter-pill-touch-height: 44px;
+  --filter-pill-radius: 999px;
+  --filter-pill-icon: 16px;
+  --filter-badge-pill-size: 22px;
+  --filter-gap: 8px;
+  --results-count-margin-top: 16px;
+
+  /* --------------------------------------------------------------------------
+     11. Headers, Modals, Forms & Floating Nav
+     -------------------------------------------------------------------------- */
+  --header-height: 64px;
+  --header-btn-size: 44px;
+  --header-btn-gap: 12px;
+
+  --floating-nav-height: 64px;
+  --floating-nav-margin: 16px;
+  --floating-nav-slots: 5;
+
+  --btn-primary-height: 52px;
+  --btn-secondary-height: 48px;
+  --btn-small-height: 36px;
+  --btn-radius-pill: 999px;
+
+  --input-height: 48px;
+  --input-radius: 16px;
+  --form-gap-label: 8px;
+  --form-gap-helper: 4px;
+  --form-gap-field: 20px;
+
+  --sheet-handle-width: 36px;
+  --sheet-handle-height: 4px;
+  --sheet-padding: 20px;
+  --sheet-radius-top: 24px;
+  --dialog-radius: 20px;
+  --sheet-close-hit: 44px;
+  --sheet-max-height: 90vh;
+
+  --table-row-height: 56px;
+
+  /* --------------------------------------------------------------------------
+     12. General Radii & Shadows
+     -------------------------------------------------------------------------- */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
   --radius-card: 24px;
   --radius-tile: 20px;
   --radius-pill: 999px;
   --radius-input: 16px;
   --radius-btn: 999px;
 
-  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
   --shadow-card: 0 6px 24px rgba(15, 23, 42, 0.06);
   --shadow-floating-nav: 0 10px 30px rgba(15, 23, 42, 0.12);
   --shadow-sheet: 0 -10px 40px rgba(15, 23, 42, 0.14);
   --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.18);
 
-  /* Layout Spacing */
-  --page-padding-x: 20px;
-  --page-padding-bottom: 112px;
-  --mobile-max-width: 480px;
+  --trans-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-padding-x: 24px;
+  }
 }

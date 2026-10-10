@@ -43,7 +43,7 @@ export const MemberHomeView: React.FC = () => {
             ? 'Open camera terminal to verify student entry'
             : 'Access rotating QR badge for Auditorium turnstile gate'
         }
-        quickActionIcon={isVolunteer ? <Scan size={22} /> : <QrCode size={22} />}
+        quickActionIcon={isVolunteer ? <Scan size={24} strokeWidth={1.75} /> : <QrCode size={24} strokeWidth={1.75} />}
         onQuickActionClick={() => setActiveTab(isVolunteer ? 'scan_qr' : 'my_qr')}
         metrics={[
           {
@@ -124,7 +124,7 @@ export const MemberHomeView: React.FC = () => {
                 color: '#10B981',
               }}
             >
-              <QrCode size={22} />
+              <QrCode size={24} strokeWidth={1.75} />
             </div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>

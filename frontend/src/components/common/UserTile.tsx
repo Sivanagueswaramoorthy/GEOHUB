@@ -18,7 +18,7 @@ export const UserTile: React.FC<UserTileProps> = ({ user, onClick, action }) => 
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <AppAvatar name={user.name} avatarUrl={user.avatarUrl} size={42} />
+        <AppAvatar name={user.name} avatarUrl={user.avatarUrl} size={48} strokeWidth={1.75} />
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
             <span style={{ fontWeight: 600, fontSize: '14px', color: '#0F172A' }}>{user.name}</span>
@@ -32,7 +32,7 @@ export const UserTile: React.FC<UserTileProps> = ({ user, onClick, action }) => 
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {action}
-        {onClick && !action && <ChevronRight size={18} color="#94A3B8" />}
+        {onClick && !action && <ChevronRight size={20} strokeWidth={1.75} color="#94A3B8" />}
       </div>
     </div>
   );

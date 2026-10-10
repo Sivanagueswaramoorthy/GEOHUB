@@ -153,12 +153,9 @@ export const CommunicationForumView: React.FC = () => {
               COMMUNICATION FORUM
             </span>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
             Club Discussion Channels
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-            Faculty directives, volunteer task syncs, GIS questions & scholar discussions
-          </p>
         </div>
 
         <button
@@ -248,7 +245,7 @@ export const CommunicationForumView: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+        <Search size={20} strokeWidth={1.75} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
       </div>
 
       {/* Posts Feed */}
@@ -263,7 +260,7 @@ export const CommunicationForumView: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            <MessageSquare size={32} color="#10B981" style={{ margin: '0 auto 10px' }} />
+            <MessageSquare size={48} strokeWidth={1.75} color="#10B981" style={{ margin: '0 auto 10px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
               No messages in this channel yet
             </h3>
@@ -329,7 +326,7 @@ export const CommunicationForumView: React.FC = () => {
                         </span>
                         <span
                           style={{
-                            fontSize: '10px',
+                            fontSize: '11px',
                             fontWeight: 700,
                             padding: '2px 7px',
                             borderRadius: '999px',
@@ -350,7 +347,7 @@ export const CommunicationForumView: React.FC = () => {
                     {msg.pinned && (
                       <span
                         style={{
-                          fontSize: '10px',
+                          fontSize: '11px',
                           fontWeight: 800,
                           color: '#047857',
                           backgroundColor: '#ECFDF5',
@@ -362,7 +359,7 @@ export const CommunicationForumView: React.FC = () => {
                           gap: '4px',
                         }}
                       >
-                        <Pin size={11} /> PINNED
+                        <Pin size={16} strokeWidth={1.75} /> PINNED
                       </span>
                     )}
                     {(currentUser.role === 'super_admin' || currentUser.role === 'admin') && (
@@ -387,7 +384,7 @@ export const CommunicationForumView: React.FC = () => {
                         }}
                         title={msg.pinned ? 'Unpin message' : 'Pin message to top'}
                       >
-                        <Pin size={11} />
+                        <Pin size={16} strokeWidth={1.75} />
                         <span>{msg.pinned ? 'Unpin' : 'Pin'}</span>
                       </button>
                     )}
@@ -422,7 +419,7 @@ export const CommunicationForumView: React.FC = () => {
                       cursor: 'pointer',
                     }}
                   >
-                    <Heart size={15} fill={hasLiked ? '#E11D48' : 'none'} color={hasLiked ? '#E11D48' : '#64748B'} />
+                    <Heart size={16} strokeWidth={1.75} fill={hasLiked ? '#E11D48' : 'none'} color={hasLiked ? '#E11D48' : '#64748B'} />
                     <span>{msg.likes} Likes</span>
                   </button>
 
@@ -440,7 +437,7 @@ export const CommunicationForumView: React.FC = () => {
                       cursor: 'pointer',
                     }}
                   >
-                    <MessageSquare size={14} />
+                    <MessageSquare size={16} strokeWidth={1.75} />
                     <span>{(msg.replies || []).length} Replies</span>
                   </button>
                 </div>
@@ -452,7 +449,7 @@ export const CommunicationForumView: React.FC = () => {
                       <div key={rep.id} style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '10px 12px', fontSize: '12px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                           <strong style={{ color: '#0F172A' }}>{rep.authorName}</strong>
-                          <span style={{ fontSize: '10px', color: '#94A3B8' }}>• {rep.authorRole}</span>
+                          <span style={{ fontSize: '11px', color: '#94A3B8' }}>• {rep.authorRole}</span>
                         </div>
                         <div style={{ color: '#334155', lineHeight: 1.4 }}>{rep.content}</div>
                       </div>
@@ -487,7 +484,7 @@ export const CommunicationForumView: React.FC = () => {
                         cursor: 'pointer',
                       }}
                     >
-                      <Send size={14} />
+                      <Send size={16} strokeWidth={1.75} />
                     </button>
                   </div>
                 )}

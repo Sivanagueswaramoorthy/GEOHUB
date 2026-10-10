@@ -145,7 +145,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
         </button>
 
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
             AI Chat
           </h2>
           <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
@@ -166,7 +166,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             color: '#64748B',
           }}
         >
-          <MoreVertical size={18} />
+          <MoreVertical size={20} strokeWidth={1.75} />
         </button>
       </div>
 
@@ -202,7 +202,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             >
               {msg.sender === 'ai' && (
                 <div style={{ flexShrink: 0, marginTop: '2px' }}>
-                  <GeoMascot size={32} waving={false} />
+                  <GeoMascot size={48} strokeWidth={1.75} waving={false} />
                 </div>
               )}
 
@@ -276,7 +276,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                                 {item.title}
                               </div>
                               <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <Clock size={11} /> {item.time}
+                                <Clock size={16} strokeWidth={1.75} /> {item.time}
                               </div>
                             </div>
                           </div>
@@ -291,7 +291,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
 
             <span
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 color: '#94A3B8',
                 marginRight: msg.sender === 'user' ? '4px' : '0',
                 marginLeft: msg.sender === 'ai' ? '40px' : '0',
@@ -365,7 +365,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             flexShrink: 0,
           }}
         >
-          <Paperclip size={18} />
+          <Paperclip size={20} strokeWidth={1.75} />
         </button>
 
         <div style={{ flex: 1, position: 'relative' }}>
@@ -400,7 +400,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
               justifyContent: 'center',
             }}
           >
-            <Send size={14} />
+            <Send size={16} strokeWidth={1.75} />
           </button>
         </div>
 

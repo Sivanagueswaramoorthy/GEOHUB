@@ -124,7 +124,7 @@ export const AppTopBar: React.FC = () => {
                 transition: 'all 150ms ease',
               }}
             >
-              <Bell size={17} />
+              <Bell size={20} strokeWidth={1.75} />
               {unreadCount > 0 && (
                 <span
                   style={{
@@ -159,7 +159,7 @@ export const AppTopBar: React.FC = () => {
                 transition: 'all 150ms ease',
               }}
             >
-              <Plus size={18} />
+              <Plus size={20} strokeWidth={1.75} />
             </button>
           </div>
         </div>
@@ -214,7 +214,7 @@ export const AppTopBar: React.FC = () => {
                 transition: 'all 150ms ease',
               }}
             >
-              <span style={{ fontSize: '24px' }}>{act.icon}</span>
+              <span style={{ fontSize: '28px' }}>{act.icon}</span>
               <div style={{ fontWeight: 800, fontSize: '13px', color: '#0F172A' }}>
                 {act.title}
               </div>

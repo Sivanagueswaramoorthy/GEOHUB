@@ -182,7 +182,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               className="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
             >
               <span className="font-extrabold">{item.label}</span>
-              <span className="text-[10px] text-emerald-600/80">({item.tag})</span>
+              <span className="text-[11px] text-emerald-600/80">({item.tag})</span>
             </button>
           ))}
         </div>
@@ -195,7 +195,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </label>
         <div className="login-input-wrapper">
           <span className="login-input-icon" aria-hidden="true">
-            <Mail size={18} />
+            <Mail size={20} strokeWidth={1.75} />
           </span>
           <input
             ref={emailRef}
@@ -220,7 +220,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
         {emailError && (
           <div id="login-email-error" className="field-error-text" role="alert">
-            <AlertCircle size={14} className="shrink-0" />
+            <AlertCircle size={16} strokeWidth={1.75} className="shrink-0" />
             <span>{emailError}</span>
           </div>
         )}
@@ -257,7 +257,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             className="remember-me-input"
           />
           <span className="custom-checkbox" aria-hidden="true">
-            {rememberMe && <CheckCircle2 size={13} strokeWidth={3} />}
+            {rememberMe && <CheckCircle2 size={16} strokeWidth={3} />}
           </span>
           <span>Keep me signed in</span>
         </label>
@@ -279,7 +279,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           role="alert"
           aria-live="polite"
         >
-          <AlertCircle size={18} className="shrink-0 text-red-600 mt-0.5" />
+          <AlertCircle size={20} strokeWidth={1.75} className="shrink-0 text-red-600 mt-0.5" />
           <div className="flex-1">
             <p>{errorState.message}</p>
             {errorState.requestId && (
@@ -293,7 +293,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 onClick={handleSubmit}
                 className="inline-flex items-center gap-1 text-xs font-bold underline mt-1 text-red-700 hover:text-red-900"
               >
-                <RefreshCw size={11} /> Retry connection
+                <RefreshCw size={16} strokeWidth={1.75} /> Retry connection
               </button>
             )}
           </div>
@@ -323,7 +323,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           ) : (
             <>
               <span>Sign in</span>
-              <ArrowRight size={18} />
+              <ArrowRight size={20} strokeWidth={1.75} />
             </>
           )}
         </button>

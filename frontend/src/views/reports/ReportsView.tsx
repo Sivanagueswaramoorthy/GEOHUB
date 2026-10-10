@@ -251,12 +251,12 @@ ${reportBody}
   };
 
   const categories: { key: ReportCategory; label: string; icon: React.ReactNode }[] = [
-    { key: 'event', label: 'Events', icon: <Calendar size={14} /> },
-    { key: 'attendance', label: 'Attendance', icon: <Users size={14} /> },
-    { key: 'budget', label: 'Budget', icon: <DollarSign size={14} /> },
-    { key: 'student_activity', label: 'Students', icon: <Building size={14} /> },
-    { key: 'feedback', label: 'Feedback', icon: <Star size={14} /> },
-    { key: 'mom', label: 'MoM', icon: <FileText size={14} /> },
+    { key: 'event', label: 'Events', icon: <Calendar size={16} strokeWidth={1.75} /> },
+    { key: 'attendance', label: 'Attendance', icon: <Users size={16} strokeWidth={1.75} /> },
+    { key: 'budget', label: 'Budget', icon: <DollarSign size={16} strokeWidth={1.75} /> },
+    { key: 'student_activity', label: 'Students', icon: <Building size={16} strokeWidth={1.75} /> },
+    { key: 'feedback', label: 'Feedback', icon: <Star size={16} strokeWidth={1.75} /> },
+    { key: 'mom', label: 'MoM', icon: <FileText size={16} strokeWidth={1.75} /> },
   ];
 
   return (
@@ -279,13 +279,10 @@ ${reportBody}
             >
               Reports Center
             </h1>
-            <p className="text-xs text-slate-500 font-medium mt-0.5">
-              Comprehensive operational audits, feedback metrics & multi-format exports.
-            </p>
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0 mt-1">
-            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               AY 2026-2027
             </span>
           </div>
@@ -325,7 +322,7 @@ ${reportBody}
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-all cursor-pointer"
             title="Export as Printable PDF"
           >
-            <Printer size={13} />
+            <Printer size={16} strokeWidth={1.75} />
             <span>PDF</span>
           </button>
 
@@ -335,7 +332,7 @@ ${reportBody}
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-all cursor-pointer"
             title="Export as Microsoft Word"
           >
-            <FileCode size={13} />
+            <FileCode size={16} strokeWidth={1.75} />
             <span>Word</span>
           </button>
 
@@ -345,7 +342,7 @@ ${reportBody}
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-all cursor-pointer"
             title="Export as Excel / CSV"
           >
-            <FileSpreadsheet size={13} />
+            <FileSpreadsheet size={16} strokeWidth={1.75} />
             <span>Excel</span>
           </button>
         </div>
@@ -355,12 +352,12 @@ ${reportBody}
       <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col gap-3.5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div className="flex items-center gap-2">
-            <BarChart3 size={18} className="text-emerald-600" />
+            <BarChart3 size={20} strokeWidth={1.75} className="text-emerald-600" />
             <span className="font-extrabold text-sm text-slate-900 capitalize">
               {activeCategory.replace('_', ' ')} Executive Audit Preview
             </span>
           </div>
-          <span className="text-[10px] font-bold text-slate-400">
+          <span className="text-[11px] font-bold text-slate-400">
             Certified by Dr. Sarah Jenkins
           </span>
         </div>
@@ -370,11 +367,11 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Total Activities</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase">Total Activities</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">{events.length} Events</div>
               </div>
               <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase">Turnout Rate</span>
+                <span className="text-[11px] font-bold text-emerald-700 uppercase">Turnout Rate</span>
                 <div className="font-extrabold text-base text-emerald-950 mt-0.5">92.5% Average</div>
               </div>
             </div>
@@ -386,7 +383,7 @@ ${reportBody}
                     <div className="font-bold text-xs text-slate-900">{ev.title}</div>
                     <div className="text-[11px] text-slate-500 mt-0.5">{ev.venue} • {ev.registeredUserIds.length} Registered</div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
                     {ev.status}
                   </span>
                 </div>
@@ -400,11 +397,11 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase">Total Check-Ins</span>
+                <span className="text-[11px] font-bold text-emerald-700 uppercase">Total Check-Ins</span>
                 <div className="font-extrabold text-base text-emerald-950 mt-0.5">{attendance.length} Scans</div>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Flagged / Duplicates</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase">Flagged / Duplicates</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">0 Incidents</div>
               </div>
             </div>
@@ -414,7 +411,7 @@ ${reportBody}
                 <div key={att.id} className="p-2 rounded-xl bg-slate-50 flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-slate-900">{att.userName}</span>
-                    <span className="text-slate-400 text-[10px] ml-1.5">{att.team || 'Member'}</span>
+                    <span className="text-slate-400 text-[11px] ml-1.5">{att.team || 'Member'}</span>
                   </div>
                   <span className="text-emerald-700 font-bold text-[11px]">Verified ✓</span>
                 </div>
@@ -428,11 +425,11 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Grant Sanctioned</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase">Grant Sanctioned</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">₹{report.totalBudget.toLocaleString()}</div>
               </div>
               <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-100">
-                <span className="text-[10px] font-bold text-amber-800 uppercase">Total Disbursed</span>
+                <span className="text-[11px] font-bold text-amber-800 uppercase">Total Disbursed</span>
                 <div className="font-extrabold text-base text-amber-950 mt-0.5">₹{report.spentBudget.toLocaleString()}</div>
               </div>
             </div>
@@ -442,7 +439,7 @@ ${reportBody}
                 <div key={exp.id} className="p-2.5 rounded-xl bg-slate-50 flex items-center justify-between text-xs">
                   <div>
                     <div className="font-bold text-slate-900">{exp.title}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{exp.vendorName} • {exp.category}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{exp.vendorName} • {exp.category}</div>
                   </div>
                   <span className="font-extrabold text-slate-900">₹{exp.amount.toLocaleString()}</span>
                 </div>
@@ -456,11 +453,11 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-purple-50 border border-purple-100">
-                <span className="text-[10px] font-bold text-purple-700 uppercase">Enrolled Scholars</span>
+                <span className="text-[11px] font-bold text-purple-700 uppercase">Enrolled Scholars</span>
                 <div className="font-extrabold text-base text-purple-950 mt-0.5">{users.length} Scholars</div>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Active Officers</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase">Active Officers</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">5 Squad Leads</div>
               </div>
             </div>
@@ -470,9 +467,9 @@ ${reportBody}
                 <div key={u.uid} className="p-2.5 rounded-xl bg-slate-50 flex items-center justify-between text-xs">
                   <div>
                     <div className="font-bold text-slate-900">{u.name}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{u.post || u.teamRole || 'Scholar'} • {u.team || 'Management'}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{u.post || u.teamRole || 'Scholar'} • {u.team || 'Management'}</div>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                     Active
                   </span>
                 </div>
@@ -486,15 +483,15 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-extrabold text-amber-800 uppercase">Cumulative Chapter Score</span>
+                <span className="text-[11px] font-extrabold text-amber-800 uppercase">Cumulative Chapter Score</span>
                 <div className="font-extrabold text-lg text-amber-950 mt-0.5">4.9 / 5.0 Rating</div>
               </div>
               <div className="flex items-center gap-1 text-amber-500">
-                <Star size={18} className="fill-amber-400" />
-                <Star size={18} className="fill-amber-400" />
-                <Star size={18} className="fill-amber-400" />
-                <Star size={18} className="fill-amber-400" />
-                <Star size={18} className="fill-amber-400" />
+                <Star size={20} strokeWidth={1.75} className="fill-amber-400" />
+                <Star size={20} strokeWidth={1.75} className="fill-amber-400" />
+                <Star size={20} strokeWidth={1.75} className="fill-amber-400" />
+                <Star size={20} strokeWidth={1.75} className="fill-amber-400" />
+                <Star size={20} strokeWidth={1.75} className="fill-amber-400" />
               </div>
             </div>
 
@@ -509,11 +506,11 @@ ${reportBody}
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Recorded Meetings</span>
+                <span className="text-[11px] font-bold text-slate-400 uppercase">Recorded Meetings</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">{meetings.length} Sessions</div>
               </div>
               <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase">Action Items Cleared</span>
+                <span className="text-[11px] font-bold text-emerald-700 uppercase">Action Items Cleared</span>
                 <div className="font-extrabold text-base text-emerald-950 mt-0.5">100% Resolved</div>
               </div>
             </div>
@@ -523,9 +520,9 @@ ${reportBody}
                 <div key={m.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs">
                   <div>
                     <div className="font-bold text-slate-900">{m.title}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{new Date(m.dateTime).toLocaleDateString()} • {m.venue}</div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">{new Date(m.dateTime).toLocaleDateString()} • {m.venue}</div>
                   </div>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                  <span className="text-[11px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
                     MoM Filed ✓
                   </span>
                 </div>

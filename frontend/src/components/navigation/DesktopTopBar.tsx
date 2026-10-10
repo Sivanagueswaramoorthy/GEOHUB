@@ -152,14 +152,14 @@ export const DesktopTopBar: React.FC = () => {
             color: '#059669',
             padding: '7px 12px',
             borderRadius: '9px',
-            fontSize: '12.5px',
+            fontSize: '12px',
             fontWeight: 700,
             cursor: 'pointer',
             transition: 'all 0.15s ease',
           }}
           title="Open Smart QR Terminal"
         >
-          <QrCode size={15} />
+          <QrCode size={16} strokeWidth={1.75} />
           <span>Smart QR</span>
         </button>
 
@@ -176,14 +176,14 @@ export const DesktopTopBar: React.FC = () => {
               color: '#FFFFFF',
               padding: '7px 13px',
               borderRadius: '9px',
-              fontSize: '12.5px',
+              fontSize: '12px',
               fontWeight: 700,
               cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
               transition: 'all 0.15s ease',
             }}
           >
-            <Plus size={15} />
+            <Plus size={16} strokeWidth={1.75} />
             <span>New Event</span>
           </button>
         )}
@@ -208,7 +208,7 @@ export const DesktopTopBar: React.FC = () => {
             }}
             title="Notifications"
           >
-            <Bell size={18} />
+            <Bell size={20} strokeWidth={1.75} />
             {unreadNotifs.length > 0 && (
               <span
                 style={{
@@ -220,7 +220,7 @@ export const DesktopTopBar: React.FC = () => {
                   borderRadius: '50%',
                   backgroundColor: '#EF4444',
                   color: '#FFFFFF',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 800,
                   display: 'flex',
                   alignItems: 'center',
@@ -300,11 +300,11 @@ export const DesktopTopBar: React.FC = () => {
             <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', lineHeight: 1.2 }}>
               {currentUser.name.split(' ')[0]}
             </div>
-            <div style={{ fontSize: '10px', fontWeight: 700, color: '#059669', lineHeight: 1.2 }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#059669', lineHeight: 1.2 }}>
               {currentUser.role.replace('_', ' ').toUpperCase()}
             </div>
           </div>
-          <ChevronDown size={14} color="#94A3B8" />
+          <ChevronDown size={16} strokeWidth={1.75} color="#94A3B8" />
         </button>
       </div>
     </header>

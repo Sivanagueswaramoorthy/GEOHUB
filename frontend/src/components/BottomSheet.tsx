@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { COMPONENTS, TYPOGRAPHY } from '../styles/tokens';
 
 export interface BottomSheetProps {
   isOpen: boolean;
@@ -18,7 +19,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   title,
   subtitle,
   children,
-  maxHeight = '85vh',
+  maxHeight = `${COMPONENTS.modals.maxHeightVh}vh`,
   showCloseButton = true,
 }) => {
   const { isPhoneFrame } = useApp();
@@ -46,50 +47,76 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(15, 23, 42, 0.55)',
-        backdropFilter: 'blur(5px)',
+        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+        backdropFilter: 'blur(4px)',
       }}
       onClick={onClose}
     >
       <div
         className="w-full mx-auto relative flex flex-col transition-transform duration-300 ease-out"
         style={{
-          maxWidth: isPhoneFrame ? '480px' : '620px',
+          maxWidth: isPhoneFrame ? '480px' : '640px',
           backgroundColor: '#FFFFFF',
-          borderTopLeftRadius: '28px',
-          borderTopRightRadius: '28px',
-          boxShadow: '0 -12px 48px rgba(15, 23, 42, 0.22)',
+          borderTopLeftRadius: `${COMPONENTS.modals.sheetTopRadius}px`,
+          borderTopRightRadius: `${COMPONENTS.modals.sheetTopRadius}px`,
+          boxShadow: '0 -12px 48px rgba(15, 23, 42, 0.16)',
           maxHeight,
           boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Drag Pill Handle */}
+        {/* Drag Pill Handle (36x4 centered) */}
         <div className="flex justify-center pt-3 pb-1">
           <div
             style={{
-              width: '40px',
-              height: '4px',
+              width: `${COMPONENTS.modals.sheetHandleWidth}px`,
+              height: `${COMPONENTS.modals.sheetHandleHeight}px`,
               borderRadius: '999px',
               backgroundColor: '#CBD5E1',
             }}
           />
         </div>
 
-        {/* Header */}
+        {/* Header with Title (18/24 700) and 44px Close Button */}
         {(title || showCloseButton) && (
-          <div className="flex items-start justify-between px-6 pt-2 pb-3 border-b border-slate-100">
-            <div>
+          <div
+            className="flex items-center justify-between border-b border-slate-100"
+            style={{
+              paddingLeft: `${COMPONENTS.modals.sheetPadding}px`,
+              paddingRight: `${COMPONENTS.modals.sheetPadding}px`,
+              paddingTop: '8px',
+              paddingBottom: '12px',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div className="flex-1 pr-2">
               {title && (
                 <h3
-                  className="font-extrabold text-slate-900 tracking-tight"
-                  style={{ fontSize: '18px', lineHeight: 1.3 }}
+                  style={{
+                    fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
+                    lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
+                    fontWeight: TYPOGRAPHY.scale.title.fontWeight,
+                    color: '#0F172A',
+                    fontFamily: 'var(--font-family)',
+                    margin: 0,
+                  }}
                 >
                   {title}
                 </h3>
               )}
               {subtitle && (
-                <p className="text-xs text-slate-500 font-medium mt-0.5">{subtitle}</p>
+                <p
+                  style={{
+                    fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
+                    lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
+                    color: '#64748B',
+                    marginTop: '2px',
+                    margin: 0,
+                  }}
+                >
+                  {subtitle}
+                </p>
               )}
             </div>
 
@@ -97,19 +124,30 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1.5 -mr-1.5 text-slate-400 hover:text-slate-700 transition-colors rounded-full"
+                className="flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors rounded-full cursor-pointer"
+                style={{
+                  width: `${COMPONENTS.modals.closeHitArea}px`,
+                  height: `${COMPONENTS.modals.closeHitArea}px`,
+                  minWidth: `${COMPONENTS.modals.closeHitArea}px`,
+                  minHeight: `${COMPONENTS.modals.closeHitArea}px`,
+                }}
                 title="Close sheet"
+                aria-label="Close"
               >
-                <X size={20} />
+                <X size={20} strokeWidth={1.75} />
               </button>
             )}
           </div>
         )}
 
-        {/* Content Body */}
+        {/* Content Body with 20px padding */}
         <div
-          className="flex-1 overflow-y-auto px-6 py-4 overscroll-contain"
-          style={{ paddingBottom: '60px' }}
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{
+            padding: `${COMPONENTS.modals.sheetPadding}px`,
+            paddingBottom: '40px',
+            boxSizing: 'border-box',
+          }}
         >
           {children}
         </div>

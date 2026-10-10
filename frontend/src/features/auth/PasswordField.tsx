@@ -50,7 +50,7 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
 
         <div className="login-input-wrapper">
           <span className="login-input-icon" aria-hidden="true">
-            <Lock size={18} />
+            <Lock size={20} strokeWidth={1.75} />
           </span>
 
           <input
@@ -81,13 +81,13 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
             aria-pressed={showPassword}
             tabIndex={0}
           >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPassword ? <EyeOff size={20} strokeWidth={1.75} /> : <Eye size={20} strokeWidth={1.75} />}
           </button>
         </div>
 
         {error && (
           <div id={errorId} className="field-error-text" role="alert">
-            <AlertCircle size={14} className="shrink-0" />
+            <AlertCircle size={16} strokeWidth={1.75} className="shrink-0" />
             <span>{error}</span>
           </div>
         )}

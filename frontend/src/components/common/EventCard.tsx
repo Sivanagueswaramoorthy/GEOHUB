@@ -96,7 +96,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
         >
           <span
             style={{
-              fontSize: '9px',
+              fontSize: '11px',
               fontWeight: 800,
               color: '#059669',
               letterSpacing: '0.06em',
@@ -107,7 +107,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           </span>
           <span
             style={{
-              fontSize: '17px',
+              fontSize: '16px',
               fontWeight: 800,
               color: '#0F172A',
               lineHeight: 1.1,
@@ -136,7 +136,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
                 gap: '5px',
                 backgroundColor: '#DC2626',
                 color: '#FFFFFF',
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 padding: '3px 9px',
                 borderRadius: '999px',
@@ -165,14 +165,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
                 gap: '4px',
                 backgroundColor: '#10B981',
                 color: '#FFFFFF',
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 padding: '3px 9px',
                 borderRadius: '999px',
                 boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
               }}
             >
-              <Check size={11} strokeWidth={3} />
+              <Check size={16} strokeWidth={3} />
               PASS READY
             </span>
           )}
@@ -229,13 +229,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <Clock size={13} color="#10B981" />
+            <Clock size={16} strokeWidth={1.75} color="#10B981" />
             <span style={{ fontWeight: 600, color: '#1E293B' }}>
               {startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • {timeStr}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <MapPin size={13} color="#10B981" />
+            <MapPin size={16} strokeWidth={1.75} color="#10B981" />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {event.venue}
             </span>
@@ -255,7 +255,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
             {event.googleFormUrl ? (
               <span style={{ color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <ExternalLink size={12} /> Google Form Sign-up
+                <ExternalLink size={16} strokeWidth={1.75} /> Google Form Sign-up
               </span>
             ) : (
               'Open to all club members'
@@ -273,7 +273,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
             }}
           >
             View Details
-            <ArrowRight size={13} />
+            <ArrowRight size={16} strokeWidth={1.75} />
           </div>
         </div>
       </div>

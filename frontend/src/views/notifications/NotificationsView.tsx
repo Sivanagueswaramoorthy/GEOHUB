@@ -22,15 +22,15 @@ export const NotificationsView: React.FC = () => {
   const getNotifIcon = (type: string) => {
     switch (type) {
       case 'event':
-        return <Calendar size={18} color="#0F766E" />;
+        return <Calendar size={20} strokeWidth={1.75} color="#0F766E" />;
       case 'task':
-        return <CheckSquare size={18} color="#2563EB" />;
+        return <CheckSquare size={20} strokeWidth={1.75} color="#2563EB" />;
       case 'approval':
-        return <ShieldCheck size={18} color="#16A34A" />;
+        return <ShieldCheck size={20} strokeWidth={1.75} color="#16A34A" />;
       case 'qr':
-        return <QrCode size={18} color="#9333EA" />;
+        return <QrCode size={20} strokeWidth={1.75} color="#9333EA" />;
       default:
-        return <Bell size={18} color="#64748B" />;
+        return <Bell size={20} strokeWidth={1.75} color="#64748B" />;
     }
   };
 
@@ -52,9 +52,6 @@ export const NotificationsView: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Notifications</h1>
-          <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Event alerts, task assignments & attendance verifications
-          </p>
         </div>
 
         <button
@@ -62,7 +59,7 @@ export const NotificationsView: React.FC = () => {
           onClick={markAllNotificationsAsRead}
           title="Mark all as read"
         >
-          <Check size={15} /> Mark All Read
+          <Check size={16} strokeWidth={1.75} /> Mark All Read
         </button>
       </div>
 
@@ -86,7 +83,7 @@ export const NotificationsView: React.FC = () => {
       <div>
         {filteredNotifs.length === 0 ? (
           <div className="empty-state">
-            <Bell size={40} color="#94A3B8" style={{ marginBottom: '12px' }} />
+            <Bell size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>All caught up!</h3>
             <p style={{ fontSize: '13px', color: '#64748B' }}>You have no unread notifications.</p>
           </div>

@@ -59,9 +59,6 @@ export const AttendanceView: React.FC = () => {
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>
             Live Attendance Desk
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B' }}>
-            Real-time terminal logs, verified timestamps & CSV audit export
-          </p>
         </div>
 
         <button className="btn btn-primary btn-sm" onClick={handleExportCSV}>
@@ -110,14 +107,14 @@ export const AttendanceView: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: 12, top: 14 }} />
+        <Search size={20} strokeWidth={1.75} color="#94A3B8" style={{ position: 'absolute', left: 12, top: 14 }} />
       </div>
 
       {/* Attendance Table / List */}
       <div>
         {filteredRecords.length === 0 ? (
           <div className="empty-state">
-            <Users size={40} color="#94A3B8" style={{ marginBottom: '12px' }} />
+            <Users size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>No records found</h3>
             <p style={{ fontSize: '13px', color: '#64748B' }}>
               No check-ins have been recorded yet for this session.
@@ -174,7 +171,7 @@ export const AttendanceView: React.FC = () => {
                     borderRadius: '999px',
                   }}
                 >
-                  <CheckCircle2 size={12} /> VERIFIED
+                  <CheckCircle2 size={16} strokeWidth={1.75} /> VERIFIED
                 </span>
                 <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '2px' }}>
                   {new Date(rec.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

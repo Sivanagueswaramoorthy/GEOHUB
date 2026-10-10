@@ -135,12 +135,9 @@ export const AiSocialStudioView: React.FC = () => {
               AI-POWERED SOCIAL MEDIA STUDIO
             </span>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
             AI Content Studio (Social Media & Daily News)
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-            Generate tailor-made copy for Instagram, LinkedIn, WhatsApp Broadcasts & College Press Bulletins
-          </p>
         </div>
       </div>
 
@@ -179,10 +176,10 @@ export const AiSocialStudioView: React.FC = () => {
             <label className="input-label">Target Platform / Channel</label>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {[
-                { key: 'instagram', label: 'Instagram', icon: <Camera size={14} color="#E1306C" /> },
-                { key: 'linkedin', label: 'LinkedIn', icon: <Share2 size={14} color="#0A66C2" /> },
-                { key: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle size={14} color="#25D366" /> },
-                { key: 'daily_news', label: 'Daily News', icon: <FileText size={14} color="#0F172A" /> },
+                { key: 'instagram', label: 'Instagram', icon: <Camera size={16} strokeWidth={1.75} color="#E1306C" /> },
+                { key: 'linkedin', label: 'LinkedIn', icon: <Share2 size={16} strokeWidth={1.75} color="#0A66C2" /> },
+                { key: 'whatsapp', label: 'WhatsApp', icon: <MessageCircle size={16} strokeWidth={1.75} color="#25D366" /> },
+                { key: 'daily_news', label: 'Daily News', icon: <FileText size={16} strokeWidth={1.75} color="#0F172A" /> },
               ].map((p) => (
                 <button
                   key={p.key}
@@ -293,7 +290,7 @@ export const AiSocialStudioView: React.FC = () => {
                 cursor: 'pointer',
               }}
             >
-              <Copy size={13} /> Copy to Clipboard
+              <Copy size={16} strokeWidth={1.75} /> Copy to Clipboard
             </button>
           </div>
 

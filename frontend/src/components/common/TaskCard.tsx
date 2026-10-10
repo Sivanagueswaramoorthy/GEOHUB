@@ -40,18 +40,19 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '10px',
-        marginBottom: '10px',
+        gap: '12px',
+        marginBottom: '12px',
         borderLeft: task.status === 'done' ? '4px solid #16A34A' : '4px solid #0F766E',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span
             style={{
               fontSize: '11px',
+              lineHeight: '14px',
               fontWeight: 600,
-              padding: '2px 6px',
+              padding: '2px 8px',
               borderRadius: '999px',
               backgroundColor: priorityStyle.bg,
               color: priorityStyle.color,
@@ -60,7 +61,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
           >
             {task.priority}
           </span>
-          <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
+          <span style={{ fontSize: '12px', lineHeight: '16px', color: '#64748B', fontWeight: 500 }}>
             {task.team}
           </span>
         </div>
@@ -74,13 +75,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
               e.stopPropagation();
               onToggleDone(e);
             }}
+            className="touch-target-44"
             style={{
               padding: 0,
               color: task.status === 'done' ? '#16A34A' : '#CBD5E1',
               marginTop: '2px',
             }}
           >
-            <CheckCircle2 size={20} />
+            <CheckCircle2 size={20} strokeWidth={1.75} />
           </button>
         )}
         <h4
@@ -88,7 +90,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
             fontSize: '14px',
             fontWeight: 600,
             color: task.status === 'done' ? '#64748B' : '#0F172A',
-            lineHeight: 1.4,
+            lineHeight: '22px',
             textDecoration: task.status === 'done' ? 'line-through' : 'none',
           }}
         >
@@ -102,31 +104,32 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingTop: '8px',
-          borderTop: '1px solid #E8ECF2',
+          borderTop: '1px solid #E2E8F0',
           fontSize: '12px',
+          lineHeight: '16px',
           color: '#64748B',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <AppAvatar name={task.assigneeName} avatarUrl={task.assigneeAvatar} size={22} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <AppAvatar name={task.assigneeName} avatarUrl={task.assigneeAvatar} size={24} strokeWidth={1.75} />
           <span style={{ fontWeight: 500 }}>{task.assigneeName}</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {(task.proofUrl || task.proofNote) && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#16A34A' }}>
-              <Paperclip size={13} />
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#16A34A' }}>
+              <Paperclip size={16} strokeWidth={1.75} />
               Proof
             </span>
           )}
           {task.comments.length > 0 && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-              <MessageSquare size={13} />
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <MessageSquare size={16} strokeWidth={1.75} />
               {task.comments.length}
             </span>
           )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Calendar size={13} />
+            <Calendar size={16} strokeWidth={1.75} />
             <span>{formatDueDate(task.dueDate)}</span>
           </div>
         </div>

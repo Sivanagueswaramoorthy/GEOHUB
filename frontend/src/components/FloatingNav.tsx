@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getRoleNavTabs, NavTabKey } from '../core/nav';
+import { COMPONENTS } from '../styles/tokens';
 
 export interface FloatingNavProps {
   className?: string;
@@ -35,24 +36,24 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
   const getLucideIcon = (iconName: string, size = 24) => {
     switch (iconName) {
       case 'house':
-        return <House size={size} />;
+        return <House size={size} strokeWidth={1.75} />;
       case 'calendar':
-        return <Calendar size={size} />;
+        return <Calendar size={size} strokeWidth={1.75} />;
       case 'layers':
-        return <Layers size={size} />;
+        return <Layers size={size} strokeWidth={1.75} />;
       case 'user-check':
-        return <UserCheck size={size} />;
+        return <UserCheck size={size} strokeWidth={1.75} />;
       case 'folder-archive':
-        return <FolderArchive size={size} />;
+        return <FolderArchive size={size} strokeWidth={1.75} />;
       case 'wallet':
-        return <Wallet size={size} />;
+        return <Wallet size={size} strokeWidth={1.75} />;
       case 'megaphone':
-        return <Megaphone size={size} />;
+        return <Megaphone size={size} strokeWidth={1.75} />;
       case 'images':
-        return <Images size={size} />;
+        return <Images size={size} strokeWidth={1.75} />;
       case 'user':
       default:
-        return <User size={size} />;
+        return <User size={size} strokeWidth={1.75} />;
     }
   };
 
@@ -104,17 +105,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       return activeTab === 'events';
     }
     if (key === 'operations') {
-      return [
-        'operations',
-        'scan_qr',
-        'attendance',
-        'approvals',
-        'reports',
-        'teams',
-        'tasks',
-        'forum',
-        'meetings',
-      ].includes(activeTab);
+      return activeTab === 'operations' || activeTab === 'explore';
     }
     if (key === 'members') {
       return activeTab === 'members';
@@ -146,10 +137,10 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
         transform: 'translateX(-50%)',
         width: 'calc(100% - 32px)',
         maxWidth: isPhoneFrame ? '440px' : '560px',
-        height: '64px',
+        height: `${COMPONENTS.floatingNav.height}px`,
         backgroundColor: '#FFFFFF',
         borderRadius: '32px',
-        border: '1px solid #EEF1F5',
+        border: '1px solid #E2E8F0',
         boxShadow: '0 10px 30px rgba(15, 23, 42, 0.12)',
         display: 'flex',
         alignItems: 'center',
@@ -161,60 +152,66 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       }}
       aria-label="Bottom Navigation"
     >
-      {tabs.map((tab) => {
+      {tabs.slice(0, 5).map((tab) => {
         const active = isTabActive(tab.key);
 
-        if (active) {
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => handleTabClick(tab.key)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full cursor-pointer overflow-hidden transition-all duration-200 ease-out shrink-0"
-              style={{
-                backgroundColor: '#E7F9F1',
-                border: '1px solid #A7F3D0',
-                color: '#065F46',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.14)',
-                height: '44px',
-              }}
-            >
-              <span className="shrink-0">{getLucideIcon(tab.iconName, 20)}</span>
-              <span
+        return (
+          <div
+            key={tab.key}
+            className="flex-1 flex items-center justify-center h-full"
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            {active ? (
+              <button
+                type="button"
+                onClick={() => handleTabClick(tab.key)}
+                className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95"
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 600,
+                  backgroundColor: '#E7F9F1',
+                  border: '1px solid #A7F3D0',
                   color: '#065F46',
-                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.14)',
+                  height: '44px',
+                  boxSizing: 'border-box',
                 }}
               >
-                {tab.label}
-              </span>
-            </button>
-          );
-        }
-
-        return (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => handleTabClick(tab.key)}
-            className="relative flex flex-col items-center justify-center p-2 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer shrink-0"
-            style={{
-              width: '44px',
-              height: '44px',
-            }}
-            title={tab.label}
-            aria-label={tab.label}
-          >
-            {getLucideIcon(tab.iconName, 24)}
-            {tab.hasUpdates && (
-              <span
-                className="absolute bottom-1 w-1.5 h-1.5 rounded-full"
-                style={{ backgroundColor: '#10B981' }}
-              />
+                <span className="shrink-0">{getLucideIcon(tab.iconName, 20)}</span>
+                <span
+                  style={{
+                    fontSize: `${COMPONENTS.floatingNav.labelFontSize}px`,
+                    lineHeight: '16px',
+                    fontWeight: COMPONENTS.floatingNav.labelFontWeight,
+                    color: '#065F46',
+                    whiteSpace: 'nowrap',
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleTabClick(tab.key)}
+                className="relative flex items-center justify-center p-2 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer active:scale-95"
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  boxSizing: 'border-box',
+                }}
+                title={tab.label}
+                aria-label={tab.label}
+              >
+                {getLucideIcon(tab.iconName, 24)}
+                {tab.hasUpdates && (
+                  <span
+                    className="absolute bottom-1 w-2 h-2 rounded-full"
+                    style={{ backgroundColor: '#10B981' }}
+                  />
+                )}
+              </button>
             )}
-          </button>
+          </div>
         );
       })}
     </nav>

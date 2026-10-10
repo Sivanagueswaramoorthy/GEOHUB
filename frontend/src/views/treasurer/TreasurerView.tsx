@@ -26,6 +26,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Check,
+  Utensils,
+  Lock,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getRolePermissions } from '../../core/permissions';
@@ -40,6 +42,7 @@ import {
   Toast,
   ConfirmDialog,
   EmptyState,
+  SearchBar,
 } from '../../components';
 
 export const TreasurerView: React.FC = () => {
@@ -332,7 +335,7 @@ export const TreasurerView: React.FC = () => {
               TREASURY & FISCAL GOVERNANCE
             </Overline>
             {!perms.canEditBudget && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                 Allocations Set by Faculty
               </span>
             )}
@@ -343,9 +346,6 @@ export const TreasurerView: React.FC = () => {
           >
             Treasurer Ledger
           </h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Manage vouchers, equipment inventory, budget allocations & fiscal audits
-          </p>
         </div>
 
         <button
@@ -358,9 +358,9 @@ export const TreasurerView: React.FC = () => {
             setFormNotes('');
             setIsAddExpenseOpen(true);
           }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all cursor-pointer active:scale-95 shrink-0 mt-1"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all cursor-pointer active:scale-95 shrink-0 mt-1"
         >
-          <Plus size={15} strokeWidth={2.5} />
+          <Plus size={16} strokeWidth={1.75} />
           <span>Add Expense</span>
         </button>
       </div>
@@ -397,7 +397,7 @@ export const TreasurerView: React.FC = () => {
         <>
           {/* Four StatTiles: Total Budget, Spent, Remaining, Pending Entries */}
           <div
-            className="grid grid-cols-2 gap-3"
+            className="stat-tiles-grid"
             style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}
           >
             <StatTile
@@ -405,7 +405,7 @@ export const TreasurerView: React.FC = () => {
               value={formatINR(totalBudget)}
               footnote="All 4 squad allocations"
               tint="mint"
-              icon={<DollarSign size={18} />}
+              icon={<DollarSign size={20} strokeWidth={1.75} />}
               onClick={() => setIsAllocationModalOpen(true)}
             />
 
@@ -414,7 +414,7 @@ export const TreasurerView: React.FC = () => {
               value={formatINR(totalSpent)}
               footnote="50.4% corpus utilized"
               tint="amber"
-              icon={<TrendingUp size={18} />}
+              icon={<TrendingUp size={20} strokeWidth={1.75} />}
               onClick={() => setActiveSubTab('expenses')}
             />
 
@@ -423,7 +423,7 @@ export const TreasurerView: React.FC = () => {
               value={formatINR(remainingBudget)}
               footnote="49.6% available balance"
               tint="teal"
-              icon={<CheckCircle2 size={18} />}
+              icon={<CheckCircle2 size={20} strokeWidth={1.75} />}
               onClick={() => setActiveSubTab('expenses')}
             />
 
@@ -432,16 +432,16 @@ export const TreasurerView: React.FC = () => {
               value={String(pendingEntriesCount)}
               footnote="Vouchers awaiting bills"
               tint="lavender"
-              icon={<Clock size={18} />}
+              icon={<Clock size={20} strokeWidth={1.75} />}
               onClick={() => setActiveSubTab('expenses')}
             />
           </div>
 
           {/* Refreshments Duty Link (converts food details into an expense) */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 shadow-2xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                🍔
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/90 shadow-2xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Utensils size={18} strokeWidth={1.75} />
               </div>
               <div className="min-w-0">
                 <span className="block text-xs font-extrabold text-amber-950 truncate">
@@ -620,7 +620,7 @@ export const TreasurerView: React.FC = () => {
                       <span className="font-extrabold text-xs text-slate-900 truncate">
                         {ev.title}
                       </span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${ev.badgeBg}`}>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${ev.badgeBg}`}>
                         {ev.badge}
                       </span>
                     </div>
@@ -653,30 +653,18 @@ export const TreasurerView: React.FC = () => {
           <SectionCard padding="14px">
             <div className="flex flex-col gap-2.5">
               {/* Search Bar */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search item, vendor or event..."
-                  value={expenseSearch}
-                  onChange={(e) => setExpenseSearch(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-                />
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                {expenseSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setExpenseSearch('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
+              <SearchBar
+                value={expenseSearch}
+                onChange={setExpenseSearch}
+                placeholder="Search item, vendor or event..."
+                resultsCount={filteredExpenses.length}
+                suggestions={['Trimble GNSS', 'Audio soundcheck', 'Floor Posters', 'Refreshments', 'Battery pack']}
+              />
 
               {/* Multi Filters Row */}
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Filter by Event</label>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Filter by Event</label>
                   <select
                     value={filterEvent}
                     onChange={(e) => setFilterEvent(e.target.value)}
@@ -692,7 +680,7 @@ export const TreasurerView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Category</label>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Category</label>
                   <select
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value)}
@@ -710,7 +698,7 @@ export const TreasurerView: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Date Range</label>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Date Range</label>
                   <select
                     value={filterDateRange}
                     onChange={(e) => setFilterDateRange(e.target.value)}
@@ -723,7 +711,7 @@ export const TreasurerView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Amount Range</label>
+                  <label className="block text-[11px] font-bold text-slate-500 mb-0.5">Amount Range</label>
                   <select
                     value={filterAmount}
                     onChange={(e) => setFilterAmount(e.target.value)}
@@ -747,7 +735,7 @@ export const TreasurerView: React.FC = () => {
                   onClick={handleExportCsv}
                   className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
                 >
-                  <Download size={13} />
+                  <Download size={16} strokeWidth={1.75} />
                   <span>Export CSV</span>
                 </button>
               </div>
@@ -771,7 +759,7 @@ export const TreasurerView: React.FC = () => {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+                        <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
                           exp.category === 'Logistics'
                             ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                             : exp.category === 'Stage'
@@ -783,7 +771,7 @@ export const TreasurerView: React.FC = () => {
                           {exp.category}
                         </span>
                         {exp.eventTitle && (
-                          <span className="text-[10px] font-semibold text-slate-500 truncate max-w-[180px]">
+                          <span className="text-[11px] font-semibold text-slate-500 truncate max-w-[180px]">
                             {exp.eventTitle}
                           </span>
                         )}
@@ -836,7 +824,7 @@ export const TreasurerView: React.FC = () => {
                         className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Edit voucher"
                       >
-                        <Edit2 size={15} />
+                        <Edit2 size={16} strokeWidth={1.75} />
                       </button>
                       <button
                         type="button"
@@ -844,7 +832,7 @@ export const TreasurerView: React.FC = () => {
                         className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                         title="Delete voucher"
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={16} strokeWidth={1.75} />
                       </button>
                     </div>
                   </div>
@@ -864,7 +852,7 @@ export const TreasurerView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-700">Physical Asset Inventory</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                 {stockItems.length} Items Monitored
               </span>
             </div>
@@ -874,7 +862,7 @@ export const TreasurerView: React.FC = () => {
               onClick={() => setIsAddStockOpen(true)}
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full font-bold text-xs bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-all cursor-pointer active:scale-95"
             >
-              <PackagePlus size={14} />
+              <PackagePlus size={16} strokeWidth={1.75} />
               <span>Add Stock Item</span>
             </button>
           </div>
@@ -889,10 +877,10 @@ export const TreasurerView: React.FC = () => {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-600">
+                      <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-600">
                         {item.category}
                       </span>
-                      <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider ${
+                      <span className={`text-[11px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider ${
                         item.quantity <= item.minThreshold
                           ? 'bg-amber-50 text-amber-800 border border-amber-200'
                           : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
@@ -909,7 +897,7 @@ export const TreasurerView: React.FC = () => {
                     <span className="font-mono font-extrabold text-base text-slate-900">
                       {item.quantity} <span className="text-xs text-slate-500 font-normal">{item.unit}</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">Min: {item.minThreshold}</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Min: {item.minThreshold}</span>
                   </div>
                 </div>
 
@@ -937,7 +925,7 @@ export const TreasurerView: React.FC = () => {
                     className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                     title="Delete item"
                   >
-                    <Trash2 size={15} />
+                    <Trash2 size={16} strokeWidth={1.75} />
                   </button>
                 </div>
               </div>
@@ -965,22 +953,22 @@ export const TreasurerView: React.FC = () => {
                 onClick={handleExportCsv}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs cursor-pointer"
               >
-                <Download size={13} />
+                <Download size={16} strokeWidth={1.75} />
                 <span>Export Ledger</span>
               </button>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-100 text-center">
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block">TOTAL OUTFLOW</span>
+                <span className="text-[11px] text-slate-400 font-bold block">TOTAL OUTFLOW</span>
                 <span className="font-mono font-extrabold text-sm text-slate-900">{formatINR(totalSpent)}</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block">VOUCHERS</span>
+                <span className="text-[11px] text-slate-400 font-bold block">VOUCHERS</span>
                 <span className="font-mono font-extrabold text-sm text-slate-900">{expenses.length} Logged</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 font-bold block">CERTIFICATION</span>
+                <span className="text-[11px] text-slate-400 font-bold block">CERTIFICATION</span>
                 <span className="text-[11px] font-bold text-emerald-700 block mt-0.5">Faculty Ratified ✓</span>
               </div>
             </div>
@@ -995,13 +983,13 @@ export const TreasurerView: React.FC = () => {
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-[10px] text-slate-400">{exp.id.toUpperCase()}</span>
-                    <span className="text-[10px] font-bold text-slate-400">• {exp.buyingDate}</span>
+                    <span className="font-mono text-[11px] text-slate-400">{exp.id.toUpperCase()}</span>
+                    <span className="text-[11px] font-bold text-slate-400">• {exp.buyingDate}</span>
                   </div>
                   <h4 className="font-extrabold text-xs text-slate-900 truncate mt-0.5">
                     {exp.title}
                   </h4>
-                  <p className="text-[10px] text-slate-500 truncate">
+                  <p className="text-[11px] text-slate-500 truncate">
                     Vendor: {exp.vendorName} • Paid by: {exp.paidBy}
                   </p>
                 </div>
@@ -1010,7 +998,7 @@ export const TreasurerView: React.FC = () => {
                   <span className="font-mono font-extrabold text-sm text-emerald-950">
                     {formatINR(exp.amount)}
                   </span>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 mt-0.5">
+                  <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 mt-0.5">
                     Approved
                   </span>
                 </div>
@@ -1292,7 +1280,10 @@ export const TreasurerView: React.FC = () => {
       >
         <div className="flex flex-col gap-3 py-1">
           <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200 text-xs text-amber-950 flex items-start gap-2">
-            <span className="font-extrabold text-amber-800 shrink-0">🔒 Read-Only:</span>
+            <span className="font-extrabold text-amber-800 shrink-0 inline-flex items-center gap-1">
+              <Lock size={12} strokeWidth={1.75} />
+              Read-Only:
+            </span>
             <span>Allocations are set by Faculty Advisor Dr. Sarah Jenkins. Modification is hidden by permission and route for the Treasurer Lead. You may submit a budget change petition below.</span>
           </div>
 
@@ -1311,11 +1302,11 @@ export const TreasurerView: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-xs text-slate-900">{item.squad}</span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
+                    <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-purple-50 text-purple-700 border border-purple-200">
                       Set by Faculty
                     </span>
                   </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">
+                  <div className="text-[11px] text-slate-500 mt-0.5">
                     Spent: {formatINR(item.spent)}
                   </div>
                 </div>

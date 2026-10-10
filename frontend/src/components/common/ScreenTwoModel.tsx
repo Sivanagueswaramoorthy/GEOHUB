@@ -122,7 +122,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
               </div>
             </div>
           </div>
-          <ChevronRight size={18} color="#94A3B8" />
+          <ChevronRight size={20} strokeWidth={1.75} color="#94A3B8" />
         </div>
       )}
 
@@ -259,7 +259,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
             </div>
             <div>
               {m.subtext && (
-                <div style={{ fontSize: '9px', color: '#059669', fontWeight: 700 }}>
+                <div style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
                   {m.subtext}
                 </div>
               )}
@@ -345,7 +345,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 {item.tag && (
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: '11px',
                       fontWeight: 700,
                       backgroundColor: tagStyle.bg,
                       color: tagStyle.text,
@@ -382,7 +382,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
           }}
         >
           <RefreshCw
-            size={14}
+            size={16} strokeWidth={1.75}
             color="#10B981"
             style={{
               transform: isRefreshed ? 'rotate(360deg)' : 'none',
@@ -462,7 +462,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                       alignItems: 'center',
                     }}
                   >
-                    {isDone ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                    {isDone ? <CheckCircle2 size={20} strokeWidth={1.75} /> : <Circle size={20} strokeWidth={1.75} />}
                   </button>
                   <div>
                     <div
@@ -479,7 +479,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                       <span>{t.team} Squad</span>
                       <span>•</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        <Clock size={10} /> {t.dueDate}
+                        <Clock size={16} strokeWidth={1.75} /> {t.dueDate}
                       </span>
                     </div>
                   </div>
@@ -487,7 +487,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
 
                 <span
                   style={{
-                    fontSize: '10px',
+                    fontSize: '11px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     color: t.priority === 'high' ? '#EF4444' : '#10B981',

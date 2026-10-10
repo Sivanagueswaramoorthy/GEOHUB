@@ -394,7 +394,7 @@ export const CampaignsView: React.FC = () => {
           }}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all cursor-pointer active:scale-95 shrink-0"
         >
-          <Plus size={15} />
+          <Plus size={16} strokeWidth={1.75} />
           <span>New Post</span>
         </button>
       </div>
@@ -437,7 +437,7 @@ export const CampaignsView: React.FC = () => {
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <Sparkles size={13} className="text-amber-500" />
+          <Sparkles size={16} strokeWidth={1.75} className="text-amber-500" />
           <span>AI Studio</span>
         </button>
 
@@ -458,12 +458,12 @@ export const CampaignsView: React.FC = () => {
           SUB-TAB 1: POSTS LIST
           ========================================================================= */}
       {activeSubTab === 'posts' && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 min-w-0 w-full max-w-full">
           {/* Filters Bar */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 min-w-0 w-full max-w-full">
             {/* Platform filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0 w-full max-w-full">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
                 Platform:
               </span>
               {(['All', 'Instagram', 'LinkedIn', 'WhatsApp', 'Other'] as const).map((plat) => (
@@ -471,7 +471,7 @@ export const CampaignsView: React.FC = () => {
                   key={plat}
                   type="button"
                   onClick={() => setSelectedPlatformFilter(plat)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                     selectedPlatformFilter === plat
                       ? 'bg-purple-700 text-white shadow-xs'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -483,8 +483,8 @@ export const CampaignsView: React.FC = () => {
             </div>
 
             {/* Status filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0 w-full max-w-full">
+              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
                 Status:
               </span>
               {(['All', 'Draft', 'Scheduled', 'Posted'] as const).map((st) => (
@@ -492,7 +492,7 @@ export const CampaignsView: React.FC = () => {
                   key={st}
                   type="button"
                   onClick={() => setSelectedStatusFilter(st)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                     selectedStatusFilter === st
                       ? 'bg-slate-900 text-white shadow-xs'
                       : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -507,11 +507,8 @@ export const CampaignsView: React.FC = () => {
           {/* Posts List */}
           {filteredPosts.length === 0 ? (
             <div className="p-8 rounded-3xl bg-white border border-slate-200 text-center flex flex-col items-center">
-              <Megaphone size={36} className="text-slate-300 mb-2" />
+              <Megaphone size={48} strokeWidth={1.75} className="text-slate-300 mb-2" />
               <h3 className="font-extrabold text-sm text-slate-800">No Posts Found</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-xs">
-                No social posts match the selected platform and status filters.
-              </p>
               <button
                 type="button"
                 onClick={() => {
@@ -544,21 +541,21 @@ export const CampaignsView: React.FC = () => {
                             : 'bg-slate-100 text-slate-700 border border-slate-200'
                         }`}
                       >
-                        {post.platform === 'Instagram' && <Camera size={12} />}
-                        {post.platform === 'LinkedIn' && <Share2 size={12} />}
-                        {post.platform === 'WhatsApp' && <MessageCircle size={12} />}
+                        {post.platform === 'Instagram' && <Camera size={16} strokeWidth={1.75} />}
+                        {post.platform === 'LinkedIn' && <Share2 size={16} strokeWidth={1.75} />}
+                        {post.platform === 'WhatsApp' && <MessageCircle size={16} strokeWidth={1.75} />}
                         <span>{post.platform}</span>
                       </span>
 
                       {post.eventTitle && (
-                        <span className="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100 truncate max-w-[140px]">
+                        <span className="text-[11px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100 truncate max-w-[140px]">
                           {post.eventTitle}
                         </span>
                       )}
                     </div>
 
                     <span
-                      className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                      className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                         post.status === 'Posted'
                           ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                           : post.status === 'Scheduled'
@@ -581,7 +578,7 @@ export const CampaignsView: React.FC = () => {
                       {post.hashtags.map((tag, idx) => (
                         <span
                           key={idx}
-                          className="text-[10px] font-semibold text-purple-700 bg-purple-50/60 px-1.5 py-0.5 rounded"
+                          className="text-[11px] font-semibold text-purple-700 bg-purple-50/60 px-1.5 py-0.5 rounded"
                         >
                           {tag}
                         </span>
@@ -594,7 +591,7 @@ export const CampaignsView: React.FC = () => {
                     <div className="flex items-center gap-1.5">
                       {post.status === 'Scheduled' && (
                         <>
-                          <Clock size={13} className="text-purple-600" />
+                          <Clock size={16} strokeWidth={1.75} className="text-purple-600" />
                           <span>
                             {post.scheduledDate} at {post.scheduledTime || '11:00'}
                           </span>
@@ -602,13 +599,13 @@ export const CampaignsView: React.FC = () => {
                       )}
                       {post.status === 'Posted' && (
                         <>
-                          <CheckCircle2 size={13} className="text-emerald-600" />
+                          <CheckCircle2 size={16} strokeWidth={1.75} className="text-emerald-600" />
                           <span>Published {post.publishedDate}</span>
                         </>
                       )}
                       {post.status === 'Draft' && (
                         <>
-                          <FileText size={13} className="text-amber-600" />
+                          <FileText size={16} strokeWidth={1.75} className="text-amber-600" />
                           <span>Unscheduled Draft</span>
                         </>
                       )}
@@ -622,7 +619,7 @@ export const CampaignsView: React.FC = () => {
                         className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
                         title="Copy caption"
                       >
-                        <Copy size={14} />
+                        <Copy size={16} strokeWidth={1.75} />
                       </button>
 
                       {/* Edit */}
@@ -632,7 +629,7 @@ export const CampaignsView: React.FC = () => {
                         className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
                         title="Edit post"
                       >
-                        <Edit2 size={14} />
+                        <Edit2 size={16} strokeWidth={1.75} />
                       </button>
 
                       {/* If Draft or Scheduled, can Mark as Posted */}
@@ -644,7 +641,7 @@ export const CampaignsView: React.FC = () => {
                             setInputLiveUrl(post.postUrl || '');
                             setIsMarkPostedOpen(true);
                           }}
-                          className="px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
+                          className="px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
                         >
                           Mark Posted
                         </button>
@@ -656,10 +653,10 @@ export const CampaignsView: React.FC = () => {
                           href={post.postUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
                         >
                           <span>Live</span>
-                          <ExternalLink size={10} />
+                          <ExternalLink size={16} strokeWidth={1.75} />
                         </a>
                       )}
 
@@ -670,7 +667,7 @@ export const CampaignsView: React.FC = () => {
                         className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                         title="Delete post"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={16} strokeWidth={1.75} />
                       </button>
                     </div>
                   </div>
@@ -690,7 +687,7 @@ export const CampaignsView: React.FC = () => {
           <SectionCard padding="18px">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <CalendarIcon size={17} className="text-purple-600" />
+                <CalendarIcon size={20} strokeWidth={1.75} className="text-purple-600" />
                 <h3 className="font-extrabold text-sm text-slate-900">{currentMonth}</h3>
               </div>
               <div className="flex items-center gap-1">
@@ -699,12 +696,12 @@ export const CampaignsView: React.FC = () => {
                   onClick={() => showToast('Navigated to September 2026')}
                   className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  <ChevronLeft size={14} />
+                  <ChevronLeft size={16} strokeWidth={1.75} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedDateStr('2026-10-08')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 cursor-pointer"
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 cursor-pointer"
                 >
                   Today
                 </button>
@@ -713,7 +710,7 @@ export const CampaignsView: React.FC = () => {
                   onClick={() => showToast('Navigated to November 2026')}
                   className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
                 >
-                  <ChevronRight size={14} />
+                  <ChevronRight size={16} strokeWidth={1.75} />
                 </button>
               </div>
             </div>
@@ -744,11 +741,7 @@ export const CampaignsView: React.FC = () => {
 
             {scheduledForSelectedDate.length === 0 ? (
               <div className="p-6 rounded-2xl bg-white border border-slate-100 text-center flex flex-col items-center">
-                <Clock size={28} className="text-slate-300 mb-1" />
-                <p className="text-xs font-bold text-slate-700">No Posts Scheduled</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Keep chapter momentum active by scheduling content for this date.
-                </p>
+                <span className="text-xs font-bold text-slate-700">No Posts Scheduled</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -774,11 +767,11 @@ export const CampaignsView: React.FC = () => {
                         <span className="text-xs font-extrabold text-purple-800 font-mono">
                           {p.scheduledTime || '11:00'}
                         </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                           {p.platform}
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-500">{p.eventTitle}</span>
+                      <span className="text-[11px] font-bold text-slate-500">{p.eventTitle}</span>
                     </div>
 
                     <p className="text-xs text-slate-800 font-medium leading-snug">
@@ -789,14 +782,14 @@ export const CampaignsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleCopyText(p.caption)}
-                        className="text-[10px] font-bold text-slate-600 hover:text-purple-700"
+                        className="text-[11px] font-bold text-slate-600 hover:text-purple-700"
                       >
                         Copy
                       </button>
                       <button
                         type="button"
                         onClick={() => handleOpenEditPost(p)}
-                        className="text-[10px] font-bold text-blue-600 hover:text-blue-800"
+                        className="text-[11px] font-bold text-blue-600 hover:text-blue-800"
                       >
                         Edit
                       </button>
@@ -807,7 +800,7 @@ export const CampaignsView: React.FC = () => {
                           setInputLiveUrl('');
                           setIsMarkPostedOpen(true);
                         }}
-                        className="text-[10px] font-bold text-emerald-600 hover:text-emerald-800"
+                        className="text-[11px] font-bold text-emerald-600 hover:text-emerald-800"
                       >
                         Publish Now ✓
                       </button>
@@ -827,7 +820,7 @@ export const CampaignsView: React.FC = () => {
         <div className="flex flex-col gap-4">
           {/* CRITICAL NOTE: Persistent & always visible */}
           <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900 flex items-start gap-2.5">
-            <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <AlertCircle size={20} strokeWidth={1.75} className="text-amber-600 shrink-0 mt-0.5" />
             <div className="text-xs leading-relaxed">
               <strong className="font-bold">Editorial Review Notice:</strong>{' '}
               Drafts are suggestions for review. Nothing is posted automatically.
@@ -863,7 +856,7 @@ export const CampaignsView: React.FC = () => {
                 {selectedAiEvent.description ||
                   'Advanced hands-on workshop covering open-source geospatial toolchains, RTK GNSS receivers, and digital terrain modeling.'}
               </p>
-              <div className="flex items-center gap-3 text-[10px] text-slate-400 font-medium pt-1 border-t border-slate-200/50">
+              <div className="flex items-center gap-3 text-[11px] text-slate-400 font-medium pt-1 border-t border-slate-200/50">
                 <span>📍 {selectedAiEvent.venue}</span>
                 <span>
                   🗓️{' '}
@@ -947,10 +940,10 @@ export const CampaignsView: React.FC = () => {
               <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-pink-700">
-                    <Camera size={15} />
+                    <Camera size={16} strokeWidth={1.75} />
                     <span>Instagram Reel / Teaser Draft</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
                     Social Copy
                   </span>
                 </div>
@@ -980,7 +973,7 @@ export const CampaignsView: React.FC = () => {
                     }
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
-                    <Copy size={12} />
+                    <Copy size={16} strokeWidth={1.75} />
                     <span>Copy</span>
                   </button>
 
@@ -994,7 +987,7 @@ export const CampaignsView: React.FC = () => {
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
-                    <Edit2 size={12} />
+                    <Edit2 size={16} strokeWidth={1.75} />
                     <span>Edit</span>
                   </button>
 
@@ -1032,7 +1025,7 @@ export const CampaignsView: React.FC = () => {
                     className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
                     title="Regenerate"
                   >
-                    <RotateCw size={13} />
+                    <RotateCw size={16} strokeWidth={1.75} />
                   </button>
                 </div>
               </div>
@@ -1041,10 +1034,10 @@ export const CampaignsView: React.FC = () => {
               <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700">
-                    <Share2 size={15} />
+                    <Share2 size={16} strokeWidth={1.75} />
                     <span>LinkedIn Professional Article / Update</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                     Professional
                   </span>
                 </div>
@@ -1074,7 +1067,7 @@ export const CampaignsView: React.FC = () => {
                     }
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
-                    <Copy size={12} />
+                    <Copy size={16} strokeWidth={1.75} />
                     <span>Copy</span>
                   </button>
 
@@ -1088,7 +1081,7 @@ export const CampaignsView: React.FC = () => {
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
-                    <Edit2 size={12} />
+                    <Edit2 size={16} strokeWidth={1.75} />
                     <span>Edit</span>
                   </button>
 
@@ -1126,7 +1119,7 @@ export const CampaignsView: React.FC = () => {
                     className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
                     title="Regenerate"
                   >
-                    <RotateCw size={13} />
+                    <RotateCw size={16} strokeWidth={1.75} />
                   </button>
                 </div>
               </div>
@@ -1135,10 +1128,10 @@ export const CampaignsView: React.FC = () => {
               <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
-                    <Newspaper size={15} />
+                    <Newspaper size={16} strokeWidth={1.75} />
                     <span>College Press & Daily News Paragraph</span>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                     Daily Digest
                   </span>
                 </div>
@@ -1165,7 +1158,7 @@ export const CampaignsView: React.FC = () => {
                     }
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
-                    <Copy size={12} />
+                    <Copy size={16} strokeWidth={1.75} />
                     <span>Copy</span>
                   </button>
 
@@ -1195,7 +1188,7 @@ export const CampaignsView: React.FC = () => {
                     className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
                     title="Regenerate"
                   >
-                    <RotateCw size={13} />
+                    <RotateCw size={16} strokeWidth={1.75} />
                   </button>
                 </div>
               </div>
@@ -1218,7 +1211,7 @@ export const CampaignsView: React.FC = () => {
               onClick={() => setIsNewsModalOpen(true)}
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 cursor-pointer"
             >
-              <Plus size={13} />
+              <Plus size={16} strokeWidth={1.75} />
               <span>Write Bulletin</span>
             </button>
           </div>
@@ -1233,7 +1226,7 @@ export const CampaignsView: React.FC = () => {
                   <span className="text-xs font-extrabold text-slate-900 leading-tight">
                     {news.title}
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
                     {news.date}
                   </span>
                 </div>
@@ -1245,7 +1238,7 @@ export const CampaignsView: React.FC = () => {
                 {news.hashtags && news.hashtags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {news.hashtags.map((h, i) => (
-                      <span key={i} className="text-[10px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded">
+                      <span key={i} className="text-[11px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded">
                         {h}
                       </span>
                     ))}
@@ -1261,7 +1254,7 @@ export const CampaignsView: React.FC = () => {
                       className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors"
                       title="Copy bulletin"
                     >
-                      <Copy size={13} />
+                      <Copy size={16} strokeWidth={1.75} />
                     </button>
                     <button
                       type="button"
@@ -1269,7 +1262,7 @@ export const CampaignsView: React.FC = () => {
                       className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                       title="Delete bulletin"
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={16} strokeWidth={1.75} />
                     </button>
                   </div>
                 </div>

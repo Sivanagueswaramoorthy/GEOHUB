@@ -55,7 +55,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               margin: '0 auto 16px auto',
             }}
           >
-            <CheckCircle2 size={32} />
+            <CheckCircle2 size={48} strokeWidth={1.75} />
           </div>
 
           <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
@@ -150,7 +150,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             }}
           >
             <span>{isLoading ? 'Dispatching...' : 'Dispatch Reset Link'}</span>
-            <ArrowRight size={15} />
+            <ArrowRight size={16} strokeWidth={1.75} />
           </button>
         </form>
       )}

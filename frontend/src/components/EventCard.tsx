@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, MapPin } from 'lucide-react';
 import { EventModel } from '../types';
 import { Chip } from './Chip';
+import { TYPOGRAPHY } from '../styles/tokens';
 
 export interface EventCardProps {
   event: EventModel;
@@ -28,13 +29,19 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <div
       onClick={() => onClick(event)}
-      className={`flex items-start gap-3.5 p-3.5 rounded-[22px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#10B981] transition-all duration-150 ${className}`}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(event);
+        }
+      }}
+      className={`flex flex-col rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#10B981] transition-all duration-150 overflow-hidden w-full ${className}`}
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: '14px',
-        padding: '14px',
-        borderRadius: '22px',
+        flexDirection: 'column',
+        borderRadius: '24px',
         backgroundColor: '#FFFFFF',
         border: '1px solid #EEF1F5',
         boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
@@ -45,27 +52,27 @@ export const EventCard: React.FC<EventCardProps> = ({
         ...style,
       }}
     >
-      {/* Event Image with White Date Badge inside */}
+      {/* Event Image Banner (16/9 aspect-ratio, top radius 24) */}
       <div
-        className="relative rounded-2xl overflow-hidden shrink-0 bg-slate-100"
+        className="relative w-full overflow-hidden bg-slate-100"
         style={{
-          width: '96px',
-          height: '96px',
-          minWidth: '96px',
-          maxWidth: '96px',
-          borderRadius: '18px',
           position: 'relative',
+          width: '100%',
+          aspectRatio: '16 / 9',
+          borderTopLeftRadius: '24px',
+          borderTopRightRadius: '24px',
           overflow: 'hidden',
-          flexShrink: 0,
           backgroundColor: '#F1F5F9',
         }}
       >
         <img
           src={
             event.posterUrl ||
-            'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80'
+            'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80'
           }
           alt={event.title}
+          loading="lazy"
+          decoding="async"
           style={{
             width: '100%',
             height: '100%',
@@ -74,110 +81,133 @@ export const EventCard: React.FC<EventCardProps> = ({
           }}
         />
 
-        {/* White Date Badge (green uppercase month + bold day) */}
+        {/* Date Badge: Pinned 12px from top-left */}
         <div
-          className="absolute top-1.5 left-1.5 flex flex-col items-center justify-center px-1.5 py-0.5 rounded-lg bg-white/95 backdrop-blur-sm shadow-sm"
+          className="absolute flex flex-col items-center justify-center rounded-xl bg-white shadow-md select-none"
           style={{
             position: 'absolute',
-            top: '6px',
-            left: '6px',
-            minWidth: '34px',
-            padding: '3px 6px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)',
+            top: '12px',
+            left: '12px',
+            minWidth: '42px',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            backgroundColor: '#FFFFFF',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            zIndex: 2,
           }}
         >
           <span
             style={{
-              fontSize: '8.5px',
+              fontSize: '11px',
+              lineHeight: '14px',
               fontWeight: 800,
               color: '#10B981',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
             }}
           >
             {monthName}
           </span>
           <span
             style={{
-              fontSize: '13px',
+              fontSize: '15px',
+              lineHeight: '18px',
               fontWeight: 800,
               color: '#0F172A',
-              lineHeight: 1.1,
+              fontFeatureSettings: '"tnum"',
             }}
           >
             {dayNum}
           </span>
         </div>
+
+        {/* Status Pill: Pinned 12px from top-right */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            zIndex: 2,
+          }}
+        >
+          <Chip
+            label={event.status === 'live' ? 'Happening Now' : event.status}
+            variant="status"
+            size="sm"
+          />
+        </div>
       </div>
 
-      {/* Details Right Column */}
+      {/* Card Body Content (16px padding) */}
       <div
-        className="flex-1 flex flex-col justify-between min-w-0 py-0.5"
+        className="flex flex-col flex-1"
         style={{
-          flex: 1,
-          minWidth: 0,
+          padding: '16px',
+          boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
-          overflow: 'hidden',
+          gap: '8px',
         }}
       >
-        <div>
-          {/* Top row: Category & Status Pill Top-Right */}
-          <div
-            className="flex items-center justify-between gap-1.5 mb-1"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px', marginBottom: '4px' }}
-          >
-            <span
-              className="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate"
-              style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94A3B8' }}
-            >
-              {event.category || 'Expedition'}
-            </span>
-            <Chip label={event.status} variant="status" size="sm" />
-          </div>
-
-          {/* Title */}
-          <h4
-            className="font-extrabold text-slate-900 text-[14px] leading-snug tracking-tight line-clamp-2 mb-1.5"
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: '14px',
-              fontWeight: 800,
-              color: '#0F172A',
-              lineHeight: 1.3,
-              margin: '0 0 6px 0',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-            }}
-          >
-            {event.title}
-          </h4>
+        {/* Category Chip */}
+        <div className="flex items-center">
+          <Chip label={event.category} variant="squad" size="sm" />
         </div>
 
-        {/* Clock-icon Date & Venue Row */}
-        <div
-          className="flex flex-col gap-1 text-[11px] text-slate-500 font-medium"
-          style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11.5px', color: '#64748B' }}
+        {/* Event Title (Title 18/24 700 with line-clamp 2) */}
+        <h3
+          style={{
+            fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
+            lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
+            fontWeight: TYPOGRAPHY.scale.title.fontWeight,
+            color: '#0F172A',
+            fontFamily: 'var(--font-family)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            margin: '2px 0 0 0',
+          }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Clock size={12} color="#94A3B8" style={{ flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {timeStr}
-            </span>
+          {event.title}
+        </h3>
+
+        {/* Venue & Time (Small 13/18 500) */}
+        <div
+          className="flex flex-col gap-1.5 mt-1"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          <div
+            className="flex items-center gap-2 text-slate-500"
+            style={{
+              fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
+              lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
+              fontWeight: TYPOGRAPHY.scale.small.fontWeight,
+            }}
+          >
+            <MapPin size={16} strokeWidth={1.75} className="shrink-0 text-slate-400" />
+            <span className="truncate">{event.venue}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <MapPin size={12} color="#94A3B8" style={{ flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.venue}</span>
+
+          <div
+            className="flex items-center gap-2 text-slate-500"
+            style={{
+              fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
+              lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
+              fontWeight: TYPOGRAPHY.scale.small.fontWeight,
+            }}
+          >
+            <Clock size={16} strokeWidth={1.75} className="shrink-0 text-slate-400" />
+            <span>{timeStr}</span>
           </div>
         </div>
       </div>

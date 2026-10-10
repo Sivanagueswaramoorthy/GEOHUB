@@ -80,75 +80,75 @@ export const BottomNavBar: React.FC = () => {
   const getPrimaryTabs = () => {
     if (isDocLead) {
       return [
-        { key: 'dashboard', label: 'Home', icon: <Home size={19} /> },
-        { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-        { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-        { key: 'archives', label: 'Archives', icon: <FolderOpen size={19} /> },
-        { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+        { key: 'dashboard', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+        { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+        { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+        { key: 'archives', label: 'Archives', icon: <FolderOpen size={20} strokeWidth={1.75} /> },
+        { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
       ];
     }
 
     if (isTreasurer) {
       return [
-        { key: 'dashboard', label: 'Home', icon: <Home size={19} /> },
-        { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-        { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-        { key: 'finance', label: 'Finance', icon: <DollarSign size={19} /> },
-        { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+        { key: 'dashboard', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+        { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+        { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+        { key: 'finance', label: 'Finance', icon: <DollarSign size={20} strokeWidth={1.75} /> },
+        { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
       ];
     }
 
     if (isPromotion) {
       return [
-        { key: 'dashboard', label: 'Home', icon: <Home size={19} /> },
-        { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-        { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-        { key: 'campaigns', label: 'Campaigns', icon: <Megaphone size={19} /> },
-        { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+        { key: 'dashboard', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+        { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+        { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+        { key: 'campaigns', label: 'Campaigns', icon: <Megaphone size={20} strokeWidth={1.75} /> },
+        { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
       ];
     }
 
     switch (currentUser.role) {
       case 'super_admin':
         return [
-          { key: 'dashboard', label: 'Home', icon: <Home size={19} /> },
-          { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-          { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-          { key: 'members', label: 'Members', icon: <UserCheck size={19} /> },
-          { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+          { key: 'dashboard', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+          { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+          { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+          { key: 'members', label: 'Members', icon: <UserCheck size={20} strokeWidth={1.75} /> },
+          { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
         ];
       case 'admin':
         return [
-          { key: 'dashboard', label: 'Home', icon: <Home size={19} /> },
-          { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-          { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-          { key: 'members', label: 'Members', icon: <UserCheck size={19} /> },
-          { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+          { key: 'dashboard', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+          { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+          { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+          { key: 'members', label: 'Members', icon: <UserCheck size={20} strokeWidth={1.75} /> },
+          { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
         ];
       case 'team_admin':
         return [
-          { key: 'team_home', label: 'Home', icon: <Home size={19} /> },
-          { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-          { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-          { key: 'members', label: 'Members', icon: <UserCheck size={19} /> },
-          { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+          { key: 'team_home', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+          { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+          { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+          { key: 'members', label: 'Members', icon: <UserCheck size={20} strokeWidth={1.75} /> },
+          { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
         ];
       case 'volunteer':
         return [
-          { key: 'home', label: 'Home', icon: <Home size={19} /> },
-          { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-          { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-          { key: 'scan_qr', label: 'Scanner', icon: <Scan size={19} /> },
-          { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+          { key: 'home', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+          { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+          { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+          { key: 'scan_qr', label: 'Scanner', icon: <Scan size={20} strokeWidth={1.75} /> },
+          { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
         ];
       case 'member':
       default:
         return [
-          { key: 'home', label: 'Home', icon: <Home size={19} /> },
-          { key: 'events', label: 'Events', icon: <Calendar size={19} /> },
-          { key: 'operations', label: 'Operations', icon: <Layers size={19} /> },
-          { key: 'members', label: 'Members', icon: <UserCheck size={19} /> },
-          { key: 'profile', label: 'Profile', icon: <User size={19} /> },
+          { key: 'home', label: 'Home', icon: <Home size={20} strokeWidth={1.75} /> },
+          { key: 'events', label: 'Events', icon: <Calendar size={20} strokeWidth={1.75} /> },
+          { key: 'operations', label: 'Operations', icon: <Layers size={20} strokeWidth={1.75} /> },
+          { key: 'members', label: 'Members', icon: <UserCheck size={20} strokeWidth={1.75} /> },
+          { key: 'profile', label: 'Profile', icon: <User size={20} strokeWidth={1.75} /> },
         ];
     }
   };
@@ -225,7 +225,7 @@ export const BottomNavBar: React.FC = () => {
                   padding: '7px 12px',
                   borderRadius: '999px',
                   fontWeight: 700,
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   border: '1px solid #A7F3D0',
                   boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
                   transition: 'all 150ms ease',
@@ -329,7 +329,7 @@ export const BottomNavBar: React.FC = () => {
               fontWeight: 700,
             }}
           >
-            <ShieldCheck size={18} color="#10B981" />
+            <ShieldCheck size={20} strokeWidth={1.75} color="#10B981" />
             <span>Switch Active Role Profile</span>
           </button>
 
@@ -350,7 +350,7 @@ export const BottomNavBar: React.FC = () => {
               color: '#DC2626',
             }}
           >
-            <LogOut size={18} color="#DC2626" />
+            <LogOut size={20} strokeWidth={1.75} color="#DC2626" />
             <span>Sign Out ({currentUser.name})</span>
           </button>
         </div>

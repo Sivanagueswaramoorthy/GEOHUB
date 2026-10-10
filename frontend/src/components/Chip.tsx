@@ -1,4 +1,5 @@
 import React from 'react';
+import { COMPONENTS, TYPOGRAPHY } from '../styles/tokens';
 
 export type ChipVariant = 'role' | 'squad' | 'year' | 'status';
 
@@ -84,27 +85,34 @@ export const Chip: React.FC<ChipProps> = ({
     }
   }
 
-  const isSmall = size === 'sm';
+  const height = size === 'sm' ? `${COMPONENTS.chips.minHeight}px` : `${COMPONENTS.chips.maxHeight}px`;
 
   return (
     <span
-      className={`inline-flex items-center gap-1 font-semibold rounded-full ${className}`}
+      className={`inline-flex items-center rounded-full font-medium select-none ${className}`}
       style={{
+        height,
+        minHeight: height,
+        paddingLeft: `${COMPONENTS.chips.paddingX}px`,
+        paddingRight: `${COMPONENTS.chips.paddingX}px`,
         backgroundColor: bgColor || defaultBg,
         borderColor: borderColor || defaultBorder,
         borderWidth: '1px',
         borderStyle: 'solid',
         color: color || defaultText,
-        fontSize: isSmall ? '11px' : '12px',
-        padding: isSmall ? '2px 8px' : '4px 10px',
-        lineHeight: 1.2,
-        letterSpacing: '0.01em',
+        fontSize: `${TYPOGRAPHY.scale.caption.fontSize}px`,
+        lineHeight: `${TYPOGRAPHY.scale.caption.lineHeight}px`,
+        fontWeight: TYPOGRAPHY.scale.caption.fontWeight,
+        fontFamily: 'var(--font-family)',
+        borderRadius: '999px',
+        gap: `${COMPONENTS.chips.gap}px`,
         whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
         ...style,
       }}
     >
-      {icon && <span className="inline-flex items-center">{icon}</span>}
-      {label}
+      {icon && <span className="inline-flex items-center shrink-0">{icon}</span>}
+      <span>{label}</span>
     </span>
   );
 };

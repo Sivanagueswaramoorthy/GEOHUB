@@ -51,9 +51,9 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
     border = '#DDD1FF';
     text = '#5B21B6';
   } else if (role === 'social_media' || role === 'team_admin' || (post && post.toLowerCase().includes('promotion'))) {
-    bg = '#F5F3FF';
-    border = '#DDD6FE';
-    text = '#6D28D9';
+    bg = '#F3EEFF';
+    border = '#DDD1FF';
+    text = '#5B21B6';
   }
 
   let displayName = friendlyName;
@@ -65,19 +65,19 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-bold rounded-full ${className}`}
+      className={`inline-flex items-center gap-1 font-bold rounded-full ${className}`}
       style={{
         backgroundColor: bg,
         border: `1px solid ${border}`,
         color: text,
         fontSize: isSmall ? '11px' : isLarge ? '13px' : '12px',
-        padding: isSmall ? '2px 8px' : isLarge ? '5px 14px' : '3px 10px',
-        lineHeight: 1.2,
+        padding: isSmall ? '2px 8px' : isLarge ? '4px 12px' : '4px 8px',
+        lineHeight: isSmall ? '14px' : isLarge ? '18px' : '16px',
         ...style,
       }}
     >
       {isSuperAdmin && showCrown && (
-        <Crown size={isSmall ? 12 : 14} color="#D97706" className="shrink-0" />
+        <Crown size={16} strokeWidth={1.75} color="#D97706" className="shrink-0" />
       )}
       <span>{displayName}</span>
     </span>

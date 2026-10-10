@@ -129,7 +129,7 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
             onClick={onClose}
             aria-label="Close dialog"
           >
-            <X size={18} />
+            <X size={20} strokeWidth={1.75} />
           </button>
         </div>
 
@@ -143,7 +143,7 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
                 color: 'var(--brand-green, #10B981)',
               }}
             >
-              <CheckCircle2 size={32} />
+              <CheckCircle2 size={48} strokeWidth={1.75} />
             </div>
 
             <h3 className="text-base font-bold text-slate-900 mb-1">Check your inbox</h3>
@@ -169,8 +169,8 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
                 {cooldown > 0 ? (
                   `Resend link in ${cooldown}s`
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 justify-center">
-                    <RefreshCw size={12} className={isSubmitting ? 'animate-spin' : ''} />
+                  <span className="inline-flex items-center gap-2 justify-center">
+                    <RefreshCw size={16} strokeWidth={1.75} className={isSubmitting ? 'animate-spin' : ''} />
                     Resend reset email
                   </span>
                 )}
@@ -185,7 +185,7 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
               </label>
               <div className="login-input-wrapper">
                 <span className="login-input-icon" aria-hidden="true">
-                  <Mail size={18} />
+                  <Mail size={20} strokeWidth={1.75} />
                 </span>
                 <input
                   ref={emailInputRef}
@@ -209,7 +209,7 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
               </div>
               {error && (
                 <div id="forgot-email-error" className="field-error-text" role="alert">
-                  <AlertCircle size={14} className="shrink-0" />
+                  <AlertCircle size={16} strokeWidth={1.75} className="shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
@@ -226,7 +226,7 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
               ) : (
                 <>
                   <span>Send reset link</span>
-                  <ArrowRight size={18} />
+                  <ArrowRight size={20} strokeWidth={1.75} />
                 </>
               )}
             </button>

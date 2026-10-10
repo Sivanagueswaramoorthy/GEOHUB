@@ -32,7 +32,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'SJ',
     badgeBg: '#FEF3C7',
     badgeColor: '#92400E',
-    icon: <ShieldCheck size={18} className="text-amber-700" />,
+    icon: <ShieldCheck size={20} strokeWidth={1.75} className="text-amber-700" />,
   },
   {
     id: 'coordinator',
@@ -43,7 +43,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'AR',
     badgeBg: '#EEF2FF',
     badgeColor: '#4338CA',
-    icon: <Shield size={18} className="text-indigo-700" />,
+    icon: <Shield size={20} strokeWidth={1.75} className="text-indigo-700" />,
   },
   {
     id: 'doc_lead',
@@ -54,7 +54,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'AP',
     badgeBg: '#F3E8FF',
     badgeColor: '#7E22CE',
-    icon: <FileText size={18} className="text-purple-700" />,
+    icon: <FileText size={20} strokeWidth={1.75} className="text-purple-700" />,
   },
   {
     id: 'treasurer_lead',
@@ -65,7 +65,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'AI',
     badgeBg: '#E0F2FE',
     badgeColor: '#0369A1',
-    icon: <DollarSign size={18} className="text-sky-700" />,
+    icon: <DollarSign size={20} strokeWidth={1.75} className="text-sky-700" />,
   },
   {
     id: 'promo_lead',
@@ -76,7 +76,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'DC',
     badgeBg: '#CCFBF1',
     badgeColor: '#0F766E',
-    icon: <Megaphone size={18} className="text-teal-700" />,
+    icon: <Megaphone size={20} strokeWidth={1.75} className="text-teal-700" />,
   },
   {
     id: 'student_volunteer',
@@ -87,7 +87,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'LV',
     badgeBg: '#E7F9F1',
     badgeColor: '#064E3B',
-    icon: <UserCheck size={18} className="text-emerald-700" />,
+    icon: <UserCheck size={20} strokeWidth={1.75} className="text-emerald-700" />,
   },
 ];
 
@@ -159,7 +159,7 @@ export const DemoRolesSheet: React.FC<DemoRolesSheetProps> = ({
             disabled={isAuthenticating}
             aria-label="Close dialog"
           >
-            <X size={18} />
+            <X size={20} strokeWidth={1.75} />
           </button>
         </div>
 

@@ -96,7 +96,7 @@ export const TeamsListView: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <AppAvatar name={selectedTeam.leadName} size={38} />
+              <AppAvatar name={selectedTeam.leadName} size={48} strokeWidth={1.75} />
               <div>
                 <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>TEAM LEAD</div>
                 <div style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>
@@ -137,7 +137,7 @@ export const TeamsListView: React.FC = () => {
               className="btn btn-primary btn-sm"
               onClick={() => setActiveTab('members')}
             >
-              <UserPlus size={14} /> Add from Directory
+              <UserPlus size={16} strokeWidth={1.75} /> Add from Directory
             </button>
           </div>
           <div>
@@ -215,9 +215,6 @@ export const TeamsListView: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div>
         <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Club Teams</h1>
-        <p style={{ fontSize: '13px', color: '#64748B' }}>
-          Functional divisions driving events, promotions, documentation and student life
-        </p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

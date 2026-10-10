@@ -30,6 +30,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { AppAvatar } from '../../components/common/AppAvatar';
 import { Modal } from '../../components/common/Modal';
+import { SearchBar } from '../../components/SearchBar';
 import { UserRole } from '../../types';
 
 export const MembersListView: React.FC = () => {
@@ -86,7 +87,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: 'All Students',
       section: 'Overview',
       count: users.length,
-      icon: <Users2 size={15} />,
+      icon: <Users2 size={16} strokeWidth={1.75} />,
       color: '#475569',
       bg: '#F1F5F9',
     },
@@ -96,7 +97,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: 'Team Leads',
       section: 'Overview',
       count: teamLeads,
-      icon: <Award size={15} />,
+      icon: <Award size={16} strokeWidth={1.75} />,
       color: '#7C3AED',
       bg: '#F5F3FF',
     },
@@ -107,7 +108,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: '1st Year',
       section: 'Filter by Student Year',
       count: firstYearCount,
-      icon: <GraduationCap size={15} />,
+      icon: <GraduationCap size={16} strokeWidth={1.75} />,
       color: '#059669',
       bg: '#ECFDF5',
     },
@@ -117,7 +118,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: '2nd Year',
       section: 'Filter by Student Year',
       count: secondYearCount,
-      icon: <GraduationCap size={15} />,
+      icon: <GraduationCap size={16} strokeWidth={1.75} />,
       color: '#0284C7',
       bg: '#ECFEFF',
     },
@@ -127,7 +128,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: '3rd Year',
       section: 'Filter by Student Year',
       count: thirdYearCount,
-      icon: <GraduationCap size={15} />,
+      icon: <GraduationCap size={16} strokeWidth={1.75} />,
       color: '#6366F1',
       bg: '#EEF2FF',
     },
@@ -137,7 +138,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: '4th Year',
       section: 'Filter by Student Year',
       count: fourthYearCount,
-      icon: <GraduationCap size={15} />,
+      icon: <GraduationCap size={16} strokeWidth={1.75} />,
       color: '#D97706',
       bg: '#FFFBEB',
     },
@@ -148,7 +149,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: 'Active',
       section: 'Status & Governance',
       count: totalActive,
-      icon: <CheckCircle2 size={15} />,
+      icon: <CheckCircle2 size={16} strokeWidth={1.75} />,
       color: '#059669',
       bg: '#ECFDF5',
     },
@@ -158,7 +159,7 @@ export const MembersListView: React.FC = () => {
       shortLabel: 'Admins',
       section: 'Status & Governance',
       count: facultyAndAdmins,
-      icon: <ShieldCheck size={15} />,
+      icon: <ShieldCheck size={16} strokeWidth={1.75} />,
       color: '#B45309',
       bg: '#FEF3C7',
     },
@@ -366,13 +367,13 @@ export const MembersListView: React.FC = () => {
             }}
             title="Return to Directory"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={20} strokeWidth={1.75} />
           </button>
 
           <div style={{ textAlign: 'center' }}>
             <span
               style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 color: '#059669',
                 letterSpacing: '0.06em',
@@ -448,7 +449,7 @@ export const MembersListView: React.FC = () => {
                 position: 'relative',
               }}
             >
-              <AppAvatar name={selectedUser.name} avatarUrl={selectedUser.avatarUrl} size={84} />
+              <AppAvatar name={selectedUser.name} avatarUrl={selectedUser.avatarUrl} size={16} strokeWidth={1.75} />
               <div
                 style={{
                   position: 'absolute',
@@ -493,7 +494,7 @@ export const MembersListView: React.FC = () => {
               {selectedUser.post && (
                 <span
                   style={{
-                    fontSize: '11.5px',
+                    fontSize: '12px',
                     fontWeight: 800,
                     color: '#065F46',
                     backgroundColor: '#D1FAE5',
@@ -505,13 +506,13 @@ export const MembersListView: React.FC = () => {
                     gap: '4px',
                   }}
                 >
-                  <Crown size={12} color="#059669" />
+                  <Crown size={16} strokeWidth={1.75} color="#059669" />
                   Post: {selectedUser.post}
                 </span>
               )}
               <span
                 style={{
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   fontWeight: 800,
                   color: badge.color,
                   backgroundColor: badge.bg,
@@ -525,7 +526,7 @@ export const MembersListView: React.FC = () => {
               {selectedUser.team && (
                 <span
                   style={{
-                    fontSize: '11.5px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     color: '#1E293B',
                     backgroundColor: '#F1F5F9',
@@ -537,14 +538,14 @@ export const MembersListView: React.FC = () => {
                     gap: '5px',
                   }}
                 >
-                  <Sparkles size={12} color="#059669" />
+                  <Sparkles size={16} strokeWidth={1.75} color="#059669" />
                   {selectedUser.team} Squad
                 </span>
               )}
               {selectedUser.yearOfStudy && (
                 <span
                   style={{
-                    fontSize: '11.5px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     color: '#64748B',
                     backgroundColor: '#F8FAFC',
@@ -572,7 +573,7 @@ export const MembersListView: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Squad
                 </span>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
@@ -589,7 +590,7 @@ export const MembersListView: React.FC = () => {
                   borderRight: '1px solid #E2E8F0',
                 }}
               >
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Standing
                 </span>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
@@ -597,7 +598,7 @@ export const MembersListView: React.FC = () => {
                 </span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Access Pass
                 </span>
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#059669', marginTop: '2px' }}>
@@ -635,7 +636,7 @@ export const MembersListView: React.FC = () => {
                       flexShrink: 0,
                     }}
                   >
-                    <Mail size={17} />
+                    <Mail size={20} strokeWidth={1.75} />
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Institutional Email</div>
@@ -683,7 +684,7 @@ export const MembersListView: React.FC = () => {
                         flexShrink: 0,
                       }}
                     >
-                      <Phone size={17} />
+                      <Phone size={20} strokeWidth={1.75} />
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Emergency Contact</div>
@@ -722,7 +723,7 @@ export const MembersListView: React.FC = () => {
                       flexShrink: 0,
                     }}
                   >
-                    <GraduationCap size={17} />
+                    <GraduationCap size={20} strokeWidth={1.75} />
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Academic Faculty & Standing</div>
@@ -757,7 +758,7 @@ export const MembersListView: React.FC = () => {
                 transition: 'all 0.15s ease',
               }}
             >
-              <Edit3 size={17} /> Edit Role & Permissions
+              <Edit3 size={20} strokeWidth={1.75} /> Edit Role & Permissions
             </button>
           </div>
         </div>
@@ -776,7 +777,7 @@ export const MembersListView: React.FC = () => {
                 <label style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Leadership Post Designation
                 </label>
-                <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700, backgroundColor: '#ECFDF5', padding: '2px 7px', borderRadius: '4px' }}>
+                <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700, backgroundColor: '#ECFDF5', padding: '2px 7px', borderRadius: '4px' }}>
                   Post Assignment
                 </span>
               </div>
@@ -944,12 +945,12 @@ export const MembersListView: React.FC = () => {
                             flexShrink: 0,
                           }}
                         >
-                          <IconComponent size={17} />
+                          <IconComponent size={20} strokeWidth={1.75} />
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: '13.5px', fontWeight: 800, color: isSelected ? '#0F172A' : '#1E293B', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 800, color: isSelected ? '#0F172A' : '#1E293B', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {item.title}
-                            <span style={{ fontSize: '9.5px', fontWeight: 700, padding: '1.5px 6px', borderRadius: '5px', backgroundColor: isSelected ? '#FFFFFF' : '#F1F5F9', color: isSelected ? item.color : '#64748B', border: `1px solid ${item.border}` }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, padding: '1.5px 6px', borderRadius: '5px', backgroundColor: isSelected ? '#FFFFFF' : '#F1F5F9', color: isSelected ? item.color : '#64748B', border: `1px solid ${item.border}` }}>
                               {item.badge}
                             </span>
                           </div>
@@ -970,7 +971,7 @@ export const MembersListView: React.FC = () => {
                           flexShrink: 0,
                         }}
                       >
-                        {isSelected && <Check size={11} color="#FFFFFF" strokeWidth={3} />}
+                        {isSelected && <Check size={16} color="#FFFFFF" strokeWidth={1.75} />}
                       </div>
                     </button>
                   );
@@ -993,7 +994,7 @@ export const MembersListView: React.FC = () => {
                   <label style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Assigned Squad
                   </label>
-                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#059669', backgroundColor: '#D1FAE5', padding: '1.5px 7px', borderRadius: '999px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', backgroundColor: '#D1FAE5', padding: '1.5px 7px', borderRadius: '999px' }}>
                     Required for Squad Roles
                   </span>
                 </div>
@@ -1039,15 +1040,15 @@ export const MembersListView: React.FC = () => {
                             flexShrink: 0,
                           }}
                         >
-                          <SquadIcon size={13} />
+                          <SquadIcon size={16} strokeWidth={1.75} />
                         </div>
                         <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ fontSize: '11.5px', fontWeight: 800, color: isSquadSelected ? '#0F172A' : '#334155' }}>
+                          <div style={{ fontSize: '12px', fontWeight: 800, color: isSquadSelected ? '#0F172A' : '#334155' }}>
                             {squad.name}
                           </div>
                         </div>
                         {isSquadSelected && (
-                          <Check size={13} color={squad.color} strokeWidth={2.5} style={{ flexShrink: 0 }} />
+                          <Check size={16} color={squad.color} strokeWidth={1.75} style={{ flexShrink: 0 }} />
                         )}
                       </button>
                     );
@@ -1063,7 +1064,7 @@ export const MembersListView: React.FC = () => {
                 borderRadius: '999px',
                 height: '44px',
                 fontWeight: 800,
-                fontSize: '13.5px',
+                fontSize: '13px',
                 boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
                 marginTop: '4px',
               }}
@@ -1083,7 +1084,7 @@ export const MembersListView: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
           <span
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 800,
               color: '#065F46',
               backgroundColor: '#D1FAE5',
@@ -1108,7 +1109,7 @@ export const MembersListView: React.FC = () => {
         </div>
         <h1
           style={{
-            fontSize: '24px',
+            fontSize: '28px',
             fontWeight: 800,
             color: '#0F172A',
             lineHeight: 1.15,
@@ -1118,46 +1119,22 @@ export const MembersListView: React.FC = () => {
         >
           Members Directory
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 10px 0', fontWeight: 500 }}>
-          Manage club members, team leads, and institutional privileges
-        </p>
       </div>
 
       {/* Search Bar */}
-      <div style={{ position: 'relative' }}>
-        <input
-          type="text"
-          className="input-field"
-          style={{
-            paddingLeft: '40px',
-            paddingRight: searchQuery ? '36px' : '14px',
-            borderRadius: '16px',
-            backgroundColor: '#FFFFFF',
-            border: '1.5px solid #E8ECF2',
-            height: '46px',
-            fontSize: '13px',
-          }}
-          placeholder="Search scholars, email, or department..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <Search size={18} color="#94A3B8" style={{ position: 'absolute', left: 14, top: 14 }} />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery('')}
-            style={{
-              position: 'absolute',
-              right: 12,
-              top: 13,
-              color: '#94A3B8',
-              padding: '2px',
-              cursor: 'pointer',
-            }}
-          >
-            <X size={16} />
-          </button>
-        )}
-      </div>
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search scholars, email, or department..."
+        resultsCount={filteredUsers.length}
+        suggestions={[
+          'Geomatics',
+          'Management Squad',
+          'Promotion Squad',
+          'Documentation Squad',
+          'Entertainment Squad',
+        ]}
+      />
 
       {/* Dropdown Filter Buttons: Role/Status & Squad */}
       <div
@@ -1195,10 +1172,10 @@ export const MembersListView: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
-              <Filter size={13} color={roleFilter !== 'All' ? '#059669' : '#64748B'} style={{ flexShrink: 0 }} />
+              <Filter size={16} strokeWidth={1.75} color={roleFilter !== 'All' ? '#059669' : '#64748B'} style={{ flexShrink: 0 }} />
               <span
                 style={{
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   fontWeight: 700,
                   color: roleFilter !== 'All' ? '#047857' : '#1E293B',
                   overflow: 'hidden',
@@ -1212,7 +1189,7 @@ export const MembersListView: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, marginLeft: '4px' }}>
               <span
                 style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 800,
                   padding: '1.5px 5px',
                   borderRadius: '999px',
@@ -1224,7 +1201,7 @@ export const MembersListView: React.FC = () => {
                 {activeRoleOption.count}
               </span>
               <ChevronDown
-                size={13}
+                size={16} strokeWidth={1.75}
                 color="#64748B"
                 style={{
                   transform: isRoleDropdownOpen ? 'rotate(180deg)' : 'none',
@@ -1266,7 +1243,7 @@ export const MembersListView: React.FC = () => {
                         <div
                           style={{
                             padding: idx === 0 ? '4px 10px 4px' : '8px 10px 4px',
-                            fontSize: '10px',
+                            fontSize: '11px',
                             fontWeight: 800,
                             color: '#94A3B8',
                             textTransform: 'uppercase',
@@ -1338,7 +1315,7 @@ export const MembersListView: React.FC = () => {
                           >
                             {opt.count}
                           </span>
-                          {roleFilter === opt.key && <Check size={14} color="#059669" />}
+                          {roleFilter === opt.key && <Check size={16} strokeWidth={1.75} color="#059669" />}
                         </div>
                       </button>
                     </React.Fragment>
@@ -1375,10 +1352,10 @@ export const MembersListView: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
-              <Layers size={13} color={teamFilter !== 'All' ? '#2563EB' : '#64748B'} style={{ flexShrink: 0 }} />
+              <Layers size={16} strokeWidth={1.75} color={teamFilter !== 'All' ? '#2563EB' : '#64748B'} style={{ flexShrink: 0 }} />
               <span
                 style={{
-                  fontSize: '11.5px',
+                  fontSize: '12px',
                   fontWeight: 700,
                   color: teamFilter !== 'All' ? '#1D4ED8' : '#1E293B',
                   overflow: 'hidden',
@@ -1392,7 +1369,7 @@ export const MembersListView: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, marginLeft: '4px' }}>
               <span
                 style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: 800,
                   padding: '1.5px 5px',
                   borderRadius: '999px',
@@ -1404,7 +1381,7 @@ export const MembersListView: React.FC = () => {
                 {activeSquadOption.count}
               </span>
               <ChevronDown
-                size={13}
+                size={16} strokeWidth={1.75}
                 color="#64748B"
                 style={{
                   transform: isSquadDropdownOpen ? 'rotate(180deg)' : 'none',
@@ -1438,7 +1415,7 @@ export const MembersListView: React.FC = () => {
                   overflowY: 'auto',
                 }}
               >
-                <div style={{ padding: '6px 10px 4px', fontSize: '10.5px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <div style={{ padding: '6px 10px 4px', fontSize: '11px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Filter by Squad
                 </div>
                 {squadDropdownOptions.map((opt) => (
@@ -1486,7 +1463,7 @@ export const MembersListView: React.FC = () => {
                       >
                         {opt.count}
                       </span>
-                      {teamFilter === opt.key && <Check size={14} color="#2563EB" />}
+                      {teamFilter === opt.key && <Check size={16} strokeWidth={1.75} color="#2563EB" />}
                     </div>
                   </button>
                 ))}
@@ -1544,7 +1521,7 @@ export const MembersListView: React.FC = () => {
                 margin: '0 auto 10px',
               }}
             >
-              <Users2 size={22} />
+              <Users2 size={24} strokeWidth={1.75} />
             </div>
             <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px' }}>
               No Scholars Found
@@ -1588,7 +1565,7 @@ export const MembersListView: React.FC = () => {
                 {/* Left: Avatar + Details */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                   <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <AppAvatar name={user.name} avatarUrl={user.avatarUrl} size={46} />
+                    <AppAvatar name={user.name} avatarUrl={user.avatarUrl} size={48} strokeWidth={1.75} />
                     <div
                       style={{
                         position: 'absolute',
@@ -1619,7 +1596,7 @@ export const MembersListView: React.FC = () => {
                       </span>
                       <span
                         style={{
-                          fontSize: '9.5px',
+                          fontSize: '11px',
                           fontWeight: 800,
                           color: badge.color,
                           backgroundColor: badge.bg,
@@ -1651,7 +1628,7 @@ export const MembersListView: React.FC = () => {
                       {user.team && (
                         <span
                           style={{
-                            fontSize: '9.5px',
+                            fontSize: '11px',
                             fontWeight: 700,
                             color: '#047857',
                             backgroundColor: '#ECFDF5',
@@ -1666,7 +1643,7 @@ export const MembersListView: React.FC = () => {
                       {user.yearOfStudy && user.yearOfStudy !== 'Faculty Staff' && (
                         <span
                           style={{
-                            fontSize: '9.5px',
+                            fontSize: '11px',
                             fontWeight: 700,
                             color: '#4338CA',
                             backgroundColor: '#EEF2FF',
@@ -1681,7 +1658,7 @@ export const MembersListView: React.FC = () => {
                       {user.department && (
                         <span
                           style={{
-                            fontSize: '10.5px',
+                            fontSize: '11px',
                             color: '#64748B',
                             fontWeight: 600,
                             overflow: 'hidden',

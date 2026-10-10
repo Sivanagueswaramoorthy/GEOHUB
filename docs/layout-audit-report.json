@@ -1,0 +1,1934 @@
+{
+  "timestamp": "2026-10-08T14:08:17.784Z",
+  "totalScreensAudited": 240,
+  "totalViolations": 0,
+  "severityCounts": {
+    "Blocker": 0,
+    "Major": 0,
+    "Minor": 0,
+    "Polish": 0
+  },
+  "screenResults": [
+    {
+      "role": "faculty",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_home_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_events_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_operations_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "members",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_members_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_profile_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "attendance",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_attendance_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "reports",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_reports_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "approvals",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_approvals_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_notifications_360x740.png"
+    },
+    {
+      "role": "faculty",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_home_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_events_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_operations_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "members",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_members_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_profile_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "attendance",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_attendance_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "reports",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_reports_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "approvals",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_approvals_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_notifications_390x844.png"
+    },
+    {
+      "role": "faculty",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_home_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_events_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_operations_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "members",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_members_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_profile_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "attendance",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_attendance_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "reports",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_reports_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "approvals",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_approvals_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_notifications_430x932.png"
+    },
+    {
+      "role": "faculty",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_home_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_events_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_operations_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "members",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_members_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_profile_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "attendance",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_attendance_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "reports",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_reports_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "approvals",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_approvals_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_notifications_768x1024.png"
+    },
+    {
+      "role": "faculty",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_home_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_events_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_operations_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "members",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_members_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_profile_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "attendance",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_attendance_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "reports",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_reports_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "approvals",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_approvals_1280x800.png"
+    },
+    {
+      "role": "faculty",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "faculty_notifications_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_home_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_events_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_operations_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "members",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_members_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_profile_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "tasks",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_tasks_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "teams",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_teams_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "meetings",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_meetings_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_notifications_360x740.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_home_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_events_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_operations_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "members",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_members_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_profile_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "tasks",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_tasks_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "teams",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_teams_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "meetings",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_meetings_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_notifications_390x844.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_home_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_events_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_operations_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "members",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_members_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_profile_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "tasks",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_tasks_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "teams",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_teams_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "meetings",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_meetings_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_notifications_430x932.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_home_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_events_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_operations_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "members",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_members_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_profile_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "tasks",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_tasks_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "teams",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_teams_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "meetings",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_meetings_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_notifications_768x1024.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_home_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_events_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_operations_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "members",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_members_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_profile_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "tasks",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_tasks_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "teams",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_teams_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "meetings",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_meetings_1280x800.png"
+    },
+    {
+      "role": "coordinator",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "coordinator_notifications_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_home_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_events_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_operations_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "archives",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_archives_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_profile_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "doc_studio",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_doc_studio_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "forum",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_forum_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_notifications_360x740.png"
+    },
+    {
+      "role": "documentation",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_home_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_events_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_operations_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "archives",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_archives_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_profile_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "doc_studio",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_doc_studio_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "forum",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_forum_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_notifications_390x844.png"
+    },
+    {
+      "role": "documentation",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_home_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_events_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_operations_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "archives",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_archives_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_profile_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "doc_studio",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_doc_studio_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "forum",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_forum_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_notifications_430x932.png"
+    },
+    {
+      "role": "documentation",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_home_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_events_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_operations_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "archives",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_archives_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_profile_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "doc_studio",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_doc_studio_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "forum",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_forum_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_notifications_768x1024.png"
+    },
+    {
+      "role": "documentation",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_home_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_events_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_operations_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "archives",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_archives_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_profile_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "doc_studio",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_doc_studio_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "forum",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_forum_1280x800.png"
+    },
+    {
+      "role": "documentation",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "documentation_notifications_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_home_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_events_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_operations_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "finance",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_finance_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_profile_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "tasks",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_tasks_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_notifications_360x740.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_home_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_events_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_operations_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "finance",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_finance_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_profile_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "tasks",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_tasks_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_notifications_390x844.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_home_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_events_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_operations_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "finance",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_finance_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_profile_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "tasks",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_tasks_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_notifications_430x932.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_home_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_events_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_operations_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "finance",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_finance_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_profile_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "tasks",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_tasks_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_notifications_768x1024.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_home_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_events_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_operations_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "finance",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_finance_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_profile_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "tasks",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_tasks_1280x800.png"
+    },
+    {
+      "role": "treasurer",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "treasurer_notifications_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_home_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_events_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_operations_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "campaigns",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_campaigns_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_profile_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "forum",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_forum_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_notifications_360x740.png"
+    },
+    {
+      "role": "promotion",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_home_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_events_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_operations_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "campaigns",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_campaigns_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_profile_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "forum",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_forum_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_notifications_390x844.png"
+    },
+    {
+      "role": "promotion",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_home_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_events_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_operations_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "campaigns",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_campaigns_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_profile_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "forum",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_forum_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_notifications_430x932.png"
+    },
+    {
+      "role": "promotion",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_home_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_events_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_operations_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "campaigns",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_campaigns_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_profile_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "forum",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_forum_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_notifications_768x1024.png"
+    },
+    {
+      "role": "promotion",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_home_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_events_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_operations_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "campaigns",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_campaigns_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_profile_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "forum",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_forum_1280x800.png"
+    },
+    {
+      "role": "promotion",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "promotion_notifications_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "home",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_home_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "events",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_events_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "operations",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_operations_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "memories",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_memories_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "profile",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_profile_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "my_qr",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_my_qr_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "tasks",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_tasks_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "notifications",
+      "viewport": "360x740",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_notifications_360x740.png"
+    },
+    {
+      "role": "student",
+      "route": "home",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_home_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "events",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_events_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "operations",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_operations_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "memories",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_memories_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "profile",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_profile_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "my_qr",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_my_qr_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "tasks",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_tasks_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "notifications",
+      "viewport": "390x844",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_notifications_390x844.png"
+    },
+    {
+      "role": "student",
+      "route": "home",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_home_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "events",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_events_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "operations",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_operations_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "memories",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_memories_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "profile",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_profile_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "my_qr",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_my_qr_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "tasks",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_tasks_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "notifications",
+      "viewport": "430x932",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_notifications_430x932.png"
+    },
+    {
+      "role": "student",
+      "route": "home",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_home_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "events",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_events_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "operations",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_operations_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "memories",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_memories_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "profile",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_profile_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "my_qr",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_my_qr_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "tasks",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_tasks_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "notifications",
+      "viewport": "768x1024",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_notifications_768x1024.png"
+    },
+    {
+      "role": "student",
+      "route": "home",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_home_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "events",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_events_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "operations",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_operations_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "memories",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_memories_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "profile",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_profile_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "my_qr",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_my_qr_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "tasks",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_tasks_1280x800.png"
+    },
+    {
+      "role": "student",
+      "route": "notifications",
+      "viewport": "1280x800",
+      "passed": true,
+      "violationsCount": 0,
+      "screenshot": "student_notifications_1280x800.png"
+    }
+  ],
+  "violations": []
+}

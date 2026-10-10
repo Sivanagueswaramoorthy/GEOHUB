@@ -74,7 +74,7 @@ export const EventHero: React.FC<EventHeroProps> = ({
             className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white text-slate-900 font-bold text-xs shadow-md transition-all hover:bg-slate-100"
           >
             <span>Details</span>
-            <ChevronRight size={14} />
+            <ChevronRight size={16} strokeWidth={1.75} />
           </button>
         </div>
 
@@ -98,7 +98,7 @@ export const EventHero: React.FC<EventHeroProps> = ({
 
           {/* Location row */}
           <div className="flex items-center gap-1.5 text-slate-200 text-xs font-medium">
-            <MapPin size={14} className="text-emerald-400 shrink-0" />
+            <MapPin size={16} strokeWidth={1.75} className="text-emerald-400 shrink-0" />
             <span className="truncate">{event.venue}</span>
           </div>
         </div>

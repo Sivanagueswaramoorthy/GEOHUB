@@ -243,7 +243,7 @@ export const VolunteerScanView: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
           <span
             style={{
-              fontSize: '10px',
+              fontSize: '11px',
               fontWeight: 800,
               color: '#065F46',
               backgroundColor: '#D1FAE5',
@@ -256,16 +256,13 @@ export const VolunteerScanView: React.FC = () => {
           >
             ● Gate Terminal Scanner
           </span>
-          <span style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600 }}>
+          <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 600 }}>
             {sessionScans.length} Checked In
           </span>
         </div>
-        <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
           QR Gate Scanner
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-          Scan attendee QR codes to verify event registration and mark live attendance
-        </p>
       </div>
 
       {/* Session Scope Tabs (Events vs Meetings) */}
@@ -361,7 +358,7 @@ export const VolunteerScanView: React.FC = () => {
             </div>
 
             <ChevronDown
-              size={18}
+              size={20} strokeWidth={1.75}
               color="#64748B"
               style={{
                 transform: isEventDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -415,18 +412,18 @@ export const VolunteerScanView: React.FC = () => {
                     }}
                   >
                     <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
-                      <div style={{ fontSize: '12.5px', fontWeight: isSelected ? 800 : 600, color: isSelected ? '#065F46' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '12px', fontWeight: isSelected ? 800 : 600, color: isSelected ? '#065F46' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {ev.title}
                       </div>
-                      <div style={{ fontSize: '10.5px', color: isSelected ? '#047857' : '#64748B' }}>
+                      <div style={{ fontSize: '11px', color: isSelected ? '#047857' : '#64748B' }}>
                         {ev.category || 'Event'}
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                      <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '999px', backgroundColor: isSelected ? '#D1FAE5' : '#F1F5F9', color: isSelected ? '#065F46' : '#64748B' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '999px', backgroundColor: isSelected ? '#D1FAE5' : '#F1F5F9', color: isSelected ? '#065F46' : '#64748B' }}>
                         {ev.registeredUserIds.length} Reg
                       </span>
-                      {isSelected && <Check size={14} color="#059669" />}
+                      {isSelected && <Check size={16} strokeWidth={1.75} color="#059669" />}
                     </div>
                   </button>
                 );
@@ -475,7 +472,7 @@ export const VolunteerScanView: React.FC = () => {
               animation: 'laserScan 2.4s ease-in-out infinite alternate',
             }}
           />
-          <Scan size={44} color="rgba(255, 255, 255, 0.25)" />
+          <Scan size={48} strokeWidth={1.75} color="rgba(255, 255, 255, 0.25)" />
         </div>
 
         <div
@@ -493,7 +490,7 @@ export const VolunteerScanView: React.FC = () => {
             fontWeight: 600,
           }}
         >
-          <Camera size={13} />
+          <Camera size={16} strokeWidth={1.75} />
           <span>Optical laser scanner active</span>
         </div>
       </div>
@@ -504,7 +501,7 @@ export const VolunteerScanView: React.FC = () => {
           <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
             Scan or Enter Any QR Code
           </h3>
-          <span style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 600 }}>
+          <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
             Barcode / UID / Token
           </span>
         </div>
@@ -552,7 +549,7 @@ export const VolunteerScanView: React.FC = () => {
                 handleProcessScan(e.target.value);
               }
             }}
-            style={{ height: '40px', borderRadius: '10px', fontSize: '12.5px' }}
+            style={{ height: '40px', borderRadius: '10px', fontSize: '12px' }}
           >
             <option value="">-- Choose student to verify attendance --</option>
             {users.map((u) => {
@@ -591,7 +588,7 @@ export const VolunteerScanView: React.FC = () => {
               gap: '6px',
             }}
           >
-            <UserCheck size={14} /> Scan Registered
+            <UserCheck size={16} strokeWidth={1.75} /> Scan Registered
           </button>
 
           <button
@@ -611,7 +608,7 @@ export const VolunteerScanView: React.FC = () => {
               backgroundColor: '#FEF2F2',
             }}
           >
-            <UserX size={14} /> Scan Unregistered
+            <UserX size={16} strokeWidth={1.75} /> Scan Unregistered
           </button>
 
           <button
@@ -631,7 +628,7 @@ export const VolunteerScanView: React.FC = () => {
               backgroundColor: '#FFFBEB',
             }}
           >
-            <RotateCcw size={13} /> Duplicate Scan
+            <RotateCcw size={16} strokeWidth={1.75} /> Duplicate Scan
           </button>
 
           <button
@@ -648,7 +645,7 @@ export const VolunteerScanView: React.FC = () => {
               gap: '6px',
             }}
           >
-            <XCircle size={14} color="#94A3B8" /> Invalid Token
+            <XCircle size={16} strokeWidth={1.75} color="#94A3B8" /> Invalid Token
           </button>
         </div>
       </div>
@@ -714,7 +711,7 @@ export const VolunteerScanView: React.FC = () => {
                   >
                     VERIFIED
                   </span>
-                  <span style={{ color: '#94A3B8', fontSize: '10px' }}>
+                  <span style={{ color: '#94A3B8', fontSize: '11px' }}>
                     {new Date(att.checkInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -753,9 +750,9 @@ export const VolunteerScanView: React.FC = () => {
               justifyContent: 'center',
             }}
           >
-            {scanResult?.status === 'success' && <CheckCircle2 size={36} />}
-            {scanResult?.status === 'warning' && <AlertTriangle size={36} />}
-            {scanResult?.status === 'error' && <XCircle size={36} />}
+            {scanResult?.status === 'success' && <CheckCircle2 size={48} strokeWidth={1.75} />}
+            {scanResult?.status === 'warning' && <AlertTriangle size={48} strokeWidth={1.75} />}
+            {scanResult?.status === 'error' && <XCircle size={48} strokeWidth={1.75} />}
           </div>
 
           <div>
@@ -778,7 +775,7 @@ export const VolunteerScanView: React.FC = () => {
                 textAlign: 'left',
               }}
             >
-              <AppAvatar name={scanResult.user.name} size={42} />
+              <AppAvatar name={scanResult.user.name} size={48} strokeWidth={1.75} />
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontWeight: 800, fontSize: '14px', color: '#0F172A' }}>
                   {scanResult.user.name}
@@ -789,7 +786,7 @@ export const VolunteerScanView: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: '11px',
                       fontWeight: 800,
                       padding: '2px 8px',
                       borderRadius: '999px',
@@ -838,7 +835,7 @@ export const VolunteerScanView: React.FC = () => {
                 boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
               }}
             >
-              <UserPlus size={17} /> Enroll & Mark Attendance Now
+              <UserPlus size={20} strokeWidth={1.75} /> Enroll & Mark Attendance Now
             </button>
           )}
 

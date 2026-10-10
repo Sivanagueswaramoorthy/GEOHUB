@@ -28,12 +28,12 @@ export const ApprovalsView: React.FC = () => {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'event':
-        return <Calendar size={18} color="#0F766E" />;
+        return <Calendar size={20} strokeWidth={1.75} color="#0F766E" />;
       case 'budget':
-        return <DollarSign size={18} color="#16A34A" />;
+        return <DollarSign size={20} strokeWidth={1.75} color="#16A34A" />;
       case 'join_request':
       default:
-        return <UserCheck size={18} color="#2563EB" />;
+        return <UserCheck size={20} strokeWidth={1.75} color="#2563EB" />;
     }
   };
 
@@ -43,9 +43,6 @@ export const ApprovalsView: React.FC = () => {
         <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>
           Approvals Hub
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748B' }}>
-          Evaluate event sanctions, membership inductions & equipment budget releases
-        </p>
       </div>
 
       {/* Tabs */}
@@ -80,7 +77,7 @@ export const ApprovalsView: React.FC = () => {
       <div>
         {filteredItems.length === 0 ? (
           <div className="empty-state">
-            <ShieldCheck size={40} color="#94A3B8" style={{ marginBottom: '12px' }} />
+            <ShieldCheck size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>No approvals pending</h3>
             <p style={{ fontSize: '13px', color: '#64748B' }}>
               All submissions in this category have been processed.
@@ -153,7 +150,7 @@ export const ApprovalsView: React.FC = () => {
                     marginBottom: '12px',
                   }}
                 >
-                  <DollarSign size={14} /> Requested: ${item.requestedBudget.toLocaleString()}
+                  <DollarSign size={16} strokeWidth={1.75} /> Requested: ${item.requestedBudget.toLocaleString()}
                 </div>
               )}
 

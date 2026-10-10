@@ -208,12 +208,9 @@ export const DocumentationStudioView: React.FC = () => {
               DOCUMENTATION WING & EXPORTS
             </span>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
             Pre-Defined Documentation Templates & Export
           </h1>
-          <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-            Standardized college club templates with one-click export to PDF, Word (.doc) and Excel (.csv)
-          </p>
         </div>
 
         {/* 3 Export Action Buttons */}
@@ -235,7 +232,7 @@ export const DocumentationStudioView: React.FC = () => {
               boxShadow: '0 3px 10px rgba(220, 38, 38, 0.25)',
             }}
           >
-            <Printer size={15} /> Export PDF
+            <Printer size={16} strokeWidth={1.75} /> Export PDF
           </button>
 
           <button
@@ -255,7 +252,7 @@ export const DocumentationStudioView: React.FC = () => {
               boxShadow: '0 3px 10px rgba(37, 99, 235, 0.25)',
             }}
           >
-            <FileText size={15} /> Export Word (.doc)
+            <FileText size={16} strokeWidth={1.75} /> Export Word (.doc)
           </button>
 
           <button
@@ -275,7 +272,7 @@ export const DocumentationStudioView: React.FC = () => {
               boxShadow: '0 3px 10px rgba(16, 185, 129, 0.25)',
             }}
           >
-            <FileSpreadsheet size={15} /> Export Excel / CSV
+            <FileSpreadsheet size={16} strokeWidth={1.75} /> Export Excel / CSV
           </button>
         </div>
       </div>
@@ -303,7 +300,7 @@ export const DocumentationStudioView: React.FC = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span
                   style={{
-                    fontSize: '10px',
+                    fontSize: '11px',
                     fontWeight: 800,
                     textTransform: 'uppercase',
                     color: isSelected ? '#047857' : '#64748B',
@@ -370,7 +367,7 @@ export const DocumentationStudioView: React.FC = () => {
               cursor: 'pointer',
             }}
           >
-            <Copy size={13} /> Copy Document Text
+            <Copy size={16} strokeWidth={1.75} /> Copy Document Text
           </button>
         </div>
 
@@ -385,7 +382,7 @@ export const DocumentationStudioView: React.FC = () => {
             rows={18}
             style={{
               fontFamily: 'Consolas, Monaco, monospace',
-              fontSize: '12.5px',
+              fontSize: '12px',
               lineHeight: 1.6,
               backgroundColor: '#F8FAFC',
             }}

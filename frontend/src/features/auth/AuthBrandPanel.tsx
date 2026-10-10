@@ -94,7 +94,7 @@ export const AuthBrandPanel: React.FC = () => {
         <div className="brand-features-list">
           <div className="brand-feature-item">
             <div className="brand-feature-icon" aria-hidden="true">
-              <QrCode size={22} />
+              <QrCode size={24} strokeWidth={1.75} />
             </div>
             <div>
               <h3 className="brand-feature-title">Smart QR attendance</h3>
@@ -106,7 +106,7 @@ export const AuthBrandPanel: React.FC = () => {
 
           <div className="brand-feature-item">
             <div className="brand-feature-icon" aria-hidden="true">
-              <CalendarCheck2 size={22} />
+              <CalendarCheck2 size={24} strokeWidth={1.75} />
             </div>
             <div>
               <h3 className="brand-feature-title">Events and duties in one place</h3>
@@ -118,7 +118,7 @@ export const AuthBrandPanel: React.FC = () => {
 
           <div className="brand-feature-item">
             <div className="brand-feature-icon" aria-hidden="true">
-              <FileSpreadsheet size={22} />
+              <FileSpreadsheet size={24} strokeWidth={1.75} />
             </div>
             <div>
               <h3 className="brand-feature-title">Reports and archives</h3>
@@ -133,7 +133,7 @@ export const AuthBrandPanel: React.FC = () => {
       {/* Bottom Footer Note */}
       <div className="relative z-10 flex items-center gap-3 pt-6 border-t border-slate-100 text-xs text-slate-500">
         <span className="inline-flex items-center gap-1.5 font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-          <Shield size={12} /> Institutional Portal
+          <Shield size={16} strokeWidth={1.75} /> Institutional Portal
         </span>
         <span>Secure Single Sign-On for accredited staff and student leaders.</span>
       </div>

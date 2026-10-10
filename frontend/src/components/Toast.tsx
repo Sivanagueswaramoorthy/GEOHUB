@@ -15,18 +15,18 @@ export const Toast: React.FC<ToastProps> = ({
   let bg = '#E7F9F1';
   let border = '#A7F3D0';
   let text = '#065F46';
-  let icon = <CheckCircle2 size={18} color="#10B981" />;
+  let icon = <CheckCircle2 size={20} strokeWidth={1.75} color="#10B981" />;
 
   if (type === 'error') {
     bg = '#FEF2F2';
     border = '#FECACA';
     text = '#DC2626';
-    icon = <AlertCircle size={18} color="#EF4444" />;
+    icon = <AlertCircle size={20} strokeWidth={1.75} color="#EF4444" />;
   } else if (type === 'info') {
     bg = '#EFF6FF';
     border = '#BFDBFE';
     text = '#1D4ED8';
-    icon = <Info size={18} color="#3B82F6" />;
+    icon = <Info size={20} strokeWidth={1.75} color="#3B82F6" />;
   }
 
   return (
@@ -48,7 +48,7 @@ export const Toast: React.FC<ToastProps> = ({
           onClick={onClose}
           className="p-1 -mr-1 text-slate-400 hover:text-slate-600 rounded-full"
         >
-          <X size={14} />
+          <X size={16} strokeWidth={1.75} />
         </button>
       )}
     </div>

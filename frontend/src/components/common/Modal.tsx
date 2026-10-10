@@ -41,17 +41,18 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="sheet-handle" />
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A' }}>{title}</h3>
+            <h3 style={{ fontSize: '18px', lineHeight: '24px', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-family)' }}>{title}</h3>
             {subtitle && (
-              <p style={{ fontSize: '13px', color: '#64748B', marginTop: '2px' }}>{subtitle}</p>
+              <p style={{ fontSize: '13px', lineHeight: '18px', color: '#64748B', marginTop: '4px', fontFamily: 'var(--font-family)' }}>{subtitle}</p>
             )}
           </div>
           <button
             className="icon-button"
             onClick={onClose}
-            style={{ width: '32px', height: '32px' }}
+            aria-label="Close modal"
+            style={{ width: '44px', height: '44px', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <X size={18} />
+            <X size={20} strokeWidth={1.75} />
           </button>
         </div>
 

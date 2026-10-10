@@ -105,7 +105,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
             </span>
             <span
               className="font-bold text-slate-400 uppercase tracking-wider"
-              style={{ fontSize: '9px', fontWeight: 700, color: '#94A3B8', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
             >
               {centerLabel}
             </span>

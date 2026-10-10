@@ -151,7 +151,7 @@ export const SuperAdminDashboardView: React.FC = () => {
       {/* Toast Alert */}
       {toastMessage && (
         <div className="executive-toast">
-          <CheckCircle2 size={18} color="#10B981" />
+          <CheckCircle2 size={20} strokeWidth={1.75} color="#10B981" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -167,13 +167,13 @@ export const SuperAdminDashboardView: React.FC = () => {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-            <Sun size={15} color="#F59E0B" />
+            <Sun size={16} strokeWidth={1.75} color="#F59E0B" />
             <span style={{ fontSize: '13px', color: '#64748B', fontWeight: 600 }}>{greetingText}</span>
           </div>
           <h1
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: '24px',
+              fontSize: '28px',
               fontWeight: 800,
               color: '#0F172A',
               lineHeight: 1.15,
@@ -239,7 +239,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <span style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 color: '#047857',
                 textTransform: 'uppercase',
@@ -258,7 +258,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 justifyContent: 'center',
                 color: '#059669',
               }}>
-                <Users2 size={14} />
+                <Users2 size={16} strokeWidth={1.75} />
               </div>
             </div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: '#064E3B', lineHeight: 1, letterSpacing: '-0.02em' }}>
@@ -292,7 +292,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <span style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 color: '#6D28D9',
                 textTransform: 'uppercase',
@@ -311,7 +311,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 justifyContent: 'center',
                 color: '#7C3AED',
               }}>
-                <Award size={14} />
+                <Award size={16} strokeWidth={1.75} />
               </div>
             </div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: '#4C1D95', lineHeight: 1, letterSpacing: '-0.02em' }}>
@@ -345,7 +345,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <span style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 color: '#B45309',
                 textTransform: 'uppercase',
@@ -364,7 +364,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 justifyContent: 'center',
                 color: '#D97706',
               }}>
-                <Calendar size={14} />
+                <Calendar size={16} strokeWidth={1.75} />
               </div>
             </div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: '#78350F', lineHeight: 1, letterSpacing: '-0.02em' }}>
@@ -398,7 +398,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <span style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: 800,
                 color: '#0F766E',
                 textTransform: 'uppercase',
@@ -417,7 +417,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 justifyContent: 'center',
                 color: '#0D9488',
               }}>
-                <CheckCircle2 size={14} />
+                <CheckCircle2 size={16} strokeWidth={1.75} />
               </div>
             </div>
             <div style={{ fontSize: '28px', fontWeight: 900, color: '#134E4A', lineHeight: 1, letterSpacing: '-0.02em' }}>
@@ -523,7 +523,7 @@ export const SuperAdminDashboardView: React.FC = () => {
               }}
             >
               <span style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>128</span>
-              <span style={{ fontSize: '9px', color: '#64748B', fontWeight: 600 }}>Scholars</span>
+              <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Scholars</span>
             </div>
           </div>
 

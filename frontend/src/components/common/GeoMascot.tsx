@@ -4,6 +4,7 @@ interface GeoMascotProps {
   size?: number;
   className?: string;
   waving?: boolean;
+  strokeWidth?: number;
 }
 
 export const GeoMascot: React.FC<GeoMascotProps> = ({ size = 64, className = '', waving = true }) => {
