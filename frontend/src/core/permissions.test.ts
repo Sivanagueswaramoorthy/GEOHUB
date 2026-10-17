@@ -25,6 +25,21 @@ describe('Permissions & Guard Suite', () => {
       expect(canAccessRoute('posts', 'super_admin').allowed).toBe(true);
       expect(canAccessRoute('approvals', 'super_admin').allowed).toBe(true);
     });
+
+    it('restricts superadmin from directly editing or uploading for other specialized roles', () => {
+      // Superadmin can view all modules
+      expect(facultyPerms.canAccessFinance).toBe(true);
+      expect(facultyPerms.canAccessCampaigns).toBe(true);
+      expect(facultyPerms.canAccessDocStudio).toBe(true);
+
+      // But cannot edit or upload operational records belonging to other roles
+      expect(facultyPerms.canManageExpenses).toBe(false); // Restricted to Treasurer
+      expect(facultyPerms.canManageCampaigns).toBe(false); // Restricted to Promotion Lead
+      expect(facultyPerms.canUploadMedia).toBe(false); // Restricted to Documentation Wing
+      expect(facultyPerms.canEditDocStudio).toBe(false); // Restricted to Documentation Wing
+      expect(facultyPerms.canCreateSquadTasks).toBe(false); // Restricted to Squad Leads
+      expect(facultyPerms.canCreateMemories).toBe(false); // Restricted to Media & Documentation
+    });
   });
 
   describe('Coordinator / Lead permissions', () => {

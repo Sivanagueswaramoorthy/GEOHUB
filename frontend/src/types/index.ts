@@ -15,6 +15,7 @@ export type UserStatus = 'active' | 'pending' | 'disabled';
 export interface UserModel {
   uid: string;
   email: string;
+  rollNo?: string;
   name: string;
   role: UserRole;
   post?: string; // e.g. 'Faculty Advisor', 'President', 'Vice President', 'Treasurer', 'Documentation Lead', 'Social Media Lead', 'Student Volunteer'

@@ -15,9 +15,11 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocTemplate } from '../../types';
+import { AuditModeBanner } from '../../components';
 
 export const DocumentationStudioView: React.FC = () => {
-  const { docTemplates, events, attendance, users } = useApp();
+  const { docTemplates, events, attendance, users, currentUser } = useApp();
+  const isSuperAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'faculty';
 
   const [selectedTemplate, setSelectedTemplate] = useState<DocTemplate>(docTemplates[0]);
   const [docContent, setDocContent] = useState<string>(docTemplates[0].defaultContent);
@@ -277,6 +279,15 @@ export const DocumentationStudioView: React.FC = () => {
         </div>
       </div>
 
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Documentation Studio & Dossier Exports"
+          operatedByRole="Documentation Wing & Archival Team"
+          actionRestrictions="Template drafting and editorial revisions are operated by the Documentation Lead. You have full inspection and export capabilities across PDF, Word (.doc), and Excel/CSV."
+        />
+      )}
+
       {/* Template Chooser Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
         {docTemplates.map((tpl) => {
@@ -374,17 +385,27 @@ export const DocumentationStudioView: React.FC = () => {
         {/* Live Document Editor */}
         <div className="input-group">
           <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Live Document Editor (Editable Markdown & Text)</span>
-            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>Changes will be included in exported file</span>
+            <span>
+              {isSuperAdmin
+                ? 'Live Document Audit Preview (Read-Only for Super Admin)'
+                : 'Live Document Editor (Editable Markdown & Text)'}
+            </span>
+            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>
+              {isSuperAdmin
+                ? 'Managed by Documentation Wing • Ready for Official Export'
+                : 'Changes will be included in exported file'}
+            </span>
           </label>
           <textarea
             className="input-field"
             rows={18}
+            readOnly={isSuperAdmin}
             style={{
               fontFamily: 'Consolas, Monaco, monospace',
               fontSize: '12px',
               lineHeight: 1.6,
-              backgroundColor: '#F8FAFC',
+              backgroundColor: isSuperAdmin ? '#F1F5F9' : '#F8FAFC',
+              cursor: isSuperAdmin ? 'default' : 'text',
             }}
             value={docContent}
             onChange={(e) => setDocContent(e.target.value)}

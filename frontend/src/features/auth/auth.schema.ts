@@ -31,47 +31,68 @@ export const createLoginSchema = (domainConstraint?: string) => {
     'student',
   ];
 
-  return z.object({
-    email: z
-      .string()
-      .trim()
-      .min(1, { message: 'Institutional email is required' })
-      .refine(
-        (val) => {
-          const lower = val.toLowerCase().trim();
-          if (roleKeywords.includes(lower)) return true;
-          return z.string().email().safeParse(val).success;
-        },
-        { message: 'Enter a valid email address (e.g. name@college.edu)' }
-      )
-      .refine(
-        (val) => {
-          const lower = val.toLowerCase().trim();
-          if (roleKeywords.includes(lower)) return true;
-          if (!activeDomain) return true;
-          return val.toLowerCase().endsWith(`@${activeDomain.toLowerCase()}`);
-        },
-        {
-          message: `Please use your institutional @${activeDomain} address`,
+  return z
+    .object({
+      rollNo: z.string().trim().optional(),
+      email: z.string().trim().optional(),
+      password: z
+        .string()
+        .min(1, { message: 'Password is required' })
+        .min(8, { message: 'Password must be at least 8 characters' }),
+      rememberMe: z.boolean().default(true),
+    })
+    .superRefine((val, ctx) => {
+      // Must provide either rollNo or email
+      if (!val.rollNo && !val.email) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Roll Number is required',
+          path: ['rollNo'],
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Institutional email is required',
+          path: ['email'],
+        });
+        return;
+      }
+
+      // If email provided without rollNo, validate email format
+      if (val.email && !val.rollNo) {
+        const lower = val.email.toLowerCase().trim();
+        if (!roleKeywords.includes(lower)) {
+          if (!z.string().email().safeParse(val.email).success) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Enter a valid email address (e.g. name@college.edu)',
+              path: ['email'],
+            });
+          } else if (activeDomain && !lower.endsWith(`@${activeDomain.toLowerCase()}`)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Please use your institutional @${activeDomain} address`,
+              path: ['email'],
+            });
+          }
         }
-      ),
-    password: z
-      .string()
-      .min(1, { message: 'Password is required' })
-      .min(8, { message: 'Password must be at least 8 characters' }),
-    rememberMe: z.boolean().default(true),
-  });
+      }
+    });
 };
 
 export const loginSchema = createLoginSchema();
 
-export type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = {
+  rollNo?: string;
+  email?: string;
+  password: string;
+  rememberMe?: boolean;
+};
 
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
     .trim()
-    .min(1, { message: 'Email is required' })
+    .min(1, { message: 'Institutional email is required' })
     .email({ message: 'Enter a valid institutional email' }),
 });
 

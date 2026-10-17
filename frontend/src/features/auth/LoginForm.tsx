@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mail, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { User, ArrowRight, CheckCircle2, AlertCircle, RefreshCw, KeyRound, Sparkles } from 'lucide-react';
 import { PasswordField } from './PasswordField';
 import { createLoginSchema, LoginFormData } from './auth.schema';
 import { AuthErrorState } from './useLogin';
@@ -11,9 +11,9 @@ interface LoginFormProps {
   errorState: AuthErrorState;
   rateLimitSeconds: number;
   onForgotPasswordClick: () => void;
-  onRequestJoinClick: () => void;
+  onRequestJoinClick?: () => void;
   onClearError?: () => void;
-  initialEmail?: string;
+  initialRollNo?: string;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
@@ -23,27 +23,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   errorState,
   rateLimitSeconds,
   onForgotPasswordClick,
-  onRequestJoinClick,
   onClearError,
-  initialEmail = '',
+  initialRollNo = '',
 }) => {
-  const [email, setEmail] = useState(initialEmail);
+  const [rollNo, setRollNo] = useState(initialRollNo);
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
   // Field-level error messages
-  const [emailError, setEmailError] = useState<string | null>(null);
+  const [rollNoError, setRollNoError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [domainHint, setDomainHint] = useState<string | null>(null);
 
   // Shake trigger on error
   const [shouldShake, setShouldShake] = useState(false);
 
-  const emailRef = useRef<HTMLInputElement>(null);
+  const rollNoRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const allowedDomain = import.meta.env?.VITE_ALLOWED_EMAIL_DOMAIN || '';
-  const loginSchema = createLoginSchema(allowedDomain);
+  const loginSchema = createLoginSchema();
 
   // Trigger shake animation when a server error occurs
   useEffect(() => {
@@ -54,23 +51,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
   }, [errorState.message]);
 
-  // Check institutional domain hint on email change
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRollNoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
-    setEmail(val);
-    if (emailError) setEmailError(null);
+    setRollNo(val);
+    if (rollNoError) setRollNoError(null);
     onClearError?.();
-
-    if (allowedDomain && val.includes('@')) {
-      const parts = val.split('@');
-      if (parts[1] && !parts[1].toLowerCase().includes(allowedDomain.toLowerCase())) {
-        setDomainHint(`Institutional accounts typically end with @${allowedDomain}`);
-      } else {
-        setDomainHint(null);
-      }
-    } else {
-      setDomainHint(null);
-    }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,19 +65,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   // Field validation on blur
-  const handleEmailBlur = () => {
-    const result = loginSchema.shape.email.safeParse(email.trim());
-    if (!result.success) {
-      setEmailError(result.error.issues[0]?.message || 'Enter a valid institutional email');
+  const handleRollNoBlur = () => {
+    if (!rollNo.trim()) {
+      setRollNoError('Roll Number is required');
     } else {
-      setEmailError(null);
+      setRollNoError(null);
     }
   };
 
   const handlePasswordBlur = () => {
-    const result = loginSchema.shape.password.safeParse(password);
-    if (!result.success) {
-      setPasswordError(result.error.issues[0]?.message || 'Password must be at least 8 characters');
+    if (!password) {
+      setPasswordError('Password is required');
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
     } else {
       setPasswordError(null);
     }
@@ -102,48 +87,34 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     e.preventDefault();
     if (isLoading || isSuccess || rateLimitSeconds > 0) return;
 
-    // Full schema validation
-    const validationResult = loginSchema.safeParse({
-      email: email.trim(),
-      password,
-      rememberMe,
-    });
+    let hasError = false;
+    if (!rollNo.trim()) {
+      setRollNoError('Roll Number is required');
+      hasError = true;
+    }
 
-    if (!validationResult.success) {
-      let firstInvalid: 'email' | 'password' | null = null;
-      let emailErr: string | null = null;
-      let passErr: string | null = null;
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    }
 
-      for (const issue of validationResult.error.issues) {
-        if (issue.path[0] === 'email' && !emailErr) {
-          emailErr = issue.message;
-          if (!firstInvalid) firstInvalid = 'email';
-        }
-        if (issue.path[0] === 'password' && !passErr) {
-          passErr = issue.message;
-          if (!firstInvalid) firstInvalid = 'password';
-        }
-      }
-
-      setEmailError(emailErr);
-      setPasswordError(passErr);
-      setShouldShake(true);
-      setTimeout(() => setShouldShake(false), 350);
-
-      // Shift focus to the first invalid field
-      if (firstInvalid === 'email') {
-        emailRef.current?.focus();
-      } else if (firstInvalid === 'password') {
+    if (hasError) {
+      if (!rollNo.trim()) {
+        rollNoRef.current?.focus();
+      } else {
         passwordRef.current?.focus();
       }
+      setShouldShake(true);
+      setTimeout(() => setShouldShake(false), 350);
       return;
     }
 
-    setEmailError(null);
+    setRollNoError(null);
     setPasswordError(null);
 
     await onSubmit({
-      email: email.trim(),
+      rollNo: rollNo.trim(),
+      email: rollNo.trim(),
       password,
       rememberMe,
     });
@@ -154,119 +125,120 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       onSubmit={handleSubmit}
       noValidate
       className={`login-form ${shouldShake ? 'shake-animation' : ''}`}
+      style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}
     >
-      {/* Quick Role Fill Chips */}
-      <div className="login-quick-roles fade-up-item stagger-1 mb-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-0.5">
-            Quick roles:
-          </span>
-          {[
-            { label: 'superadmin', user: 'superadmin', pass: 'admin123', tag: 'Faculty' },
-            { label: 'admin', user: 'admin', pass: 'admin123', tag: 'President' },
-            { label: 'doc', user: 'doc', pass: 'admin123', tag: 'Documentation' },
-            { label: 'tres', user: 'tres', pass: 'admin123', tag: 'Treasurer' },
-            { label: 'promo', user: 'promo', pass: 'admin123', tag: 'Promotion' },
-          ].map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              disabled={isLoading || isSuccess}
-              onClick={() => {
-                setEmail(item.user);
-                setPassword(item.pass);
-                setEmailError(null);
-                setPasswordError(null);
-                onClearError?.();
-              }}
-              className="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
-            >
-              <span className="font-extrabold">{item.label}</span>
-              <span className="text-[11px] text-emerald-600/80">({item.tag})</span>
-            </button>
-          ))}
-        </div>
+      {/* Quick Roll No Fill Chips */}
+      <div className="login-quick-roles" style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
+          Roll Nos:
+        </span>
+        {[
+          { roll: 'FAC01', label: 'Faculty', pass: 'admin123' },
+          { roll: '21GEO001', label: 'President', pass: 'admin123' },
+          { roll: '22GEO019', label: 'Treasurer', pass: 'admin123' },
+          { roll: '22GEO014', label: 'Promotion', pass: 'admin123' },
+          { roll: '23GEO088', label: 'Member', pass: 'admin123' },
+          { roll: '23GEO042', label: 'Volunteer', pass: 'admin123' },
+        ].map((item) => (
+          <button
+            key={item.roll}
+            type="button"
+            disabled={isLoading || isSuccess}
+            onClick={() => {
+              setRollNo(item.roll);
+              setPassword(item.pass);
+              setRollNoError(null);
+              setPasswordError(null);
+              onClearError?.();
+            }}
+            style={{
+              flexShrink: 0,
+              padding: '4px 10px',
+              borderRadius: '9999px',
+              fontSize: '11px',
+              fontWeight: 600,
+              backgroundColor: '#ECFDF5',
+              color: '#065F46',
+              border: '1px solid #A7F3D0',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <strong style={{ fontWeight: 800 }}>{item.roll}</strong>
+            <span style={{ opacity: 0.8, fontSize: '10px' }}>({item.label})</span>
+          </button>
+        ))}
       </div>
 
-      {/* Email / Username Input */}
-      <div className="login-field-group fade-up-item stagger-1">
-        <label htmlFor="login-email" className="login-label">
-          Institutional Email or Role Username
+      {/* Register Number (Reg No) Input */}
+      <div className="login-field-group">
+        <label htmlFor="login-roll-no" className="login-label">
+          <span>Register Number (Reg No)</span>
         </label>
         <div className="login-input-wrapper">
           <span className="login-input-icon" aria-hidden="true">
-            <Mail size={20} strokeWidth={1.75} />
+            <User size={18} strokeWidth={2} />
           </span>
           <input
-            ref={emailRef}
-            id="login-email"
+            ref={rollNoRef}
+            id="login-roll-no"
             type="text"
             autoComplete="username"
-            autoCapitalize="off"
+            autoCapitalize="characters"
             spellCheck={false}
-            value={email}
-            onChange={handleEmailChange}
-            onBlur={handleEmailBlur}
+            value={rollNo}
+            onChange={handleRollNoChange}
+            onBlur={handleRollNoBlur}
             disabled={isLoading || isSuccess}
-            placeholder="superadmin, admin, doc, tres, promo or name@college.edu"
-            className={`login-input ${emailError ? 'has-error' : ''}`}
-            aria-invalid={Boolean(emailError)}
-            aria-describedby={[
-              emailError ? 'login-email-error' : null,
-              domainHint ? 'login-email-hint' : null,
-            ].filter(Boolean).join(' ') || undefined}
+            placeholder="Enter your Reg No (e.g. 21GEO001)"
+            aria-label="Register Number / Roll Number"
+            className={`login-input ${rollNoError ? 'has-error' : ''}`}
+            aria-invalid={Boolean(rollNoError)}
+            aria-describedby={rollNoError ? 'login-roll-no-error' : undefined}
           />
         </div>
 
-        {emailError && (
-          <div id="login-email-error" className="field-error-text" role="alert">
-            <AlertCircle size={16} strokeWidth={1.75} className="shrink-0" />
-            <span>{emailError}</span>
-          </div>
-        )}
-
-        {domainHint && !emailError && (
-          <div id="login-email-hint" className="field-hint-text">
-            {domainHint}
+        {rollNoError && (
+          <div id="login-roll-no-error" className="field-error-text" role="alert">
+            <AlertCircle size={14} className="shrink-0" />
+            <span>{rollNoError}</span>
           </div>
         )}
       </div>
 
       {/* Password Input */}
-      <div className="fade-up-item stagger-2">
-        <PasswordField
-          ref={passwordRef}
-          id="login-password"
-          value={password}
-          onChange={handlePasswordChange}
-          onBlur={handlePasswordBlur}
-          error={passwordError || undefined}
-          disabled={isLoading || isSuccess}
-          placeholder="••••••••••••"
-        />
-      </div>
+      <PasswordField
+        ref={passwordRef}
+        id="login-password"
+        value={password}
+        onChange={handlePasswordChange}
+        onBlur={handlePasswordBlur}
+        error={passwordError || undefined}
+        disabled={isLoading || isSuccess}
+        placeholder="Enter your password"
+      />
 
       {/* Options Row: Keep me signed in & Forgot password link */}
-      <div className="login-options-row fade-up-item stagger-3">
-        <label className="remember-me-label">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#475569', cursor: 'pointer', fontWeight: 500 }}>
           <input
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
             disabled={isLoading || isSuccess}
-            className="remember-me-input"
+            style={{ width: '16px', height: '16px', accentColor: '#059669', cursor: 'pointer' }}
           />
-          <span className="custom-checkbox" aria-hidden="true">
-            {rememberMe && <CheckCircle2 size={16} strokeWidth={3} />}
-          </span>
-          <span>Keep me signed in</span>
+          <span>Remember my Reg No</span>
         </label>
 
         <button
           type="button"
           onClick={onForgotPasswordClick}
           disabled={isLoading || isSuccess}
-          className="forgot-password-link"
+          style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: 700, color: '#047857', cursor: 'pointer', textDecoration: 'underline' }}
         >
           Forgot password?
         </button>
@@ -275,78 +247,53 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Error Banner (Visible when sign-in fails) */}
       {errorState.message && (
         <div
-          className="login-error-banner"
+          className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2 animate-fade-in"
           role="alert"
           aria-live="polite"
         >
-          <AlertCircle size={20} strokeWidth={1.75} className="shrink-0 text-red-600 mt-0.5" />
+          <AlertCircle size={16} className="shrink-0 text-red-600 mt-0.5" />
           <div className="flex-1">
-            <p>{errorState.message}</p>
-            {errorState.requestId && (
-              <p className="text-[11px] text-red-500 mt-1 font-mono">
-                Ref ID: {errorState.requestId}
-              </p>
-            )}
+            <p className="font-semibold">{errorState.message}</p>
             {errorState.retryable && (
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="inline-flex items-center gap-1 text-xs font-bold underline mt-1 text-red-700 hover:text-red-900"
+                className="inline-flex items-center gap-1 text-xs font-bold underline mt-1 text-red-800"
               >
-                <RefreshCw size={16} strokeWidth={1.75} /> Retry connection
+                <RefreshCw size={14} /> Retry connection
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* Primary Submit Button */}
-      <div className="fade-up-item stagger-4" style={{ width: '100%' }}>
-        <button
-          type="submit"
-          disabled={isLoading || isSuccess || rateLimitSeconds > 0}
-          className={`login-submit-btn ${isSuccess ? 'is-success' : ''}`}
-          aria-busy={isLoading}
-        >
-          {isSuccess ? (
-            <>
-              <CheckCircle2 size={20} className="animate-scale-in" />
-              <span>Verified & Redirecting</span>
-            </>
-          ) : isLoading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Signing in...</span>
-            </>
-          ) : rateLimitSeconds > 0 ? (
-            <span>Locked ({rateLimitSeconds}s)</span>
-          ) : (
-            <>
-              <span>Sign in</span>
-              <ArrowRight size={20} strokeWidth={1.75} />
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Divider */}
-      <div className="login-divider fade-up-item stagger-4">
-        <div className="login-divider-line" />
-        <span className="login-divider-text">or</span>
-        <div className="login-divider-line" />
-      </div>
-
-      {/* Secondary Action: Request to join */}
-      <div className="fade-up-item stagger-5" style={{ width: '100%' }}>
-        <button
-          type="button"
-          onClick={onRequestJoinClick}
-          disabled={isLoading || isSuccess}
-          className="login-join-btn"
-        >
-          Request to join the club
-        </button>
-      </div>
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={isLoading || isSuccess || rateLimitSeconds > 0}
+        aria-busy={isLoading}
+        className="btn-login-submit"
+        style={{ marginTop: '4px', width: '100%' }}
+      >
+        {rateLimitSeconds > 0 ? (
+          <span>Locked ({rateLimitSeconds}s)</span>
+        ) : isLoading ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+            <span>Signing in...</span>
+          </span>
+        ) : isSuccess ? (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={18} />
+            <span>Authenticated!</span>
+          </span>
+        ) : (
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <span>Sign in with Reg No</span>
+            <ArrowRight size={16} />
+          </span>
+        )}
+      </button>
     </form>
   );
 };

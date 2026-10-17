@@ -20,9 +20,11 @@ import { useApp } from '../../context/AppContext';
 import { MemoryItem } from '../../types';
 import { Modal } from '../../components/common/Modal';
 import { SearchBar } from '../../components/SearchBar';
+import { AuditModeBanner } from '../../components';
 
 export const MemoriesHubView: React.FC = () => {
   const { memories, currentUser } = useApp();
+  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
 
   const [viewMode, setViewMode] = useState<'grid' | 'geotag'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -199,27 +201,56 @@ export const MemoriesHubView: React.FC = () => {
             </button>
           </div>
 
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            style={{
-              padding: '10px 16px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
-              cursor: 'pointer',
-            }}
-          >
-            <Camera size={16} /> Add Memory
-          </button>
+          {!isSuperAdmin ? (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              style={{
+                padding: '10px 16px',
+                borderRadius: '999px',
+                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                fontSize: '13px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+                cursor: 'pointer',
+              }}
+            >
+              <Camera size={16} /> Add Memory
+            </button>
+          ) : (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#F1F5F9',
+                color: '#334155',
+                border: '1px solid #CBD5E1',
+              }}
+            >
+              <Eye size={14} color="#64748B" />
+              <span>Audit Mode</span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Chapter Memories & Visual Expeditions"
+          operatedByRole="Documentation & Media Wing"
+          actionRestrictions="Memory publishing and geotagged uploads are operated by the Media and Documentation leads. You have full archival inspection and relive access."
+        />
+      )}
 
       {/* Filter Category Pills */}
       <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>

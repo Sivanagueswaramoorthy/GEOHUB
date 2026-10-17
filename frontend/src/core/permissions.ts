@@ -16,7 +16,16 @@ export interface RolePermissions {
   canManageSettings: boolean;
   canEditBudget: boolean;
   canReviewExecutiveApprovals: boolean;
+  canManageExpenses: boolean;
+  canManageCampaigns: boolean;
+  canUploadMedia: boolean;
+  canEditDocStudio: boolean;
+  canCreateSquadTasks: boolean;
+  canCreateMemories: boolean;
 }
+
+export const isSuperAdminRole = (role: UserRole): boolean =>
+  role === 'super_admin' || role === 'faculty';
 
 export const getRolePermissions = (role: UserRole): RolePermissions => {
   switch (role) {
@@ -36,6 +45,13 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: true,
         canEditBudget: true,
         canReviewExecutiveApprovals: true,
+        // Institutional oversight: SuperAdmin views all modules but does not edit/upload for other roles
+        canManageExpenses: false,
+        canManageCampaigns: false,
+        canUploadMedia: false,
+        canEditDocStudio: false,
+        canCreateSquadTasks: false,
+        canCreateMemories: false,
       };
 
     case 'admin':
@@ -54,6 +70,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false, // Hidden from Operations and direct URL
         canEditBudget: false, // Read-only budget view with "View only" chip
         canReviewExecutiveApprovals: false, // Replaced with coordinator tasks & attention queue
+        canManageExpenses: false,
+        canManageCampaigns: false,
+        canUploadMedia: true,
+        canEditDocStudio: false,
+        canCreateSquadTasks: true,
+        canCreateMemories: true,
       };
 
     case 'treasurer':
@@ -71,6 +93,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false,
         canEditBudget: false, // Allocation editing is hidden by permission and by route ("Set by Faculty")
         canReviewExecutiveApprovals: true,
+        canManageExpenses: true,
+        canManageCampaigns: false,
+        canUploadMedia: false,
+        canEditDocStudio: false,
+        canCreateSquadTasks: false,
+        canCreateMemories: false,
       };
 
     case 'documentation':
@@ -88,6 +116,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false,
         canEditBudget: false,
         canReviewExecutiveApprovals: false,
+        canManageExpenses: false,
+        canManageCampaigns: false,
+        canUploadMedia: true,
+        canEditDocStudio: true,
+        canCreateSquadTasks: false,
+        canCreateMemories: true,
       };
 
     case 'social_media':
@@ -106,6 +140,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false,
         canEditBudget: false,
         canReviewExecutiveApprovals: false,
+        canManageExpenses: false,
+        canManageCampaigns: role === 'social_media',
+        canUploadMedia: false,
+        canEditDocStudio: false,
+        canCreateSquadTasks: true,
+        canCreateMemories: false,
       };
 
     case 'volunteer':
@@ -123,6 +163,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false,
         canEditBudget: false,
         canReviewExecutiveApprovals: false,
+        canManageExpenses: false,
+        canManageCampaigns: false,
+        canUploadMedia: false,
+        canEditDocStudio: false,
+        canCreateSquadTasks: false,
+        canCreateMemories: false,
       };
 
     case 'member':
@@ -141,6 +187,12 @@ export const getRolePermissions = (role: UserRole): RolePermissions => {
         canManageSettings: false,
         canEditBudget: false,
         canReviewExecutiveApprovals: false,
+        canManageExpenses: false,
+        canManageCampaigns: false,
+        canUploadMedia: false,
+        canEditDocStudio: false,
+        canCreateSquadTasks: false,
+        canCreateMemories: false,
       };
   }
 };

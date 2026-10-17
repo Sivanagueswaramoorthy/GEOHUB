@@ -126,7 +126,8 @@ export const useLogin = (options?: UseLoginOptions) => {
     setIsLoading(true);
     setErrorState({ code: null, message: null });
 
-    const trimmedEmail = data.email.trim().toLowerCase();
+    const rawIdentifier = (data.rollNo || data.email || '').trim();
+    const trimmedIdentifier = rawIdentifier.toLowerCase();
     const password = data.password;
     const rememberMe = Boolean(data.rememberMe);
 
@@ -145,14 +146,15 @@ export const useLogin = (options?: UseLoginOptions) => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              email: trimmedEmail,
+              rollNo: data.rollNo || trimmedIdentifier,
+              email: data.email || trimmedIdentifier,
               password,
             }),
           });
 
           if (!res.ok) {
             if (res.status === 401) {
-              setErrorState({ code: '401', message: 'Incorrect email or password.' });
+              setErrorState({ code: '401', message: 'Incorrect Roll Number or password.' });
               setIsLoading(false);
               return false;
             }
@@ -210,7 +212,7 @@ export const useLogin = (options?: UseLoginOptions) => {
         await new Promise((resolve) => setTimeout(resolve, 450));
 
         // Testing error triggers
-        if (trimmedEmail.includes('ratelimit')) {
+        if (trimmedIdentifier.includes('ratelimit')) {
           setRateLimitSeconds(120);
           setErrorState({
             code: '429',
@@ -220,7 +222,7 @@ export const useLogin = (options?: UseLoginOptions) => {
           return false;
         }
 
-        if (trimmedEmail.includes('suspended') || trimmedEmail.includes('403')) {
+        if (trimmedIdentifier.includes('suspended') || trimmedIdentifier.includes('403')) {
           setErrorState({
             code: '403',
             message: 'Your account is awaiting approval or has been suspended. Contact your club coordinator.',
@@ -229,7 +231,7 @@ export const useLogin = (options?: UseLoginOptions) => {
           return false;
         }
 
-        if (trimmedEmail.includes('network') || password === 'networkfail') {
+        if (trimmedIdentifier.includes('network') || password === 'networkfail') {
           setErrorState({
             code: 'NETWORK',
             message: "Can't reach the server. Check your connection and try again.",
@@ -244,71 +246,83 @@ export const useLogin = (options?: UseLoginOptions) => {
         if (normalizedPass === 'wrongpassword' || normalizedPass === 'invalid123') {
           setErrorState({
             code: '401',
-            message: 'Incorrect email or password.',
+            message: 'Incorrect Roll Number or password.',
           });
           setIsLoading(false);
           return false;
         }
 
-        const id = trimmedEmail.toLowerCase().replace(/[\s_\-.]+/g, '');
+        const id = trimmedIdentifier.toLowerCase().replace(/[\s_\-.]+/g, '');
 
-        // Match known demo users by email
-        let found = demoUsersList.find((u) => u.email.toLowerCase() === trimmedEmail);
+        // Match known demo users by rollNo or email
+        let found = demoUsersList.find(
+          (u) =>
+            (u.rollNo && u.rollNo.toLowerCase() === trimmedIdentifier) ||
+            (u.rollNo && u.rollNo.toLowerCase().replace(/[\s_\-.]+/g, '') === id) ||
+            u.email.toLowerCase() === trimmedIdentifier
+        );
 
         if (!found) {
           if (
+            id === 'fac01' ||
             id === 'superadmin' ||
             id === 'super' ||
             id.includes('superadmin') ||
             id === 'faculty' ||
             id.includes('advisor') ||
-            trimmedEmail.includes('sarah')
+            trimmedIdentifier.includes('sarah')
           ) {
             found = demoSuperAdmin;
           } else if (
+            id === '21geo001' ||
             id === 'admin' ||
             id.includes('coordinator') ||
             id.includes('president') ||
             id === 'pres' ||
             id === 'vp' ||
-            trimmedEmail.includes('alex') ||
-            trimmedEmail.includes('elena')
+            trimmedIdentifier.includes('alex') ||
+            trimmedIdentifier.includes('elena')
           ) {
             found = demoAdmin;
           } else if (
+            id === '22geo018' ||
             id === 'doc' ||
             id.startsWith('doc') ||
             id.includes('documentation') ||
-            trimmedEmail.includes('aarav')
+            trimmedIdentifier.includes('aarav')
           ) {
             found = demoDocLead;
           } else if (
+            id === '22geo019' ||
             id === 'tres' ||
             id === 'treas' ||
             id.startsWith('tres') ||
             id.startsWith('treas') ||
             id.includes('treasurer') ||
-            trimmedEmail.includes('ananya')
+            trimmedIdentifier.includes('ananya')
           ) {
             found = demoTreasurer;
           } else if (
+            id === '22geo014' ||
             id === 'promo' ||
             id.startsWith('promo') ||
             id.includes('promotion') ||
-            trimmedEmail.includes('david')
+            trimmedIdentifier.includes('david')
           ) {
             found = demoTeamAdmin;
           } else if (
+            id === '23geo042' ||
             id === 'volunteer' ||
             id.startsWith('volunt') ||
-            trimmedEmail.includes('volunteer') ||
-            trimmedEmail.includes('liam')
+            trimmedIdentifier.includes('volunteer') ||
+            trimmedIdentifier.includes('liam')
           ) {
             found = demoVolunteer;
           } else if (
+            id === '23geo088' ||
             id === 'member' ||
             id === 'student' ||
-            trimmedEmail.includes('maya')
+            trimmedIdentifier.includes('maya')
           ) {
             found = demoMember;
           } else {
@@ -316,8 +330,9 @@ export const useLogin = (options?: UseLoginOptions) => {
             found = {
               ...demoMember,
               uid: `u_${Date.now().toString(36)}`,
-              email: trimmedEmail.includes('@') ? trimmedEmail : `${trimmedEmail}@college.edu`,
-              name: trimmedEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+              rollNo: rawIdentifier.toUpperCase(),
+              email: trimmedIdentifier.includes('@') ? trimmedIdentifier : `${trimmedIdentifier}@college.edu`,
+              name: `Student (${rawIdentifier.toUpperCase()})`,
             };
           }
         }

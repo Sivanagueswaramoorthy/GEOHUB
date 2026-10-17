@@ -16,6 +16,7 @@ import {
 export const demoSuperAdmin: UserModel = {
   uid: 'u_super_admin_01',
   email: 'sarah.jenkins@college.edu',
+  rollNo: 'FAC01',
   name: 'Dr. Sarah Jenkins',
   role: 'super_admin',
   team: 'Management',
@@ -31,6 +32,7 @@ export const demoSuperAdmin: UserModel = {
 export const demoAdmin: UserModel = {
   uid: 'u_admin_02',
   email: 'alex.rivera@college.edu',
+  rollNo: '21GEO001',
   name: 'Alex Rivera',
   role: 'admin',
   team: 'Management',
@@ -46,6 +48,7 @@ export const demoAdmin: UserModel = {
 export const demoTeamAdmin: UserModel = {
   uid: 'u_promo_03',
   email: 'david.chen@college.edu',
+  rollNo: '22GEO014',
   name: 'David Chen',
   role: 'team_admin',
   team: 'Promotion',
@@ -62,6 +65,7 @@ export const demoTeamAdmin: UserModel = {
 export const demoMember: UserModel = {
   uid: 'u_member_04',
   email: 'maya.patel@college.edu',
+  rollNo: '23GEO088',
   name: 'Maya Patel',
   role: 'member',
   team: 'Documentation',
@@ -77,6 +81,7 @@ export const demoMember: UserModel = {
 export const demoVolunteer: UserModel = {
   uid: 'u_volunteer_05',
   email: 'liam.vance@college.edu',
+  rollNo: '23GEO042',
   name: 'Liam Vance',
   role: 'volunteer',
   team: 'Entertainment',
@@ -92,6 +97,7 @@ export const demoVolunteer: UserModel = {
 export const demoDocLead: UserModel = {
   uid: 'u_doc_lead_08',
   email: 'aarav.patel@college.edu',
+  rollNo: '22GEO018',
   name: 'Aarav Patel',
   role: 'documentation',
   team: 'Documentation',
@@ -108,6 +114,7 @@ export const demoDocLead: UserModel = {
 export const demoTreasurer: UserModel = {
   uid: 'u_treasurer_09',
   email: 'ananya.iyer@college.edu',
+  rollNo: '22GEO019',
   name: 'Ananya Iyer',
   role: 'treasurer',
   team: 'Management',

@@ -43,6 +43,7 @@ import {
   ConfirmDialog,
   EmptyState,
   SearchBar,
+  AuditModeBanner,
 } from '../../components';
 
 export const TreasurerView: React.FC = () => {
@@ -64,6 +65,9 @@ export const TreasurerView: React.FC = () => {
   } = useApp();
 
   const perms = getRolePermissions(currentUser.role);
+  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
+  const canManageExpenses = perms.canManageExpenses && !isSuperAdmin;
+
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'expenses' | 'stock' | 'history'>('overview');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -348,22 +352,40 @@ export const TreasurerView: React.FC = () => {
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingExpenseId(null);
-            setFormTitle('');
-            setFormAmount('');
-            setFormVendor('');
-            setFormNotes('');
-            setIsAddExpenseOpen(true);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all cursor-pointer active:scale-95 shrink-0 mt-1"
-        >
-          <Plus size={16} strokeWidth={1.75} />
-          <span>Add Expense</span>
-        </button>
+        {canManageExpenses ? (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingExpenseId(null);
+              setFormTitle('');
+              setFormAmount('');
+              setFormVendor('');
+              setFormNotes('');
+              setIsAddExpenseOpen(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all cursor-pointer active:scale-95 shrink-0 mt-1"
+          >
+            <Plus size={16} strokeWidth={1.75} />
+            <span>Add Expense</span>
+          </button>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0 mt-1">
+            <Eye size={14} className="text-slate-500" />
+            <span>Audit Mode</span>
+          </div>
+        )}
       </div>
+
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Treasurer Ledger & Physical Stock"
+          operatedByRole="Student Treasurer Lead"
+          actionRestrictions="Expense voucher logging, receipt uploads, and stock cataloging are restricted to the Treasurer. Faculty operates overall corpus caps and budget sanction approvals."
+          facultyActionLabel="Open Faculty Approvals & Sanctions Desk"
+          onFacultyActionClick={() => setActiveTab('approvals')}
+        />
+      )}
 
       {/* 4 Tabs: Overview, Expenses, Stock, History */}
       <div className="flex items-center gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200 shadow-2xs">
@@ -453,13 +475,19 @@ export const TreasurerView: React.FC = () => {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleConvertRefreshmentDuty}
-              className="px-3 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
-            >
-              Convert to Expense →
-            </button>
+            {canManageExpenses ? (
+              <button
+                type="button"
+                onClick={handleConvertRefreshmentDuty}
+                className="px-3 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0 whitespace-nowrap active:scale-95"
+              >
+                Convert to Expense →
+              </button>
+            ) : (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shrink-0 whitespace-nowrap">
+                Treasurer Action
+              </span>
+            )}
           </div>
 
           {/* Budget Overview Card: allocated vs used progress bar with percent */}
@@ -817,24 +845,26 @@ export const TreasurerView: React.FC = () => {
                       <span className="text-[11px] text-slate-400 font-medium">No receipt attached</span>
                     )}
 
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditExpense(exp)}
-                        className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-                        title="Edit voucher"
-                      >
-                        <Edit2 size={16} strokeWidth={1.75} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setExpenseToDelete(exp)}
-                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                        title="Delete voucher"
-                      >
-                        <Trash2 size={16} strokeWidth={1.75} />
-                      </button>
-                    </div>
+                    {canManageExpenses && (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditExpense(exp)}
+                          className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                          title="Edit voucher"
+                        >
+                          <Edit2 size={16} strokeWidth={1.75} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setExpenseToDelete(exp)}
+                          className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Delete voucher"
+                        >
+                          <Trash2 size={16} strokeWidth={1.75} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -857,14 +887,16 @@ export const TreasurerView: React.FC = () => {
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsAddStockOpen(true)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full font-bold text-xs bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-all cursor-pointer active:scale-95"
-            >
-              <PackagePlus size={16} strokeWidth={1.75} />
-              <span>Add Stock Item</span>
-            </button>
+            {canManageExpenses && (
+              <button
+                type="button"
+                onClick={() => setIsAddStockOpen(true)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full font-bold text-xs bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-all cursor-pointer active:scale-95"
+              >
+                <PackagePlus size={16} strokeWidth={1.75} />
+                <span>Add Stock Item</span>
+              </button>
+            )}
           </div>
 
           {/* Stock Cards List */}
@@ -919,14 +951,16 @@ export const TreasurerView: React.FC = () => {
                     <span className="text-[11px] text-slate-400 font-medium">Stock level optimal</span>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={() => setStockToDelete(item)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
-                    title="Delete item"
-                  >
-                    <Trash2 size={16} strokeWidth={1.75} />
-                  </button>
+                  {canManageExpenses && (
+                    <button
+                      type="button"
+                      onClick={() => setStockToDelete(item)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
+                      title="Delete item"
+                    >
+                      <Trash2 size={16} strokeWidth={1.75} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -1318,16 +1352,29 @@ export const TreasurerView: React.FC = () => {
             ))}
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setIsAllocationModalOpen(false);
-              setIsRequestRebalanceOpen(true);
-            }}
-            className="w-full py-3 rounded-full font-bold text-xs bg-purple-600 text-white shadow-sm hover:bg-purple-700 transition-all cursor-pointer mt-1"
-          >
-            + Request Allocation Change from Faculty
-          </button>
+          {canManageExpenses ? (
+            <button
+              type="button"
+              onClick={() => {
+                setIsAllocationModalOpen(false);
+                setIsRequestRebalanceOpen(true);
+              }}
+              className="w-full py-3 rounded-full font-bold text-xs bg-purple-600 text-white shadow-sm hover:bg-purple-700 transition-all cursor-pointer mt-1"
+            >
+              + Request Allocation Change from Faculty
+            </button>
+          ) : isSuperAdmin ? (
+            <button
+              type="button"
+              onClick={() => {
+                setIsAllocationModalOpen(false);
+                setActiveTab('approvals');
+              }}
+              className="w-full py-3 rounded-full font-bold text-xs bg-indigo-700 text-white shadow-sm hover:bg-indigo-800 transition-all cursor-pointer mt-1"
+            >
+              Open Faculty Approvals & Sanctions Desk →
+            </button>
+          ) : null}
         </div>
       </BottomSheet>
 

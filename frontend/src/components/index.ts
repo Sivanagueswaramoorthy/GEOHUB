@@ -27,4 +27,5 @@ export * from './Button';
 export * from './Avatar';
 export * from './Field';
 export * from './DataTable';
+export * from './AuditModeBanner';
 export { EmptyState } from './common/EmptyState';

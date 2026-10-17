@@ -28,6 +28,13 @@ import {
   PackagePlus,
   Settings,
   Check,
+  CheckCircle2,
+  ExternalLink,
+  Info,
+  Activity,
+  UserCheck,
+  Eye,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import { getRolePermissions } from '../../../core/permissions';
@@ -82,6 +89,101 @@ export const FacultyOperationsView: React.FC = () => {
   // Treasurer Audit & Allocation Modals
   const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
   const [isAuditReportExportOpen, setIsAuditReportExportOpen] = useState(false);
+
+  // Toggle display of rich Team Lead Portal Updates on each module
+  const [showLeadUpdates, setShowLeadUpdates] = useState(true);
+
+  // Team Lead Portal Audit Modal State
+  const [selectedLeadAudit, setSelectedLeadAudit] = useState<{
+    moduleTitle: string;
+    domain: string;
+    leadName: string;
+    leadRole: string;
+    department: string;
+    timeAgo: string;
+    updateText: string;
+    metric?: string;
+    details: string;
+    targetTab: string;
+    verifiedStatus?: string;
+    lastAction?: string;
+  } | null>(null);
+
+  const openAuditModal = (data: {
+    moduleTitle: string;
+    domain: string;
+    leadName: string;
+    leadRole: string;
+    department: string;
+    timeAgo: string;
+    updateText: string;
+    metric?: string;
+    details: string;
+    targetTab: string;
+    verifiedStatus?: string;
+    lastAction?: string;
+  }) => {
+    setSelectedLeadAudit(data);
+  };
+
+  // Portal Leads Overview for the executive activity ticker
+  const portalLeadsSummary = [
+    {
+      id: 'Documentation',
+      name: 'Aarav Patel',
+      role: 'Documentation Lead',
+      dept: 'Geoinformatics & Archival',
+      avatarBg: '#ECFDF5',
+      avatarColor: '#047857',
+      latestAction: 'Prefilled 4 event dossiers & verified 8 deliverables',
+      timeAgo: '1h ago',
+      count: '7 Modules',
+    },
+    {
+      id: 'Promotion',
+      name: 'David Chen',
+      role: 'Promotion Lead',
+      dept: 'Earth Science & Media',
+      avatarBg: '#FFF1F2',
+      avatarColor: '#BE123C',
+      latestAction: 'GEO FEST 2026 live campaign reaching 1,840 students',
+      timeAgo: '2h ago',
+      count: '4 Modules',
+    },
+    {
+      id: 'Management',
+      name: 'Elena Rostova',
+      role: 'Management Lead (VP)',
+      dept: 'Geology & Governance',
+      avatarBg: '#EEF2FF',
+      avatarColor: '#4338CA',
+      latestAction: 'Allocated 18 squad duties & approved 4 member proofs',
+      timeAgo: '3h ago',
+      count: '5 Modules',
+    },
+    {
+      id: 'Treasurer',
+      name: 'Ananya Iyer',
+      role: 'Treasurer Lead',
+      dept: 'Economics & Financial Analytics',
+      avatarBg: '#FFFBEB',
+      avatarColor: '#B45309',
+      latestAction: 'Logged ₹6,500 audio voucher; ₹71,800 balance remaining',
+      timeAgo: '2h ago',
+      count: '6 Modules',
+    },
+    {
+      id: 'Attendance',
+      name: 'Liam Vance',
+      role: 'Gate & Volunteer Lead',
+      dept: 'Environmental Studies',
+      avatarBg: '#F0F9FF',
+      avatarColor: '#0369A1',
+      latestAction: '185 gate scans synchronized for QGIS Workshop',
+      timeAgo: 'Yesterday',
+      count: '3 Modules',
+    },
+  ];
 
   const handleModuleClick = (tab: string) => {
     setActiveTab(tab as any);
@@ -347,6 +449,82 @@ export const FacultyOperationsView: React.FC = () => {
         />
       </div>
 
+      {/* Live Team Lead Portal Activity Ticker */}
+      <div className="flex flex-col gap-2 pt-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <Activity size={14} className="text-emerald-600 animate-pulse" />
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
+              RESPECTIVE SQUAD LEADS • PORTAL UPDATES STREAM
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowLeadUpdates((prev) => !prev)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer"
+            style={{
+              backgroundColor: showLeadUpdates ? '#ECFDF5' : '#F8FAFC',
+              borderColor: showLeadUpdates ? '#A7F3D0' : '#E2E8F0',
+              color: showLeadUpdates ? '#047857' : '#64748B',
+            }}
+            title="Toggle display of team lead updates across all module cards"
+          >
+            <SlidersHorizontal size={12} />
+            <span>{showLeadUpdates ? 'Lead Updates: ON' : 'Compact View'}</span>
+          </button>
+        </div>
+
+        {/* Scrollable Lead Strip */}
+        <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-1">
+          {portalLeadsSummary.map((lead) => {
+            const isCurrentDomain = adminDeptFilter === lead.id;
+            return (
+              <div
+                key={lead.id}
+                onClick={() => setAdminDeptFilter(lead.id as any)}
+                className="shrink-0 flex items-center gap-2.5 p-2.5 rounded-2xl border transition-all cursor-pointer hover:shadow-xs select-none"
+                style={{
+                  backgroundColor: isCurrentDomain ? '#FFFFFF' : '#F8FAFC',
+                  borderColor: isCurrentDomain ? '#3B82F6' : '#E2E8F0',
+                  minWidth: '240px',
+                  boxShadow: isCurrentDomain ? '0 4px 12px rgba(59, 130, 246, 0.12)' : 'none',
+                }}
+              >
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border"
+                  style={{
+                    backgroundColor: lead.avatarBg,
+                    borderColor: `${lead.avatarColor}30`,
+                    color: lead.avatarColor,
+                  }}
+                >
+                  {lead.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </div>
+                <div className="flex flex-col min-w-0 pr-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-black text-slate-900 truncate">
+                      {lead.name}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      • {lead.timeAgo}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 truncate">
+                    {lead.role}
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-700 truncate mt-0.5" style={{ color: lead.avatarColor }}>
+                    "{lead.latestAction}"
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Domain Filter Section */}
       <div className="flex flex-col gap-2.5 pt-1">
         <div className="flex items-center justify-between">
@@ -398,13 +576,67 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 1. DOCUMENTATION */}
       {showDocDomain && (
-        <CategoryCard title="DOCUMENTATION & ARCHIVES" countBadge={7}>
+        <CategoryCard
+          title="DOCUMENTATION & ARCHIVES"
+          countBadge={7}
+          leadInfo={{
+            name: 'Aarav Patel',
+            role: 'Documentation Lead',
+            department: 'Geoinformatics & Archival Science',
+            avatarBg: '#ECFDF5',
+            avatarColor: '#047857',
+            updatesSummary: 'Lead Portal • 7 modules managed in Documentation Studio',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Documentation Studio Suite',
+              domain: 'Documentation & Archives',
+              leadName: 'Aarav Patel',
+              leadRole: 'Documentation Lead',
+              department: 'Geoinformatics & Archival Science',
+              timeAgo: '1h ago',
+              updateText: 'Prefilled 4 event dossiers, verified 8 deliverables, and compiled Bulletin #4',
+              metric: '7 Modules Active',
+              details:
+                'Aarav Patel maintains all institutional archival assets. In this session, official dossiers for QGIS Workshop, GEO FEST, and Drone Survey were linked with speaker profiles and verified turnstiles.',
+              targetTab: 'doc_studio',
+              verifiedStatus: 'Verified by Faculty In-charge',
+            })
+          }
+        >
           <ModuleTile
             title="Templates Prefilled"
             icon={<FileText size={20} />}
             iconBg="#E7F9F1"
             iconBorder="#A7F3D0"
             accentColor="#059669"
+            metric="4 Dossiers"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Prefilled official dossiers for QGIS Workshop & GEO FEST 2026',
+                    timeAgo: '1h ago',
+                    badge: '4 Templates Ready',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Templates Prefilled',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: '1h ago',
+                updateText: 'Prefilled official dossiers for QGIS Workshop & GEO FEST 2026',
+                metric: '4 Official Dossiers',
+                details:
+                  'Aarav Patel populated 4 event document templates with verified guest speaker bios, sanctioned budgets, and hall coordinates. Dossiers are formatted to university accreditation standards.',
+                targetTab: 'doc_studio',
+              })
+            }
             onClick={() => handleModuleClick('doc_studio')}
           />
           <ModuleTile
@@ -413,6 +645,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#2563EB"
+            metric="8/12 Done"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: '8 of 12 deliverables verified across 4 events; 2 missing reports flagged',
+                    timeAgo: '2h ago',
+                    badge: '67% Complete',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Checklist Audit',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: '2h ago',
+                updateText: '8 of 12 deliverables verified across 4 events; 2 missing reports flagged',
+                metric: '8 of 12 Verified',
+                details:
+                  'Audit performed across Q3 chapter events. Missing post-event narrative for Campus Drone Survey and delayed feedback summary flagged for follow-up.',
+                targetTab: 'doc_studio',
+              })
+            }
             onClick={() => handleModuleClick('doc_studio')}
           />
           <ModuleTile
@@ -421,6 +680,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FFF8E6"
             iconBorder="#FDE68A"
             accentColor="#D97706"
+            metric="3 Published"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Published Bulletin #4: "Eco-Awareness Drive Concludes with 200+ Trees"',
+                    timeAgo: '4h ago',
+                    badge: 'Published',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Daily News Bulletin',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: '4h ago',
+                updateText: 'Published Bulletin #4: "Eco-Awareness Drive Concludes with 200+ Trees"',
+                metric: 'Bulletin #4 Live',
+                details:
+                  'Drafted editorial bulletin highlighting volunteer achievements, geospatial field photos, and upcoming workshops. Published across student portals.',
+                targetTab: 'doc_studio',
+              })
+            }
             onClick={() => handleModuleClick('doc_studio')}
           />
           <ModuleTile
@@ -429,6 +715,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F5F3FF"
             iconBorder="#DDD1FF"
             accentColor="#7C3AED"
+            metric="5 Sessions"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Drafted & submitted signed MoM for Core Committee Briefing (Hall B)',
+                    timeAgo: 'Yesterday',
+                    badge: 'Signed MoM',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Minutes of Meeting (MoM)',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: 'Yesterday',
+                updateText: 'Drafted & submitted signed MoM for Core Committee Briefing (Hall B)',
+                metric: '14 Signatures',
+                details:
+                  'Recorded minutes of meeting for October 3 core briefing. All 6 action items assigned with deadlines. Approved by Club President Alex Rivera.',
+                targetTab: 'meetings',
+              })
+            }
             onClick={() => handleModuleClick('meetings')}
           />
           <ModuleTile
@@ -437,6 +750,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#E8FBF8"
             iconBorder="#99F6E4"
             accentColor="#0D9488"
+            metric="12 Uploads"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Uploaded 12 high-res GPS tagged photos from Alumni Talk & GIS Lab',
+                    timeAgo: '2h ago',
+                    badge: '12 Geotagged',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Geotagged Photo Records',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: '2h ago',
+                updateText: 'Uploaded 12 high-res GPS tagged photos from Alumni Talk & GIS Lab',
+                metric: '12 Images (+13.08, +80.27)',
+                details:
+                  '12 camera RAW files ingested with embedded GPS coordinate stamps and timestamps. Linked directly to event archive album.',
+                targetTab: 'gallery',
+              })
+            }
             onClick={() => handleModuleClick('gallery')}
           />
           <ModuleTile
@@ -445,6 +785,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FEF2F2"
             iconBorder="#FECACA"
             accentColor="#DC2626"
+            metric="3 Streams"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Attached 4K stream recording link for QGIS Remote Sensing session',
+                    timeAgo: '1d ago',
+                    badge: '4K Recording',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Video Archive Links',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: '1d ago',
+                updateText: 'Attached 4K stream recording link for QGIS Remote Sensing session',
+                metric: '3 Cloud Streams',
+                details:
+                  'Private cloud video stream linked for workshop attendees who missed hands-on lab exercises. Secured behind institutional single sign-on.',
+                targetTab: 'gallery',
+              })
+            }
             onClick={() => handleModuleClick('gallery')}
           />
           <ModuleTile
@@ -453,6 +820,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FFF1F2"
             iconBorder="#FECDD3"
             accentColor="#E11D48"
+            metric="4 Albums"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Aarav Patel',
+                    leadRole: 'Doc Lead',
+                    updateText: 'Organized 2026-27 albums; categorized 48 photos by event tags',
+                    timeAgo: 'Yesterday',
+                    badge: '48 Photos',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Media Gallery Manager',
+                domain: 'Documentation & Archives',
+                leadName: 'Aarav Patel',
+                leadRole: 'Documentation Lead',
+                department: 'Geoinformatics & Archival Science',
+                timeAgo: 'Yesterday',
+                updateText: 'Organized 2026-27 albums; categorized 48 photos by event tags',
+                metric: '48 Media Files',
+                details:
+                  'Categorized media repository into 4 thematic folders: Conclaves, Field Expeditions, Workshops, and Alumni Engagements.',
+                targetTab: 'gallery',
+              })
+            }
             onClick={() => handleModuleClick('gallery')}
           />
         </CategoryCard>
@@ -460,13 +854,66 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 2. PROMOTION */}
       {showPromoDomain && (
-        <CategoryCard title="PROMOTION & CAMPAIGNS" countBadge={4}>
+        <CategoryCard
+          title="PROMOTION & CAMPAIGNS"
+          countBadge={4}
+          leadInfo={{
+            name: 'David Chen',
+            role: 'Promotion Lead',
+            department: 'Earth Science & Media',
+            avatarBg: '#FFF1F2',
+            avatarColor: '#BE123C',
+            updatesSummary: 'Lead Portal • 4 modules managed in Campaigns & AI Studio',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Promotion Studio Suite',
+              domain: 'Promotion & Campaigns',
+              leadName: 'David Chen',
+              leadRole: 'Promotion Lead',
+              department: 'Earth Science & Media',
+              timeAgo: '2h ago',
+              updateText: 'Activated GEO FEST outreach campaign reaching 1,840 impressions and queued 3 promo blasts',
+              metric: '4 Modules Active',
+              details:
+                'David Chen manages club brand visibility and event turnouts. Current active campaign tracking shows +34% follower surge across social portals.',
+              targetTab: 'campaigns',
+            })
+          }
+        >
           <ModuleTile
             title="Campaigns"
             icon={<Megaphone size={20} />}
             iconBg="#FFF1F2"
             iconBorder="#FECDD3"
             accentColor="#E11D48"
+            metric="1.8k Reach"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'David Chen',
+                    leadRole: 'Promo Lead',
+                    updateText: 'Active campaign "GEO FEST 2026" achieved 1,840 impressions & 85 clicks',
+                    timeAgo: '2h ago',
+                    badge: 'Active • 1.8k Reach',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Campaigns',
+                domain: 'Promotion & Campaigns',
+                leadName: 'David Chen',
+                leadRole: 'Promotion Lead',
+                department: 'Earth Science & Media',
+                timeAgo: '2h ago',
+                updateText: 'Active campaign "GEO FEST 2026" achieved 1,840 impressions & 85 clicks',
+                metric: '1,840 Impressions',
+                details:
+                  'David Chen initiated wave 2 promotional blitz across WhatsApp bulletin and Instagram Stories. Conversion rate on registration link is 4.6%.',
+                targetTab: 'campaigns',
+              })
+            }
             onClick={() => handleModuleClick('campaigns')}
           />
           <ModuleTile
@@ -475,6 +922,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#2563EB"
+            metric="14 Posts"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'David Chen',
+                    leadRole: 'Promo Lead',
+                    updateText: 'Published Instagram Carousel "Speaker Spotlight: Dr. Sarah Jenkins"',
+                    timeAgo: '4h ago',
+                    badge: 'Live on IG',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Posts Studio',
+                domain: 'Promotion & Campaigns',
+                leadName: 'David Chen',
+                leadRole: 'Promotion Lead',
+                department: 'Earth Science & Media',
+                timeAgo: '4h ago',
+                updateText: 'Published Instagram Carousel "Speaker Spotlight: Dr. Sarah Jenkins"',
+                metric: '14 Feed Posts',
+                details:
+                  'Published official 5-slide carousel showcasing keynote topics on AI Geospatial mapping. Logged 340 likes and 42 shares.',
+                targetTab: 'social_media',
+              })
+            }
             onClick={() => handleModuleClick('social_media')}
           />
           <ModuleTile
@@ -483,6 +957,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F5F3FF"
             iconBorder="#DDD1FF"
             accentColor="#7C3AED"
+            metric="6 Upcoming"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'David Chen',
+                    leadRole: 'Promo Lead',
+                    updateText: 'Scheduled 3 promotional posts for Thursday 3:00 PM & Friday 10:00 AM',
+                    timeAgo: 'Yesterday',
+                    badge: '3 Scheduled',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Content Calendar',
+                domain: 'Promotion & Campaigns',
+                leadName: 'David Chen',
+                leadRole: 'Promotion Lead',
+                department: 'Earth Science & Media',
+                timeAgo: 'Yesterday',
+                updateText: 'Scheduled 3 promotional posts for Thursday 3:00 PM & Friday 10:00 AM',
+                metric: '6 Calendar Slots',
+                details:
+                  'Configured automated dissemination schedule for registration deadline notices, volunteer badges reveal, and speaker arrival announcements.',
+                targetTab: 'events',
+              })
+            }
             onClick={() => handleModuleClick('events')}
           />
           <ModuleTile
@@ -491,6 +992,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#E7F9F1"
             iconBorder="#A7F3D0"
             accentColor="#059669"
+            metric="Q3 Report"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'David Chen',
+                    leadRole: 'Promo Lead',
+                    updateText: 'Generated Q3 Social Analytics summary report: +34% student engagement',
+                    timeAgo: '3d ago',
+                    badge: 'PDF Ready',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Campaign Reach Export',
+                domain: 'Promotion & Campaigns',
+                leadName: 'David Chen',
+                leadRole: 'Promotion Lead',
+                department: 'Earth Science & Media',
+                timeAgo: '3d ago',
+                updateText: 'Generated Q3 Social Analytics summary report: +34% student engagement',
+                metric: 'Analytics Dossier',
+                details:
+                  'Compiled consolidated outreach metrics across Instagram, LinkedIn, and campus bulletin boards. Verified +34% year-over-year participation increase.',
+                targetTab: 'reports',
+              })
+            }
             onClick={() => showToast('✓ Generated Campaign Reach Summary (PDF)')}
           />
         </CategoryCard>
@@ -498,13 +1026,66 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 3. MANAGEMENT & GOVERNANCE */}
       {showMgmtDomain && (
-        <CategoryCard title="MANAGEMENT & GOVERNANCE" countBadge={5}>
+        <CategoryCard
+          title="MANAGEMENT & GOVERNANCE"
+          countBadge={5}
+          leadInfo={{
+            name: 'Elena Rostova',
+            role: 'Management Lead (VP)',
+            department: 'Geology & Governance',
+            avatarBg: '#EEF2FF',
+            avatarColor: '#4338CA',
+            updatesSummary: 'Lead Portal • 5 modules managed in Roster & Committee',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Management & Governance Suite',
+              domain: 'Management & Governance',
+              leadName: 'Elena Rostova',
+              leadRole: 'Management Lead (VP)',
+              department: 'Geology & Governance',
+              timeAgo: '1h ago',
+              updateText: 'Allocated 18 squad duties, approved 4 member proofs, and endorsed 1 officer elevation',
+              metric: '5 Modules Active',
+              details:
+                'Elena Rostova oversees internal club operations, member tasks, and volunteer deployments. Active duty roster tracking 75% completion across all departments.',
+              targetTab: 'tasks',
+            })
+          }
+        >
           <ModuleTile
             title="Squad Leads & Posts"
             icon={<Award size={20} />}
             iconBg="#F3EEFF"
             iconBorder="#DDD1FF"
             accentColor="#5B21B6"
+            metric="5 Leads"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Elena Rostova',
+                    leadRole: 'Mgmt Lead',
+                    updateText: 'Endorsed Maya Patel for Documentation Officer elevation; verified portfolio',
+                    timeAgo: '1h ago',
+                    badge: '1 Elevation Pending',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Squad Leads & Posts',
+                domain: 'Management & Governance',
+                leadName: 'Elena Rostova',
+                leadRole: 'Management Lead (VP)',
+                department: 'Geology & Governance',
+                timeAgo: '1h ago',
+                updateText: 'Endorsed Maya Patel for Documentation Officer elevation; verified portfolio',
+                metric: '5 Active Squad Leads',
+                details:
+                  'Formal elevation requisition submitted to elevate Maya Patel to 2nd Year Documentation Officer. Verified by club executive board.',
+                targetTab: 'teams',
+              })
+            }
             onClick={() => setIsPostsModalOpen(true)}
           />
           <ModuleTile
@@ -513,6 +1094,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#2563EB"
+            metric="18/24 Done"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Elena Rostova',
+                    leadRole: 'Mgmt Lead',
+                    updateText: 'Allocated 18 squad duties for GIS Expedition; approved 4 member proofs',
+                    timeAgo: '3h ago',
+                    badge: '75% Complete',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Master Duty Roster',
+                domain: 'Management & Governance',
+                leadName: 'Elena Rostova',
+                leadRole: 'Management Lead (VP)',
+                department: 'Geology & Governance',
+                timeAgo: '3h ago',
+                updateText: 'Allocated 18 squad duties for GIS Expedition; approved 4 member proofs',
+                metric: '18 of 24 Fulfilled',
+                details:
+                  'Reviewed photographic proof submissions from 4 volunteers for stage rigging and directional banners. Approved marks recorded into member dossiers.',
+                targetTab: 'tasks',
+              })
+            }
             onClick={() => handleModuleClick('tasks')}
           />
           <ModuleTile
@@ -521,6 +1129,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F5F3FF"
             iconBorder="#DDD1FF"
             accentColor="#6D28D9"
+            metric="14 Present"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Elena Rostova',
+                    leadRole: 'Mgmt Lead',
+                    updateText: 'Convened Core Committee Meeting in Seminar Hall B; 14 of 16 attended',
+                    timeAgo: 'Yesterday',
+                    badge: 'Quorum Met',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Meetings & MoM',
+                domain: 'Management & Governance',
+                leadName: 'Elena Rostova',
+                leadRole: 'Management Lead (VP)',
+                department: 'Geology & Governance',
+                timeAgo: 'Yesterday',
+                updateText: 'Convened Core Committee Meeting in Seminar Hall B; 14 of 16 attended',
+                metric: '14 of 16 Present',
+                details:
+                  'Core committee convened with quorum met. Reviewed final venue security checklist and stage layout for the upcoming symposium.',
+                targetTab: 'meetings',
+              })
+            }
             onClick={() => handleModuleClick('meetings')}
           />
           <ModuleTile
@@ -529,6 +1164,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FFF8E6"
             iconBorder="#FDE68A"
             accentColor="#B45309"
+            metric="3 Pending"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Elena Rostova',
+                    leadRole: 'Mgmt Lead',
+                    updateText: 'Endorsed Anjali R. membership application & ₹3,500 workshop charter',
+                    timeAgo: '2h ago',
+                    badge: '3 Requiring Seal',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Approvals',
+                domain: 'Management & Governance',
+                leadName: 'Elena Rostova',
+                leadRole: 'Management Lead (VP)',
+                department: 'Geology & Governance',
+                timeAgo: '2h ago',
+                updateText: 'Endorsed Anjali R. membership application & ₹3,500 workshop charter',
+                metric: '3 Pending Seals',
+                details:
+                  '3 executive approvals queued for Faculty Advisor digital authorization: Anjali R. induction, ₹3,500 QGIS workshop charter, and stage budget.',
+                targetTab: 'approvals',
+              })
+            }
             onClick={() => handleModuleClick('approvals')}
           />
           <ModuleTile
@@ -537,6 +1199,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F8FAFC"
             iconBorder="#E2E8F0"
             accentColor="#475569"
+            metric="AY 26-27"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Elena Rostova',
+                    leadRole: 'Mgmt Lead',
+                    updateText: 'Tenure period Fall 2026 - Spring 2027 confirmed with Faculty Advisory',
+                    timeAgo: '3d ago',
+                    badge: 'Governance OK',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Settings',
+                domain: 'Management & Governance',
+                leadName: 'Elena Rostova',
+                leadRole: 'Management Lead (VP)',
+                department: 'Geology & Governance',
+                timeAgo: '3d ago',
+                updateText: 'Tenure period Fall 2026 - Spring 2027 confirmed with Faculty Advisory',
+                metric: 'Governance Synchronized',
+                details:
+                  'Verified academic year settings, department rosters, and emergency SMS notification routing with institutional admin directory.',
+                targetTab: 'settings',
+              })
+            }
             onClick={() => setIsSettingsOpen(true)}
           />
         </CategoryCard>
@@ -544,13 +1233,66 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 4. TREASURER & FINANCE */}
       {showTreasuryDomain && (
-        <CategoryCard title="TREASURER & FINANCE" countBadge={6}>
+        <CategoryCard
+          title="TREASURER & FINANCE"
+          countBadge={6}
+          leadInfo={{
+            name: 'Ananya Iyer',
+            role: 'Treasurer Lead',
+            department: 'Economics & Financial Analytics',
+            avatarBg: '#FFFBEB',
+            avatarColor: '#B45309',
+            updatesSummary: 'Lead Portal • 6 modules managed in Treasury & Vouchers',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Treasurer & Finance Suite',
+              domain: 'Treasurer & Finance',
+              leadName: 'Ananya Iyer',
+              leadRole: 'Treasurer Lead',
+              department: 'Economics & Financial Analytics',
+              timeAgo: '2h ago',
+              updateText: 'Logged ₹6,500 audio voucher, reconciled ₹48,200 spent, and audited stock ledger',
+              metric: '6 Modules Active',
+              details:
+                'Ananya Iyer oversees chapter disbursements, voucher proofs, and physical inventory. Chapter corpus balance stands at ₹71,800 remaining with 100% receipt coverage.',
+              targetTab: 'treasurer',
+            })
+          }
+        >
           <ModuleTile
             title="Expenses & Claims"
             icon={<DollarSign size={20} />}
             iconBg="#E7F9F1"
             iconBorder="#A7F3D0"
             accentColor="#059669"
+            metric="12 Vouchers"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Logged ₹6,500 stage audio console voucher with verified tax receipt',
+                    timeAgo: '2h ago',
+                    badge: '₹6,500 Logged',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Expenses & Claims',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: '2h ago',
+                updateText: 'Logged ₹6,500 stage audio console voucher with verified tax receipt',
+                metric: '12 Cleared Vouchers',
+                details:
+                  'Recorded voucher #EXP-1092 from Campus Logistics for seminar hall audio mixers. High-res tax receipt and GST invoice attached.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setActiveTab('treasurer')}
           />
           <ModuleTile
@@ -559,6 +1301,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#2563EB"
+            metric="40% Burn"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Audited ledger: ₹48,200 disbursed of ₹1,20,000 ceiling (40.2% burn rate)',
+                    timeAgo: 'Today',
+                    badge: '₹71.8k Rem.',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Budget Overview',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: 'Today',
+                updateText: 'Audited ledger: ₹48,200 disbursed of ₹1,20,000 ceiling (40.2% burn rate)',
+                metric: '₹71,800 Available',
+                details:
+                  'Mid-semester budget audit reveals healthy fiscal burn rate of 40.2%. Reserve contingency corpus of ₹25,000 remains untouched.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setActiveTab('treasurer')}
           />
           <ModuleTile
@@ -567,6 +1336,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F3EEFF"
             iconBorder="#DDD1FF"
             accentColor="#7C3AED"
+            metric="1 Pending"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Submitted ₹12,000 disbursement requisition for GEO FEST main stage setup',
+                    timeAgo: '3h ago',
+                    badge: '₹12,000 Req.',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Allocation Requests',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: '3h ago',
+                updateText: 'Submitted ₹12,000 disbursement requisition for GEO FEST main stage setup',
+                metric: '₹12,000 Requisition',
+                details:
+                  'Requisition for stage fabrication, truss lighting, and delegate kit printing submitted for Faculty In-charge final sanction.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setIsAllocationModalOpen(true)}
           />
           <ModuleTile
@@ -575,6 +1371,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FFF8E6"
             iconBorder="#FDE68A"
             accentColor="#92400E"
+            metric="8 Types"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Added 40 badge lanyards & 5 banner stands; inventory total ₹32,400',
+                    timeAgo: 'Yesterday',
+                    badge: '124 Units Stocked',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Stock Items',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: 'Yesterday',
+                updateText: 'Added 40 badge lanyards & 5 banner stands; inventory total ₹32,400',
+                metric: '124 Units (₹32,400)',
+                details:
+                  'Storeroom inventory verified in department cabinet. 40 reusable lanyards, 5 roll-up banners, and 3 wireless presenter remotes logged.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setActiveTab('treasurer')}
           />
           <ModuleTile
@@ -583,6 +1406,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#E8FBF8"
             iconBorder="#99F6E4"
             accentColor="#0D9488"
+            metric="8 Invoices"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Archived GST tax invoices for GIS Lab workshop consumables',
+                    timeAgo: '2d ago',
+                    badge: 'GST Verified',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Purchase History',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: '2d ago',
+                updateText: 'Archived GST tax invoices for GIS Lab workshop consumables',
+                metric: '8 GST Invoices',
+                details:
+                  'All vendor purchases logged with GSTIN numbers, bank transaction reference IDs, and payment stamps.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setActiveTab('treasurer')}
           />
           <ModuleTile
@@ -591,6 +1441,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#E7F9F1"
             iconBorder="#A7F3D0"
             accentColor="#059669"
+            metric="Audited"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Ananya Iyer',
+                    leadRole: 'Treasurer',
+                    updateText: 'Compiled Mid-Term Utilization Dossier for Dean of Sciences sign-off',
+                    timeAgo: 'Yesterday',
+                    badge: 'Dean Format',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Fiscal Audit Export',
+                domain: 'Treasurer & Finance',
+                leadName: 'Ananya Iyer',
+                leadRole: 'Treasurer Lead',
+                department: 'Economics & Financial Analytics',
+                timeAgo: 'Yesterday',
+                updateText: 'Compiled Mid-Term Utilization Dossier for Dean of Sciences sign-off',
+                metric: 'Audit Ready',
+                details:
+                  'Financial report generated matching institutional format required for Dean of Sciences quarterly review and funding allocation.',
+                targetTab: 'treasurer',
+              })
+            }
             onClick={() => setIsAuditReportExportOpen(true)}
           />
         </CategoryCard>
@@ -598,13 +1475,66 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 5. ATTENDANCE & GATES */}
       {showAttendanceDomain && (
-        <CategoryCard title="ATTENDANCE & GATES" countBadge={3}>
+        <CategoryCard
+          title="ATTENDANCE & GATES"
+          countBadge={3}
+          leadInfo={{
+            name: 'Liam Vance',
+            role: 'Gate & Volunteer Lead',
+            department: 'Environmental Studies',
+            avatarBg: '#F0F9FF',
+            avatarColor: '#0369A1',
+            updatesSummary: 'Lead Portal • 3 modules managed in Gate Operations',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Gates & Attendance Suite',
+              domain: 'Attendance & Gates',
+              leadName: 'Liam Vance',
+              leadRole: 'Gate & Volunteer Lead',
+              department: 'Environmental Studies',
+              timeAgo: 'Yesterday',
+              updateText: 'Synchronized gate ledger with 185 verified student check-ins and zero scan failures',
+              metric: '3 Modules Active',
+              details:
+                'Liam Vance coordinates entrance turnstiles, volunteer scanners, and dynamic token validation. 94.8% turn-out verified for the QGIS Workshop.',
+              targetTab: 'attendance',
+            })
+          }
+        >
           <ModuleTile
             title="Gate Scanner"
             icon={<Scan size={20} />}
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#2563EB"
+            metric="185 Scanned"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Liam Vance',
+                    leadRole: 'Gate Lead',
+                    updateText: 'Closed Gate 1 session for QGIS Workshop: 185 check-ins, zero rejections',
+                    timeAgo: 'Yesterday',
+                    badge: '185 Verified',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Gate Scanner',
+                domain: 'Attendance & Gates',
+                leadName: 'Liam Vance',
+                leadRole: 'Gate & Volunteer Lead',
+                department: 'Environmental Studies',
+                timeAgo: 'Yesterday',
+                updateText: 'Closed Gate 1 session for QGIS Workshop: 185 check-ins, zero rejections',
+                metric: '185 Verified Attendees',
+                details:
+                  'High-speed dynamic QR token validation deployed at Grand Auditorium entrance. Average scan speed 1.8 seconds per attendee.',
+                targetTab: 'scan_qr',
+              })
+            }
             onClick={() => handleModuleClick('scan_qr')}
           />
           <ModuleTile
@@ -613,6 +1543,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#E8FBF8"
             iconBorder="#99F6E4"
             accentColor="#0D9488"
+            metric="Live Sync"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Liam Vance',
+                    leadRole: 'Gate Lead',
+                    updateText: 'Synchronized dynamic token ledger with 94.8% verified turnout',
+                    timeAgo: 'Yesterday',
+                    badge: '94.8% Turnout',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Live Gate Logs',
+                domain: 'Attendance & Gates',
+                leadName: 'Liam Vance',
+                leadRole: 'Gate & Volunteer Lead',
+                department: 'Environmental Studies',
+                timeAgo: 'Yesterday',
+                updateText: 'Synchronized dynamic token ledger with 94.8% verified turnout',
+                metric: '94.8% Verified Turnout',
+                details:
+                  'Real-time check-in ledger cross-referenced against advance registrations. Turn-out certificate generated for academic credit.',
+                targetTab: 'attendance',
+              })
+            }
             onClick={() => handleModuleClick('attendance')}
           />
           <ModuleTile
@@ -621,6 +1578,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#F3EEFF"
             iconBorder="#DDD1FF"
             accentColor="#7C3AED"
+            metric="VIP Active"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Liam Vance',
+                    leadRole: 'Gate Lead',
+                    updateText: 'Generated Faculty VIP Gate Pass with perpetual biometric clearance',
+                    timeAgo: '2d ago',
+                    badge: 'VIP Clearance',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Advisor Pass',
+                domain: 'Attendance & Gates',
+                leadName: 'Liam Vance',
+                leadRole: 'Gate & Volunteer Lead',
+                department: 'Environmental Studies',
+                timeAgo: '2d ago',
+                updateText: 'Generated Faculty VIP Gate Pass with perpetual biometric clearance',
+                metric: 'Faculty Pass Active',
+                details:
+                  'Encrypted dynamic token pass generated for Dr. Sarah Jenkins. Grants uninterrupted VIP access to all lab facilities and event stages.',
+                targetTab: 'my_qr',
+              })
+            }
             onClick={() => handleModuleClick('my_qr')}
           />
         </CategoryCard>
@@ -628,13 +1612,66 @@ export const FacultyOperationsView: React.FC = () => {
 
       {/* 6. COMMUNICATION */}
       {showCommDomain && (
-        <CategoryCard title="COMMUNICATION" countBadge={2}>
+        <CategoryCard
+          title="COMMUNICATION"
+          countBadge={2}
+          leadInfo={{
+            name: 'Alex Rivera',
+            role: 'Club President',
+            department: 'Geoinformatics Engineering',
+            avatarBg: '#FAF5FF',
+            avatarColor: '#7E22CE',
+            updatesSummary: 'Executive Portal • 2 modules managed in Forum & Broadcasts',
+          }}
+          onAuditLead={() =>
+            openAuditModal({
+              moduleTitle: 'Communication Suite',
+              domain: 'Communication & Outreach',
+              leadName: 'Alex Rivera',
+              leadRole: 'Club President',
+              department: 'Geoinformatics Engineering',
+              timeAgo: '3h ago',
+              updateText: 'Dispatched broadcast alert to 128 scholars and moderated volunteer discussion forum',
+              metric: '2 Modules Active',
+              details:
+                'Alex Rivera manages club announcements and general body communications. Official notice issued regarding room reallocation.',
+              targetTab: 'forum',
+            })
+          }
+        >
           <ModuleTile
             title="Forum (Discussions)"
             icon={<MessageSquare size={20} />}
             iconBg="#EFF6FF"
             iconBorder="#BFDBFE"
             accentColor="#1D4ED8"
+            metric="Pinned"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Alex Rivera',
+                    leadRole: 'President',
+                    updateText: 'Pinned thread: "Volunteer briefing for Saturday 9:00 AM in Hall B"',
+                    timeAgo: '3h ago',
+                    badge: '18 Replies',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Forum (Discussions)',
+                domain: 'Communication',
+                leadName: 'Alex Rivera',
+                leadRole: 'Club President',
+                department: 'Geoinformatics Engineering',
+                timeAgo: '3h ago',
+                updateText: 'Pinned thread: "Volunteer briefing for Saturday 9:00 AM in Hall B"',
+                metric: '18 Active Replies',
+                details:
+                  'Club-wide discussion thread initiated for student volunteers regarding Saturday setup timeline and equipment handling.',
+                targetTab: 'forum',
+              })
+            }
             onClick={() => handleModuleClick('forum')}
           />
           <ModuleTile
@@ -643,6 +1680,33 @@ export const FacultyOperationsView: React.FC = () => {
             iconBg="#FEF2F2"
             iconBorder="#FECACA"
             accentColor="#DC2626"
+            metric="128 Sent"
+            leadUpdate={
+              showLeadUpdates
+                ? {
+                    leadName: 'Alex Rivera',
+                    leadRole: 'President',
+                    updateText: 'Dispatched broadcast alert to 128 chapter scholars regarding room shift',
+                    timeAgo: '5h ago',
+                    badge: '128 Scholars',
+                  }
+                : undefined
+            }
+            onAuditClick={() =>
+              openAuditModal({
+                moduleTitle: 'Notifications',
+                domain: 'Communication',
+                leadName: 'Alex Rivera',
+                leadRole: 'Club President',
+                department: 'Geoinformatics Engineering',
+                timeAgo: '5h ago',
+                updateText: 'Dispatched broadcast alert to 128 chapter scholars regarding room shift',
+                metric: '128 Deliveries (100%)',
+                details:
+                  'High-priority push alert successfully delivered to all active scholars notifying them of venue reallocation to Seminar Hall B.',
+                targetTab: 'notifications',
+              })
+            }
             onClick={() => handleModuleClick('notifications')}
           />
         </CategoryCard>
@@ -896,6 +1960,110 @@ export const FacultyOperationsView: React.FC = () => {
             ))}
           </div>
         </div>
+      </BottomSheet>
+
+      {/* Team Lead Portal Update Audit Bottom Sheet */}
+      <BottomSheet
+        isOpen={selectedLeadAudit !== null}
+        onClose={() => setSelectedLeadAudit(null)}
+        title={selectedLeadAudit ? `Portal Audit: ${selectedLeadAudit.moduleTitle}` : 'Lead Portal Update'}
+        subtitle={
+          selectedLeadAudit
+            ? `${selectedLeadAudit.domain} • Updated by ${selectedLeadAudit.leadName}`
+            : undefined
+        }
+      >
+        {selectedLeadAudit && (
+          <div className="flex flex-col gap-4 py-1">
+            {/* Lead Identity Card */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-extrabold text-sm flex items-center justify-center shrink-0">
+                  {selectedLeadAudit.leadName
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-sm text-slate-900">
+                      {selectedLeadAudit.leadName}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      {selectedLeadAudit.leadRole}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium mt-0.5">
+                    {selectedLeadAudit.department} • Active Squad Leader
+                  </span>
+                </div>
+              </div>
+              <span className="text-[11px] font-bold text-slate-400 bg-white px-2.5 py-1 rounded-full border border-slate-200">
+                {selectedLeadAudit.timeAgo}
+              </span>
+            </div>
+
+            {/* Portal Action Card */}
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Activity size={15} className="text-emerald-600" />
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">
+                    LATEST ACTION IN RESPECTIVE PORTAL
+                  </span>
+                </div>
+                {selectedLeadAudit.metric && (
+                  <span className="text-xs font-black text-slate-800 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200">
+                    {selectedLeadAudit.metric}
+                  </span>
+                )}
+              </div>
+
+              <div className="text-sm font-bold text-slate-900 leading-snug">
+                "{selectedLeadAudit.updateText}"
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-normal m-0 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                {selectedLeadAudit.details}
+              </p>
+
+              <div className="flex items-center justify-between pt-1 text-[11px] font-bold text-slate-500">
+                <span className="flex items-center gap-1 text-emerald-700">
+                  <CheckCircle2 size={13} />
+                  {selectedLeadAudit.verifiedStatus || 'Synchronized with Chapter Database'}
+                </span>
+                <span>Audit Ref: #{Math.floor(100000 + Math.random() * 900000)}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  const target = selectedLeadAudit.targetTab;
+                  setSelectedLeadAudit(null);
+                  handleModuleClick(target);
+                }}
+                className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ExternalLink size={14} />
+                <span>Open {selectedLeadAudit.moduleTitle} in Portal</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  showToast(`✓ Acknowledged & endorsed ${selectedLeadAudit.leadName}'s update!`);
+                  setSelectedLeadAudit(null);
+                }}
+                className="w-full py-2.5 rounded-full font-bold text-xs bg-slate-100 text-slate-800 hover:bg-slate-200 transition-all cursor-pointer"
+              >
+                Acknowledge & Seal Update
+              </button>
+            </div>
+          </div>
+        )}
       </BottomSheet>
     </div>
   );

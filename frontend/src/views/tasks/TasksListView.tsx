@@ -5,6 +5,7 @@ import { TaskCard } from '../../components/common/TaskCard';
 import { StatusChip } from '../../components/common/StatusChip';
 import { AppAvatar } from '../../components/common/AppAvatar';
 import { Modal } from '../../components/common/Modal';
+import { AuditModeBanner } from '../../components';
 import { TaskPriority, TaskStatus } from '../../types';
 
 export const TasksListView: React.FC = () => {
@@ -18,6 +19,8 @@ export const TasksListView: React.FC = () => {
     addTaskComment,
     createTask,
   } = useApp();
+
+  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
 
   const [statusFilter, setStatusFilter] = useState<'all' | 'todo' | 'in_progress' | 'done'>('all');
   const [teamFilter, setTeamFilter] = useState<string>('All');
@@ -179,27 +182,48 @@ export const TasksListView: React.FC = () => {
           </div>
         </div>
 
-        {/* Task Actions: Status Toggle & Proof Upload */}
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            className={`btn ${selectedTask.status === 'done' ? 'btn-secondary' : 'btn-primary'} btn-block`}
-            onClick={() => {
-              if (selectedTask.status !== 'done') {
-                setIsProofModalOpen(true);
-              } else {
-                updateTaskStatus(selectedTask.id, 'in_progress');
-              }
+        {/* Task Actions: Status Toggle & Proof Upload (restricted to assignees / leads) */}
+        {!isSuperAdmin ? (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              className={`btn ${selectedTask.status === 'done' ? 'btn-secondary' : 'btn-primary'} btn-block`}
+              onClick={() => {
+                if (selectedTask.status !== 'done') {
+                  setIsProofModalOpen(true);
+                } else {
+                  updateTaskStatus(selectedTask.id, 'in_progress');
+                }
+              }}
+            >
+              {selectedTask.status === 'done' ? (
+                <>Mark as In Progress</>
+              ) : (
+                <>
+                  <CheckCircle2 size={20} strokeWidth={1.75} /> Mark Complete & Submit Proof
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 14px',
+              borderRadius: '12px',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              fontSize: '12px',
+              color: '#475569',
             }}
           >
-            {selectedTask.status === 'done' ? (
-              <>Mark as In Progress</>
-            ) : (
-              <>
-                <CheckCircle2 size={20} strokeWidth={1.75} /> Mark Complete & Submit Proof
-              </>
-            )}
-          </button>
-        </div>
+            <CheckCircle2 size={16} color="#64748B" />
+            <span>
+              Proof submissions and completion toggles are operated by the assigned scholar ({selectedTask.assigneeName}) and squad lead.
+            </span>
+          </div>
+        )}
 
         {/* Proof of Work Card if submitted */}
         {(selectedTask.proofUrl || selectedTask.proofNote) && (
@@ -328,12 +352,21 @@ export const TasksListView: React.FC = () => {
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Club Tasks</h1>
         </div>
-        {(currentUser.role === 'team_admin' || currentUser.role === 'admin' || currentUser.role === 'super_admin') && (
+        {!isSuperAdmin && (currentUser.role === 'team_admin' || currentUser.role === 'admin') && (
           <button className="btn btn-primary btn-sm" onClick={() => setIsCreateModalOpen(true)}>
             <Plus size={16} /> Create Task
           </button>
         )}
       </div>
+
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Squad Task Deliverables"
+          operatedByRole="Department Leads & Assigned Scholars"
+          actionRestrictions="Task allocation and proof submissions are operated by Squad Leads and assignees. You have complete inspection access across all teams."
+        />
+      )}
 
       {/* Status Filter Pills */}
       <div className="pill-tabs">

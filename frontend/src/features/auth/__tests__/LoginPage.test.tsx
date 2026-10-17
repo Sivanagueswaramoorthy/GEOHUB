@@ -114,7 +114,7 @@ describe('LoginForm Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/Institutional email is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Roll Number is required/i)).toBeInTheDocument();
       expect(screen.getByText(/Password is required/i)).toBeInTheDocument();
     });
     expect(mockSubmit).not.toHaveBeenCalled();
@@ -263,70 +263,51 @@ describe('DemoRolesSheet Component', () => {
 });
 
 describe('LoginPage Integration and E2E Auth Behavior', () => {
-  it('renders brand elements, two-tone wordmark, and institutional tagline', () => {
+  it('renders brand elements, mascot, direct Reg No and Password placeholders, without Google sign in, Sign In header, or role button', () => {
     render(
       <AppProvider>
         <LoginPage />
       </AppProvider>
     );
 
-    expect(screen.getAllByText('Green Eco').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Organization').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Your club, organized.')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
-    expect(screen.getAllByText('Department of Geography').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Green Eco Organization')).toBeInTheDocument();
+
+    // Sign In heading and subtitle removed per design request
+    expect(screen.queryByRole('heading', { name: /sign in/i })).not.toBeInTheDocument();
+
+    // Select Role to Continue button removed per design request
+    expect(screen.queryByRole('button', { name: /select role to continue/i })).not.toBeInTheDocument();
+
+    // Sign in with Google must be completely removed
+    expect(screen.queryByRole('button', { name: /continue with google/i })).not.toBeInTheDocument();
+
+    // Register Number and Password fields must be directly visible with correct placeholders
+    expect(screen.getByPlaceholderText(/enter your reg no/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/enter your password/i)).toBeInTheDocument();
   });
 
-  it('successfully authenticates with valid credentials and triggers redirect', async () => {
+  it('successfully authenticates with valid roll number credentials and triggers redirect', async () => {
     render(
       <AppProvider>
         <LoginPage />
       </AppProvider>
     );
 
-    const emailInput = screen.getByLabelText(/institutional email/i);
-    const passwordInput = screen.getByPlaceholderText('••••••••••••');
+    // Direct input fields are immediately available
+    const rollNoInput = screen.getByPlaceholderText(/enter your reg no/i);
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
 
-    fireEvent.change(emailInput, { target: { value: 'alex.rivera@college.edu' } });
-    fireEvent.change(passwordInput, { target: { value: 'leadership2026' } });
+    fireEvent.change(rollNoInput, { target: { value: '21GEO001' } });
+    fireEvent.change(passwordInput, { target: { value: 'admin123' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    fireEvent.click(screen.getByRole('button', { name: /sign in with reg no/i }));
 
     await waitFor(
       () => {
-        expect(screen.getByText(/verified & redirecting/i)).toBeInTheDocument();
+        expect(screen.getByText(/authenticated/i)).toBeInTheDocument();
       },
       { timeout: 2000 }
     );
-  });
-
-  it('hides Demo Roles trigger by default in production mode', () => {
-    render(
-      <AppProvider>
-        <LoginPage />
-      </AppProvider>
-    );
-
-    expect(screen.queryByRole('button', { name: /demo roles/i })).not.toBeInTheDocument();
-  });
-
-  it('renders Demo Roles trigger when enabled via ?demo=true param', () => {
-    window.history.pushState({}, '', '/login?demo=true');
-    render(
-      <AppProvider>
-        <LoginPage />
-      </AppProvider>
-    );
-
-    const trigger = screen.getByRole('button', { name: /demo roles/i });
-    expect(trigger).toBeInTheDocument();
-
-    // Clicking it opens the demo roles sheet
-    fireEvent.click(trigger);
-    expect(screen.getByRole('heading', { name: /instant demo personas/i })).toBeInTheDocument();
-
-    // Reset url
-    window.history.pushState({}, '', '/');
   });
 });
 

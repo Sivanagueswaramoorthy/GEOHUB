@@ -183,7 +183,7 @@ export const DemoRolesSheet: React.FC<DemoRolesSheetProps> = ({
               </div>
 
               <div className="demo-role-info">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="demo-role-name">{persona.name}</span>
                   <span
                     className="demo-role-badge"
@@ -194,6 +194,11 @@ export const DemoRolesSheet: React.FC<DemoRolesSheetProps> = ({
                   >
                     {persona.roleTitle}
                   </span>
+                  {persona.user.rollNo && (
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                      Roll No: {persona.user.rollNo}
+                    </span>
+                  )}
                 </div>
                 <p className="demo-role-desc">{persona.description}</p>
               </div>

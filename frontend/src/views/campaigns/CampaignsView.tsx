@@ -39,7 +39,9 @@ import {
   ConfirmDialog,
   WeekStrip,
   WeekDayItem,
+  AuditModeBanner,
 } from '../../components';
+import { getRolePermissions } from '../../core/permissions';
 
 export const CampaignsView: React.FC = () => {
   const {
@@ -54,7 +56,12 @@ export const CampaignsView: React.FC = () => {
     addDailyNews,
     updateDailyNews,
     deleteDailyNews,
+    setActiveTab,
   } = useApp();
+
+  const perms = getRolePermissions(currentUser.role);
+  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
+  const canManageCampaigns = perms.canManageCampaigns && !isSuperAdmin;
 
   // Active top-level subtab
   const [activeSubTab, setActiveSubTab] = useState<'calendar' | 'posts' | 'ai' | 'news'>('posts');
@@ -383,21 +390,39 @@ export const CampaignsView: React.FC = () => {
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setEditingPostId(null);
-            setPostCaption('');
-            setPostStatus('Scheduled');
-            setPostPlatform('Instagram');
-            setIsPostModalOpen(true);
-          }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all cursor-pointer active:scale-95 shrink-0"
-        >
-          <Plus size={16} strokeWidth={1.75} />
-          <span>New Post</span>
-        </button>
+        {canManageCampaigns ? (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingPostId(null);
+              setPostCaption('');
+              setPostStatus('Scheduled');
+              setPostPlatform('Instagram');
+              setIsPostModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all cursor-pointer active:scale-95 shrink-0"
+          >
+            <Plus size={16} strokeWidth={1.75} />
+            <span>New Post</span>
+          </button>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+            <Eye size={14} className="text-slate-500" />
+            <span>Audit Mode</span>
+          </div>
+        )}
       </div>
+
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Campaigns Hub & Media Directives"
+          operatedByRole="Promotion & Social Media Lead"
+          actionRestrictions="Campaign scheduling, live publishing, and daily bulletin drafting are operated by the Promotion Lead. Faculty reviews and approves campaigns on the Approvals Desk."
+          facultyActionLabel="Open Faculty Approvals & Sanctions Desk"
+          onFacultyActionClick={() => setActiveTab('approvals')}
+        />
+      )}
 
       {/* 4 Segmented Sub-Tabs */}
       <div
@@ -623,17 +648,19 @@ export const CampaignsView: React.FC = () => {
                       </button>
 
                       {/* Edit */}
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditPost(post)}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
-                        title="Edit post"
-                      >
-                        <Edit2 size={16} strokeWidth={1.75} />
-                      </button>
+                      {canManageCampaigns && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditPost(post)}
+                          className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
+                          title="Edit post"
+                        >
+                          <Edit2 size={16} strokeWidth={1.75} />
+                        </button>
+                      )}
 
                       {/* If Draft or Scheduled, can Mark as Posted */}
-                      {post.status !== 'Posted' && (
+                      {canManageCampaigns && post.status !== 'Posted' && (
                         <button
                           type="button"
                           onClick={() => {
@@ -661,14 +688,16 @@ export const CampaignsView: React.FC = () => {
                       )}
 
                       {/* Delete */}
-                      <button
-                        type="button"
-                        onClick={() => setDeleteConfirmPostId(post.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                        title="Delete post"
-                      >
-                        <Trash2 size={16} strokeWidth={1.75} />
-                      </button>
+                      {canManageCampaigns && (
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirmPostId(post.id)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Delete post"
+                        >
+                          <Trash2 size={16} strokeWidth={1.75} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1206,14 +1235,16 @@ export const CampaignsView: React.FC = () => {
             <span className="text-xs font-bold text-slate-700">
               Published College Press Bulletins ({dailyNews.length})
             </span>
-            <button
-              type="button"
-              onClick={() => setIsNewsModalOpen(true)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 cursor-pointer"
-            >
-              <Plus size={16} strokeWidth={1.75} />
-              <span>Write Bulletin</span>
-            </button>
+            {canManageCampaigns && (
+              <button
+                type="button"
+                onClick={() => setIsNewsModalOpen(true)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 cursor-pointer"
+              >
+                <Plus size={16} strokeWidth={1.75} />
+                <span>Write Bulletin</span>
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -1251,19 +1282,21 @@ export const CampaignsView: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleCopyText(`${news.title}\n\n${news.content}`, 'Bulletin')}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
                       title="Copy bulletin"
                     >
                       <Copy size={16} strokeWidth={1.75} />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeleteConfirmNewsId(news.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Delete bulletin"
-                    >
-                      <Trash2 size={16} strokeWidth={1.75} />
-                    </button>
+                    {canManageCampaigns && (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteConfirmNewsId(news.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Delete bulletin"
+                      >
+                        <Trash2 size={16} strokeWidth={1.75} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

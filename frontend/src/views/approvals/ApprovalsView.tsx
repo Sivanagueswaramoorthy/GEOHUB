@@ -40,9 +40,17 @@ export const ApprovalsView: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div>
-        <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>
-          Approvals Hub
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#4F46E5', backgroundColor: '#EEF2FF', padding: '2px 8px', borderRadius: '999px', border: '1px solid #C7D2FE', letterSpacing: '0.04em' }}>
+            SUPER ADMIN & FACULTY SANCTIONING DESK
+          </span>
+        </div>
+        <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+          Executive Approvals & Sanctions
         </h1>
+        <p style={{ fontSize: '12px', color: '#64748B', marginTop: '4px', margin: 0 }}>
+          Direct operational authority for Faculty In-Charge to sanction student proposals, budget allocations, and membership inductions.
+        </p>
       </div>
 
       {/* Tabs */}

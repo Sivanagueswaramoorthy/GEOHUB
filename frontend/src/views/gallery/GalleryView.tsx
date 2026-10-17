@@ -31,10 +31,15 @@ import {
   Toast,
   EmptyState,
   ErrorState,
+  AuditModeBanner,
 } from '../../components';
+import { getRolePermissions } from '../../core/permissions';
 
 export const GalleryView: React.FC = () => {
   const { gallery, events, currentUser, uploadGalleryItem } = useApp();
+  const perms = getRolePermissions(currentUser.role);
+  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
+  const canUploadMedia = perms.canUploadMedia && !isSuperAdmin;
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -204,15 +209,31 @@ export const GalleryView: React.FC = () => {
           </h1>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsUploadOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all shrink-0 mt-1 cursor-pointer active:scale-95"
-        >
-          <Upload size={16} strokeWidth={1.75} />
-          <span>Upload Media</span>
-        </button>
+        {canUploadMedia ? (
+          <button
+            type="button"
+            onClick={() => setIsUploadOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all shrink-0 mt-1 cursor-pointer active:scale-95"
+          >
+            <Upload size={16} strokeWidth={1.75} />
+            <span>Upload Media</span>
+          </button>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0 mt-1">
+            <Eye size={14} className="text-slate-500" />
+            <span>Audit Mode</span>
+          </div>
+        )}
       </div>
+
+      {/* Institutional Audit Mode Notice for Super Admin */}
+      {isSuperAdmin && (
+        <AuditModeBanner
+          moduleName="Media Archives & Geotagged Expeditions"
+          operatedByRole="Documentation Wing & Event Teams"
+          actionRestrictions="Media uploads, geotagging, and archival record logs are operated by the Documentation Wing. You have complete inspection, filtering, and media retrieval access."
+        />
+      )}
 
       {/* Search Bar & Grid/List View Toggle */}
       <div className="flex items-center gap-2">
