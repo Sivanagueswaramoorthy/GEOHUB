@@ -53,9 +53,9 @@ export const Chip: React.FC<ChipProps> = ({
     }
   } else if (variant === 'role') {
     if (lower.includes('admin') || lower.includes('lead') || lower.includes('advisor')) {
-      defaultBg = '#E7F9F1';
-      defaultBorder = '#A7F3D0';
-      defaultText = '#065F46';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#8EB69B';
+      defaultText = '#163832';
     } else {
       defaultBg = '#F8FAFC';
       defaultBorder = '#E2E8F0';
@@ -71,9 +71,9 @@ export const Chip: React.FC<ChipProps> = ({
       defaultBorder = '#FECACA';
       defaultText = '#DC2626';
     } else if (lower.includes('approved') || lower.includes('active') || lower.includes('completed')) {
-      defaultBg = '#E7F9F1';
-      defaultBorder = '#A7F3D0';
-      defaultText = '#065F46';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#8EB69B';
+      defaultText = '#163832';
     } else if (lower.includes('pending') || lower.includes('planned')) {
       defaultBg = '#FFF8E6';
       defaultBorder = '#FDE68A';

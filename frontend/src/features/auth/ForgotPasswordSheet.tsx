@@ -138,9 +138,9 @@ export const ForgotPasswordSheet: React.FC<ForgotPasswordSheetProps> = ({
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
               style={{
-                backgroundColor: 'var(--mint-tint, #E7F9F1)',
-                border: '1px solid var(--mint-border, #A7F3D0)',
-                color: 'var(--brand-green, #10B981)',
+                backgroundColor: 'var(--mint-tint, #DAF1DE)',
+                border: '1px solid var(--mint-border, #8EB69B)',
+                color: 'var(--brand-green, #235347)',
               }}
             >
               <CheckCircle2 size={48} strokeWidth={1.75} />

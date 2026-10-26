@@ -14,28 +14,31 @@
   --bg-input: #FFFFFF;
 
   /* --------------------------------------------------------------------------
-     2. Brand Colors
+     2. Brand Colors (Forest Pine Rebuild)
      -------------------------------------------------------------------------- */
-  --brand-green: #10B981;
-  --dark-green: #064E3B;
-  --mint-tint: #E7F9F1;
-  --mint-border: #A7F3D0;
-  --mint-text: #065F46;
+  --brand-green: #235347;
+  --dark-green: #0B2B26;
+  --darkest-pine: #051F20;
+  --spruce-green: #163832;
+  --sage-green: #8EB69B;
+  --mint-tint: #DAF1DE;
+  --mint-border: #8EB69B;
+  --mint-text: #163832;
 
   /* Primary compatibility aliases */
-  --primary: #10B981;
-  --primary-dark: #064E3B;
-  --primary-light: #E7F9F1;
-  --primary-border: #A7F3D0;
-  --accent: #10B981;
+  --primary: #235347;
+  --primary-dark: #0B2B26;
+  --primary-light: #DAF1DE;
+  --primary-border: #8EB69B;
+  --accent: #235347;
 
   /* --------------------------------------------------------------------------
      3. Pastel Stat Tile Color Sets
      -------------------------------------------------------------------------- */
-  --stat-mint-bg: #E7F9F1;
-  --stat-mint-border: #A7F3D0;
-  --stat-mint-text: #065F46;
-  --stat-mint-num: #064E3B;
+  --stat-mint-bg: #DAF1DE;
+  --stat-mint-border: #8EB69B;
+  --stat-mint-text: #163832;
+  --stat-mint-num: #0B2B26;
 
   --stat-lavender-bg: #F3EEFF;
   --stat-lavender-border: #DDD1FF;
@@ -47,19 +50,19 @@
   --stat-amber-text: #92400E;
   --stat-amber-num: #7C2D12;
 
-  --stat-teal-bg: #E8FBF8;
-  --stat-teal-border: #99F6E4;
-  --stat-teal-text: #0F766E;
-  --stat-teal-num: #115E59;
+  --stat-teal-bg: #DAF1DE;
+  --stat-teal-border: #8EB69B;
+  --stat-teal-text: #163832;
+  --stat-teal-num: #0B2B26;
 
   /* --------------------------------------------------------------------------
      4. Neutrals, Text & Dividers
      -------------------------------------------------------------------------- */
-  --text-main: #0F172A;
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --text-tertiary: #94A3B8;
-  --text-muted: #94A3B8;
+  --text-main: #051F20;
+  --text-primary: #051F20;
+  --text-secondary: #163832;
+  --text-tertiary: #64748B;
+  --text-muted: #8EB69B;
   --divider: #EEF1F5;
   --card-border: #EEF1F5;
   --border-soft: #EEF1F5;
@@ -73,8 +76,8 @@
   --danger-border: #FECACA;
   --danger-text: #DC2626;
 
-  --success-green: #10B981;
-  --success-bg: #E7F9F1;
+  --success-green: #235347;
+  --success-bg: #DAF1DE;
   --warning-amber: #F59E0B;
   --warning-bg: #FFF8E6;
   --info-blue: #3B82F6;
@@ -235,7 +238,7 @@
   --search-icon-inset: 16px;
   --search-clear-size: 24px;
   --search-clear-hit: 44px;
-  --search-focus-ring: 0 0 0 2px #10B981, 0 0 0 4px rgba(16, 185, 129, 0.18);
+  --search-focus-ring: 0 0 0 2px #235347, 0 0 0 4px rgba(35, 83, 71, 0.20);
   --search-margin-top: 16px;
   --search-margin-bottom: 12px;
 

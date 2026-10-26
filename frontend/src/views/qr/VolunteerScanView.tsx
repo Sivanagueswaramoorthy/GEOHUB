@@ -245,12 +245,12 @@ export const VolunteerScanView: React.FC = () => {
             style={{
               fontSize: '11px',
               fontWeight: 800,
-              color: '#065F46',
-              backgroundColor: '#D1FAE5',
+              color: '#0B2B26',
+              backgroundColor: '#DAF1DE',
               padding: '3px 10px',
               borderRadius: '999px',
               letterSpacing: '0.04em',
-              border: '1px solid #A7F3D0',
+              border: '1px solid #8EB69B',
               textTransform: 'uppercase',
             }}
           >
@@ -317,7 +317,7 @@ export const VolunteerScanView: React.FC = () => {
           <label style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Active {scanScope === 'event' ? 'Event' : 'Meeting'} Checkpoint
           </label>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '999px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#163832', backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '999px' }}>
             {registeredCount} {scanScope === 'event' ? 'Registered' : 'Expected'}
           </span>
         </div>
@@ -331,20 +331,20 @@ export const VolunteerScanView: React.FC = () => {
               minHeight: '42px',
               padding: '8px 12px',
               backgroundColor: '#FFFFFF',
-              border: isEventDropdownOpen ? '1.5px solid #059669' : '1.5px solid #E2E8F0',
+              border: isEventDropdownOpen ? '1.5px solid #235347' : '1.5px solid #E2E8F0',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
-              boxShadow: isEventDropdownOpen ? '0 0 0 3px rgba(16, 185, 129, 0.15)' : 'none',
+              boxShadow: isEventDropdownOpen ? '0 0 0 3px rgba(35, 83, 71, 0.15)' : 'none',
               transition: 'all 0.15s ease',
               textAlign: 'left',
               gap: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
-              <Calendar size={16} color="#059669" style={{ flexShrink: 0 }} />
+              <Calendar size={16} color="#235347" style={{ flexShrink: 0 }} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {activeSessionTitle}
@@ -403,7 +403,7 @@ export const VolunteerScanView: React.FC = () => {
                       padding: '8px 10px',
                       borderRadius: '10px',
                       border: 'none',
-                      backgroundColor: isSelected ? '#ECFDF5' : 'transparent',
+                      backgroundColor: isSelected ? '#DAF1DE' : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -412,18 +412,18 @@ export const VolunteerScanView: React.FC = () => {
                     }}
                   >
                     <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
-                      <div style={{ fontSize: '12px', fontWeight: isSelected ? 800 : 600, color: isSelected ? '#065F46' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontSize: '12px', fontWeight: isSelected ? 800 : 600, color: isSelected ? '#0B2B26' : '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {ev.title}
                       </div>
-                      <div style={{ fontSize: '11px', color: isSelected ? '#047857' : '#64748B' }}>
+                      <div style={{ fontSize: '11px', color: isSelected ? '#163832' : '#64748B' }}>
                         {ev.category || 'Event'}
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                      <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '999px', backgroundColor: isSelected ? '#D1FAE5' : '#F1F5F9', color: isSelected ? '#065F46' : '#64748B' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '999px', backgroundColor: isSelected ? '#DAF1DE' : '#F1F5F9', color: isSelected ? '#0B2B26' : '#64748B' }}>
                         {ev.registeredUserIds.length} Reg
                       </span>
-                      {isSelected && <Check size={16} strokeWidth={1.75} color="#059669" />}
+                      {isSelected && <Check size={16} strokeWidth={1.75} color="#235347" />}
                     </div>
                   </button>
                 );
@@ -453,7 +453,7 @@ export const VolunteerScanView: React.FC = () => {
           style={{
             width: '160px',
             height: '160px',
-            border: '2px solid rgba(16, 185, 129, 0.85)',
+            border: '2px solid rgba(35, 83, 71, 0.85)',
             borderRadius: '16px',
             position: 'relative',
             display: 'flex',
@@ -467,8 +467,8 @@ export const VolunteerScanView: React.FC = () => {
               position: 'absolute',
               width: '100%',
               height: '3px',
-              backgroundColor: '#10B981',
-              boxShadow: '0 0 14px #10B981',
+              backgroundColor: '#235347',
+              boxShadow: '0 0 14px #235347',
               animation: 'laserScan 2.4s ease-in-out infinite alternate',
             }}
           />
@@ -654,7 +654,7 @@ export const VolunteerScanView: React.FC = () => {
       <div className="app-card" style={{ padding: '16px', borderRadius: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Users size={16} color="#059669" />
+            <Users size={16} color="#235347" />
             <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
               Live Gate Admission Log
             </h3>
@@ -663,11 +663,11 @@ export const VolunteerScanView: React.FC = () => {
             style={{
               fontSize: '11px',
               fontWeight: 800,
-              color: '#059669',
-              backgroundColor: '#ECFDF5',
+              color: '#163832',
+              backgroundColor: '#DAF1DE',
               padding: '2px 8px',
               borderRadius: '999px',
-              border: '1px solid #A7F3D0',
+              border: '1px solid #8EB69B',
             }}
           >
             {sessionScans.length} verified
@@ -703,7 +703,7 @@ export const VolunteerScanView: React.FC = () => {
                 <div style={{ textAlign: 'right' }}>
                   <span
                     style={{
-                      color: '#059669',
+                      color: '#235347',
                       fontWeight: 800,
                       fontSize: '11px',
                       display: 'block',
@@ -735,13 +735,13 @@ export const VolunteerScanView: React.FC = () => {
               borderRadius: '50%',
               backgroundColor:
                 scanResult?.status === 'success'
-                  ? 'rgba(16, 185, 129, 0.12)'
+                  ? 'rgba(35, 83, 71, 0.12)'
                   : scanResult?.status === 'warning'
                   ? 'rgba(217, 119, 6, 0.12)'
                   : 'rgba(220, 38, 38, 0.12)',
               color:
                 scanResult?.status === 'success'
-                  ? '#059669'
+                  ? '#235347'
                   : scanResult?.status === 'warning'
                   ? '#D97706'
                   : '#DC2626',
@@ -790,9 +790,9 @@ export const VolunteerScanView: React.FC = () => {
                       fontWeight: 800,
                       padding: '2px 8px',
                       borderRadius: '999px',
-                      backgroundColor: scanResult.isRegistered ? '#D1FAE5' : '#FEE2E2',
-                      color: scanResult.isRegistered ? '#065F46' : '#991B1B',
-                      border: `1px solid ${scanResult.isRegistered ? '#A7F3D0' : '#FECACA'}`,
+                      backgroundColor: scanResult.isRegistered ? '#DAF1DE' : '#FEE2E2',
+                      color: scanResult.isRegistered ? '#0B2B26' : '#991B1B',
+                      border: `1px solid ${scanResult.isRegistered ? '#8EB69B' : '#FECACA'}`,
                     }}
                   >
                     {scanResult.isRegistered ? '✅ Registered for Event' : '❌ NOT Registered for Event'}
@@ -824,7 +824,7 @@ export const VolunteerScanView: React.FC = () => {
                 borderRadius: '999px',
                 height: '46px',
                 fontWeight: 800,
-                backgroundColor: '#059669',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 border: 'none',
                 display: 'flex',
@@ -832,7 +832,7 @@ export const VolunteerScanView: React.FC = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                boxShadow: '0 4px 12px rgba(35, 83, 71, 0.25)',
               }}
             >
               <UserPlus size={20} strokeWidth={1.75} /> Enroll & Mark Attendance Now

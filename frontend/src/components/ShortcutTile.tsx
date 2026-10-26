@@ -15,9 +15,9 @@ export interface ShortcutTileProps {
 export const ShortcutTile: React.FC<ShortcutTileProps> = ({
   label,
   icon,
-  iconBg = '#E7F9F1',
-  iconBorder = '#A7F3D0',
-  iconColor = '#065F46',
+  iconBg = '#DAF1DE',
+  iconBorder = '#8EB69B',
+  iconColor = '#163832',
   badge,
   onClick,
   className = '',
@@ -27,7 +27,7 @@ export const ShortcutTile: React.FC<ShortcutTileProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-[#E2E8F0] shadow-[0_2px_8px_rgba(15,23,42,0.03)] cursor-pointer hover:border-[#10B981] hover:scale-105 transition-all duration-150 ${className}`}
+      className={`relative flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-[#E2E8F0] shadow-[0_2px_8px_rgba(15,23,42,0.03)] cursor-pointer hover:border-[#235347] hover:scale-105 transition-all duration-150 ${className}`}
       style={{
         minWidth: '72px',
         ...style,

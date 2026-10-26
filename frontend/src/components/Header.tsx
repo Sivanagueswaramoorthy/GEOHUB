@@ -136,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
                     width: '8px',
                     height: '8px',
                     borderRadius: '50%',
-                    backgroundColor: '#10B981',
+                    backgroundColor: '#235347',
                     border: '2px solid #FFFFFF',
                   }}
                 />
@@ -154,10 +154,10 @@ export const Header: React.FC<HeaderProps> = ({
                 minWidth: `${COMPONENTS.header.buttonSize}px`,
                 minHeight: `${COMPONENTS.header.buttonSize}px`,
                 borderRadius: '999px',
-                backgroundColor: '#E7F9F1',
-                border: '1px solid #A7F3D0',
-                color: '#065F46',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.16)',
+                backgroundColor: '#DAF1DE',
+                border: '1px solid #8EB69B',
+                color: '#163832',
+                boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
                 boxSizing: 'border-box',
               }}
               title="Quick Actions"

@@ -126,8 +126,8 @@ export const DesktopTopBar: React.FC = () => {
             transition: 'all 0.15s ease',
           }}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = '#10B981';
-            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.12)';
+            e.currentTarget.style.borderColor = '#235347';
+            e.currentTarget.style.boxShadow = '0 0 0 3px rgba(35, 83, 71, 0.15)';
             e.currentTarget.style.backgroundColor = '#FFFFFF';
           }}
           onBlur={(e) => {
@@ -147,9 +147,9 @@ export const DesktopTopBar: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            backgroundColor: '#ECFDF5',
-            border: '1px solid #A7F3D0',
-            color: '#059669',
+            backgroundColor: '#DAF1DE',
+            border: '1px solid #8EB69B',
+            color: '#163832',
             padding: '7px 12px',
             borderRadius: '9px',
             fontSize: '12px',
@@ -171,7 +171,7 @@ export const DesktopTopBar: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               border: 'none',
               color: '#FFFFFF',
               padding: '7px 13px',
@@ -179,7 +179,7 @@ export const DesktopTopBar: React.FC = () => {
               fontSize: '12px',
               fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+              boxShadow: '0 4px 12px rgba(35, 83, 71, 0.25)',
               transition: 'all 0.15s ease',
             }}
           >
@@ -253,7 +253,7 @@ export const DesktopTopBar: React.FC = () => {
                 <span style={{ fontWeight: 700, fontSize: '13px', color: '#0F172A' }}>Notifications</span>
                 <button
                   onClick={markAllNotificationsAsRead}
-                  style={{ background: 'none', border: 'none', color: '#10B981', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: 'none', border: 'none', color: '#235347', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
                 >
                   Mark all as read
                 </button>
@@ -265,12 +265,12 @@ export const DesktopTopBar: React.FC = () => {
                     style={{
                       padding: '8px 10px',
                       borderRadius: '8px',
-                      backgroundColor: n.isRead ? '#F8FAFC' : '#ECFDF5',
-                      border: n.isRead ? '1px solid #F1F5F9' : '1px solid #A7F3D0',
+                      backgroundColor: n.isRead ? '#F8FAFC' : '#DAF1DE',
+                      border: n.isRead ? '1px solid #F1F5F9' : '1px solid #8EB69B',
                       fontSize: '12px',
                     }}
                   >
-                    <div style={{ fontWeight: 600, color: '#0F172A' }}>{n.title}</div>
+                    <div style={{ fontWeight: 600, color: '#051F20' }}>{n.title}</div>
                     <div style={{ color: '#64748B', fontSize: '11px', marginTop: '2px' }}>{n.message}</div>
                   </div>
                 ))}
@@ -297,10 +297,10 @@ export const DesktopTopBar: React.FC = () => {
         >
           <AppAvatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size={28} />
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', lineHeight: 1.2 }}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', lineHeight: 1.2 }}>
               {currentUser.name.split(' ')[0]}
             </div>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#059669', lineHeight: 1.2 }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#235347', lineHeight: 1.2 }}>
               {currentUser.role.replace('_', ' ').toUpperCase()}
             </div>
           </div>

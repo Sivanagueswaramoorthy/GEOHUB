@@ -43,6 +43,7 @@ import { CategoryCard } from '../../../components/CategoryCard';
 import { ModuleTile } from '../../../components/ModuleTile';
 import { BottomSheet } from '../../../components/BottomSheet';
 import { Toast } from '../../../components/Toast';
+import { registerAudit } from '../../../features/audits/audit.data';
 
 export const FacultyOperationsView: React.FC = () => {
   const {
@@ -93,38 +94,27 @@ export const FacultyOperationsView: React.FC = () => {
   // Toggle display of rich Team Lead Portal Updates on each module
   const [showLeadUpdates, setShowLeadUpdates] = useState(true);
 
-  // Team Lead Portal Audit Modal State
-  const [selectedLeadAudit, setSelectedLeadAudit] = useState<{
+  // Navigate to Dedicated Full-Page Portal Audit View
+  const openAuditPage = (data: {
     moduleTitle: string;
-    domain: string;
-    leadName: string;
-    leadRole: string;
-    department: string;
-    timeAgo: string;
-    updateText: string;
+    domain?: string;
+    leadName?: string;
+    leadRole?: string;
+    department?: string;
+    timeAgo?: string;
+    updateText?: string;
     metric?: string;
-    details: string;
-    targetTab: string;
+    details?: string;
+    targetTab?: string;
     verifiedStatus?: string;
     lastAction?: string;
-  } | null>(null);
-
-  const openAuditModal = (data: {
-    moduleTitle: string;
-    domain: string;
-    leadName: string;
-    leadRole: string;
-    department: string;
-    timeAgo: string;
-    updateText: string;
-    metric?: string;
-    details: string;
-    targetTab: string;
-    verifiedStatus?: string;
-    lastAction?: string;
+    auditRef?: string;
   }) => {
-    setSelectedLeadAudit(data);
+    const record = registerAudit(data);
+    setActiveTab(`audits/${record.slug}`);
   };
+
+  const openAuditModal = openAuditPage;
 
   // Portal Leads Overview for the executive activity ticker
   const portalLeadsSummary = [
@@ -133,8 +123,8 @@ export const FacultyOperationsView: React.FC = () => {
       name: 'Aarav Patel',
       role: 'Documentation Lead',
       dept: 'Geoinformatics & Archival',
-      avatarBg: '#ECFDF5',
-      avatarColor: '#047857',
+      avatarBg: '#DAF1DE',
+      avatarColor: '#163832',
       latestAction: 'Prefilled 4 event dossiers & verified 8 deliverables',
       timeAgo: '1h ago',
       count: '7 Modules',
@@ -242,21 +232,21 @@ export const FacultyOperationsView: React.FC = () => {
       label: 'Documentation',
       count: 7,
       icon: FileText,
-      activeBg: '#ECFDF5',
-      activeBorder: '#10B981',
-      activeColor: '#065F46',
-      activeIconBg: '#D1FAE5',
-      activeIconBorder: '#A7F3D0',
-      activeIconColor: '#059669',
-      activeBadgeBg: '#D1FAE5',
-      activeBadgeBorder: '#A7F3D0',
-      activeBadgeColor: '#065F46',
+      activeBg: '#DAF1DE',
+      activeBorder: '#235347',
+      activeColor: '#0B2B26',
+      activeIconBg: '#DAF1DE',
+      activeIconBorder: '#8EB69B',
+      activeIconColor: '#235347',
+      activeBadgeBg: '#DAF1DE',
+      activeBadgeBorder: '#8EB69B',
+      activeBadgeColor: '#0B2B26',
       inactiveBg: '#FFFFFF',
       inactiveBorder: '#E2E8F0',
       inactiveColor: '#334155',
-      inactiveIconBg: '#ECFDF5',
-      inactiveIconBorder: '#A7F3D0',
-      inactiveIconColor: '#059669',
+      inactiveIconBg: '#DAF1DE',
+      inactiveIconBorder: '#8EB69B',
+      inactiveIconColor: '#235347',
       inactiveBadgeBg: '#F8FAFC',
       inactiveBadgeBorder: '#E2E8F0',
       inactiveBadgeColor: '#64748B',
@@ -449,81 +439,7 @@ export const FacultyOperationsView: React.FC = () => {
         />
       </div>
 
-      {/* Live Team Lead Portal Activity Ticker */}
-      <div className="flex flex-col gap-2 pt-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Activity size={14} className="text-emerald-600 animate-pulse" />
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-700">
-              RESPECTIVE SQUAD LEADS • PORTAL UPDATES STREAM
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowLeadUpdates((prev) => !prev)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer"
-            style={{
-              backgroundColor: showLeadUpdates ? '#ECFDF5' : '#F8FAFC',
-              borderColor: showLeadUpdates ? '#A7F3D0' : '#E2E8F0',
-              color: showLeadUpdates ? '#047857' : '#64748B',
-            }}
-            title="Toggle display of team lead updates across all module cards"
-          >
-            <SlidersHorizontal size={12} />
-            <span>{showLeadUpdates ? 'Lead Updates: ON' : 'Compact View'}</span>
-          </button>
-        </div>
 
-        {/* Scrollable Lead Strip */}
-        <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-1 -mx-1">
-          {portalLeadsSummary.map((lead) => {
-            const isCurrentDomain = adminDeptFilter === lead.id;
-            return (
-              <div
-                key={lead.id}
-                onClick={() => setAdminDeptFilter(lead.id as any)}
-                className="shrink-0 flex items-center gap-2.5 p-2.5 rounded-2xl border transition-all cursor-pointer hover:shadow-xs select-none"
-                style={{
-                  backgroundColor: isCurrentDomain ? '#FFFFFF' : '#F8FAFC',
-                  borderColor: isCurrentDomain ? '#3B82F6' : '#E2E8F0',
-                  minWidth: '240px',
-                  boxShadow: isCurrentDomain ? '0 4px 12px rgba(59, 130, 246, 0.12)' : 'none',
-                }}
-              >
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border"
-                  style={{
-                    backgroundColor: lead.avatarBg,
-                    borderColor: `${lead.avatarColor}30`,
-                    color: lead.avatarColor,
-                  }}
-                >
-                  {lead.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </div>
-                <div className="flex flex-col min-w-0 pr-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs font-black text-slate-900 truncate">
-                      {lead.name}
-                    </span>
-                    <span className="text-[10px] font-semibold text-slate-400">
-                      • {lead.timeAgo}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-500 truncate">
-                    {lead.role}
-                  </span>
-                  <span className="text-[10px] font-semibold text-slate-700 truncate mt-0.5" style={{ color: lead.avatarColor }}>
-                    "{lead.latestAction}"
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Domain Filter Section */}
       <div className="flex flex-col gap-2.5 pt-1">
@@ -583,8 +499,8 @@ export const FacultyOperationsView: React.FC = () => {
             name: 'Aarav Patel',
             role: 'Documentation Lead',
             department: 'Geoinformatics & Archival Science',
-            avatarBg: '#ECFDF5',
-            avatarColor: '#047857',
+            avatarBg: '#DAF1DE',
+            avatarColor: '#163832',
             updatesSummary: 'Lead Portal • 7 modules managed in Documentation Studio',
           }}
           onAuditLead={() =>
@@ -607,9 +523,9 @@ export const FacultyOperationsView: React.FC = () => {
           <ModuleTile
             title="Templates Prefilled"
             icon={<FileText size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             metric="4 Dossiers"
             leadUpdate={
               showLeadUpdates
@@ -989,9 +905,9 @@ export const FacultyOperationsView: React.FC = () => {
           <ModuleTile
             title="Campaign Reach Export"
             icon={<Download size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             metric="Q3 Report"
             leadUpdate={
               showLeadUpdates
@@ -1263,9 +1179,9 @@ export const FacultyOperationsView: React.FC = () => {
           <ModuleTile
             title="Expenses & Claims"
             icon={<DollarSign size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             metric="12 Vouchers"
             leadUpdate={
               showLeadUpdates
@@ -1438,9 +1354,9 @@ export const FacultyOperationsView: React.FC = () => {
           <ModuleTile
             title="Fiscal Audit export"
             icon={<Download size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             metric="Audited"
             leadUpdate={
               showLeadUpdates
@@ -1962,109 +1878,6 @@ export const FacultyOperationsView: React.FC = () => {
         </div>
       </BottomSheet>
 
-      {/* Team Lead Portal Update Audit Bottom Sheet */}
-      <BottomSheet
-        isOpen={selectedLeadAudit !== null}
-        onClose={() => setSelectedLeadAudit(null)}
-        title={selectedLeadAudit ? `Portal Audit: ${selectedLeadAudit.moduleTitle}` : 'Lead Portal Update'}
-        subtitle={
-          selectedLeadAudit
-            ? `${selectedLeadAudit.domain} • Updated by ${selectedLeadAudit.leadName}`
-            : undefined
-        }
-      >
-        {selectedLeadAudit && (
-          <div className="flex flex-col gap-4 py-1">
-            {/* Lead Identity Card */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-extrabold text-sm flex items-center justify-center shrink-0">
-                  {selectedLeadAudit.leadName
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-sm text-slate-900">
-                      {selectedLeadAudit.leadName}
-                    </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {selectedLeadAudit.leadRole}
-                    </span>
-                  </div>
-                  <span className="text-xs text-slate-500 font-medium mt-0.5">
-                    {selectedLeadAudit.department} • Active Squad Leader
-                  </span>
-                </div>
-              </div>
-              <span className="text-[11px] font-bold text-slate-400 bg-white px-2.5 py-1 rounded-full border border-slate-200">
-                {selectedLeadAudit.timeAgo}
-              </span>
-            </div>
-
-            {/* Portal Action Card */}
-            <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Activity size={15} className="text-emerald-600" />
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">
-                    LATEST ACTION IN RESPECTIVE PORTAL
-                  </span>
-                </div>
-                {selectedLeadAudit.metric && (
-                  <span className="text-xs font-black text-slate-800 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200">
-                    {selectedLeadAudit.metric}
-                  </span>
-                )}
-              </div>
-
-              <div className="text-sm font-bold text-slate-900 leading-snug">
-                "{selectedLeadAudit.updateText}"
-              </div>
-
-              <p className="text-xs text-slate-600 leading-relaxed font-normal m-0 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                {selectedLeadAudit.details}
-              </p>
-
-              <div className="flex items-center justify-between pt-1 text-[11px] font-bold text-slate-500">
-                <span className="flex items-center gap-1 text-emerald-700">
-                  <CheckCircle2 size={13} />
-                  {selectedLeadAudit.verifiedStatus || 'Synchronized with Chapter Database'}
-                </span>
-                <span>Audit Ref: #{Math.floor(100000 + Math.random() * 900000)}</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  const target = selectedLeadAudit.targetTab;
-                  setSelectedLeadAudit(null);
-                  handleModuleClick(target);
-                }}
-                className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <ExternalLink size={14} />
-                <span>Open {selectedLeadAudit.moduleTitle} in Portal</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  showToast(`✓ Acknowledged & endorsed ${selectedLeadAudit.leadName}'s update!`);
-                  setSelectedLeadAudit(null);
-                }}
-                className="w-full py-2.5 rounded-full font-bold text-xs bg-slate-100 text-slate-800 hover:bg-slate-200 transition-all cursor-pointer"
-              >
-                Acknowledge & Seal Update
-              </button>
-            </div>
-          </div>
-        )}
-      </BottomSheet>
     </div>
   );
 };

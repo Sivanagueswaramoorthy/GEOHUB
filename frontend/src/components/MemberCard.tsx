@@ -31,7 +31,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           onClick(user);
         }
       }}
-      className={`flex items-center gap-3 rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#10B981] transition-all duration-150 w-full ${className}`}
+      className={`flex items-center gap-3 rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#235347] transition-all duration-150 w-full ${className}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -74,7 +74,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               fontSize: `${TYPOGRAPHY.scale.subtitle.fontSize}px`,
               lineHeight: `${TYPOGRAPHY.scale.subtitle.lineHeight}px`,
               fontWeight: TYPOGRAPHY.scale.subtitle.fontWeight,
-              color: '#0F172A',
+              color: '#051F20',
               fontFamily: 'var(--font-family)',
             }}
           >
@@ -92,7 +92,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
               fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
               lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
               fontWeight: TYPOGRAPHY.scale.small.fontWeight,
-              color: '#64748B',
+              color: '#163832',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',

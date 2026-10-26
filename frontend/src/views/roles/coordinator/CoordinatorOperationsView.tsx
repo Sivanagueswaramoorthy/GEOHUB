@@ -108,21 +108,21 @@ export const CoordinatorOperationsView: React.FC = () => {
       label: 'Documentation',
       count: 7,
       icon: FileText,
-      activeBg: '#ECFDF5',
-      activeBorder: '#10B981',
-      activeColor: '#065F46',
-      activeIconBg: '#D1FAE5',
-      activeIconBorder: '#A7F3D0',
-      activeIconColor: '#059669',
-      activeBadgeBg: '#D1FAE5',
-      activeBadgeBorder: '#A7F3D0',
-      activeBadgeColor: '#065F46',
+      activeBg: '#DAF1DE',
+      activeBorder: '#235347',
+      activeColor: '#0B2B26',
+      activeIconBg: '#DAF1DE',
+      activeIconBorder: '#8EB69B',
+      activeIconColor: '#235347',
+      activeBadgeBg: '#DAF1DE',
+      activeBadgeBorder: '#8EB69B',
+      activeBadgeColor: '#0B2B26',
       inactiveBg: '#FFFFFF',
       inactiveBorder: '#E2E8F0',
       inactiveColor: '#334155',
-      inactiveIconBg: '#ECFDF5',
-      inactiveIconBorder: '#A7F3D0',
-      inactiveIconColor: '#059669',
+      inactiveIconBg: '#DAF1DE',
+      inactiveIconBorder: '#8EB69B',
+      inactiveIconColor: '#235347',
       inactiveBadgeBg: '#F8FAFC',
       inactiveBadgeBorder: '#E2E8F0',
       inactiveBadgeColor: '#64748B',
@@ -280,9 +280,9 @@ export const CoordinatorOperationsView: React.FC = () => {
         <ShortcutTile
           label="Templates"
           icon={<FileText size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          iconColor="#065F46"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          iconColor="#163832"
           onClick={() => handleModuleClick('doc_studio')}
         />
 
@@ -382,9 +382,9 @@ export const CoordinatorOperationsView: React.FC = () => {
             <ModuleTile
               title="Templates"
               icon={<FileText size={20} />}
-              iconBg="#E7F9F1"
-              iconBorder="#A7F3D0"
-              accentColor="#059669"
+              iconBg="#DAF1DE"
+              iconBorder="#8EB69B"
+              accentColor="#235347"
               onClick={() => handleModuleClick('doc_studio')}
             />
             <ModuleTile
@@ -472,9 +472,9 @@ export const CoordinatorOperationsView: React.FC = () => {
           <ModuleTile
             title="Campaign Reach export"
             icon={<Download size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             onClick={() => handleModuleClick('campaigns')}
           />
         </CategoryCard>
@@ -524,9 +524,9 @@ export const CoordinatorOperationsView: React.FC = () => {
           <ModuleTile
             title="Expenses & Claims"
             icon={<DollarSign size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             onClick={() => handleModuleClick('finance')}
           />
           <ModuleTile
@@ -564,9 +564,9 @@ export const CoordinatorOperationsView: React.FC = () => {
           <ModuleTile
             title="Finance Reports"
             icon={<Download size={20} />}
-            iconBg="#E7F9F1"
-            iconBorder="#A7F3D0"
-            accentColor="#059669"
+            iconBg="#DAF1DE"
+            iconBorder="#8EB69B"
+            accentColor="#235347"
             onClick={() => handleModuleClick('finance')}
           />
         </CategoryCard>

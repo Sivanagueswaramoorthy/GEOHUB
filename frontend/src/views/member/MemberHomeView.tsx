@@ -51,7 +51,7 @@ export const MemberHomeView: React.FC = () => {
             value: pendingTasks.length,
             label: 'Tasks Today',
             subtext: 'Next: 2:00 PM',
-            bgColor: '#ECFDF5',
+            bgColor: '#DAF1DE',
           },
           {
             icon: <Award size={16} />,
@@ -117,11 +117,11 @@ export const MemberHomeView: React.FC = () => {
                 width: '42px',
                 height: '42px',
                 borderRadius: '12px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
               }}
             >
               <QrCode size={24} strokeWidth={1.75} />
@@ -130,7 +130,7 @@ export const MemberHomeView: React.FC = () => {
               <div style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
                 Your Check-in Pass
               </div>
-              <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>
+              <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
                 ● 30s Dynamic Security Token Active
               </div>
             </div>
@@ -141,12 +141,12 @@ export const MemberHomeView: React.FC = () => {
             style={{
               padding: '8px 16px',
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               color: '#FFFFFF',
               border: 'none',
               fontWeight: 700,
               fontSize: '12px',
-              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+              boxShadow: '0 2px 8px rgba(35, 83, 71, 0.25)',
             }}
           >
             Show QR

@@ -44,7 +44,7 @@ export const DashboardView: React.FC = () => {
             value: 3,
             label: 'Events Today',
             subtext: 'Next: 2:00 PM',
-            bgColor: '#ECFDF5',
+            bgColor: '#DAF1DE',
           },
           {
             icon: <Users2 size={16} />,
@@ -97,21 +97,21 @@ export const DashboardView: React.FC = () => {
             backgroundColor: '#FFFFFF',
             borderRadius: '20px',
             border: '1px solid #E8ECF2',
-            borderLeft: '4px solid #10B981',
+            borderLeft: '4px solid #235347',
             padding: '16px',
             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#047857', backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#163832', backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '6px' }}>
               ● LIVE SESSION ATTENDANCE
             </span>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: '#10B981' }}>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: '#235347' }}>
               {liveEvent.registeredUserIds.length} / {liveEvent.capacity} Checked In
             </span>
           </div>
 
-          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', marginBottom: '12px' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', marginBottom: '12px' }}>
             {liveEvent.title}
           </h3>
 
@@ -122,7 +122,7 @@ export const DashboardView: React.FC = () => {
                 flex: 1,
                 height: '38px',
                 borderRadius: '999px',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
                 color: '#FFFFFF',
                 border: 'none',
                 fontWeight: 700,
@@ -141,9 +141,9 @@ export const DashboardView: React.FC = () => {
                 height: '38px',
                 padding: '0 16px',
                 borderRadius: '999px',
-                backgroundColor: '#ECFDF5',
-                color: '#047857',
-                border: '1px solid #A7F3D0',
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                border: '1px solid #8EB69B',
                 fontWeight: 700,
                 fontSize: '12px',
                 display: 'flex',

@@ -142,20 +142,20 @@ export const MyQrView: React.FC = () => {
               minHeight: '42px',
               padding: '8px 12px',
               backgroundColor: '#FFFFFF',
-              border: isEventDropdownOpen ? '1.5px solid #059669' : '1.5px solid #E2E8F0',
+              border: isEventDropdownOpen ? '1.5px solid #235347' : '1.5px solid #E2E8F0',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               cursor: 'pointer',
-              boxShadow: isEventDropdownOpen ? '0 0 0 3px rgba(16, 185, 129, 0.15)' : 'none',
+              boxShadow: isEventDropdownOpen ? '0 0 0 3px rgba(35, 83, 71, 0.15)' : 'none',
               transition: 'all 0.15s ease',
               textAlign: 'left',
               gap: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
-              <Calendar size={16} color="#059669" style={{ flexShrink: 0 }} />
+              <Calendar size={16} color="#235347" style={{ flexShrink: 0 }} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {selectedEvent.title}
@@ -215,7 +215,7 @@ export const MyQrView: React.FC = () => {
                       padding: '8px 10px',
                       borderRadius: '10px',
                       border: 'none',
-                      backgroundColor: isSelected ? '#ECFDF5' : 'transparent',
+                      backgroundColor: isSelected ? '#DAF1DE' : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -235,7 +235,7 @@ export const MyQrView: React.FC = () => {
                         style={{
                           fontSize: '12px',
                           fontWeight: isSelected ? 800 : 600,
-                          color: isSelected ? '#065F46' : '#0F172A',
+                          color: isSelected ? '#0B2B26' : '#0F172A',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -243,7 +243,7 @@ export const MyQrView: React.FC = () => {
                       >
                         {ev.title}
                       </div>
-                      <div style={{ fontSize: '11px', color: isSelected ? '#047857' : '#64748B' }}>
+                      <div style={{ fontSize: '11px', color: isSelected ? '#163832' : '#64748B' }}>
                         {ev.category || 'Event'} • {ev.venue || 'Campus Hall'}
                       </div>
                     </div>
@@ -255,13 +255,13 @@ export const MyQrView: React.FC = () => {
                           fontWeight: 700,
                           padding: '2px 6px',
                           borderRadius: '999px',
-                          backgroundColor: isSelected ? '#D1FAE5' : '#F1F5F9',
-                          color: isSelected ? '#065F46' : '#64748B',
+                          backgroundColor: isSelected ? '#DAF1DE' : '#F1F5F9',
+                          color: isSelected ? '#0B2B26' : '#64748B',
                         }}
                       >
                         {ev.registeredUserIds.length} Reg
                       </span>
-                      {isSelected && <Check size={16} strokeWidth={1.75} color="#059669" />}
+                      {isSelected && <Check size={16} strokeWidth={1.75} color="#235347" />}
                     </div>
                   </button>
                 );
@@ -305,7 +305,7 @@ export const MyQrView: React.FC = () => {
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
                 Checked In
               </span>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: '#059669', marginTop: '1px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: '#235347', marginTop: '1px' }}>
                 {eventAttendanceRecords.length}
               </span>
             </div>
@@ -329,9 +329,9 @@ export const MyQrView: React.FC = () => {
           style={{
             padding: '10px 12px',
             borderRadius: '12px',
-            backgroundColor: feedbackMessage.type === 'success' ? '#ECFDF5' : '#FEF3C7',
-            border: `1.5px solid ${feedbackMessage.type === 'success' ? '#A7F3D0' : '#FDE68A'}`,
-            color: feedbackMessage.type === 'success' ? '#065F46' : '#92400E',
+            backgroundColor: feedbackMessage.type === 'success' ? '#DAF1DE' : '#FEF3C7',
+            border: `1.5px solid ${feedbackMessage.type === 'success' ? '#8EB69B' : '#FDE68A'}`,
+            color: feedbackMessage.type === 'success' ? '#0B2B26' : '#92400E',
             fontSize: '12px',
             fontWeight: 700,
             display: 'flex',
@@ -340,7 +340,7 @@ export const MyQrView: React.FC = () => {
           }}
         >
           {feedbackMessage.type === 'success' ? (
-            <CheckCircle2 size={16} color="#059669" />
+            <CheckCircle2 size={16} color="#235347" />
           ) : (
             <AlertTriangle size={16} color="#D97706" />
           )}
@@ -354,7 +354,7 @@ export const MyQrView: React.FC = () => {
           <span style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Select Operation
           </span>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: activeMode === 'add_students' ? '#059669' : '#2563EB' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: activeMode === 'add_students' ? '#235347' : '#2563EB' }}>
             {activeMode === 'add_students' ? '● Auto-Enrollment Pass' : '● Attendance Gate Pass'}
           </span>
         </div>
@@ -381,7 +381,7 @@ export const MyQrView: React.FC = () => {
               borderRadius: '12px',
               border: 'none',
               backgroundColor: activeMode === 'add_students' ? '#FFFFFF' : 'transparent',
-              color: activeMode === 'add_students' ? '#065F46' : '#64748B',
+              color: activeMode === 'add_students' ? '#0B2B26' : '#64748B',
               fontWeight: 800,
               fontSize: '12px',
               cursor: 'pointer',
@@ -393,7 +393,7 @@ export const MyQrView: React.FC = () => {
               gap: '7px',
             }}
           >
-            <UserPlus size={16} color={activeMode === 'add_students' ? '#059669' : '#64748B'} />
+            <UserPlus size={16} color={activeMode === 'add_students' ? '#235347' : '#64748B'} />
             <span>Add Students</span>
           </button>
 
@@ -439,7 +439,7 @@ export const MyQrView: React.FC = () => {
               textAlign: 'center',
               padding: '30px 18px',
               borderRadius: '22px',
-              border: '2px dashed #A7F3D0',
+              border: '2px dashed #8EB69B',
               backgroundColor: '#F0FDF4',
             }}
           >
@@ -448,13 +448,13 @@ export const MyQrView: React.FC = () => {
                 width: '54px',
                 height: '54px',
                 borderRadius: '50%',
-                backgroundColor: '#ECFDF5',
-                color: '#059669',
+                backgroundColor: '#DAF1DE',
+                color: '#235347',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '12px',
-                border: '1.5px solid #A7F3D0',
+                border: '1.5px solid #8EB69B',
               }}
             >
               <UserPlus size={28} strokeWidth={1.75} />
@@ -463,7 +463,7 @@ export const MyQrView: React.FC = () => {
               Add Students to Event
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#163832', backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '6px' }}>
                 Auto-Enrollment Pass
               </span>
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px' }}>
@@ -477,7 +477,7 @@ export const MyQrView: React.FC = () => {
                 height: '44px',
                 padding: '0 26px',
                 borderRadius: '999px',
-                backgroundColor: '#059669',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '13px',
@@ -486,7 +486,7 @@ export const MyQrView: React.FC = () => {
                 alignItems: 'center',
                 gap: '8px',
                 cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                boxShadow: '0 4px 12px rgba(35, 83, 71, 0.25)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -527,7 +527,7 @@ export const MyQrView: React.FC = () => {
               Mark Event Attendance
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#163832', backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '6px' }}>
                 Checkpoint Pass
               </span>
               <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px' }}>
@@ -570,13 +570,13 @@ export const MyQrView: React.FC = () => {
               borderRadius: '14px',
               backgroundColor: secondsLeft <= 5 ? '#FEF2F2' : '#F0FDF4',
               border: `1.5px solid ${secondsLeft <= 5 ? '#FECACA' : '#BBF7D0'}`,
-              color: secondsLeft <= 5 ? '#DC2626' : '#065F46',
+              color: secondsLeft <= 5 ? '#DC2626' : '#0B2B26',
               fontSize: '12px',
               fontWeight: 700,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <Clock size={16} color={secondsLeft <= 5 ? '#DC2626' : '#059669'} />
+              <Clock size={16} color={secondsLeft <= 5 ? '#DC2626' : '#235347'} />
               <span>
                 {activeMode === 'add_students' ? 'Add Students QR' : 'Mark Attendance QR'} Valid: <b>{secondsLeft}s left</b>
               </span>
@@ -586,7 +586,7 @@ export const MyQrView: React.FC = () => {
                 style={{
                   width: '56px',
                   height: '6px',
-                  backgroundColor: secondsLeft <= 5 ? '#FECACA' : '#D1FAE5',
+                  backgroundColor: secondsLeft <= 5 ? '#FECACA' : '#DAF1DE',
                   borderRadius: '999px',
                   overflow: 'hidden',
                 }}
@@ -595,7 +595,7 @@ export const MyQrView: React.FC = () => {
                   style={{
                     height: '100%',
                     width: `${(secondsLeft / 20) * 100}%`,
-                    backgroundColor: secondsLeft <= 5 ? '#DC2626' : '#059669',
+                    backgroundColor: secondsLeft <= 5 ? '#DC2626' : '#235347',
                     transition: 'width 1s linear',
                   }}
                 />
@@ -641,12 +641,12 @@ export const MyQrView: React.FC = () => {
                   gap: '5px',
                   padding: '4px 12px',
                   borderRadius: '999px',
-                  backgroundColor: '#ECFDF5',
-                  color: '#059669',
+                  backgroundColor: '#DAF1DE',
+                  color: '#163832',
                   fontSize: '11px',
                   fontWeight: 800,
                   marginBottom: '10px',
-                  border: '1px solid #A7F3D0',
+                  border: '1px solid #8EB69B',
                 }}
               >
                 <Sparkles size={16} strokeWidth={1.75} />
@@ -663,8 +663,8 @@ export const MyQrView: React.FC = () => {
                   padding: '16px',
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  border: '2.5px solid #10B981',
-                  boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
+                  border: '2.5px solid #235347',
+                  boxShadow: '0 8px 24px rgba(35, 83, 71, 0.12)',
                   marginBottom: '12px',
                 }}
               >
@@ -689,11 +689,11 @@ export const MyQrView: React.FC = () => {
                   border: secondsLeft <= 5 ? '1px solid #FECACA' : '1px solid #BBF7D0',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: secondsLeft <= 5 ? '#DC2626' : '#065F46',
+                  color: secondsLeft <= 5 ? '#DC2626' : '#0B2B26',
                   marginBottom: '14px',
                 }}
               >
-                <Clock size={16} strokeWidth={1.75} color={secondsLeft <= 5 ? '#DC2626' : '#059669'} />
+                <Clock size={16} strokeWidth={1.75} color={secondsLeft <= 5 ? '#DC2626' : '#235347'} />
                 <span>Pass auto-expires in {secondsLeft}s</span>
               </div>
 
@@ -703,7 +703,7 @@ export const MyQrView: React.FC = () => {
                   <span style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Live Registered Roster ({registeredStudents.length} Students)
                   </span>
-                  <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
+                  <span style={{ fontSize: '11px', color: '#235347', fontWeight: 700 }}>
                     ● Auto-Sync Active
                   </span>
                 </div>
@@ -783,12 +783,12 @@ export const MyQrView: React.FC = () => {
                   gap: '5px',
                   padding: '4px 12px',
                   borderRadius: '999px',
-                  backgroundColor: '#ECFDF5',
-                  color: '#059669',
+                  backgroundColor: '#DAF1DE',
+                  color: '#163832',
                   fontSize: '11px',
                   fontWeight: 800,
                   marginBottom: '10px',
-                  border: '1px solid #A7F3D0',
+                  border: '1px solid #8EB69B',
                 }}
               >
                 <ShieldCheck size={16} strokeWidth={1.75} />
@@ -835,7 +835,7 @@ export const MyQrView: React.FC = () => {
                   marginBottom: '14px',
                 }}
               >
-                <Clock size={16} strokeWidth={1.75} color={secondsLeft <= 5 ? '#DC2626' : '#059669'} />
+                <Clock size={16} strokeWidth={1.75} color={secondsLeft <= 5 ? '#DC2626' : '#235347'} />
                 <span>Gate pass auto-expires in {secondsLeft}s</span>
               </div>
 
@@ -846,7 +846,7 @@ export const MyQrView: React.FC = () => {
                   backgroundColor: '#F0FDF4',
                   border: '1px solid #BBF7D0',
                   fontSize: '12px',
-                  color: '#065F46',
+                  color: '#0B2B26',
                   fontWeight: 600,
                   width: '100%',
                   textAlign: 'left',

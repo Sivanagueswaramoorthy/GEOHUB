@@ -18,7 +18,7 @@ export const GeoMascot: React.FC<GeoMascotProps> = ({ size = 64, className = '',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        filter: 'drop-shadow(0 8px 16px rgba(16, 185, 129, 0.25))',
+        filter: 'drop-shadow(0 8px 16px rgba(35, 83, 71, 0.25))',
       }}
     >
       <svg
@@ -29,17 +29,17 @@ export const GeoMascot: React.FC<GeoMascotProps> = ({ size = 64, className = '',
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Main Body Gradient: Vibrant Lightgreen / Emerald to Mint */}
+          {/* Main Body Gradient: Curated Pine / Forest Palette */}
           <linearGradient id="mascotBodyGrad" x1="20" y1="15" x2="100" y2="110" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#34D399" />
-            <stop offset="50%" stopColor="#10B981" />
-            <stop offset="100%" stopColor="#059669" />
+            <stop offset="0%" stopColor="#8EB69B" />
+            <stop offset="50%" stopColor="#235347" />
+            <stop offset="100%" stopColor="#0B2B26" />
           </linearGradient>
 
           {/* Belly Soft Glow Gradient */}
           <linearGradient id="bellyGlow" x1="60" y1="60" x2="60" y2="105" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#A7F3D0" stopOpacity="0.45" />
-            <stop offset="100%" stopColor="#ECFDF5" stopOpacity="0.8" />
+            <stop offset="0%" stopColor="#8EB69B" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#DAF1DE" stopOpacity="0.8" />
           </linearGradient>
 
           {/* Cheek Blush Gradient */}
@@ -70,7 +70,7 @@ export const GeoMascot: React.FC<GeoMascotProps> = ({ size = 64, className = '',
           d="M60 28 C56 16, 48 12, 42 12 C44 22, 54 26, 60 28 Z"
           fill="#86EFAC"
         />
-        <circle cx="60" cy="27" r="2.5" fill="#047857" />
+        <circle cx="60" cy="27" r="2.5" fill="#163832" />
 
         {/* Waving Left Hand (Right Arm visually) */}
         {waving ? (
@@ -110,19 +110,19 @@ export const GeoMascot: React.FC<GeoMascotProps> = ({ size = 64, className = '',
 
         {/* Eyes: Glossy, Friendly Big Anime/Kawaii Eyes */}
         {/* Left Eye */}
-        <ellipse cx="46" cy="57" rx="6.5" ry="8" fill="#064E3B" />
+        <ellipse cx="46" cy="57" rx="6.5" ry="8" fill="#051F20" />
         <ellipse cx="44.5" cy="54" rx="2.5" ry="3.5" fill="#FFFFFF" />
         <circle cx="48" cy="60" r="1.2" fill="#FFFFFF" />
 
         {/* Right Eye */}
-        <ellipse cx="74" cy="57" rx="6.5" ry="8" fill="#064E3B" />
+        <ellipse cx="74" cy="57" rx="6.5" ry="8" fill="#051F20" />
         <ellipse cx="72.5" cy="54" rx="2.5" ry="3.5" fill="#FFFFFF" />
         <circle cx="76" cy="60" r="1.2" fill="#FFFFFF" />
 
         {/* Mouth: Cheerful Happy Smile */}
         <path
           d="M54 67 Q60 74 66 67"
-          stroke="#064E3B"
+          stroke="#051F20"
           strokeWidth="2.5"
           strokeLinecap="round"
           fill="none"

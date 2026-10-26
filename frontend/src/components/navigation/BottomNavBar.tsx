@@ -220,14 +220,14 @@ export const BottomNavBar: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '5px',
-                  backgroundColor: '#ECFDF5',
-                  color: '#047857',
+                  backgroundColor: '#DAF1DE',
+                  color: '#163832',
                   padding: '7px 12px',
                   borderRadius: '999px',
                   fontWeight: 700,
                   fontSize: '12px',
-                  border: '1px solid #A7F3D0',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
+                  border: '1px solid #8EB69B',
+                  boxShadow: '0 2px 8px rgba(35, 83, 71, 0.15)',
                   transition: 'all 150ms ease',
                   flexShrink: 0,
                 }}
@@ -280,8 +280,8 @@ export const BottomNavBar: React.FC = () => {
               justifyContent: 'space-between',
               padding: '12px 14px',
               borderRadius: '14px',
-              border: activeTab === 'profile' ? '1.5px solid #10B981' : '1px solid #E8ECF2',
-              backgroundColor: activeTab === 'profile' ? '#ECFDF5' : '#FFFFFF',
+              border: activeTab === 'profile' ? '1.5px solid #235347' : '1px solid #E8ECF2',
+              backgroundColor: activeTab === 'profile' ? '#DAF1DE' : '#FFFFFF',
               cursor: 'pointer',
               boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)',
             }}
@@ -292,17 +292,17 @@ export const BottomNavBar: React.FC = () => {
                   width: '38px',
                   height: '38px',
                   borderRadius: '10px',
-                  backgroundColor: '#ECFDF5',
+                  backgroundColor: '#DAF1DE',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#10B981',
+                  color: '#235347',
                 }}
               >
                 <User size={20} />
               </div>
               <div>
-                <div style={{ fontWeight: 800, fontSize: '13px', color: '#0F172A' }}>
+                <div style={{ fontWeight: 800, fontSize: '13px', color: '#051F20' }}>
                   Institutional Profile
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>
@@ -329,7 +329,7 @@ export const BottomNavBar: React.FC = () => {
               fontWeight: 700,
             }}
           >
-            <ShieldCheck size={20} strokeWidth={1.75} color="#10B981" />
+            <ShieldCheck size={20} strokeWidth={1.75} color="#235347" />
             <span>Switch Active Role Profile</span>
           </button>
 

@@ -122,7 +122,7 @@ export const DocumentationHomeView: React.FC<DocumentationHomeViewProps> = ({
                         cx="22"
                         cy="22"
                         r="18"
-                        stroke={percent === 100 ? '#10B981' : percent > 50 ? '#0D9488' : '#F59E0B'}
+                        stroke={percent === 100 ? '#235347' : percent > 50 ? '#163832' : '#F59E0B'}
                         strokeWidth="4"
                         strokeDasharray={strokeDash}
                         strokeDashoffset={strokeOffset}
@@ -219,11 +219,11 @@ export const DocumentationHomeView: React.FC<DocumentationHomeViewProps> = ({
 
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           {[
-            { name: 'Event Report', icon: <FileText size={16} />, bg: '#E7F9F1', border: '#A7F3D0', text: '#065F46' },
+            { name: 'Event Report', icon: <FileText size={16} />, bg: '#DAF1DE', border: '#8EB69B', text: '#0B2B26' },
             { name: 'MoM', icon: <Calendar size={16} />, bg: '#F3EEFF', border: '#DDD1FF', text: '#5B21B6' },
             { name: 'Attendance Summary', icon: <CheckSquare size={16} />, bg: '#E8FBF8', border: '#99F6E4', text: '#0D9488' },
             { name: 'Budget Summary', icon: <DollarSign size={16} />, bg: '#FFF8E6', border: '#FDE68A', text: '#92400E' },
-            { name: 'Feedback Summary', icon: <Sparkles size={16} />, bg: '#ECFDF5', border: '#A7F3D0', text: '#059669' },
+            { name: 'Feedback Summary', icon: <Sparkles size={16} />, bg: '#DAF1DE', border: '#8EB69B', text: '#163832' },
           ].map((tpl) => (
             <button
               key={tpl.name}

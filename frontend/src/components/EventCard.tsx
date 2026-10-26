@@ -37,7 +37,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           onClick(event);
         }
       }}
-      className={`flex flex-col rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#10B981] transition-all duration-150 overflow-hidden w-full ${className}`}
+      className={`flex flex-col rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#235347] transition-all duration-150 overflow-hidden w-full ${className}`}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -105,7 +105,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               fontSize: '11px',
               lineHeight: '14px',
               fontWeight: 800,
-              color: '#10B981',
+              color: '#235347',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
@@ -117,7 +117,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               fontSize: '15px',
               lineHeight: '18px',
               fontWeight: 800,
-              color: '#0F172A',
+              color: '#051F20',
               fontFeatureSettings: '"tnum"',
             }}
           >
@@ -164,7 +164,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
             lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
             fontWeight: TYPOGRAPHY.scale.title.fontWeight,
-            color: '#0F172A',
+            color: '#051F20',
             fontFamily: 'var(--font-family)',
             display: '-webkit-box',
             WebkitLineClamp: 2,

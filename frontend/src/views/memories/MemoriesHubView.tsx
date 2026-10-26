@@ -121,7 +121,7 @@ export const MemoriesHubView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -134,11 +134,11 @@ export const MemoriesHubView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 letterSpacing: '0.04em',
               }}
             >
@@ -192,9 +192,9 @@ export const MemoriesHubView: React.FC = () => {
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                backgroundColor: viewMode === 'geotag' ? '#10B981' : 'transparent',
+                backgroundColor: viewMode === 'geotag' ? '#235347' : 'transparent',
                 color: viewMode === 'geotag' ? '#FFFFFF' : '#64748B',
-                boxShadow: viewMode === 'geotag' ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 'none',
+                boxShadow: viewMode === 'geotag' ? '0 2px 8px rgba(35, 83, 71, 0.3)' : 'none',
               }}
             >
               <Compass size={16} strokeWidth={1.75} /> Geo-tag Mode
@@ -207,7 +207,7 @@ export const MemoriesHubView: React.FC = () => {
               style={{
                 padding: '10px 16px',
                 borderRadius: '999px',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '13px',
@@ -215,7 +215,7 @@ export const MemoriesHubView: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+                boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
                 cursor: 'pointer',
               }}
             >
@@ -268,9 +268,9 @@ export const MemoriesHubView: React.FC = () => {
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: 700,
-              border: selectedCategory === c.key ? '1px solid #10B981' : '1px solid #E2E8F0',
-              backgroundColor: selectedCategory === c.key ? '#ECFDF5' : '#FFFFFF',
-              color: selectedCategory === c.key ? '#047857' : '#64748B',
+              border: selectedCategory === c.key ? '1px solid #235347' : '1px solid #E2E8F0',
+              backgroundColor: selectedCategory === c.key ? '#DAF1DE' : '#FFFFFF',
+              color: selectedCategory === c.key ? '#163832' : '#64748B',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}
@@ -318,7 +318,7 @@ export const MemoriesHubView: React.FC = () => {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(16, 185, 129, 0.14)';
+                e.currentTarget.style.boxShadow = '0 12px 28px rgba(35, 83, 71, 0.14)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
@@ -363,7 +363,7 @@ export const MemoriesHubView: React.FC = () => {
                       style={{
                         fontSize: '11px',
                         fontWeight: 800,
-                        backgroundColor: '#10B981',
+                        backgroundColor: '#235347',
                         color: '#FFFFFF',
                         padding: '3px 8px',
                         borderRadius: '6px',
@@ -379,7 +379,7 @@ export const MemoriesHubView: React.FC = () => {
 
                 {/* Bottom title on thumbnail */}
                 <div style={{ position: 'absolute', bottom: '12px', left: '14px', right: '14px' }}>
-                  <div style={{ fontSize: '11px', color: '#34D399', fontWeight: 700 }}>
+                  <div style={{ fontSize: '11px', color: '#8EB69B', fontWeight: 700 }}>
                     {mem.eventTitle}
                   </div>
                   <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', margin: '2px 0 0 0', lineHeight: 1.25 }}>
@@ -434,8 +434,8 @@ export const MemoriesHubView: React.FC = () => {
           >
             <div style={{ position: 'relative', zIndex: 2 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                <Compass size={16} color="#34D399" />
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#34D399', letterSpacing: '0.06em' }}>
+                <Compass size={16} color="#8EB69B" />
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#8EB69B', letterSpacing: '0.06em' }}>
                   SPATIAL GIS METRIC VIEW
                 </span>
               </div>
@@ -448,15 +448,15 @@ export const MemoriesHubView: React.FC = () => {
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>WGS84</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>WGS84</div>
                   <div style={{ fontSize: '11px', color: '#94A3B8' }}>Datum Reference</div>
                 </div>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>5 cm</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>5 cm</div>
                   <div style={{ fontSize: '11px', color: '#94A3B8' }}>RTK Baseline Accuracy</div>
                 </div>
                 <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#34D399' }}>Munnar / Chennai</div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>Munnar / Chennai</div>
                   <div style={{ fontSize: '11px', color: '#94A3B8' }}>Primary Baselines</div>
                 </div>
               </div>
@@ -471,9 +471,9 @@ export const MemoriesHubView: React.FC = () => {
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  border: '1px solid #A7F3D0',
+                  border: '1px solid #8EB69B',
                   padding: '16px',
-                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.08)',
+                  boxShadow: '0 4px 16px rgba(35, 83, 71, 0.08)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
@@ -487,7 +487,7 @@ export const MemoriesHubView: React.FC = () => {
                       top: '10px',
                       left: '10px',
                       backgroundColor: 'rgba(15, 23, 42, 0.85)',
-                      color: '#34D399',
+                      color: '#8EB69B',
                       fontSize: '11px',
                       fontWeight: 800,
                       padding: '4px 10px',
@@ -506,7 +506,7 @@ export const MemoriesHubView: React.FC = () => {
                   <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
                     {mem.title}
                   </h4>
-                  <div style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+                  <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
                     {mem.geotags?.[0]?.locationName || 'High-Altitude Survey Station'}
                   </div>
                   <p style={{ fontSize: '12px', color: '#64748B', margin: '8px 0 0 0', lineHeight: 1.4 }}>
@@ -650,7 +650,7 @@ export const MemoriesHubView: React.FC = () => {
             className="btn btn-primary btn-block"
             style={{
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               height: '46px',
               fontSize: '14px',
               fontWeight: 700,

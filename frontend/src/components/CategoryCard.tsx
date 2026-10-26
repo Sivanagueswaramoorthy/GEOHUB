@@ -54,9 +54,9 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 border"
               style={{
-                backgroundColor: leadInfo.avatarBg || '#ECFDF5',
-                borderColor: '#A7F3D0',
-                color: leadInfo.avatarColor || '#065F46',
+                backgroundColor: leadInfo.avatarBg || '#DAF1DE',
+                borderColor: '#8EB69B',
+                color: leadInfo.avatarColor || '#163832',
               }}
             >
               {leadInfo.name
@@ -101,8 +101,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         </div>
       )}
 
-      {/* Responsive module tiles grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{children}</div>
+      {/* Responsive square module tiles grid (2 columns) */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">{children}</div>
     </SectionCard>
   );
 };

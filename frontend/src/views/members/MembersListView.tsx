@@ -109,8 +109,8 @@ export const MembersListView: React.FC = () => {
       section: 'Filter by Student Year',
       count: firstYearCount,
       icon: <GraduationCap size={16} strokeWidth={1.75} />,
-      color: '#059669',
-      bg: '#ECFDF5',
+      color: '#163832',
+      bg: '#DAF1DE',
     },
     {
       key: '2nd_year',
@@ -150,8 +150,8 @@ export const MembersListView: React.FC = () => {
       section: 'Status & Governance',
       count: totalActive,
       icon: <CheckCircle2 size={16} strokeWidth={1.75} />,
-      color: '#059669',
-      bg: '#ECFDF5',
+      color: '#163832',
+      bg: '#DAF1DE',
     },
     {
       key: 'executive',
@@ -258,7 +258,7 @@ export const MembersListView: React.FC = () => {
         return { label: user.post, color: '#B45309', bg: '#FEF3C7', border: '#FDE68A' };
       }
       if (user.post.includes('Treasurer')) {
-        return { label: user.post, color: '#047857', bg: '#ECFDF5', border: '#A7F3D0' };
+        return { label: user.post, color: '#163832', bg: '#DAF1DE', border: '#8EB69B' };
       }
       if (user.post.includes('Documentation')) {
         return { label: user.post, color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' };
@@ -290,9 +290,9 @@ export const MembersListView: React.FC = () => {
     if (user.role === 'treasurer') {
       return {
         label: user.post || 'Treasurer Lead',
-        color: '#047857',
-        bg: '#ECFDF5',
-        border: '#A7F3D0',
+        color: '#163832',
+        bg: '#DAF1DE',
+        border: '#8EB69B',
       };
     }
     if (user.role === 'documentation') {
@@ -329,9 +329,9 @@ export const MembersListView: React.FC = () => {
     }
     return {
       label: user.team ? `${user.team} Member` : 'Student Member',
-      color: '#047857',
-      bg: '#ECFDF5',
-      border: '#A7F3D0',
+      color: '#163832',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
     };
   };
 
@@ -375,7 +375,7 @@ export const MembersListView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#059669',
+                color: '#163832',
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
               }}
@@ -391,8 +391,8 @@ export const MembersListView: React.FC = () => {
             style={{
               padding: '5px 12px',
               borderRadius: '999px',
-              backgroundColor: '#ECFDF5',
-              border: '1.5px solid #A7F3D0',
+              backgroundColor: '#DAF1DE',
+              border: '1.5px solid #8EB69B',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
@@ -403,11 +403,11 @@ export const MembersListView: React.FC = () => {
                 width: '7px',
                 height: '7px',
                 borderRadius: '50%',
-                backgroundColor: '#10B981',
-                boxShadow: '0 0 6px rgba(16, 185, 129, 0.6)',
+                backgroundColor: '#235347',
+                boxShadow: '0 0 6px rgba(35, 83, 71, 0.6)',
               }}
             />
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#065F46' }}>Active</span>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#0B2B26' }}>Active</span>
           </div>
         </div>
 
@@ -458,7 +458,7 @@ export const MembersListView: React.FC = () => {
                   width: '16px',
                   height: '16px',
                   borderRadius: '50%',
-                  backgroundColor: '#10B981',
+                  backgroundColor: '#235347',
                   border: '2.5px solid #FFFFFF',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
                 }}
@@ -496,9 +496,9 @@ export const MembersListView: React.FC = () => {
                   style={{
                     fontSize: '12px',
                     fontWeight: 800,
-                    color: '#065F46',
-                    backgroundColor: '#D1FAE5',
-                    border: '1.5px solid #6EE7B7',
+                    color: '#0B2B26',
+                    backgroundColor: '#DAF1DE',
+                    border: '1.5px solid #8EB69B',
                     padding: '4px 12px',
                     borderRadius: '999px',
                     display: 'inline-flex',
@@ -506,7 +506,7 @@ export const MembersListView: React.FC = () => {
                     gap: '4px',
                   }}
                 >
-                  <Crown size={16} strokeWidth={1.75} color="#059669" />
+                  <Crown size={16} strokeWidth={1.75} color="#235347" />
                   Post: {selectedUser.post}
                 </span>
               )}
@@ -538,7 +538,7 @@ export const MembersListView: React.FC = () => {
                     gap: '5px',
                   }}
                 >
-                  <Sparkles size={16} strokeWidth={1.75} color="#059669" />
+                  <Sparkles size={16} strokeWidth={1.75} color="#235347" />
                   {selectedUser.team} Squad
                 </span>
               )}
@@ -601,7 +601,7 @@ export const MembersListView: React.FC = () => {
                 <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Access Pass
                 </span>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: '#059669', marginTop: '2px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#235347', marginTop: '2px' }}>
                   Verified
                 </span>
               </div>
@@ -628,11 +628,11 @@ export const MembersListView: React.FC = () => {
                       width: '36px',
                       height: '36px',
                       borderRadius: '10px',
-                      backgroundColor: '#ECFDF5',
+                      backgroundColor: '#DAF1DE',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#059669',
+                      color: '#235347',
                       flexShrink: 0,
                     }}
                   >
@@ -745,7 +745,7 @@ export const MembersListView: React.FC = () => {
                 height: '48px',
                 borderRadius: '999px',
                 border: 'none',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
                 color: '#FFFFFF',
                 fontSize: '14px',
                 fontWeight: 800,
@@ -754,7 +754,7 @@ export const MembersListView: React.FC = () => {
                 justifyContent: 'center',
                 gap: '8px',
                 cursor: 'pointer',
-                boxShadow: '0 6px 18px rgba(16, 185, 129, 0.28)',
+                boxShadow: '0 6px 18px rgba(35, 83, 71, 0.28)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -777,7 +777,7 @@ export const MembersListView: React.FC = () => {
                 <label style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Leadership Post Designation
                 </label>
-                <span style={{ fontSize: '11px', color: '#059669', fontWeight: 700, backgroundColor: '#ECFDF5', padding: '2px 7px', borderRadius: '4px' }}>
+                <span style={{ fontSize: '11px', color: '#163832', fontWeight: 700, backgroundColor: '#DAF1DE', padding: '2px 7px', borderRadius: '4px' }}>
                   Post Assignment
                 </span>
               </div>
@@ -803,9 +803,9 @@ export const MembersListView: React.FC = () => {
                       borderRadius: '8px',
                       fontSize: '11px',
                       fontWeight: editPost === p.title ? 800 : 600,
-                      backgroundColor: editPost === p.title ? '#10B981' : '#F1F5F9',
+                      backgroundColor: editPost === p.title ? '#235347' : '#F1F5F9',
                       color: editPost === p.title ? '#FFFFFF' : '#334155',
-                      border: editPost === p.title ? '1px solid #059669' : '1px solid #E2E8F0',
+                      border: editPost === p.title ? '1px solid #163832' : '1px solid #E2E8F0',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
@@ -857,9 +857,9 @@ export const MembersListView: React.FC = () => {
                     role: 'treasurer' as UserRole,
                     title: 'Treasurer',
                     icon: DollarSign,
-                    color: '#047857',
-                    bg: '#ECFDF5',
-                    border: '#A7F3D0',
+                    color: '#163832',
+                    bg: '#DAF1DE',
+                    border: '#8EB69B',
                     badge: 'Finance',
                   },
                   {
@@ -893,9 +893,9 @@ export const MembersListView: React.FC = () => {
                     role: 'team_admin' as UserRole,
                     title: 'Squad Team Lead',
                     icon: Users2,
-                    color: '#059669',
-                    bg: '#ECFDF5',
-                    border: '#A7F3D0',
+                    color: '#163832',
+                    bg: '#DAF1DE',
+                    border: '#8EB69B',
                     badge: 'Squad Role',
                   },
                   {
@@ -994,7 +994,7 @@ export const MembersListView: React.FC = () => {
                   <label style={{ fontSize: '11px', fontWeight: 800, color: '#0F172A', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Assigned Squad
                   </label>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#059669', backgroundColor: '#D1FAE5', padding: '1.5px 7px', borderRadius: '999px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#163832', backgroundColor: '#DAF1DE', padding: '1.5px 7px', borderRadius: '999px' }}>
                     Required for Squad Roles
                   </span>
                 </div>
@@ -1065,7 +1065,7 @@ export const MembersListView: React.FC = () => {
                 height: '44px',
                 fontWeight: 800,
                 fontSize: '13px',
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+                boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
                 marginTop: '4px',
               }}
             >
@@ -1086,12 +1086,12 @@ export const MembersListView: React.FC = () => {
             style={{
               fontSize: '11px',
               fontWeight: 800,
-              color: '#065F46',
-              backgroundColor: '#D1FAE5',
+              color: '#0B2B26',
+              backgroundColor: '#DAF1DE',
               padding: '3px 9px',
               borderRadius: '999px',
               letterSpacing: '0.04em',
-              border: '1px solid #A7F3D0',
+              border: '1px solid #8EB69B',
               textTransform: 'uppercase',
             }}
           >
@@ -1163,7 +1163,7 @@ export const MembersListView: React.FC = () => {
               justifyContent: 'space-between',
               padding: '0 10px',
               backgroundColor: roleFilter !== 'All' ? '#F0FDF4' : '#FFFFFF',
-              border: roleFilter !== 'All' ? '1.5px solid #10B981' : '1.5px solid #E2E8F0',
+              border: roleFilter !== 'All' ? '1.5px solid #235347' : '1.5px solid #E2E8F0',
               borderRadius: '14px',
               cursor: 'pointer',
               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
@@ -1172,12 +1172,12 @@ export const MembersListView: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
-              <Filter size={16} strokeWidth={1.75} color={roleFilter !== 'All' ? '#059669' : '#64748B'} style={{ flexShrink: 0 }} />
+              <Filter size={16} strokeWidth={1.75} color={roleFilter !== 'All' ? '#235347' : '#64748B'} style={{ flexShrink: 0 }} />
               <span
                 style={{
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: roleFilter !== 'All' ? '#047857' : '#1E293B',
+                  color: roleFilter !== 'All' ? '#163832' : '#1E293B',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -1193,8 +1193,8 @@ export const MembersListView: React.FC = () => {
                   fontWeight: 800,
                   padding: '1.5px 5px',
                   borderRadius: '999px',
-                  backgroundColor: roleFilter !== 'All' ? '#D1FAE5' : '#F1F5F9',
-                  color: roleFilter !== 'All' ? '#047857' : '#64748B',
+                  backgroundColor: roleFilter !== 'All' ? '#DAF1DE' : '#F1F5F9',
+                  color: roleFilter !== 'All' ? '#163832' : '#64748B',
                   lineHeight: 1.2,
                 }}
               >
@@ -1268,7 +1268,7 @@ export const MembersListView: React.FC = () => {
                           justifyContent: 'space-between',
                           padding: '8px 10px',
                           borderRadius: '10px',
-                          backgroundColor: roleFilter === opt.key ? '#ECFDF5' : 'transparent',
+                          backgroundColor: roleFilter === opt.key ? '#DAF1DE' : 'transparent',
                           border: 'none',
                           cursor: 'pointer',
                           textAlign: 'left',
@@ -1296,7 +1296,7 @@ export const MembersListView: React.FC = () => {
                             style={{
                               fontSize: '12px',
                               fontWeight: roleFilter === opt.key ? 800 : 600,
-                              color: roleFilter === opt.key ? '#047857' : '#1E293B',
+                              color: roleFilter === opt.key ? '#163832' : '#1E293B',
                             }}
                           >
                             {opt.label}
@@ -1315,7 +1315,7 @@ export const MembersListView: React.FC = () => {
                           >
                             {opt.count}
                           </span>
-                          {roleFilter === opt.key && <Check size={16} strokeWidth={1.75} color="#059669" />}
+                          {roleFilter === opt.key && <Check size={16} strokeWidth={1.75} color="#235347" />}
                         </div>
                       </button>
                     </React.Fragment>
@@ -1476,7 +1476,7 @@ export const MembersListView: React.FC = () => {
       {/* Scholars List: Elevated Professional Cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#047857', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#163832', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
             Roster • {filteredUsers.length} Students
           </span>
           {(roleFilter !== 'All' || teamFilter !== 'All' || searchQuery) && (
@@ -1553,8 +1553,8 @@ export const MembersListView: React.FC = () => {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.borderColor = '#A7F3D0';
-                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(16, 185, 129, 0.12)';
+                  e.currentTarget.style.borderColor = '#8EB69B';
+                  e.currentTarget.style.boxShadow = '0 6px 18px rgba(35, 83, 71, 0.12)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
@@ -1574,7 +1574,7 @@ export const MembersListView: React.FC = () => {
                         width: '11px',
                         height: '11px',
                         borderRadius: '50%',
-                        backgroundColor: '#10B981',
+                        backgroundColor: '#235347',
                         border: '2px solid #FFFFFF',
                       }}
                       title="Enrolled Scholar"
@@ -1630,11 +1630,11 @@ export const MembersListView: React.FC = () => {
                           style={{
                             fontSize: '11px',
                             fontWeight: 700,
-                            color: '#047857',
-                            backgroundColor: '#ECFDF5',
+                            color: '#163832',
+                            backgroundColor: '#DAF1DE',
                             padding: '1.5px 6px',
                             borderRadius: '6px',
-                            border: '1px solid #A7F3D0',
+                            border: '1px solid #8EB69B',
                           }}
                         >
                           {user.team} Squad

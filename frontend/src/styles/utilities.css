@@ -890,11 +890,11 @@
 }
 
 .border-emerald-100 {
-  border-color: #D1FAE5;
+  border-color: #DAF1DE;
 }
 
 .border-emerald-200 {
-  border-color: #A7F3D0;
+  border-color: #8EB69B;
 }
 
 .border-amber-200 {
@@ -931,27 +931,27 @@
 }
 
 .bg-emerald-50 {
-  background-color: #ECFDF5;
+  background-color: #DAF1DE;
 }
 
 .bg-emerald-50\/50 {
-  background-color: rgba(236, 253, 245, 0.5);
+  background-color: rgba(218, 241, 222, 0.5);
 }
 
 .bg-emerald-100 {
-  background-color: #D1FAE5;
+  background-color: #DAF1DE;
 }
 
 .bg-emerald-500 {
-  background-color: #10B981;
+  background-color: #235347;
 }
 
 .bg-emerald-600 {
-  background-color: #059669;
+  background-color: #163832;
 }
 
 .bg-emerald-700 {
-  background-color: #047857;
+  background-color: #0B2B26;
 }
 
 .bg-amber-50 {
@@ -984,15 +984,15 @@
 }
 
 .text-slate-900 {
-  color: #0F172A;
+  color: #051F20;
 }
 
 .text-slate-800 {
-  color: #1E293B;
+  color: #0B2B26;
 }
 
 .text-slate-700 {
-  color: #334155;
+  color: #163832;
 }
 
 .text-slate-600 {
@@ -1008,20 +1008,42 @@
 }
 
 .text-emerald-600 {
-  color: #059669;
+  color: #235347;
 }
 
 .text-emerald-700 {
-  color: #047857;
+  color: #163832;
 }
 
 .text-emerald-800 {
-  color: #065F46;
+  color: #0B2B26;
 }
 
 .text-emerald-950 {
-  color: #022C22;
+  color: #051F20;
 }
+
+/* Forest Pine Brand Palette Utilities (#051F20, #0B2B26, #163832, #235347, #8EB69B, #DAF1DE) */
+.bg-brand-darkest { background-color: #051F20; }
+.bg-brand-deep { background-color: #0B2B26; }
+.bg-brand-spruce { background-color: #163832; }
+.bg-brand-forest { background-color: #235347; }
+.bg-brand-sage { background-color: #8EB69B; }
+.bg-brand-mint { background-color: #DAF1DE; }
+
+.text-brand-darkest { color: #051F20; }
+.text-brand-deep { color: #0B2B26; }
+.text-brand-spruce { color: #163832; }
+.text-brand-forest { color: #235347; }
+.text-brand-sage { color: #8EB69B; }
+.text-brand-mint { color: #DAF1DE; }
+
+.border-brand-darkest { border-color: #051F20; }
+.border-brand-deep { border-color: #0B2B26; }
+.border-brand-spruce { border-color: #163832; }
+.border-brand-forest { border-color: #235347; }
+.border-brand-sage { border-color: #8EB69B; }
+.border-brand-mint { border-color: #DAF1DE; }
 
 .text-amber-500 {
   color: #F59E0B;

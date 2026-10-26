@@ -149,7 +149,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = ({
         centerTotal={formatINR(227000)}
         centerLabel="Total Spent"
         segments={[
-          { label: 'Logistics', count: 82500, color: '#059669' },
+          { label: 'Logistics', count: 82500, color: '#235347' },
           { label: 'Stage', count: 58500, color: '#7C3AED' },
           { label: 'Refreshments', count: 47800, color: '#D97706' },
           { label: 'Printing', count: 38200, color: '#0284C7' },

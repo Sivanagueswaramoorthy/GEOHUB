@@ -151,7 +151,7 @@ export const SuperAdminDashboardView: React.FC = () => {
       {/* Toast Alert */}
       {toastMessage && (
         <div className="executive-toast">
-          <CheckCircle2 size={20} strokeWidth={1.75} color="#10B981" />
+          <CheckCircle2 size={20} strokeWidth={1.75} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -193,7 +193,7 @@ export const SuperAdminDashboardView: React.FC = () => {
             borderRadius: '18px',
             backgroundColor: '#FFFFFF',
             border: '1px solid #E8ECF2',
-            boxShadow: '0 6px 18px rgba(16, 185, 129, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04)',
+            boxShadow: '0 6px 18px rgba(35, 83, 71, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -229,9 +229,9 @@ export const SuperAdminDashboardView: React.FC = () => {
 
           {/* Card 1: Total Members — Mint */}
           <div style={{
-            backgroundColor: '#ECFDF5',
+            backgroundColor: '#DAF1DE',
             borderRadius: '18px',
-            border: '1.5px solid #A7F3D0',
+            border: '1.5px solid #8EB69B',
             padding: '14px',
             display: 'flex',
             flexDirection: 'column',
@@ -241,7 +241,7 @@ export const SuperAdminDashboardView: React.FC = () => {
               <span style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
+                color: '#163832',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
                 lineHeight: 1.3,
@@ -252,16 +252,16 @@ export const SuperAdminDashboardView: React.FC = () => {
                 width: '28px',
                 height: '28px',
                 borderRadius: '10px',
-                backgroundColor: '#D1FAE5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#059669',
+                color: '#163832',
               }}>
                 <Users2 size={16} strokeWidth={1.75} />
               </div>
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 900, color: '#064E3B', lineHeight: 1, letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: '28px', fontWeight: 900, color: '#0B2B26', lineHeight: 1, letterSpacing: '-0.02em' }}>
               128
             </div>
             <div style={{
@@ -270,9 +270,9 @@ export const SuperAdminDashboardView: React.FC = () => {
               width: 'fit-content',
               fontSize: '11px',
               fontWeight: 700,
-              color: '#047857',
+              color: '#163832',
               backgroundColor: '#FFFFFF',
-              border: '1px solid #6EE7B7',
+              border: '1px solid #8EB69B',
               padding: '2px 8px',
               borderRadius: '999px',
             }}>
@@ -457,7 +457,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
             Members per team
           </h4>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#10B981' }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
             128 Total
           </span>
         </div>
@@ -473,7 +473,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 cy="20"
                 r="15.915"
                 fill="transparent"
-                stroke="#10B981"
+                stroke="#0B2B26"
                 strokeWidth="4"
                 strokeDasharray="26.5 73.5"
                 strokeDashoffset="25"
@@ -484,7 +484,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 cy="20"
                 r="15.915"
                 fill="transparent"
-                stroke="#34D399"
+                stroke="#235347"
                 strokeWidth="4"
                 strokeDasharray="26.5 73.5"
                 strokeDashoffset="-1.5"
@@ -495,7 +495,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 cy="20"
                 r="15.915"
                 fill="transparent"
-                stroke="#6EE7B7"
+                stroke="#8EB69B"
                 strokeWidth="4"
                 strokeDasharray="25 75"
                 strokeDashoffset="-28"
@@ -506,7 +506,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 cy="20"
                 r="15.915"
                 fill="transparent"
-                stroke="#A7F3D0"
+                stroke="#DAF1DE"
                 strokeWidth="4"
                 strokeDasharray="22 78"
                 strokeDashoffset="-53"
@@ -530,19 +530,19 @@ export const SuperAdminDashboardView: React.FC = () => {
           {/* Donut Legend */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#0B2B26' }} />
               <span>Promotion: <strong>34</strong></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#34D399' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#235347' }} />
               <span>Entertainment: <strong>34</strong></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#6EE7B7' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#8EB69B' }} />
               <span>Management: <strong>32</strong></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#A7F3D0' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#DAF1DE', border: '1px solid #8EB69B' }} />
               <span>Documentation: <strong>28</strong></span>
             </div>
           </div>
@@ -624,15 +624,15 @@ export const SuperAdminDashboardView: React.FC = () => {
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    backgroundColor: isSelected ? '#10B981' : d.isToday ? '#ECFDF5' : '#F8FAFC',
-                    color: isSelected ? '#FFFFFF' : d.isToday ? '#047857' : '#0F172A',
-                    border: d.isToday && !isSelected ? '1.5px solid #10B981' : 'none',
+                    backgroundColor: isSelected ? '#235347' : d.isToday ? '#DAF1DE' : '#F8FAFC',
+                    color: isSelected ? '#FFFFFF' : d.isToday ? '#163832' : '#0F172A',
+                    border: d.isToday && !isSelected ? '1.5px solid #235347' : 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 800,
                     fontSize: '13px',
-                    boxShadow: isSelected ? '0 4px 12px rgba(16, 185, 129, 0.35)' : 'none',
+                    boxShadow: isSelected ? '0 4px 12px rgba(35, 83, 71, 0.35)' : 'none',
                     transition: 'all 150ms ease',
                   }}
                 >
@@ -647,7 +647,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                         width: '5px',
                         height: '5px',
                         borderRadius: '50%',
-                        backgroundColor: isSelected ? '#10B981' : '#059669',
+                        backgroundColor: isSelected ? '#235347' : '#163832',
                       }}
                     />
                   )}
@@ -678,7 +678,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                   day: 'numeric',
                 })}
           </h2>
-          <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '999px' }}>
+          <span style={{ fontSize: '11px', color: '#163832', fontWeight: 700, backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '999px' }}>
             {currentAgenda.length} Items
           </span>
         </div>
@@ -706,8 +706,8 @@ export const SuperAdminDashboardView: React.FC = () => {
                   style={{
                     fontSize: '11px',
                     fontWeight: 800,
-                    color: '#047857',
-                    backgroundColor: '#ECFDF5',
+                    color: '#163832',
+                    backgroundColor: '#DAF1DE',
                     padding: '3px 8px',
                     borderRadius: '6px',
                     whiteSpace: 'nowrap',
@@ -788,9 +788,9 @@ export const SuperAdminDashboardView: React.FC = () => {
                   style={{
                     padding: '6px 14px',
                     borderRadius: '999px',
-                    backgroundColor: '#ECFDF5',
-                    border: '1px solid #A7F3D0',
-                    color: '#047857',
+                    backgroundColor: '#DAF1DE',
+                    border: '1px solid #8EB69B',
+                    color: '#163832',
                     fontSize: '12px',
                     fontWeight: 700,
                   }}
@@ -808,7 +808,7 @@ export const SuperAdminDashboardView: React.FC = () => {
             style={{
               fontSize: '12px',
               fontWeight: 700,
-              color: '#10B981',
+              color: '#235347',
               textDecoration: 'none',
             }}
           >
@@ -835,7 +835,7 @@ export const SuperAdminDashboardView: React.FC = () => {
           </h4>
           <button
             onClick={() => setActiveTab('gallery')}
-            style={{ fontSize: '12px', fontWeight: 700, color: '#10B981' }}
+            style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}
           >
             See all
           </button>
@@ -900,14 +900,14 @@ export const SuperAdminDashboardView: React.FC = () => {
       >
         <div>
           <div style={{ backgroundColor: '#F8FAFC', padding: '14px', borderRadius: '12px', border: '1px solid #E8ECF2', marginBottom: '14px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: '#047857', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: '#163832', textTransform: 'uppercase' }}>
               PROPOSAL SUMMARY
             </div>
             <div style={{ fontSize: '13px', color: '#334155', marginTop: '4px', lineHeight: 1.45 }}>
               "{reviewItem?.details}"
             </div>
             {reviewItem?.amount && (
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#047857', marginTop: '8px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: '#163832', marginTop: '8px' }}>
                 Requested Allocation: {reviewItem.amount}
               </div>
             )}
@@ -920,7 +920,7 @@ export const SuperAdminDashboardView: React.FC = () => {
                 flex: 1,
                 height: '42px',
                 borderRadius: '999px',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
                 color: '#FFFFFF',
                 border: 'none',
                 fontWeight: 700,

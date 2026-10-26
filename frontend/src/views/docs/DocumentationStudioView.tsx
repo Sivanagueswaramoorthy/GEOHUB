@@ -70,7 +70,7 @@ export const DocumentationStudioView: React.FC = () => {
   const handleExportWord = () => {
     const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head><meta charset='utf-8'><title>${selectedTemplate.name}</title>
-    <style>body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;} h1{color:#047857;} h2{color:#0F172A;}</style>
+    <style>body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;} h1{color:#0B2B26;} h2{color:#0F172A;}</style>
     </head><body><pre style="font-family:Arial,sans-serif;white-space:pre-wrap;">${docContent}</pre></body></html>`;
     const blob = new Blob(['\ufeff', header], { type: 'application/msword' });
     const url = URL.createObjectURL(blob);
@@ -96,8 +96,8 @@ export const DocumentationStudioView: React.FC = () => {
           <title>${selectedTemplate.name}</title>
           <style>
             body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #0F172A; line-height: 1.6; }
-            .header { border-bottom: 2px solid #10B981; padding-bottom: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
-            .header-title { font-size: 20px; font-weight: 800; color: #047857; margin: 0; }
+            .header { border-bottom: 2px solid #235347; padding-bottom: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+            .header-title { font-size: 20px; font-weight: 800; color: #0B2B26; margin: 0; }
             .content { white-space: pre-wrap; font-size: 13px; line-height: 1.65; }
             @media print { body { padding: 0; } }
           </style>
@@ -186,7 +186,7 @@ export const DocumentationStudioView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -199,11 +199,11 @@ export const DocumentationStudioView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 letterSpacing: '0.04em',
               }}
             >
@@ -262,7 +262,7 @@ export const DocumentationStudioView: React.FC = () => {
             style={{
               padding: '9px 15px',
               borderRadius: '999px',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               color: '#FFFFFF',
               border: 'none',
               fontSize: '12px',
@@ -271,7 +271,7 @@ export const DocumentationStudioView: React.FC = () => {
               alignItems: 'center',
               gap: '6px',
               cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(16, 185, 129, 0.25)',
+              boxShadow: '0 3px 10px rgba(35, 83, 71, 0.25)',
             }}
           >
             <FileSpreadsheet size={16} strokeWidth={1.75} /> Export Excel / CSV
@@ -297,9 +297,9 @@ export const DocumentationStudioView: React.FC = () => {
               key={tpl.id}
               onClick={() => handleSelectTemplate(tpl)}
               style={{
-                backgroundColor: isSelected ? '#ECFDF5' : '#FFFFFF',
+                backgroundColor: isSelected ? '#DAF1DE' : '#FFFFFF',
                 borderRadius: '16px',
-                border: isSelected ? '2px solid #10B981' : '1px solid #E8ECF2',
+                border: isSelected ? '2px solid #235347' : '1px solid #E8ECF2',
                 padding: '14px',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
@@ -314,12 +314,12 @@ export const DocumentationStudioView: React.FC = () => {
                     fontSize: '11px',
                     fontWeight: 800,
                     textTransform: 'uppercase',
-                    color: isSelected ? '#047857' : '#64748B',
+                    color: isSelected ? '#163832' : '#64748B',
                   }}
                 >
                   {tpl.category.replace('_', ' ')}
                 </span>
-                {isSelected && <Check size={16} color="#10B981" strokeWidth={3} />}
+                {isSelected && <Check size={16} color="#235347" strokeWidth={3} />}
               </div>
               <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
                 {tpl.name}

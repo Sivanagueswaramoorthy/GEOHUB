@@ -167,10 +167,10 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
                 onClick={() => handleTabClick(tab.key)}
                 className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95"
                 style={{
-                  backgroundColor: '#E7F9F1',
-                  border: '1px solid #A7F3D0',
-                  color: '#065F46',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.14)',
+                  backgroundColor: '#DAF1DE',
+                  border: '1px solid #8EB69B',
+                  color: '#163832',
+                  boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
                   height: '44px',
                   boxSizing: 'border-box',
                 }}
@@ -181,7 +181,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
                     fontSize: `${COMPONENTS.floatingNav.labelFontSize}px`,
                     lineHeight: '16px',
                     fontWeight: COMPONENTS.floatingNav.labelFontWeight,
-                    color: '#065F46',
+                    color: '#163832',
                     whiteSpace: 'nowrap',
                     fontFamily: 'var(--font-family)',
                   }}
@@ -206,7 +206,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
                 {tab.hasUpdates && (
                   <span
                     className="absolute bottom-1 w-2 h-2 rounded-full"
-                    style={{ backgroundColor: '#10B981' }}
+                    style={{ backgroundColor: '#235347' }}
                   />
                 )}
               </button>

@@ -209,6 +209,11 @@ export const canAccessRoute = (
   const normalizedRoute = route.toLowerCase().replace(/^[#/]+/, '');
   const perms = getRolePermissions(role);
 
+  // Portal Audits route check - accessible to view
+  if (normalizedRoute.startsWith('audits')) {
+    return { allowed: true };
+  }
+
   // Settings route check
   if (normalizedRoute === 'settings') {
     if (!perms.canManageSettings) {

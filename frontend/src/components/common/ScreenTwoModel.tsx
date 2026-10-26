@@ -103,11 +103,11 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 width: '42px',
                 height: '42px',
                 borderRadius: '12px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
                 flexShrink: 0,
               }}
             >
@@ -209,14 +209,14 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    backgroundColor: isActive ? '#10B981' : '#F8FAFC',
-                    color: isActive ? '#FFFFFF' : '#0F172A',
+                    backgroundColor: isActive ? '#235347' : '#F8FAFC',
+                    color: isActive ? '#FFFFFF' : '#051F20',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 700,
                     fontSize: '13px',
-                    boxShadow: isActive ? '0 4px 12px rgba(16, 185, 129, 0.35)' : 'none',
+                    boxShadow: isActive ? '0 4px 12px rgba(35, 83, 71, 0.35)' : 'none',
                     transition: 'all 150ms ease',
                   }}
                 >
@@ -240,30 +240,30 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
           <div
             key={i}
             style={{
-              backgroundColor: m.bgColor || '#ECFDF5',
+              backgroundColor: m.bgColor || '#DAF1DE',
               borderRadius: '16px',
               padding: '12px 10px',
-              border: '1px solid #D1FAE5',
+              border: '1px solid #8EB69B',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
               minHeight: '84px',
-              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.05)',
+              boxShadow: '0 2px 6px rgba(35, 83, 71, 0.05)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ color: '#047857' }}>{m.icon}</span>
-              <span style={{ fontSize: '16px', fontWeight: 800, color: '#064E3B' }}>
+              <span style={{ color: '#163832' }}>{m.icon}</span>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: '#0B2B26' }}>
                 {m.value}
               </span>
             </div>
             <div>
               {m.subtext && (
-                <div style={{ fontSize: '11px', color: '#059669', fontWeight: 700 }}>
+                <div style={{ fontSize: '11px', color: '#235347', fontWeight: 700 }}>
                   {m.subtext}
                 </div>
               )}
-              <div style={{ fontSize: '11px', color: '#047857', fontWeight: 600, marginTop: '2px', lineHeight: 1.15 }}>
+              <div style={{ fontSize: '11px', color: '#163832', fontWeight: 600, marginTop: '2px', lineHeight: 1.15 }}>
                 {m.label}
               </div>
             </div>
@@ -283,7 +283,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
       >
         {/* Header with Live Status Tag */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
             {briefTitle}
           </h2>
           <span
@@ -293,13 +293,13 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
               gap: '5px',
               fontSize: '11px',
               fontWeight: 700,
-              color: '#10B981',
-              backgroundColor: '#ECFDF5',
+              color: '#163832',
+              backgroundColor: '#DAF1DE',
               padding: '2px 8px',
               borderRadius: '999px',
             }}
           >
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#235347' }} />
             Live
           </span>
         </div>
@@ -314,7 +314,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 case 'overdue':
                   return { bg: '#FEE2E2', text: '#DC2626' };
                 case 'active':
-                  return { bg: '#ECFDF5', text: '#059669' };
+                  return { bg: '#DAF1DE', text: '#163832' };
                 default:
                   return { bg: '#F1F5F9', text: '#475569' };
               }
@@ -332,7 +332,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
                     {item.title}
                   </div>
                   {item.subtitle && (
@@ -371,7 +371,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
             borderRadius: '999px',
             backgroundColor: '#F8FAFC',
             border: '1px solid #E8ECF2',
-            color: '#0F172A',
+            color: '#051F20',
             fontWeight: 700,
             fontSize: '13px',
             display: 'flex',
@@ -383,7 +383,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
         >
           <RefreshCw
             size={16} strokeWidth={1.75}
-            color="#10B981"
+            color="#235347"
             style={{
               transform: isRefreshed ? 'rotate(360deg)' : 'none',
               transition: 'transform 500ms ease',
@@ -428,7 +428,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
 
           <button
             onClick={() => setActiveTab('tasks')}
-            style={{ fontSize: '12px', fontWeight: 600, color: '#10B981' }}
+            style={{ fontSize: '12px', fontWeight: 600, color: '#235347' }}
           >
             See all
           </button>
@@ -457,7 +457,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <button
                     style={{
-                      color: isDone ? '#10B981' : '#CBD5E1',
+                      color: isDone ? '#235347' : '#CBD5E1',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -469,7 +469,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                       style={{
                         fontSize: '13px',
                         fontWeight: 700,
-                        color: isDone ? '#94A3B8' : '#0F172A',
+                        color: isDone ? '#94A3B8' : '#051F20',
                         textDecoration: isDone ? 'line-through' : 'none',
                       }}
                     >
@@ -490,8 +490,8 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                     fontSize: '11px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
-                    color: t.priority === 'high' ? '#EF4444' : '#10B981',
-                    backgroundColor: t.priority === 'high' ? '#FEE2E2' : '#ECFDF5',
+                    color: t.priority === 'high' ? '#EF4444' : '#163832',
+                    backgroundColor: t.priority === 'high' ? '#FEE2E2' : '#DAF1DE',
                     padding: '2px 6px',
                     borderRadius: '4px',
                   }}

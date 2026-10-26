@@ -44,9 +44,9 @@ export const Image: React.FC<ImageProps> = ({
           style={{
             width: `${avatarSize}px`,
             height: `${avatarSize}px`,
-            backgroundColor: '#E7F9F1',
-            border: '1.5px solid #A7F3D0',
-            color: '#065F46',
+            backgroundColor: '#DAF1DE',
+            border: '1.5px solid #8EB69B',
+            color: '#163832',
             fontSize: `${Math.round(avatarSize * 0.36)}px`,
             fontWeight: 600,
             ...style,
@@ -59,7 +59,7 @@ export const Image: React.FC<ImageProps> = ({
               style={{
                 width: '10px',
                 height: '10px',
-                backgroundColor: '#10B981',
+                backgroundColor: '#235347',
                 boxShadow: '0 0 0 2px #FFFFFF',
               }}
             />
@@ -194,7 +194,7 @@ export const Image: React.FC<ImageProps> = ({
             right: '0px',
             width: '10px',
             height: '10px',
-            backgroundColor: '#10B981',
+            backgroundColor: '#235347',
             boxShadow: '0 0 0 2px #FFFFFF',
           }}
         />

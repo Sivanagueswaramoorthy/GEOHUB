@@ -125,10 +125,10 @@ export const ProfileView: React.FC = () => {
           style={{
             width: '44px',
             height: '44px',
-            backgroundColor: '#E7F9F1',
-            border: '1px solid #A7F3D0',
-            color: '#065F46',
-            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.16)',
+            backgroundColor: '#DAF1DE',
+            border: '1px solid #8EB69B',
+            color: '#163832',
+            boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
           }}
           title="Open Dynamic QR Pass"
           aria-label="Open Dynamic QR Pass"
@@ -145,11 +145,11 @@ export const ProfileView: React.FC = () => {
                 width: '72px',
                 height: '72px',
                 borderRadius: '50%',
-                backgroundColor: '#E7F9F1',
-                border: '2.5px solid #A7F3D0',
-                color: '#064E3B',
+                backgroundColor: '#DAF1DE',
+                border: '2.5px solid #8EB69B',
+                color: '#0B2B26',
                 fontFamily: 'var(--font-family)',
-                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.15)',
+                boxShadow: '0 4px 16px rgba(35, 83, 71, 0.15)',
               }}
             >
               {initials}
@@ -157,7 +157,7 @@ export const ProfileView: React.FC = () => {
 
             {/* Online Dot */}
             <span
-              className="absolute bottom-1 right-1 rounded-full bg-[#10B981]"
+              className="absolute bottom-1 right-1 rounded-full bg-[#235347]"
               title="Active Executive"
             />
           </div>
@@ -212,8 +212,8 @@ export const ProfileView: React.FC = () => {
                 : '+1 (555) 014-9921')
             }
             icon={<Phone size={16} />}
-            iconBg="#E7F9F1"
-            iconColor="#065F46"
+            iconBg="#DAF1DE"
+            iconColor="#163832"
           />
 
           <InfoRow
@@ -251,9 +251,9 @@ export const ProfileView: React.FC = () => {
                   <span
                     className="text-[11px] font-bold px-2 py-0.5 rounded-full"
                     style={{
-                      backgroundColor: isPromotion ? '#F5F3FF' : '#ECFDF5',
-                      color: isPromotion ? '#6D28D9' : '#065F46',
-                      border: isPromotion ? '1px solid #DDD6FE' : '1px solid #A7F3D0',
+                      backgroundColor: isPromotion ? '#F5F3FF' : '#DAF1DE',
+                      color: isPromotion ? '#6D28D9' : '#163832',
+                      border: isPromotion ? '1px solid #DDD6FE' : '1px solid #8EB69B',
                     }}
                   >
                     {currentUser.team || (isPromotion ? 'Promotion' : isTreasurer ? 'Management' : 'Documentation')} Squad
@@ -292,9 +292,9 @@ export const ProfileView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsRoleSwitcherOpen(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs bg-white border border-slate-200 text-slate-800 shadow-xs hover:border-emerald-400 hover:text-emerald-700 transition-all cursor-pointer active:scale-98"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs bg-white border border-slate-200 text-slate-800 shadow-xs hover:border-[#235347] hover:text-[#235347] transition-all cursor-pointer active:scale-98"
         >
-          <Shield size={16} className="text-emerald-600" />
+          <Shield size={16} className="text-[#235347]" />
           <span>Switch Demo Role (Preview As Another Role)</span>
         </button>
 
@@ -324,7 +324,7 @@ export const ProfileView: React.FC = () => {
         <div className="flex flex-col items-center text-center py-2">
           {/* QR Code Container */}
           <div
-            className="p-4 rounded-3xl bg-white border-2 border-emerald-200 shadow-md mb-4"
+            className="p-4 rounded-3xl bg-white border-2 border-[#8EB69B] shadow-md mb-4"
             style={{ width: '220px', height: '220px' }}
           >
             <QRCodeSVG
@@ -332,13 +332,20 @@ export const ProfileView: React.FC = () => {
               size={188}
               level="H"
               includeMargin={false}
-              fgColor="#064E3B"
+              fgColor="#0B2B26"
             />
           </div>
 
           {/* Countdown timer pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold text-xs mb-3">
-            <RotateCw size={16} strokeWidth={1.75} className="animate-spin text-emerald-600" />
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full font-extrabold text-xs mb-3"
+            style={{
+              backgroundColor: '#DAF1DE',
+              border: '1px solid #8EB69B',
+              color: '#163832',
+            }}
+          >
+            <RotateCw size={16} strokeWidth={1.75} className="animate-spin text-[#235347]" />
             <span>Refreshes in {secondsLeft}s</span>
           </div>
 
@@ -348,7 +355,7 @@ export const ProfileView: React.FC = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 cursor-pointer hover:bg-slate-100 mb-2"
           >
             <span>{qrToken}</span>
-            {copiedToken ? <Check size={16} strokeWidth={1.75} className="text-emerald-600" /> : <Copy size={16} strokeWidth={1.75} />}
+            {copiedToken ? <Check size={16} strokeWidth={1.75} className="text-[#235347]" /> : <Copy size={16} strokeWidth={1.75} />}
           </div>
 
           <span className="text-[11px] font-bold text-slate-400">

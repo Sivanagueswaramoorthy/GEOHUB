@@ -17,10 +17,10 @@ export const orgConfig: OrgBrandingConfig = {
   wordmarkPart1: 'Green Eco',
   wordmarkPart2: 'Organization',
   tagline: 'Environmental Conservation & Geo Club Management',
-  brandGreen: '#10B981',
-  darkGreen: '#064E3B',
-  mintTint: '#E7F9F1',
-  mintBorder: '#A7F3D0',
+  brandGreen: '#235347',
+  darkGreen: '#0B2B26',
+  mintTint: '#DAF1DE',
+  mintBorder: '#8EB69B',
   appTitle: 'GeoHub',
 };
 
@@ -35,7 +35,7 @@ export const OrgLogoIcon: React.FC<{ size?: number; className?: string }> = ({ s
       width: `${size}px`,
       height: `${size}px`,
       borderRadius: `${Math.round(size * 0.32)}px`,
-      backgroundColor: '#E7F9F1',
+      backgroundColor: '#DAF1DE',
       overflow: 'hidden',
       padding: '3px',
     }}

@@ -50,11 +50,11 @@ export const DesktopSidebar: React.FC = () => {
   const rolesList: { role: UserRole; label: string; icon: React.ReactNode; color: string; bg: string }[] = [
     { role: 'faculty', label: 'Faculty Advisor', icon: <ShieldCheck size={16} strokeWidth={1.75} />, color: '#B45309', bg: '#FEF3C7' },
     { role: 'coordinator', label: 'Coordinator', icon: <Shield size={16} strokeWidth={1.75} />, color: '#4338CA', bg: '#EEF2FF' },
-    { role: 'treasurer', label: 'Treasurer', icon: <DollarSign size={16} strokeWidth={1.75} />, color: '#047857', bg: '#ECFDF5' },
+    { role: 'treasurer', label: 'Treasurer', icon: <DollarSign size={16} strokeWidth={1.75} />, color: '#163832', bg: '#DAF1DE' },
     { role: 'documentation', label: 'Documentation', icon: <FileText size={16} strokeWidth={1.75} />, color: '#D97706', bg: '#FFFBEB' },
     { role: 'social_media', label: 'Social Media', icon: <Share2 size={16} strokeWidth={1.75} />, color: '#E11D48', bg: '#FFF1F2' },
     { role: 'volunteer', label: 'Volunteer', icon: <QrCode size={16} strokeWidth={1.75} />, color: '#BE185D', bg: '#FCE7F3' },
-    { role: 'member', label: 'Member', icon: <User size={16} strokeWidth={1.75} />, color: '#15803D', bg: '#DCFCE7' },
+    { role: 'member', label: 'Member', icon: <User size={16} strokeWidth={1.75} />, color: '#235347', bg: '#DAF1DE' },
   ];
 
   interface NavItem {
@@ -203,13 +203,13 @@ export const DesktopSidebar: React.FC = () => {
               width: '44px',
               height: '44px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
-              border: '1px solid #A7F3D0',
+              background: 'linear-gradient(135deg, #DAF1DE 0%, #8EB69B 100%)',
+              border: '1px solid #8EB69B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               padding: '4px',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)',
+              boxShadow: '0 4px 12px rgba(35, 83, 71, 0.15)',
             }}
           >
             <img
@@ -220,18 +220,18 @@ export const DesktopSidebar: React.FC = () => {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontWeight: 800, fontSize: '18px', color: '#0F172A', letterSpacing: '-0.4px' }}>
+              <span style={{ fontWeight: 800, fontSize: '18px', color: '#051F20', letterSpacing: '-0.4px' }}>
                 GeoHub
               </span>
               <span
                 style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  backgroundColor: '#ECFDF5',
-                  color: '#059669',
+                  backgroundColor: '#DAF1DE',
+                  color: '#163832',
                   padding: '2px 6px',
                   borderRadius: '6px',
-                  border: '1px solid #A7F3D0',
+                  border: '1px solid #8EB69B',
                 }}
               >
                 PRO
@@ -259,10 +259,10 @@ export const DesktopSidebar: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
             <AppAvatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size={48} strokeWidth={1.75} />
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {currentUser.name}
               </div>
-              <div style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+              <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
                 {currentUser.role.replace('_', ' ').toUpperCase()}
               </div>
             </div>
@@ -363,11 +363,11 @@ export const DesktopSidebar: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: '9px 12px',
                       borderRadius: '10px',
-                      backgroundColor: isActive ? '#ECFDF5' : 'transparent',
-                      color: isActive ? '#059669' : '#475569',
+                      backgroundColor: isActive ? '#DAF1DE' : 'transparent',
+                      color: isActive ? '#163832' : '#475569',
                       fontWeight: isActive ? 700 : 500,
                       fontSize: '13px',
-                      border: isActive ? '1px solid #A7F3D0' : '1px solid transparent',
+                      border: isActive ? '1px solid #8EB69B' : '1px solid transparent',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                       textAlign: 'left',
@@ -380,7 +380,7 @@ export const DesktopSidebar: React.FC = () => {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ color: isActive ? '#059669' : '#64748B' }}>{item.icon}</span>
+                      <span style={{ color: isActive ? '#235347' : '#64748B' }}>{item.icon}</span>
                       <span>{item.label}</span>
                     </div>
                     {item.badge && (
@@ -388,7 +388,7 @@ export const DesktopSidebar: React.FC = () => {
                         style={{
                           fontSize: '11px',
                           fontWeight: 700,
-                          backgroundColor: isActive ? '#059669' : '#E2E8F0',
+                          backgroundColor: isActive ? '#235347' : '#E2E8F0',
                           color: isActive ? '#FFFFFF' : '#475569',
                           padding: '1px 7px',
                           borderRadius: '10px',

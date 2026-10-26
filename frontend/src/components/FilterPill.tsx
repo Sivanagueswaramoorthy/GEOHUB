@@ -31,11 +31,11 @@ export const FilterPill: React.FC<FilterPillProps> = ({
       style={{
         height: `${SEARCH_AND_FILTER.filterPill.touchTargetHeight}px`,
         padding: '0 16px',
-        backgroundColor: isActive ? '#E7F9F1' : '#FFFFFF',
-        border: isActive ? '1px solid #A7F3D0' : '1px solid #EEF1F5',
-        color: isActive ? '#065F46' : '#0F172A',
+        backgroundColor: isActive ? '#DAF1DE' : '#FFFFFF',
+        border: isActive ? '1px solid #8EB69B' : '1px solid #EEF1F5',
+        color: isActive ? '#163832' : '#051F20',
         boxShadow: isActive
-          ? '0 2px 8px rgba(16, 185, 129, 0.16)'
+          ? '0 2px 8px rgba(35, 83, 71, 0.16)'
           : '0 2px 6px rgba(15, 23, 42, 0.03)',
         borderRadius: '999px',
         fontSize: `${SEARCH_AND_FILTER.filterPill.fontSize}px`,
@@ -59,7 +59,7 @@ export const FilterPill: React.FC<FilterPillProps> = ({
         <span
           className="inline-flex items-center justify-center font-bold px-2 rounded-full"
           style={{
-            backgroundColor: isActive ? '#10B981' : '#F1F5F9',
+            backgroundColor: isActive ? '#235347' : '#F1F5F9',
             color: isActive ? '#FFFFFF' : '#64748B',
             fontSize: `${SEARCH_AND_FILTER.filterPill.badgeFontSize}px`,
             minWidth: `${SEARCH_AND_FILTER.filterPill.badgePillSize}px`,

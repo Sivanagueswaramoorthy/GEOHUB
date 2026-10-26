@@ -44,14 +44,14 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             width: '84px',
             height: '84px',
             borderRadius: '50%',
-            backgroundColor: '#E7F9F1',
-            border: '1px solid #A7F3D0',
-            color: '#065F46',
+            backgroundColor: '#DAF1DE',
+            border: '1px solid #8EB69B',
+            color: '#163832',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '20px',
-            boxShadow: '0 8px 24px rgba(16, 185, 129, 0.15)',
+            boxShadow: '0 8px 24px rgba(35, 83, 71, 0.15)',
           }}
         >
           <Compass size={48} strokeWidth={1.75} className="animate-spin-slow" />
@@ -82,7 +82,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
           style={{
             fontSize: '28px',
             fontWeight: 800,
-            color: '#0F172A',
+            color: '#051F20',
             letterSpacing: '-0.02em',
             lineHeight: '34px',
             marginBottom: '8px',
@@ -101,7 +101,7 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             fontWeight: 600,
           }}
         >
-          Unrecognized route: <code style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px', color: '#0F172A' }}>{routeName || '#unknown'}</code>
+          Unrecognized route: <code style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px', color: '#051F20' }}>{routeName || '#unknown'}</code>
         </span>
 
         {/* Action Button */}
@@ -117,14 +117,14 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
             minHeight: '52px',
             padding: '0 24px',
             borderRadius: '999px',
-            backgroundColor: '#10B981',
+            backgroundColor: '#235347',
             color: '#FFFFFF',
             fontSize: '15px',
             lineHeight: '20px',
             fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
+            boxShadow: '0 4px 14px rgba(35, 83, 71, 0.25)',
             transition: 'all 150ms ease',
           }}
         >

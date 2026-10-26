@@ -85,8 +85,8 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'Field verifications, gate passes & QR scans',
     user: demoVolunteer,
     initials: 'LV',
-    badgeBg: '#E7F9F1',
-    badgeColor: '#064E3B',
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
     icon: <UserCheck size={20} strokeWidth={1.75} className="text-emerald-700" />,
   },
 ];

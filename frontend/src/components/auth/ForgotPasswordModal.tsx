@@ -46,9 +46,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              backgroundColor: '#E7F9F1',
-              border: '2px solid #A7F3D0',
-              color: '#065F46',
+              backgroundColor: '#DAF1DE',
+              border: '2px solid #8EB69B',
+              color: '#163832',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -58,11 +58,11 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <CheckCircle2 size={48} strokeWidth={1.75} />
           </div>
 
-          <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', marginBottom: '8px' }}>
+          <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#051F20', marginBottom: '8px' }}>
             Recovery Link Dispatched
           </h4>
           <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.5, marginBottom: '24px' }}>
-            We have transmitted an authorized password reset token to <strong style={{ color: '#0F172A' }}>{email}</strong>. Please inspect your college inbox.
+            We have transmitted an authorized password reset token to <strong style={{ color: '#051F20' }}>{email}</strong>. Please inspect your college inbox.
           </p>
 
           <button
@@ -72,7 +72,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               width: '100%',
               padding: '12px 20px',
               borderRadius: '999px',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               color: '#FFFFFF',
               fontWeight: 700,
               fontSize: '13px',
@@ -99,7 +99,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               gap: '10px',
             }}
           >
-            <KeyRound size={20} color="#0F766E" className="shrink-0" />
+            <KeyRound size={20} color="#235347" className="shrink-0" />
             <span>Enter your registered university domain address (e.g. <code>@college.edu</code>).</span>
           </div>
 
@@ -135,7 +135,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               width: '100%',
               padding: '12px 20px',
               borderRadius: '999px',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               color: '#FFFFFF',
               fontWeight: 700,
               fontSize: '13px',
@@ -146,7 +146,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               justifyContent: 'center',
               gap: '8px',
               marginTop: '8px',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.2)',
+              boxShadow: '0 4px 12px rgba(35, 83, 71, 0.2)',
             }}
           >
             <span>{isLoading ? 'Dispatching...' : 'Dispatch Reset Link'}</span>

@@ -45,21 +45,21 @@ export const TeamHomeView: React.FC = () => {
             value: teamTasks.length,
             label: 'Squad Tasks',
             subtext: `${completedTasks.length} Done`,
-            bgColor: '#ECFDF5',
+            bgColor: '#DAF1DE',
           },
           {
             icon: <Users2 size={16} />,
             value: teamMembers.length,
             label: 'Squad Scholars',
             subtext: 'Active',
-            bgColor: '#F0FDF4',
+            bgColor: '#DAF1DE',
           },
           {
             icon: <Award size={16} />,
             value: `${progressPercent}%`,
             label: 'Sprint Velocity',
             subtext: 'On Track',
-            bgColor: '#E6FBF2',
+            bgColor: '#DAF1DE',
           },
         ]}
         briefTitle={`${team.name} Squad Brief`}
@@ -111,9 +111,9 @@ export const TeamHomeView: React.FC = () => {
               style={{
                 fontSize: '12px',
                 fontWeight: 700,
-                color: '#10B981',
-                backgroundColor: '#ECFDF5',
-                border: '1px solid #A7F3D0',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
+                border: '1px solid #8EB69B',
                 padding: '4px 10px',
                 borderRadius: '999px',
               }}
@@ -146,7 +146,7 @@ export const TeamHomeView: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 600 }}>Active</span>
+                <span style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>Active</span>
               </div>
             ))}
           </div>

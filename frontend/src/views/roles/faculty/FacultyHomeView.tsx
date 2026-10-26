@@ -95,7 +95,7 @@ export const FacultyHomeView: React.FC<FacultyHomeViewProps> = ({
           { label: 'Promotion', count: 34, color: '#A855F7' },
           { label: 'Entertainment', count: 34, color: '#F59E0B' },
           { label: 'Management', count: 32, color: '#3B82F6' },
-          { label: 'Documentation', count: 28, color: '#10B981' },
+          { label: 'Documentation', count: 28, color: '#235347' },
         ]}
       />
 
@@ -288,11 +288,11 @@ export const FacultyHomeView: React.FC<FacultyHomeViewProps> = ({
           </span>
 
           {[
-            { label: 'Documentation', percent: 85, color: '#10B981' },
-            { label: 'Signage & Badges', percent: 100, color: '#10B981' },
+            { label: 'Documentation', percent: 85, color: '#235347' },
+            { label: 'Signage & Badges', percent: 100, color: '#235347' },
             { label: 'Shortlisting Attendees', percent: 70, color: '#3B82F6' },
             { label: 'Refreshments & Food', percent: 60, color: '#F59E0B' },
-            { label: 'Gate Attendance Terminals', percent: 100, color: '#10B981' },
+            { label: 'Gate Attendance Terminals', percent: 100, color: '#235347' },
           ].map((duty, idx) => (
             <div key={idx} className="flex flex-col gap-1">
               <div className="flex items-center justify-between text-xs font-semibold">
@@ -410,9 +410,9 @@ export const FacultyHomeView: React.FC<FacultyHomeViewProps> = ({
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-extrabold"
                     style={{
-                      backgroundColor: '#E7F9F1',
-                      border: '1px solid #A7F3D0',
-                      color: '#064E3B',
+                      backgroundColor: '#DAF1DE',
+                      border: '1px solid #8EB69B',
+                      color: '#0B2B26',
                     }}
                   >
                     {holder.name.slice(0, 2).toUpperCase()}

@@ -1,0 +1,188 @@
+/* ==========================================================================
+   GeoHub - Minimalist Animated Splash Screen
+   Exclusively presents:
+   1. GeoClub Official Emblem Logo with gentle floating & glow
+   2. "Green Eco Organization" Brand Title with entrance animation
+   ========================================================================== */
+
+.splash-screen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(120% 90% at 50% 42%, #DAF1DE 0%, #F4FAF5 45%, #FFFFFF 100%);
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+  transition: opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.48s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.48s ease;
+  will-change: opacity, transform;
+}
+
+.splash-screen-overlay.splash-closing {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Ambient Background Lights & Rings */
+.splash-ambient-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.splash-glow-disc {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(35, 83, 71, 0.25) 0%, rgba(142, 182, 155, 0.12) 50%, transparent 75%);
+  filter: blur(32px);
+  animation: splash-glow-breathe 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes splash-glow-breathe {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+  }
+}
+
+
+
+/* Center Stack: Logo & Brand Title */
+.splash-brand-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+/* Logo Image Container with Premium White Badge Background */
+.splash-logo-container {
+  width: 164px;
+  height: 124px;
+  background-color: #FFFFFF;
+  border-radius: 28px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 18px 38px -8px rgba(35, 83, 71, 0.24),
+              0 4px 14px rgba(5, 31, 32, 0.05),
+              0 0 0 1.5px rgba(142, 182, 155, 0.85);
+  animation: splash-logo-enter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+             splash-logo-float 3.4s ease-in-out infinite alternate 0.8s;
+}
+
+.splash-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes splash-logo-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.68) translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes splash-logo-float {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-8px);
+  }
+}
+
+/* "Green Eco Organization" Brand Title */
+.splash-brand-text {
+  margin: 24px 0 0 0;
+  font-family: var(--font-family, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
+  font-size: clamp(23px, 6vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  color: #0B2B26;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 1.3em;
+  white-space: pre-wrap;
+}
+
+.splash-text-content {
+  background: linear-gradient(135deg, #051F20 0%, #0B2B26 45%, #235347 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline;
+}
+
+/* Typing Caret */
+.splash-cursor {
+  display: inline-block;
+  width: 2.5px;
+  height: 0.85em;
+  background-color: #235347;
+  margin-left: 3px;
+  vertical-align: -0.05em;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(35, 83, 71, 0.6);
+  transition: opacity 0.4s ease;
+}
+
+.splash-cursor.cursor-typing {
+  opacity: 1;
+  animation: splash-cursor-blink 0.55s ease-in-out infinite;
+}
+
+.splash-cursor.cursor-finished {
+  animation: splash-cursor-blink 0.8s ease-in-out 3;
+  opacity: 0;
+}
+
+@keyframes splash-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen-overlay,
+  .splash-logo-container,
+  .splash-logo-img,
+  .splash-brand-text,
+  .splash-cursor {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

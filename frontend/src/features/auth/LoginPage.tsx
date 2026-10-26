@@ -39,19 +39,19 @@ export const LoginPage: React.FC = () => {
     <main className="mascot-login-screen">
       {/* 4 Floating Rounded Square Icon Cards in the upper corners */}
       <div className="floating-corner-card top-left-high" aria-hidden="true">
-        <Leaf size={19} color="#059669" strokeWidth={2.2} />
+        <Leaf size={19} color="#235347" strokeWidth={2.2} />
       </div>
 
       <div className="floating-corner-card top-left-low" aria-hidden="true">
-        <Calendar size={18} color="#059669" strokeWidth={2.2} />
+        <Calendar size={18} color="#235347" strokeWidth={2.2} />
       </div>
 
       <div className="floating-corner-card top-right-high" aria-hidden="true">
-        <CheckSquare size={19} color="#059669" strokeWidth={2.2} />
+        <CheckSquare size={19} color="#235347" strokeWidth={2.2} />
       </div>
 
       <div className="floating-corner-card top-right-low" aria-hidden="true">
-        <Sparkles size={18} color="#10B981" strokeWidth={2.2} />
+        <Sparkles size={18} color="#235347" strokeWidth={2.2} />
       </div>
 
       {/* Main Column */}

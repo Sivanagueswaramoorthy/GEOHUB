@@ -218,9 +218,9 @@ export const DocumentationOperationsView: React.FC = () => {
         <ShortcutTile
           label="Templates"
           icon={<FileText size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          iconColor="#065F46"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          iconColor="#163832"
           onClick={() => setIsTemplatesModalOpen(true)}
         />
 
@@ -257,9 +257,9 @@ export const DocumentationOperationsView: React.FC = () => {
         <ModuleTile
           title="Templates"
           icon={<FileText size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setIsTemplatesModalOpen(true)}
         />
 
@@ -368,9 +368,9 @@ export const DocumentationOperationsView: React.FC = () => {
         <ModuleTile
           title="Official Dossier"
           icon={<Download size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => {
             showToast('✓ Generating Official Chapter Dossier export...');
           }}

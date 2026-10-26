@@ -34,7 +34,7 @@ export const RoleSwitcherModal: React.FC = () => {
       name: 'Ananya Iyer',
       title: 'Treasurer Lead • Management Squad',
       dept: 'Economics & Financial Analytics (3rd Year)',
-      icon: <DollarSign size={20} color="#047857" />,
+      icon: <DollarSign size={20} color="#235347" />,
     },
     {
       role: 'documentation',
@@ -86,8 +86,8 @@ export const RoleSwitcherModal: React.FC = () => {
                 justifyContent: 'space-between',
                 padding: '14px',
                 borderRadius: '12px',
-                border: isSelected ? '2px solid #0F766E' : '1px solid #E8ECF2',
-                backgroundColor: isSelected ? '#F0FDFA' : '#FFFFFF',
+                border: isSelected ? '2px solid #235347' : '1px solid #E8ECF2',
+                backgroundColor: isSelected ? '#DAF1DE' : '#FFFFFF',
                 cursor: 'pointer',
                 transition: 'all 150ms ease',
               }}
@@ -96,12 +96,12 @@ export const RoleSwitcherModal: React.FC = () => {
                 <AppAvatar name={opt.name} size={48} strokeWidth={1.75} />
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#0F172A' }}>
+                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#051F20' }}>
                       {opt.name}
                     </span>
                     {opt.icon}
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#0F766E', marginTop: '1px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#163832', marginTop: '1px' }}>
                     {opt.title}
                   </div>
                   <div style={{ fontSize: '11px', color: '#64748B' }}>{opt.dept}</div>
@@ -114,7 +114,7 @@ export const RoleSwitcherModal: React.FC = () => {
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    backgroundColor: '#0F766E',
+                    backgroundColor: '#235347',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

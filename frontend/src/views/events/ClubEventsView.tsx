@@ -595,8 +595,8 @@ export const ClubEventsView: React.FC = () => {
               type="submit"
               className="w-full sm:flex-1 py-3 px-6 rounded-full font-bold text-xs text-white shadow-md hover:bg-emerald-600 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
               style={{
-                backgroundColor: '#10B981',
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+                backgroundColor: '#235347',
+                boxShadow: '0 4px 14px rgba(35, 83, 71, 0.35)',
               }}
             >
               <Plus size={16} strokeWidth={1.75} />
@@ -1652,8 +1652,8 @@ export const ClubEventsView: React.FC = () => {
             onClick={() => setIsCreateOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full font-button text-white min-h-[44px] shadow-sm transition-all hover:bg-emerald-600 active:scale-95 shrink-0 mt-1 cursor-pointer"
             style={{
-              backgroundColor: '#10B981',
-              boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)',
+              backgroundColor: '#235347',
+              boxShadow: '0 2px 10px rgba(35, 83, 71, 0.3)',
             }}
           >
             <Plus size={16} strokeWidth={1.75} />

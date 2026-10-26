@@ -292,8 +292,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   style={{
                     backgroundColor: filterAction.isActive
                       ? '#FFFFFF'
-                      : '#10B981',
-                    color: filterAction.isActive ? '#0F766E' : '#FFFFFF',
+                      : '#235347',
+                    color: filterAction.isActive ? '#163832' : '#FFFFFF',
                     fontSize: '10px',
                     fontWeight: 700,
                     padding: '1px 5px',

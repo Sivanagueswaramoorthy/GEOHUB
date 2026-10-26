@@ -91,9 +91,9 @@ export const TreasurerOperationsView: React.FC = () => {
         <ShortcutTile
           label="Add Expense"
           icon={<Receipt size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          iconColor="#065F46"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          iconColor="#163832"
           onClick={() => setActiveTab('treasurer')}
         />
 
@@ -132,9 +132,9 @@ export const TreasurerOperationsView: React.FC = () => {
         <ModuleTile
           title="Expenses & Claims"
           icon={<DollarSign size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setActiveTab('treasurer')}
         />
 
@@ -225,9 +225,9 @@ export const TreasurerOperationsView: React.FC = () => {
         <ModuleTile
           title="Official Dossier"
           icon={<Download size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setIsAuditReportExportOpen(true)}
         />
       </CategoryCard>
@@ -563,7 +563,7 @@ export const TreasurerOperationsView: React.FC = () => {
                         <title>GeoHub Official Fiscal Audit Statement 2026-2027</title>
                         <style>
                           body { font-family: sans-serif; padding: 40px; color: #0F172A; }
-                          h1 { color: #065F46; font-size: 20px; border-bottom: 2px solid #065F46; padding-bottom: 8px; }
+                          h1 { color: #163832; font-size: 20px; border-bottom: 2px solid #235347; padding-bottom: 8px; }
                           table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
                           th, td { border: 1px solid #CBD5E1; padding: 8px 12px; text-align: left; }
                           th { background-color: #F8FAFC; color: #1E293B; font-weight: bold; }

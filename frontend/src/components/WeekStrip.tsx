@@ -38,12 +38,12 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
             onClick={() => onSelectDate(item.dateStr)}
             className="flex-1 flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl transition-all duration-200 cursor-pointer min-w-[42px]"
             style={{
-              backgroundColor: isSelected ? '#10B981' : '#FFFFFF',
-              border: isSelected ? '1px solid #10B981' : '1px solid #EEF1F5',
+              backgroundColor: isSelected ? '#235347' : '#FFFFFF',
+              border: isSelected ? '1px solid #235347' : '1px solid #EEF1F5',
               boxShadow: isSelected
-                ? '0 6px 16px rgba(16, 185, 129, 0.35)'
+                ? '0 6px 16px rgba(35, 83, 71, 0.35)'
                 : '0 2px 6px rgba(15, 23, 42, 0.02)',
-              color: isSelected ? '#FFFFFF' : '#0F172A',
+              color: isSelected ? '#FFFFFF' : '#051F20',
             }}
           >
             {/* Day name (Mon, Tue) */}
@@ -64,7 +64,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                 fontSize: '15px',
                 fontWeight: 800,
                 lineHeight: 1.2,
-                color: isSelected ? '#FFFFFF' : '#0F172A',
+                color: isSelected ? '#FFFFFF' : '#051F20',
               }}
             >
               {item.dayNum}
@@ -78,7 +78,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                     width: '4px',
                     height: '4px',
                     borderRadius: '50%',
-                    backgroundColor: isSelected ? '#FFFFFF' : '#10B981',
+                    backgroundColor: isSelected ? '#FFFFFF' : '#235347',
                   }}
                 />
               )}

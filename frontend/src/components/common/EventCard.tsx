@@ -33,8 +33,8 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 10px 24px -4px rgba(16, 185, 129, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04)';
-        e.currentTarget.style.borderColor = '#A7F3D0';
+        e.currentTarget.style.boxShadow = '0 10px 24px -4px rgba(35, 83, 71, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04)';
+        e.currentTarget.style.borderColor = '#8EB69B';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
@@ -98,7 +98,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
             style={{
               fontSize: '11px',
               fontWeight: 800,
-              color: '#059669',
+              color: '#235347',
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
             }}
@@ -109,7 +109,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
             style={{
               fontSize: '16px',
               fontWeight: 800,
-              color: '#0F172A',
+              color: '#051F20',
               lineHeight: 1.1,
             }}
           >
@@ -163,13 +163,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '4px',
-                backgroundColor: '#10B981',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 fontSize: '11px',
                 fontWeight: 800,
                 padding: '3px 9px',
                 borderRadius: '999px',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)',
+                boxShadow: '0 2px 8px rgba(35, 83, 71, 0.35)',
               }}
             >
               <Check size={16} strokeWidth={3} />
@@ -188,7 +188,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           style={{
             fontSize: '16px',
             fontWeight: 800,
-            color: '#0F172A',
+            color: '#051F20',
             lineHeight: 1.3,
             margin: '0 0 6px 0',
             letterSpacing: '-0.01em',
@@ -229,13 +229,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <Clock size={16} strokeWidth={1.75} color="#10B981" />
+            <Clock size={16} strokeWidth={1.75} color="#235347" />
             <span style={{ fontWeight: 600, color: '#1E293B' }}>
               {startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • {timeStr}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <MapPin size={16} strokeWidth={1.75} color="#10B981" />
+            <MapPin size={16} strokeWidth={1.75} color="#235347" />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {event.venue}
             </span>
@@ -254,7 +254,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
         >
           <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
             {event.googleFormUrl ? (
-              <span style={{ color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ color: '#235347', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <ExternalLink size={16} strokeWidth={1.75} /> Google Form Sign-up
               </span>
             ) : (
@@ -269,7 +269,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
               gap: '4px',
               fontSize: '12px',
               fontWeight: 700,
-              color: '#10B981',
+              color: '#235347',
             }}
           >
             View Details

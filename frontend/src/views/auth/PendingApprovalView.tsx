@@ -186,7 +186,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
               minHeight: '52px',
               padding: '0 24px',
               borderRadius: '999px',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               color: '#FFFFFF',
               fontSize: '15px',
               lineHeight: '20px',
@@ -197,7 +197,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
+              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.25)',
               transition: 'all 150ms ease',
             }}
           >

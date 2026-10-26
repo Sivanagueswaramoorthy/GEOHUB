@@ -765,7 +765,7 @@ export const HomeView: React.FC = () => {
                             </style>
                           </head>
                           <body>
-                            <h2 style="color: #047857; margin-bottom: 20px;">COLLEGE GEO CLUB - OFFICIAL DOCUMENT</h2>
+                            <h2 style="color: #163832; margin-bottom: 20px;">COLLEGE GEO CLUB - OFFICIAL DOCUMENT</h2>
                             <pre>${previewTemplate.content}</pre>
                             <script>window.onload = function() { window.print(); }</script>
                           </body>

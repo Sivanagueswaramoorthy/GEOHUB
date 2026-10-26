@@ -116,9 +116,9 @@ export const StudentOperationsView: React.FC = () => {
         <ShortcutTile
           label="Community"
           icon={<MessageSquare size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          iconColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          iconColor="#163832"
           onClick={() => setActiveTab('forum')}
         />
       </div>
@@ -204,9 +204,9 @@ export const StudentOperationsView: React.FC = () => {
         <ModuleTile
           title="Event Feedback"
           icon={<Sparkles size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setIsStudentFeedbackOpen(true)}
         />
       </CategoryCard>

@@ -111,7 +111,7 @@ export const AiSocialStudioView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -124,11 +124,11 @@ export const AiSocialStudioView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 letterSpacing: '0.04em',
               }}
             >
@@ -193,9 +193,9 @@ export const AiSocialStudioView: React.FC = () => {
                     borderRadius: '999px',
                     fontSize: '12px',
                     fontWeight: 700,
-                    border: platform === p.key ? '2px solid #10B981' : '1px solid #E2E8F0',
-                    backgroundColor: platform === p.key ? '#ECFDF5' : '#FFFFFF',
-                    color: platform === p.key ? '#047857' : '#475569',
+                    border: platform === p.key ? '2px solid #235347' : '1px solid #E2E8F0',
+                    backgroundColor: platform === p.key ? '#DAF1DE' : '#FFFFFF',
+                    color: platform === p.key ? '#163832' : '#475569',
                     cursor: 'pointer',
                   }}
                 >
@@ -226,7 +226,7 @@ export const AiSocialStudioView: React.FC = () => {
           style={{
             padding: '12px 24px',
             borderRadius: '999px',
-            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
             color: '#FFFFFF',
             border: 'none',
             fontSize: '14px',
@@ -236,7 +236,7 @@ export const AiSocialStudioView: React.FC = () => {
             justifyContent: 'center',
             gap: '8px',
             cursor: isGenerating ? 'wait' : 'pointer',
-            boxShadow: '0 4px 16px rgba(16, 185, 129, 0.3)',
+            boxShadow: '0 4px 16px rgba(35, 83, 71, 0.3)',
           }}
         >
           <Wand2 size={16} />
@@ -250,9 +250,9 @@ export const AiSocialStudioView: React.FC = () => {
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '20px',
-            border: '2px solid #10B981',
+            border: '2px solid #8EB69B',
             padding: '20px',
-            boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
+            boxShadow: '0 8px 24px rgba(35, 83, 71, 0.12)',
             display: 'flex',
             flexDirection: 'column',
             gap: '14px',
@@ -263,11 +263,11 @@ export const AiSocialStudioView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '3px 10px',
                 borderRadius: '8px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 textTransform: 'uppercase',
               }}
             >
@@ -282,7 +282,7 @@ export const AiSocialStudioView: React.FC = () => {
                 gap: '6px',
                 padding: '6px 14px',
                 borderRadius: '999px',
-                backgroundColor: '#10B981',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '12px',
@@ -313,8 +313,8 @@ export const AiSocialStudioView: React.FC = () => {
                   style={{
                     fontSize: '11px',
                     fontWeight: 700,
-                    color: '#047857',
-                    backgroundColor: '#ECFDF5',
+                    color: '#163832',
+                    backgroundColor: '#DAF1DE',
                     padding: '2px 8px',
                     borderRadius: '6px',
                   }}
@@ -326,7 +326,7 @@ export const AiSocialStudioView: React.FC = () => {
           )}
 
           {/* CTA */}
-          <div style={{ fontSize: '12px', fontWeight: 700, color: '#059669', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: '#235347', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
             {generatedOutput.callToAction}
           </div>
         </div>

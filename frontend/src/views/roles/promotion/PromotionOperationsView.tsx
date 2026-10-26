@@ -243,9 +243,9 @@ export const PromotionOperationsView: React.FC = () => {
         <ShortcutTile
           label="Campaign Report"
           icon={<BarChart3 size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          iconColor="#065F46"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          iconColor="#163832"
           onClick={() => setIsCampaignReachExportOpen(true)}
         />
       </div>
@@ -324,9 +324,9 @@ export const PromotionOperationsView: React.FC = () => {
         <ModuleTile
           title="My Pass"
           icon={<QrCode size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setActiveTab('my_qr')}
         />
       </CategoryCard>
@@ -357,9 +357,9 @@ export const PromotionOperationsView: React.FC = () => {
         <ModuleTile
           title="Campaign Reach export"
           icon={<Download size={20} />}
-          iconBg="#E7F9F1"
-          iconBorder="#A7F3D0"
-          accentColor="#059669"
+          iconBg="#DAF1DE"
+          iconBorder="#8EB69B"
+          accentColor="#235347"
           onClick={() => setIsCampaignReachExportOpen(true)}
         />
       </CategoryCard>

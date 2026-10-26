@@ -159,7 +159,7 @@ export const ReportsView: React.FC = () => {
         reportTitle = 'VERIFIED CHAPTER ATTENDANCE AUDIT';
         reportBody = `<p><strong>Total Verified Turnstile Scans:</strong> ${attendance.length}</p>
 <table border="1" cellpadding="6" style="border-collapse:collapse; width:100%;">
-<tr bgcolor="#E7F9F1"><th>Student Name</th><th>Email</th><th>Squad</th><th>Check-in Timestamp</th></tr>
+<tr bgcolor="#DAF1DE"><th>Student Name</th><th>Email</th><th>Squad</th><th>Check-in Timestamp</th></tr>
 ${attendance
   .map(
     (a) => `<tr><td>${a.userName}</td><td>${a.userEmail}</td><td>${a.team || 'General'}</td><td>${a.checkInTime}</td></tr>`
@@ -222,8 +222,8 @@ ${events
     const fullHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head><meta charset='utf-8'><title>${reportTitle}</title></head>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
-<div style="border-bottom: 2px solid #0F766E; padding-bottom: 8px; margin-bottom: 16px;">
-  <h1 style="color: #0F766E; margin: 0;">GEOHUB CHAPTER REPORT</h1>
+<div style="border-bottom: 2px solid #235347; padding-bottom: 8px; margin-bottom: 16px;">
+  <h1 style="color: #0B2B26; margin: 0;">GEOHUB CHAPTER REPORT</h1>
   <h2 style="color: #334155; margin: 4px 0 0 0;">${reportTitle}</h2>
   <p style="font-size: 11px; color: #64748B;">Generated: ${new Date().toLocaleString()} | Executive Sanction: Dr. Sarah Jenkins (Faculty Advisor)</p>
 </div>
@@ -282,7 +282,10 @@ ${reportBody}
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0 mt-1">
-            <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span
+              className="text-[11px] font-extrabold px-2 py-0.5 rounded-full"
+              style={{ backgroundColor: '#DAF1DE', color: '#163832', border: '1px solid #8EB69B' }}
+            >
               AY 2026-2027
             </span>
           </div>
@@ -339,7 +342,8 @@ ${reportBody}
           <button
             type="button"
             onClick={handleExportExcel}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer hover:opacity-90"
+            style={{ backgroundColor: '#DAF1DE', color: '#163832', border: '1px solid #8EB69B' }}
             title="Export as Excel / CSV"
           >
             <FileSpreadsheet size={16} strokeWidth={1.75} />
@@ -352,7 +356,7 @@ ${reportBody}
       <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col gap-3.5">
         <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
           <div className="flex items-center gap-2">
-            <BarChart3 size={20} strokeWidth={1.75} className="text-emerald-600" />
+            <BarChart3 size={20} strokeWidth={1.75} color="#235347" />
             <span className="font-extrabold text-sm text-slate-900 capitalize">
               {activeCategory.replace('_', ' ')} Executive Audit Preview
             </span>
@@ -370,9 +374,12 @@ ${reportBody}
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Total Activities</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">{events.length} Events</div>
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[11px] font-bold text-emerald-700 uppercase">Turnout Rate</span>
-                <div className="font-extrabold text-base text-emerald-950 mt-0.5">92.5% Average</div>
+              <div
+                className="p-2.5 rounded-xl"
+                style={{ backgroundColor: '#DAF1DE', border: '1px solid #8EB69B' }}
+              >
+                <span className="text-[11px] font-bold uppercase" style={{ color: '#163832' }}>Turnout Rate</span>
+                <div className="font-extrabold text-base mt-0.5" style={{ color: '#0B2B26' }}>92.5% Average</div>
               </div>
             </div>
 
@@ -383,7 +390,10 @@ ${reportBody}
                     <div className="font-bold text-xs text-slate-900">{ev.title}</div>
                     <div className="text-[11px] text-slate-500 mt-0.5">{ev.venue} • {ev.registeredUserIds.length} Registered</div>
                   </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 uppercase">
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-full uppercase"
+                    style={{ backgroundColor: '#DAF1DE', color: '#163832', border: '1px solid #8EB69B' }}
+                  >
                     {ev.status}
                   </span>
                 </div>
@@ -396,9 +406,12 @@ ${reportBody}
         {activeCategory === 'attendance' && (
           <div className="flex flex-col gap-2.5">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[11px] font-bold text-emerald-700 uppercase">Total Check-Ins</span>
-                <div className="font-extrabold text-base text-emerald-950 mt-0.5">{attendance.length} Scans</div>
+              <div
+                className="p-2.5 rounded-xl"
+                style={{ backgroundColor: '#DAF1DE', border: '1px solid #8EB69B' }}
+              >
+                <span className="text-[11px] font-bold uppercase" style={{ color: '#163832' }}>Total Check-Ins</span>
+                <div className="font-extrabold text-base mt-0.5" style={{ color: '#0B2B26' }}>{attendance.length} Scans</div>
               </div>
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Flagged / Duplicates</span>
@@ -413,7 +426,7 @@ ${reportBody}
                     <span className="font-bold text-slate-900">{att.userName}</span>
                     <span className="text-slate-400 text-[11px] ml-1.5">{att.team || 'Member'}</span>
                   </div>
-                  <span className="text-emerald-700 font-bold text-[11px]">Verified ✓</span>
+                  <span style={{ color: '#235347' }} className="font-bold text-[11px]">Verified ✓</span>
                 </div>
               ))}
             </div>
@@ -469,7 +482,10 @@ ${reportBody}
                     <div className="font-bold text-slate-900">{u.name}</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">{u.post || u.teamRole || 'Scholar'} • {u.team || 'Management'}</div>
                   </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: '#DAF1DE', color: '#163832', border: '1px solid #8EB69B' }}
+                  >
                     Active
                   </span>
                 </div>
@@ -509,9 +525,12 @@ ${reportBody}
                 <span className="text-[11px] font-bold text-slate-400 uppercase">Recorded Meetings</span>
                 <div className="font-extrabold text-base text-slate-900 mt-0.5">{meetings.length} Sessions</div>
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-                <span className="text-[11px] font-bold text-emerald-700 uppercase">Action Items Cleared</span>
-                <div className="font-extrabold text-base text-emerald-950 mt-0.5">100% Resolved</div>
+              <div
+                className="p-2.5 rounded-xl"
+                style={{ backgroundColor: '#DAF1DE', border: '1px solid #8EB69B' }}
+              >
+                <span className="text-[11px] font-bold uppercase" style={{ color: '#163832' }}>Action Items Cleared</span>
+                <div className="font-extrabold text-base mt-0.5" style={{ color: '#0B2B26' }}>100% Resolved</div>
               </div>
             </div>
 
@@ -522,7 +541,10 @@ ${reportBody}
                     <div className="font-bold text-slate-900">{m.title}</div>
                     <div className="text-[11px] text-slate-400 mt-0.5">{new Date(m.dateTime).toLocaleDateString()} • {m.venue}</div>
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                  <span
+                    className="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                    style={{ backgroundColor: '#DAF1DE', color: '#163832', border: '1px solid #8EB69B' }}
+                  >
                     MoM Filed ✓
                   </span>
                 </div>

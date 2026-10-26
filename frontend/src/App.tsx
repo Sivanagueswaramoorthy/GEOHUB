@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { FloatingNav } from './components/FloatingNav';
 import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
+import { SplashScreen } from './components/SplashScreen';
 
 // Five Primary Screens
 import { HomeView } from './views/home/HomeView';
@@ -36,6 +37,7 @@ import { CampaignsView } from './views/campaigns/CampaignsView';
 import { NotificationsView } from './views/notifications/NotificationsView';
 import { PendingApprovalView } from './views/auth/PendingApprovalView';
 import { NotFoundView } from './views/auth/NotFoundView';
+import { AuditDetailPage } from './features/audits/AuditDetailPage';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -102,8 +104,8 @@ const MainAppContent: React.FC = () => {
     ...(navTabs.some((t) => t.key === 'memories') ? ['memories'] : []),
   ];
 
-  // Sub-routes that have a parent back destination
-  const isSubRoute = !primaryTabKeys.includes(activeTab);
+  // Sub-routes that have a parent back destination (excluding dedicated audit page which has its own sticky breadcrumb header)
+  const isSubRoute = !primaryTabKeys.includes(activeTab) && !activeTab.startsWith('audits');
 
   const getSubRouteTitle = () => {
     switch (activeTab) {
@@ -213,6 +215,10 @@ const MainAppContent: React.FC = () => {
         return <NotificationsView />;
 
       default:
+        if (activeTab.startsWith('audits/') || activeTab === 'audits') {
+          const auditId = activeTab.replace(/^audits\/?/, '') || 'daily-news-bulletin';
+          return <AuditDetailPage auditId={auditId} />;
+        }
         return <NotFoundView attemptedRoute={activeTab} onGoHome={() => setActiveTab('home')} />;
     }
   };
@@ -228,12 +234,12 @@ const MainAppContent: React.FC = () => {
         />
       )}
 
-      {/* Shell column: responsive fullscreen (1280px) or mobile frame (480px) */}
+      {/* Shell column: responsive fullscreen or mobile frame */}
       <div
-        className={`mobile-shell-column ${isPhoneFrame ? 'phone-frame-mode' : 'fullscreen-mode'}`}
+        className={`mobile-shell-column ${isPhoneFrame && !activeTab.startsWith('audits') ? 'phone-frame-mode' : 'fullscreen-mode'}`}
         style={{
           width: '100%',
-          maxWidth: isPhoneFrame ? '480px' : '1280px',
+          maxWidth: isPhoneFrame && !activeTab.startsWith('audits') ? '480px' : '100%',
           transition: 'max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
@@ -257,12 +263,12 @@ const MainAppContent: React.FC = () => {
         )}
 
         {/* Main Content Area */}
-        <main className="mobile-app-content">
+        <main className={`mobile-app-content ${activeTab.startsWith('audits') ? 'audit-content-override' : ''}`}>
           {renderActiveScreen()}
         </main>
 
-        {/* Floating Pill Bottom Nav (5 role-based tabs) */}
-        <FloatingNav />
+        {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views) */}
+        {!activeTab.startsWith('audits') && <FloatingNav />}
 
         {/* Role Switcher Modal */}
         <RoleSwitcherModal />
@@ -272,8 +278,16 @@ const MainAppContent: React.FC = () => {
 };
 
 export function App() {
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  // Allow re-triggering splash from console/testing if needed
+  React.useEffect(() => {
+    (window as any).triggerSplash = () => setShowSplash(true);
+  }, []);
+
   return (
     <AppProvider>
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       <MainAppContent />
     </AppProvider>
   );

@@ -29,15 +29,15 @@ export const Button: React.FC<ButtonProps> = ({
   let lineHeight = '20px';
   let fontWeight = 700;
   let padding = '0 24px';
-  let bg = '#10B981';
+  let bg = '#235347';
   let color = '#FFFFFF';
   let border = 'none';
-  let boxShadow = '0 4px 14px rgba(16, 185, 129, 0.2)';
+  let boxShadow = '0 4px 14px rgba(35, 83, 71, 0.2)';
 
   if (variant === 'secondary') {
     height = '48px';
     bg = '#FFFFFF';
-    color = '#0F172A';
+    color = '#051F20';
     border = '1px solid #E2E8F0';
     boxShadow = '0 2px 8px rgba(15, 23, 42, 0.04)';
     padding = '0 20px';
@@ -46,9 +46,9 @@ export const Button: React.FC<ButtonProps> = ({
     fontSize = '12px';
     lineHeight = '16px';
     fontWeight = 600;
-    bg = '#E7F9F1';
-    color = '#065F46';
-    border = '1px solid #A7F3D0';
+    bg = '#DAF1DE';
+    color = '#163832';
+    border = '1px solid #8EB69B';
     boxShadow = 'none';
     padding = '0 16px';
   } else if (variant === 'danger') {
@@ -61,8 +61,8 @@ export const Button: React.FC<ButtonProps> = ({
   } else if (variant === 'outline') {
     height = '48px';
     bg = '#FFFFFF';
-    color = '#10B981';
-    border = '1px solid #10B981';
+    color = '#235347';
+    border = '1px solid #235347';
     boxShadow = 'none';
     padding = '0 20px';
   } else if (variant === 'ghost') {

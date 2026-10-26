@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:apk": "npm run build && powershell -NoProfile -Command \"Copy-Item -Path 'dist\\*' -Destination '..\\android\\app\\src\\main\\assets\\' -Recurse -Force; Push-Location ..\\android; $env:JAVA_HOME = 'C:\\Program Files\\Android\\Android Studio\\jbr'; $env:PATH = \\\"$env:JAVA_HOME\\bin;$env:PATH\\\"; .\\gradlew.bat assembleRelease assembleDebug; Pop-Location; Copy-Item '..\\android\\app\\build\\outputs\\apk\\release\\app-release.apk' '..\\geohub-app.apk' -Force; Copy-Item '..\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk' '..\\geohub-app-debug.apk' -Force; Write-Host 'APK generated at ../geohub-app.apk' -ForegroundColor Green\"",
     "lint": "oxlint",
     "test": "vitest run",
     "audit:layout": "npx tsx e2e/layout-audit/run-audit.ts",

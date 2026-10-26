@@ -20,9 +20,9 @@ export const Overline: React.FC<OverlineProps> = ({
       <span
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full whitespace-nowrap ${className}`}
         style={{
-          backgroundColor: '#E7F9F1',
-          border: '1px solid #A7F3D0',
-          color: '#065F46',
+          backgroundColor: '#DAF1DE',
+          border: '1px solid #8EB69B',
+          color: '#163832',
           fontSize: '11px',
           fontWeight: 700,
           textTransform: 'uppercase',
@@ -38,7 +38,7 @@ export const Overline: React.FC<OverlineProps> = ({
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               display: 'inline-block',
               flexShrink: 0,
             }}
@@ -53,7 +53,7 @@ export const Overline: React.FC<OverlineProps> = ({
     <div
       className={`inline-flex items-center gap-1.5 whitespace-nowrap ${className}`}
       style={{
-        color: '#10B981',
+        color: '#235347',
         fontSize: '11px',
         fontWeight: 700,
         textTransform: 'uppercase',
@@ -69,7 +69,7 @@ export const Overline: React.FC<OverlineProps> = ({
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            backgroundColor: '#10B981',
+            backgroundColor: '#235347',
             display: 'inline-block',
             flexShrink: 0,
           }}

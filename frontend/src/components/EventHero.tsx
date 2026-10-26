@@ -55,7 +55,7 @@ export const EventHero: React.FC<EventHeroProps> = ({
           <span
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-xs uppercase tracking-wider"
             style={{
-              backgroundColor: isLive ? '#EF4444' : '#10B981',
+              backgroundColor: isLive ? '#EF4444' : '#235347',
               color: '#FFFFFF',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
             }}
@@ -83,7 +83,7 @@ export const EventHero: React.FC<EventHeroProps> = ({
           {/* Mint overline */}
           <div
             className="font-bold text-xs uppercase tracking-wider mb-1"
-            style={{ color: '#A7F3D0' }}
+            style={{ color: '#8EB69B' }}
           >
             {event.category || 'Expedition'}
           </div>

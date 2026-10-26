@@ -30,18 +30,18 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   const isSmall = size === 'sm';
   const isLarge = size === 'lg';
 
-  let bg = '#E7F9F1';
-  let border = '#A7F3D0';
-  let text = '#065F46';
+  let bg = '#DAF1DE';
+  let border = '#8EB69B';
+  let text = '#163832';
 
   if (isSuperAdmin) {
     bg = '#FFF8E6';
     border = '#FDE68A';
     text = '#92400E';
   } else if (role === 'admin' || role === 'coordinator') {
-    bg = '#E7F9F1';
-    border = '#A7F3D0';
-    text = '#065F46';
+    bg = '#DAF1DE';
+    border = '#8EB69B';
+    text = '#163832';
   } else if (role === 'treasurer') {
     bg = '#FFF8E6';
     border = '#FDE68A';

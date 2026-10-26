@@ -974,7 +974,7 @@ export const MembersDirectoryView: React.FC = () => {
                     value={`GEOHUB:NEW:${previewEmail}`}
                     size={48}
                     bgColor="#FFFFFF"
-                    fgColor="#064E3B"
+                    fgColor="#0B2B26"
                   />
                 </div>
               </div>

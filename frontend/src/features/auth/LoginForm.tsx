@@ -157,9 +157,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               borderRadius: '9999px',
               fontSize: '11px',
               fontWeight: 600,
-              backgroundColor: '#ECFDF5',
-              color: '#065F46',
-              border: '1px solid #A7F3D0',
+              backgroundColor: '#DAF1DE',
+              color: '#163832',
+              border: '1px solid #8EB69B',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -229,7 +229,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
             disabled={isLoading || isSuccess}
-            style={{ width: '16px', height: '16px', accentColor: '#059669', cursor: 'pointer' }}
+            style={{ width: '16px', height: '16px', accentColor: '#235347', cursor: 'pointer' }}
           />
           <span>Remember my Reg No</span>
         </label>
@@ -238,7 +238,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           type="button"
           onClick={onForgotPasswordClick}
           disabled={isLoading || isSuccess}
-          style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: 700, color: '#047857', cursor: 'pointer', textDecoration: 'underline' }}
+          style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: 700, color: '#235347', cursor: 'pointer', textDecoration: 'underline' }}
         >
           Forgot password?
         </button>

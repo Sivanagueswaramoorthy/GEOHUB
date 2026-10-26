@@ -230,7 +230,7 @@ export const PromotionHomeView: React.FC<{ showToast: (msg: string) => void }> =
                     <path
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       fill="none"
-                      stroke={completedTasks === 5 ? '#059669' : '#7C3AED'}
+                      stroke={completedTasks === 5 ? '#235347' : '#7C3AED'}
                       strokeWidth="3.5"
                       strokeDasharray={`${pct}, 100`}
                       strokeLinecap="round"

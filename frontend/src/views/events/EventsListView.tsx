@@ -239,7 +239,7 @@ export const EventsListView: React.FC = () => {
               gap: '8px',
             }}
           >
-            <CheckCircle2 size={16} color="#10B981" />
+            <CheckCircle2 size={16} color="#235347" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -253,12 +253,12 @@ export const EventsListView: React.FC = () => {
             gap: '8px',
             fontSize: '13px',
             fontWeight: 700,
-            color: '#047857',
-            backgroundColor: '#ECFDF5',
+            color: '#163832',
+            backgroundColor: '#DAF1DE',
             padding: '6px 14px',
             borderRadius: '999px',
             width: 'fit-content',
-            border: '1px solid #A7F3D0',
+            border: '1px solid #8EB69B',
             cursor: 'pointer',
           }}
         >
@@ -313,11 +313,11 @@ export const EventsListView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: selectedEvent.eventType === 'external' ? '#7C3AED' : '#047857',
-                backgroundColor: selectedEvent.eventType === 'external' ? '#F5F3FF' : '#ECFDF5',
+                color: selectedEvent.eventType === 'external' ? '#7C3AED' : '#163832',
+                backgroundColor: selectedEvent.eventType === 'external' ? '#F5F3FF' : '#DAF1DE',
                 padding: '4px 10px',
                 borderRadius: '8px',
-                border: `1px solid ${selectedEvent.eventType === 'external' ? '#DDD6FE' : '#A7F3D0'}`,
+                border: `1px solid ${selectedEvent.eventType === 'external' ? '#DDD6FE' : '#8EB69B'}`,
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
@@ -402,9 +402,9 @@ export const EventsListView: React.FC = () => {
         {selectedEvent.status === 'completed' && selectedEvent.completedData && (
           <div
             style={{
-              backgroundColor: '#F0FDF4',
+              backgroundColor: '#DAF1DE',
               borderRadius: '20px',
-              border: '2px solid #34D399',
+              border: '2px solid #8EB69B',
               padding: '18px 20px',
               display: 'flex',
               flexDirection: 'column',
@@ -413,18 +413,18 @@ export const EventsListView: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={20} color="#059669" />
-                <span style={{ fontSize: '16px', fontWeight: 800, color: '#065F46' }}>
+                <CheckCircle2 size={20} color="#235347" />
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#0B2B26' }}>
                   Post-Event Deliverables & News Summary
                 </span>
               </div>
-              <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#D1FAE5', color: '#047857', padding: '3px 8px', borderRadius: '6px' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, backgroundColor: '#DAF1DE', color: '#163832', padding: '3px 8px', borderRadius: '6px' }}>
                 Event Completed
               </span>
             </div>
 
             {/* Feedback Rating */}
-            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '12px', border: '1px solid #A7F3D0' }}>
+            <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', padding: '12px', border: '1px solid #8EB69B' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                 <Star size={16} color="#EAB308" fill="#EAB308" />
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>Feedback & Ratings</span>
@@ -456,9 +456,9 @@ export const EventsListView: React.FC = () => {
               style={{
                 padding: '8px 14px',
                 borderRadius: '10px',
-                backgroundColor: '#ECFDF5',
-                border: '1px solid #A7F3D0',
-                color: '#047857',
+                backgroundColor: '#DAF1DE',
+                border: '1px solid #8EB69B',
+                color: '#163832',
                 fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
@@ -511,11 +511,11 @@ export const EventsListView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#059669',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '6px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
               }}
             >
               4 STREAMS
@@ -541,7 +541,7 @@ export const EventsListView: React.FC = () => {
                   <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
                     1. Documentation Wing
                   </span>
-                  <FileText size={16} strokeWidth={1.75} color="#059669" />
+                  <FileText size={16} strokeWidth={1.75} color="#235347" />
                 </div>
                 <div style={{ fontSize: '12px', color: '#64748B' }}>
                   Assigned: <strong>{selectedEvent.volunteerAssignments?.documentation?.join(', ') || 'Priya Sharma'}</strong>
@@ -554,7 +554,7 @@ export const EventsListView: React.FC = () => {
                   gap: '8px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: selectedEvent.workDoneStatus?.documentationDone ? '#059669' : '#475569',
+                  color: selectedEvent.workDoneStatus?.documentationDone ? '#163832' : '#475569',
                   cursor: 'pointer',
                 }}
               >
@@ -574,7 +574,7 @@ export const EventsListView: React.FC = () => {
                       documentationDone: e.target.checked,
                     });
                   }}
-                  style={{ width: '16px', height: '16px', accentColor: '#10B981', cursor: 'pointer' }}
+                  style={{ width: '16px', height: '16px', accentColor: '#235347', cursor: 'pointer' }}
                 />
                 <span>Work Done Verified</span>
               </label>
@@ -611,7 +611,7 @@ export const EventsListView: React.FC = () => {
                   gap: '8px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: selectedEvent.workDoneStatus?.signageDone ? '#059669' : '#475569',
+                  color: selectedEvent.workDoneStatus?.signageDone ? '#163832' : '#475569',
                   cursor: 'pointer',
                 }}
               >
@@ -631,7 +631,7 @@ export const EventsListView: React.FC = () => {
                       signageDone: e.target.checked,
                     });
                   }}
-                  style={{ width: '16px', height: '16px', accentColor: '#10B981', cursor: 'pointer' }}
+                  style={{ width: '16px', height: '16px', accentColor: '#235347', cursor: 'pointer' }}
                 />
                 <span>Work Done Verified</span>
               </label>
@@ -668,7 +668,7 @@ export const EventsListView: React.FC = () => {
                   gap: '8px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: selectedEvent.workDoneStatus?.shortlistingDone ? '#059669' : '#475569',
+                  color: selectedEvent.workDoneStatus?.shortlistingDone ? '#163832' : '#475569',
                   cursor: 'pointer',
                 }}
               >
@@ -688,7 +688,7 @@ export const EventsListView: React.FC = () => {
                       shortlistingDone: e.target.checked,
                     });
                   }}
-                  style={{ width: '16px', height: '16px', accentColor: '#10B981', cursor: 'pointer' }}
+                  style={{ width: '16px', height: '16px', accentColor: '#235347', cursor: 'pointer' }}
                 />
                 <span>Work Done Verified</span>
               </label>
@@ -725,7 +725,7 @@ export const EventsListView: React.FC = () => {
                   gap: '8px',
                   fontSize: '12px',
                   fontWeight: 700,
-                  color: selectedEvent.workDoneStatus?.foodArranged ? '#059669' : '#475569',
+                  color: selectedEvent.workDoneStatus?.foodArranged ? '#163832' : '#475569',
                   cursor: 'pointer',
                 }}
               >
@@ -745,7 +745,7 @@ export const EventsListView: React.FC = () => {
                       foodArranged: e.target.checked,
                     });
                   }}
-                  style={{ width: '16px', height: '16px', accentColor: '#10B981', cursor: 'pointer' }}
+                  style={{ width: '16px', height: '16px', accentColor: '#235347', cursor: 'pointer' }}
                 />
                 <span>Work Done Verified</span>
               </label>
@@ -771,7 +771,7 @@ export const EventsListView: React.FC = () => {
               style={{
                 fontSize: '12px',
                 fontWeight: 700,
-                color: '#059669',
+                color: '#235347',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
@@ -799,7 +799,7 @@ export const EventsListView: React.FC = () => {
               <p style={{ fontSize: '12px', color: '#64748B', margin: '4px 0 8px 0', lineHeight: 1.4 }}>
                 {selectedEvent.preEventMoM?.notes || (preMeeting ? preMeeting.momNotes : 'Pre-event sync conducted to assign all 4 volunteer streams and finalize lab logistics.')}
               </p>
-              <div style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+              <div style={{ fontSize: '11px', color: '#163832', fontWeight: 600 }}>
                 Date: {selectedEvent.preEventMoM?.meetingDate || 'Prior to session'}
               </div>
             </div>
@@ -807,7 +807,7 @@ export const EventsListView: React.FC = () => {
             {/* Post-Event MoM */}
             <div style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '12px 14px', border: '1px solid #E2E8F0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <BookOpen size={16} strokeWidth={1.75} color="#059669" />
+                <BookOpen size={16} strokeWidth={1.75} color="#235347" />
                 <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
                   Post-Event MoM
                 </span>
@@ -818,7 +818,7 @@ export const EventsListView: React.FC = () => {
               <p style={{ fontSize: '12px', color: '#64748B', margin: '4px 0 8px 0', lineHeight: 1.4 }}>
                 {selectedEvent.postEventMoM?.notes || (selectedEvent.status === 'completed' ? selectedEvent.completedData?.documentationSummary : 'Post-event MoM will be logged immediately following session conclusion and feedback collection.')}
               </p>
-              <div style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+              <div style={{ fontSize: '11px', color: '#163832', fontWeight: 600 }}>
                 Target: Outcome Report & Certificate of Completion
               </div>
             </div>
@@ -831,9 +831,9 @@ export const EventsListView: React.FC = () => {
             style={{
               backgroundColor: '#FFFFFF',
               borderRadius: '20px',
-              border: '2px solid #10B981',
+              border: '2px solid #235347',
               padding: '16px 18px',
-              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.12)',
+              boxShadow: '0 8px 24px rgba(35, 83, 71, 0.12)',
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
@@ -846,11 +846,11 @@ export const EventsListView: React.FC = () => {
                     width: '38px',
                     height: '38px',
                     borderRadius: '10px',
-                    backgroundColor: '#ECFDF5',
+                    backgroundColor: '#DAF1DE',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#10B981',
+                    color: '#235347',
                   }}
                 >
                   <ExternalLink size={20} />
@@ -869,11 +869,11 @@ export const EventsListView: React.FC = () => {
                 style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: '#047857',
-                  backgroundColor: '#ECFDF5',
+                  color: '#163832',
+                  backgroundColor: '#DAF1DE',
                   padding: '3px 8px',
                   borderRadius: '6px',
-                  border: '1px solid #A7F3D0',
+                  border: '1px solid #8EB69B',
                 }}
               >
                 GOOGLE FORM
@@ -888,7 +888,7 @@ export const EventsListView: React.FC = () => {
                 width: '100%',
                 height: '46px',
                 borderRadius: '999px',
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
                 color: '#FFFFFF',
                 textDecoration: 'none',
                 fontSize: '14px',
@@ -897,7 +897,7 @@ export const EventsListView: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+                boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
               }}
             >
               <ExternalLink size={20} strokeWidth={1.75} />
@@ -931,11 +931,11 @@ export const EventsListView: React.FC = () => {
                 width: '30px',
                 height: '30px',
                 borderRadius: '8px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
               }}
             >
               <Calendar size={16} />
@@ -971,11 +971,11 @@ export const EventsListView: React.FC = () => {
                 width: '30px',
                 height: '30px',
                 borderRadius: '8px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
               }}
             >
               <MapPin size={16} />
@@ -984,7 +984,7 @@ export const EventsListView: React.FC = () => {
             <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', lineHeight: 1.25 }}>
               {selectedEvent.venue}
             </div>
-            <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+            <span style={{ fontSize: '11px', color: '#163832', fontWeight: 600 }}>
               {selectedEvent.geoCoordinates ? `${selectedEvent.geoCoordinates.lat}° N, ${selectedEvent.geoCoordinates.lng}° E` : 'Main Campus'}
             </span>
           </div>
@@ -1006,11 +1006,11 @@ export const EventsListView: React.FC = () => {
                 width: '30px',
                 height: '30px',
                 borderRadius: '8px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
               }}
             >
               <UserCheck size={16} />
@@ -1039,17 +1039,17 @@ export const EventsListView: React.FC = () => {
                 width: '30px',
                 height: '30px',
                 borderRadius: '8px',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
               }}
             >
               <Sparkles size={16} />
             </div>
             <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Access Scope</span>
-            <div style={{ fontSize: '13px', fontWeight: 800, color: '#047857', lineHeight: 1.25 }}>
+            <div style={{ fontSize: '13px', fontWeight: 800, color: '#163832', lineHeight: 1.25 }}>
               {selectedEvent.eventType === 'external' ? 'Inter-College' : 'Internal Club'}
             </div>
             <span style={{ fontSize: '11px', color: '#64748B' }}>
@@ -1087,7 +1087,7 @@ export const EventsListView: React.FC = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <UserCheck size={16} strokeWidth={1.75} color="#10B981" />
+              <UserCheck size={16} strokeWidth={1.75} color="#235347" />
               <span style={{ color: '#64748B' }}>Organized by:</span>
               <strong style={{ color: '#0F172A' }}>{selectedEvent.createdBy}</strong>
             </div>
@@ -1190,7 +1190,7 @@ export const EventsListView: React.FC = () => {
                 borderRadius: '999px',
                 height: '46px',
                 fontWeight: 800,
-                background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               }}
             >
               Finalize Post-Event Deliverables
@@ -1227,7 +1227,7 @@ export const EventsListView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -1240,12 +1240,12 @@ export const EventsListView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
                 letterSpacing: '0.04em',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
               }}
             >
               GEO EXPEDITIONS & LABS
@@ -1271,7 +1271,7 @@ export const EventsListView: React.FC = () => {
             style={{
               padding: '8px 14px',
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               color: '#FFFFFF',
               border: 'none',
               fontSize: '12px',
@@ -1279,7 +1279,7 @@ export const EventsListView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 3px 10px rgba(16, 185, 129, 0.28)',
+              boxShadow: '0 3px 10px rgba(35, 83, 71, 0.28)',
               whiteSpace: 'nowrap',
               flexShrink: 0,
             }}
@@ -1343,8 +1343,8 @@ export const EventsListView: React.FC = () => {
             overflow: 'hidden',
             position: 'relative',
             height: '180px',
-            boxShadow: '0 8px 25px rgba(16, 185, 129, 0.15)',
-            border: '1px solid #A7F3D0',
+            boxShadow: '0 8px 25px rgba(35, 83, 71, 0.15)',
+            border: '1px solid #8EB69B',
             cursor: 'pointer',
             backgroundColor: '#0F172A',
           }}
@@ -1396,7 +1396,7 @@ export const EventsListView: React.FC = () => {
             ) : (
               <span
                 style={{
-                  backgroundColor: '#10B981',
+                  backgroundColor: '#235347',
                   color: '#FFFFFF',
                   fontSize: '11px',
                   fontWeight: 800,
@@ -1427,7 +1427,7 @@ export const EventsListView: React.FC = () => {
               <span
                 style={{
                   fontSize: '11px',
-                  color: '#34D399',
+                  color: '#8EB69B',
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
@@ -1447,7 +1447,7 @@ export const EventsListView: React.FC = () => {
                 {spotlightEvent.title}
               </h2>
               <div style={{ fontSize: '11px', color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Clock size={16} strokeWidth={1.75} color="#34D399" />
+                <Clock size={16} strokeWidth={1.75} color="#8EB69B" />
                 <span>
                   {new Date(spotlightEvent.startDate).toLocaleDateString('en-US', {
                     month: 'short',
@@ -1543,11 +1543,11 @@ export const EventsListView: React.FC = () => {
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                backgroundColor: '#ECFDF5',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10B981',
+                color: '#235347',
                 marginBottom: '14px',
               }}
             >
@@ -1564,7 +1564,7 @@ export const EventsListView: React.FC = () => {
               style={{
                 padding: '8px 16px',
                 borderRadius: '999px',
-                backgroundColor: '#10B981',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '12px',
@@ -1639,9 +1639,9 @@ export const EventsListView: React.FC = () => {
                 style={{
                   padding: '9px 12px',
                   borderRadius: '10px',
-                  border: newEventType === 'internal' ? '2px solid #10B981' : '1px solid #CBD5E1',
-                  backgroundColor: newEventType === 'internal' ? '#ECFDF5' : '#FFFFFF',
-                  color: newEventType === 'internal' ? '#047857' : '#475569',
+                  border: newEventType === 'internal' ? '2px solid #235347' : '1px solid #CBD5E1',
+                  backgroundColor: newEventType === 'internal' ? '#DAF1DE' : '#FFFFFF',
+                  color: newEventType === 'internal' ? '#163832' : '#475569',
                   fontWeight: 700,
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -1742,7 +1742,7 @@ export const EventsListView: React.FC = () => {
             className="btn btn-primary btn-block"
             style={{
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               height: '46px',
               fontSize: '14px',
               fontWeight: 700,

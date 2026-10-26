@@ -96,7 +96,7 @@ export const AppTopBar: React.FC = () => {
               fontWeight: 800,
               letterSpacing: '-0.025em',
               lineHeight: 1.2,
-              background: 'linear-gradient(135deg, #0F172A 0%, #064E3B 45%, #059669 100%)',
+              background: 'linear-gradient(135deg, #051F20 0%, #0B2B26 45%, #235347 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -119,7 +119,7 @@ export const AppTopBar: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0F172A',
+                color: '#051F20',
                 position: 'relative',
                 transition: 'all 150ms ease',
               }}
@@ -133,7 +133,7 @@ export const AppTopBar: React.FC = () => {
                     right: '7px',
                     width: '8px',
                     height: '8px',
-                    backgroundColor: '#10B981',
+                    backgroundColor: '#235347',
                     borderRadius: '50%',
                     border: '2px solid #FFFFFF',
                   }}
@@ -149,13 +149,13 @@ export const AppTopBar: React.FC = () => {
                 width: '38px',
                 height: '38px',
                 borderRadius: '50%',
-                backgroundColor: '#ECFDF5',
-                border: '1px solid #A7F3D0',
+                backgroundColor: '#DAF1DE',
+                border: '1px solid #8EB69B',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#047857',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
+                color: '#163832',
+                boxShadow: '0 2px 8px rgba(35, 83, 71, 0.15)',
                 transition: 'all 150ms ease',
               }}
             >
@@ -248,7 +248,7 @@ export const AppTopBar: React.FC = () => {
           <button
             type="submit"
             className="btn btn-primary btn-block"
-            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}
+            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)' }}
           >
             Broadcast Announcement
           </button>
@@ -295,7 +295,7 @@ export const AppTopBar: React.FC = () => {
           <button
             type="submit"
             className="btn btn-primary btn-block"
-            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}
+            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)' }}
           >
             Confirm Assignment
           </button>
@@ -336,7 +336,7 @@ export const AppTopBar: React.FC = () => {
           <button
             type="submit"
             className="btn btn-primary btn-block"
-            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)' }}
+            style={{ borderRadius: '999px', background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)' }}
           >
             Schedule & Add to Agenda
           </button>

@@ -12,10 +12,10 @@ export const Toast: React.FC<ToastProps> = ({
   type = 'success',
   onClose,
 }) => {
-  let bg = '#E7F9F1';
-  let border = '#A7F3D0';
-  let text = '#065F46';
-  let icon = <CheckCircle2 size={20} strokeWidth={1.75} color="#10B981" />;
+  let bg = '#DAF1DE';
+  let border = '#8EB69B';
+  let text = '#163832';
+  let icon = <CheckCircle2 size={20} strokeWidth={1.75} color="#235347" />;
 
   if (type === 'error') {
     bg = '#FEF2F2';

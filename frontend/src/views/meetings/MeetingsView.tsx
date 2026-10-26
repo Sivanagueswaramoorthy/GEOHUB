@@ -145,7 +145,7 @@ export const MeetingsView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -158,11 +158,11 @@ export const MeetingsView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 letterSpacing: '0.04em',
               }}
             >
@@ -180,7 +180,7 @@ export const MeetingsView: React.FC = () => {
             style={{
               padding: '10px 16px',
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               color: '#FFFFFF',
               border: 'none',
               fontSize: '13px',
@@ -188,7 +188,7 @@ export const MeetingsView: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
               cursor: 'pointer',
             }}
           >
@@ -213,9 +213,9 @@ export const MeetingsView: React.FC = () => {
               borderRadius: '999px',
               fontSize: '12px',
               fontWeight: 700,
-              border: activeFilter === tab.key ? '1px solid #10B981' : '1px solid #E2E8F0',
-              backgroundColor: activeFilter === tab.key ? '#ECFDF5' : '#FFFFFF',
-              color: activeFilter === tab.key ? '#047857' : '#64748B',
+              border: activeFilter === tab.key ? '1px solid #235347' : '1px solid #E2E8F0',
+              backgroundColor: activeFilter === tab.key ? '#DAF1DE' : '#FFFFFF',
+              color: activeFilter === tab.key ? '#163832' : '#64748B',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
               transition: 'all 0.15s ease',
@@ -258,7 +258,7 @@ export const MeetingsView: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            <Calendar size={48} strokeWidth={1.75} color="#10B981" style={{ margin: '0 auto 10px' }} />
+            <Calendar size={48} strokeWidth={1.75} color="#235347" style={{ margin: '0 auto 10px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
               No meetings found
             </h3>
@@ -298,18 +298,18 @@ export const MeetingsView: React.FC = () => {
                         padding: '3px 8px',
                         borderRadius: '6px',
                         backgroundColor:
-                          m.type === 'pre_event' ? '#ECFDF5' : m.type === 'post_event' ? '#EEF2FF' : '#FEF3C7',
+                          m.type === 'pre_event' ? '#DAF1DE' : m.type === 'post_event' ? '#EEF2FF' : '#FEF3C7',
                         color:
-                          m.type === 'pre_event' ? '#047857' : m.type === 'post_event' ? '#4338CA' : '#B45309',
+                          m.type === 'pre_event' ? '#163832' : m.type === 'post_event' ? '#4338CA' : '#B45309',
                         border:
-                          m.type === 'pre_event' ? '1px solid #A7F3D0' : m.type === 'post_event' ? '1px solid #C7D2FE' : '1px solid #FDE68A',
+                          m.type === 'pre_event' ? '1px solid #8EB69B' : m.type === 'post_event' ? '1px solid #C7D2FE' : '1px solid #FDE68A',
                       }}
                     >
                       {m.type === 'pre_event' ? 'Pre-Event Briefing' : m.type === 'post_event' ? 'Post-Event Review' : 'General Sync'}
                     </span>
 
                     {m.eventTitle && (
-                      <span style={{ fontSize: '11px', color: '#059669', fontWeight: 600 }}>
+                      <span style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
                         • Linked: {m.eventTitle}
                       </span>
                     )}
@@ -319,8 +319,8 @@ export const MeetingsView: React.FC = () => {
                     style={{
                       fontSize: '11px',
                       fontWeight: 700,
-                      color: isCompleted ? '#047857' : '#D97706',
-                      backgroundColor: isCompleted ? '#ECFDF5' : '#FFFBEB',
+                      color: isCompleted ? '#163832' : '#D97706',
+                      backgroundColor: isCompleted ? '#DAF1DE' : '#FFFBEB',
                       padding: '3px 8px',
                       borderRadius: '6px',
                     }}
@@ -337,18 +337,18 @@ export const MeetingsView: React.FC = () => {
                 {/* Date & Logistics */}
                 <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '12px', color: '#64748B' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={16} strokeWidth={1.75} color="#10B981" />
+                    <Clock size={16} strokeWidth={1.75} color="#235347" />
                     <strong style={{ color: '#1E293B' }}>
                       {mDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </strong>{' '}
                     at {mDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={16} strokeWidth={1.75} color="#10B981" />
+                    <MapPin size={16} strokeWidth={1.75} color="#235347" />
                     {m.venue}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={16} strokeWidth={1.75} color="#10B981" />
+                    <ShieldCheck size={16} strokeWidth={1.75} color="#235347" />
                     Host: {m.organizerName}
                   </span>
                 </div>
@@ -361,7 +361,7 @@ export const MeetingsView: React.FC = () => {
 
                 {/* MoM Snippet if present */}
                 {m.momNotes && (
-                  <div style={{ backgroundColor: '#ECFDF5', padding: '12px 14px', borderRadius: '12px', fontSize: '12px', color: '#065F46', border: '1px solid #A7F3D0' }}>
+                  <div style={{ backgroundColor: '#DAF1DE', padding: '12px 14px', borderRadius: '12px', fontSize: '12px', color: '#163832', border: '1px solid #8EB69B' }}>
                     <div style={{ fontWeight: 800, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <FileText size={16} strokeWidth={1.75} /> Recorded Minutes of Meeting (MoM):
                     </div>
@@ -372,7 +372,7 @@ export const MeetingsView: React.FC = () => {
                 {/* Action Items status pill */}
                 {totalActionCount > 0 && (
                   <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={16} strokeWidth={1.75} color="#10B981" />
+                    <CheckCircle2 size={16} strokeWidth={1.75} color="#235347" />
                     <span>Action Items Progress:</span>
                     <strong style={{ color: '#0F172A' }}>{actionCompletedCount} of {totalActionCount} completed</strong>
                   </div>
@@ -385,7 +385,7 @@ export const MeetingsView: React.FC = () => {
                     style={{
                       padding: '8px 16px',
                       borderRadius: '999px',
-                      backgroundColor: isCompleted ? '#F1F5F9' : '#10B981',
+                      backgroundColor: isCompleted ? '#F1F5F9' : '#235347',
                       color: isCompleted ? '#0F172A' : '#FFFFFF',
                       border: 'none',
                       fontSize: '12px',
@@ -496,7 +496,7 @@ export const MeetingsView: React.FC = () => {
             className="btn btn-primary btn-block"
             style={{
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               height: '46px',
               fontSize: '14px',
               fontWeight: 700,
@@ -554,7 +554,7 @@ export const MeetingsView: React.FC = () => {
                 style={{
                   padding: '8px 14px',
                   borderRadius: '12px',
-                  backgroundColor: '#10B981',
+                  backgroundColor: '#235347',
                   color: '#FFFFFF',
                   border: 'none',
                   fontWeight: 700,
@@ -580,9 +580,9 @@ export const MeetingsView: React.FC = () => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '8px 12px',
-                      backgroundColor: item.isDone ? '#ECFDF5' : '#F8FAFC',
+                      backgroundColor: item.isDone ? '#DAF1DE' : '#F8FAFC',
                       borderRadius: '10px',
-                      border: item.isDone ? '1px solid #A7F3D0' : '1px solid #E2E8F0',
+                      border: item.isDone ? '1px solid #8EB69B' : '1px solid #E2E8F0',
                       fontSize: '12px',
                     }}
                   >
@@ -591,9 +591,9 @@ export const MeetingsView: React.FC = () => {
                         type="checkbox"
                         checked={item.isDone}
                         onChange={() => handleToggleActionDone(idx)}
-                        style={{ width: '16px', height: '16px', accentColor: '#10B981' }}
+                        style={{ width: '16px', height: '16px', accentColor: '#235347' }}
                       />
-                      <span style={{ textDecoration: item.isDone ? 'line-through' : 'none', color: item.isDone ? '#047857' : '#0F172A' }}>
+                      <span style={{ textDecoration: item.isDone ? 'line-through' : 'none', color: item.isDone ? '#163832' : '#0F172A' }}>
                         {item.task}
                       </span>
                     </div>
@@ -611,14 +611,14 @@ export const MeetingsView: React.FC = () => {
             onClick={handleSaveMoM}
             style={{
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               color: '#FFFFFF',
               border: 'none',
               height: '46px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
               marginTop: '8px',
             }}
           >

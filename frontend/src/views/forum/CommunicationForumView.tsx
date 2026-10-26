@@ -43,8 +43,8 @@ export const CommunicationForumView: React.FC = () => {
       name: 'Official Announcements',
       desc: 'Faculty notices, DGCA drone permits, symposium dates and college directives',
       icon: <Megaphone size={16} />,
-      color: '#059669',
-      bg: '#ECFDF5',
+      color: '#163832',
+      bg: '#DAF1DE',
     },
     coordination: {
       name: 'Event & Volunteer Coordination',
@@ -129,7 +129,7 @@ export const CommunicationForumView: React.FC = () => {
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#10B981" />
+          <CheckCircle2 size={16} color="#235347" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -142,11 +142,11 @@ export const CommunicationForumView: React.FC = () => {
               style={{
                 fontSize: '11px',
                 fontWeight: 800,
-                color: '#047857',
-                backgroundColor: '#ECFDF5',
+                color: '#163832',
+                backgroundColor: '#DAF1DE',
                 padding: '2px 8px',
                 borderRadius: '999px',
-                border: '1px solid #A7F3D0',
+                border: '1px solid #8EB69B',
                 letterSpacing: '0.04em',
               }}
             >
@@ -163,7 +163,7 @@ export const CommunicationForumView: React.FC = () => {
           style={{
             padding: '10px 18px',
             borderRadius: '999px',
-            background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
             color: '#FFFFFF',
             border: 'none',
             fontSize: '13px',
@@ -171,7 +171,7 @@ export const CommunicationForumView: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.28)',
+            boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
             cursor: 'pointer',
           }}
         >
@@ -260,7 +260,7 @@ export const CommunicationForumView: React.FC = () => {
               textAlign: 'center',
             }}
           >
-            <MessageSquare size={48} strokeWidth={1.75} color="#10B981" style={{ margin: '0 auto 10px' }} />
+            <MessageSquare size={48} strokeWidth={1.75} color="#235347" style={{ margin: '0 auto 10px' }} />
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
               No messages in this channel yet
             </h3>
@@ -272,7 +272,7 @@ export const CommunicationForumView: React.FC = () => {
               style={{
                 padding: '8px 16px',
                 borderRadius: '999px',
-                backgroundColor: '#10B981',
+                backgroundColor: '#235347',
                 color: '#FFFFFF',
                 border: 'none',
                 fontSize: '12px',
@@ -292,9 +292,9 @@ export const CommunicationForumView: React.FC = () => {
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  border: msg.pinned ? '2px solid #10B981' : '1px solid #E8ECF2',
+                  border: msg.pinned ? '2px solid #235347' : '1px solid #E8ECF2',
                   padding: '18px 20px',
-                  boxShadow: msg.pinned ? '0 8px 24px rgba(16, 185, 129, 0.1)' : '0 4px 16px rgba(15, 23, 42, 0.03)',
+                  boxShadow: msg.pinned ? '0 8px 24px rgba(35, 83, 71, 0.1)' : '0 4px 16px rgba(15, 23, 42, 0.03)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
@@ -308,12 +308,12 @@ export const CommunicationForumView: React.FC = () => {
                         width: '36px',
                         height: '36px',
                         borderRadius: '50%',
-                        backgroundColor: '#ECFDF5',
+                        backgroundColor: '#DAF1DE',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontWeight: 800,
-                        color: '#059669',
+                        color: '#163832',
                         fontSize: '14px',
                       }}
                     >
@@ -349,11 +349,11 @@ export const CommunicationForumView: React.FC = () => {
                         style={{
                           fontSize: '11px',
                           fontWeight: 800,
-                          color: '#047857',
-                          backgroundColor: '#ECFDF5',
+                          color: '#163832',
+                          backgroundColor: '#DAF1DE',
                           padding: '3px 8px',
                           borderRadius: '6px',
-                          border: '1px solid #A7F3D0',
+                          border: '1px solid #8EB69B',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '4px',
@@ -372,8 +372,8 @@ export const CommunicationForumView: React.FC = () => {
                         style={{
                           padding: '3px 8px',
                           borderRadius: '6px',
-                          backgroundColor: msg.pinned ? '#E7F9F1' : '#F1F5F9',
-                          color: msg.pinned ? '#047857' : '#64748B',
+                          backgroundColor: msg.pinned ? '#DAF1DE' : '#F1F5F9',
+                          color: msg.pinned ? '#163832' : '#64748B',
                           border: 'none',
                           fontSize: '11px',
                           fontWeight: 700,
@@ -433,7 +433,7 @@ export const CommunicationForumView: React.FC = () => {
                       gap: '5px',
                       fontSize: '12px',
                       fontWeight: 700,
-                      color: '#059669',
+                      color: '#235347',
                       cursor: 'pointer',
                     }}
                   >
@@ -476,7 +476,7 @@ export const CommunicationForumView: React.FC = () => {
                       style={{
                         padding: '0 16px',
                         borderRadius: '12px',
-                        backgroundColor: '#10B981',
+                        backgroundColor: '#235347',
                         color: '#FFFFFF',
                         border: 'none',
                         fontSize: '12px',
@@ -530,7 +530,7 @@ export const CommunicationForumView: React.FC = () => {
             className="btn btn-primary btn-block"
             style={{
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
               height: '46px',
               fontSize: '14px',
               fontWeight: 700,

@@ -145,11 +145,11 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
         </button>
 
         <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', lineHeight: 1.2 }}>
             AI Chat
           </h2>
-          <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+          <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#235347' }} />
             GeoAI Companion Online
           </div>
         </div>
@@ -215,9 +215,9 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                         msg.sender === 'user'
                           ? '18px 18px 4px 18px'
                           : '18px 18px 18px 4px',
-                      backgroundColor: msg.sender === 'user' ? '#FFFFFF' : '#ECFDF5',
-                      color: msg.sender === 'user' ? '#0F172A' : '#065F46',
-                      border: msg.sender === 'user' ? '1px solid #E8ECF2' : '1px solid #A7F3D0',
+                      backgroundColor: msg.sender === 'user' ? '#FFFFFF' : '#DAF1DE',
+                      color: msg.sender === 'user' ? '#051F20' : '#163832',
+                      border: msg.sender === 'user' ? '1px solid #E8ECF2' : '1px solid #8EB69B',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
                       fontSize: '14px',
                       lineHeight: 1.45,
@@ -242,10 +242,10 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: '#051F20' }}>
                         Today's Plan
                       </span>
-                      <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, backgroundColor: '#ECFDF5', padding: '2px 8px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '11px', color: '#163832', fontWeight: 700, backgroundColor: '#DAF1DE', padding: '2px 8px', borderRadius: '6px' }}>
                         Optimized
                       </span>
                     </div>
@@ -272,7 +272,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <span style={{ fontSize: '16px' }}>{item.icon}</span>
                             <div>
-                              <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>
+                              <div style={{ fontSize: '12px', fontWeight: 700, color: '#051F20' }}>
                                 {item.title}
                               </div>
                               <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -326,9 +326,9 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             style={{
               padding: '6px 12px',
               borderRadius: '999px',
-              backgroundColor: '#ECFDF5',
-              border: '1px solid #A7F3D0',
-              color: '#065F46',
+              backgroundColor: '#DAF1DE',
+              border: '1px solid #8EB69B',
+              color: '#163832',
               fontSize: '11px',
               fontWeight: 600,
               whiteSpace: 'nowrap',
@@ -393,7 +393,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
               width: '30px',
               height: '30px',
               borderRadius: '50%',
-              backgroundColor: '#10B981',
+              backgroundColor: '#235347',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
@@ -404,7 +404,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           </button>
         </div>
 
-        {/* Voice / Mic Button (Solid Lightgreen Circle from Screen 3) */}
+        {/* Voice / Mic Button (Solid Brand Emerald Circle) */}
         <button
           type="button"
           onClick={() => {
@@ -414,12 +414,12 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            backgroundColor: '#10B981',
+            backgroundColor: '#235347',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
+            boxShadow: '0 4px 14px rgba(35, 83, 71, 0.35)',
             flexShrink: 0,
           }}
         >
