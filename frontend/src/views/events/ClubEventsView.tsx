@@ -16,7 +16,6 @@ import {
   Video,
   Newspaper,
   FileSpreadsheet,
-  DollarSign,
   Megaphone,
   ArrowLeft,
   MapPin,
@@ -24,6 +23,10 @@ import {
   Users,
   Layers,
   Sparkles,
+  Check,
+  ShieldCheck,
+  ChevronRight,
+  BadgeCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getRolePermissions, FACULTY_ONLY_ARCHIVE } from '../../core/permissions';
@@ -45,11 +48,9 @@ export const ClubEventsView: React.FC = () => {
     events,
     meetings,
     gallery,
-    expenses,
     posts,
     campaigns,
     updateCampaignChecklist,
-    addExpenseItem,
     selectedEventId,
     setSelectedEventId,
     registerForEvent,
@@ -79,51 +80,7 @@ export const ClubEventsView: React.FC = () => {
     }
   }, [selectedEventId, events]);
 
-  // Event Expense Modal State
-  const [isEventExpenseModalOpen, setIsEventExpenseModalOpen] = useState(false);
-  const [eventExpTitle, setEventExpTitle] = useState('');
-  const [eventExpCategory, setEventExpCategory] = useState<
-    'Logistics' | 'Stage' | 'Printing' | 'Refreshments' | 'Equipment' | 'Other'
-  >('Logistics');
-  const [eventExpAmount, setEventExpAmount] = useState('');
-  const [eventExpVendor, setEventExpVendor] = useState('');
-  const [eventExpDate, setEventExpDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [eventExpReceipt, setEventExpReceipt] = useState(
-    'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80'
-  );
-  const [eventExpNotes, setEventExpNotes] = useState('');
 
-  const formatINR = (amt: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amt);
-  };
-
-  const handleAddEventExpense = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedEventModal || !eventExpTitle.trim() || !eventExpAmount) return;
-    const num = parseFloat(eventExpAmount);
-    addExpenseItem({
-      eventId: selectedEventModal.id,
-      eventTitle: selectedEventModal.title,
-      title: eventExpTitle,
-      amount: isNaN(num) ? 0 : num,
-      category: eventExpCategory,
-      buyingDate: eventExpDate,
-      vendorName: eventExpVendor || 'Campus Vendor',
-      receiptUrl: eventExpReceipt,
-      approvedBy: 'Dr. Sarah Jenkins (Faculty Advisor)',
-      notes: eventExpNotes,
-    });
-    showToast(`✓ Added ₹${num.toLocaleString('en-IN')} expense to ${selectedEventModal.title}`);
-    setIsEventExpenseModalOpen(false);
-    setEventExpTitle('');
-    setEventExpAmount('');
-    setEventExpVendor('');
-    setEventExpNotes('');
-  };
 
   // Documentation Checklist Map per event
   const [eventDocStatusMap, setEventDocStatusMap] = useState<
@@ -620,29 +577,6 @@ export const ClubEventsView: React.FC = () => {
   // VIEW 2: FULL PAGE EVENT DETAILS & OPERATIONS (NO BOTTOM SHEET POPUP)
   // =========================================================================
   if (selectedEventModal) {
-    const eventAllocated =
-      selectedEventModal.id === 'event_01'
-        ? 150000
-        : selectedEventModal.id === 'event_02'
-        ? 120000
-        : selectedEventModal.id === 'event_05'
-        ? 45000
-        : selectedEventModal.id === 'event_03'
-        ? 35000
-        : selectedEventModal.budget > 5000
-        ? selectedEventModal.budget
-        : 50000;
-
-    const eventExpensesList = expenses.filter(
-      (e) =>
-        e.eventId === selectedEventModal.id ||
-        (e.eventTitle && e.eventTitle.toLowerCase() === selectedEventModal.title.toLowerCase())
-    );
-
-    const eventSpent = eventExpensesList.reduce((sum, e) => sum + e.amount, 0);
-    const eventRemaining = Math.max(0, eventAllocated - eventSpent);
-    const eventUsedPct = Math.min(100, Math.round((eventSpent / eventAllocated) * 100));
-
     const eventCampaign = campaigns.find(
       (c) =>
         c.eventId === selectedEventModal.id ||
@@ -667,7 +601,7 @@ export const ClubEventsView: React.FC = () => {
         : 'bg-amber-50 text-amber-800 border-amber-200';
 
     return (
-      <div className="flex flex-col gap-4 pb-20 animate-fadeIn">
+      <div className="flex flex-col gap-5 pb-24 animate-fadeIn">
         {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
 
         {/* Top Navigation & Status Bar */}
@@ -678,95 +612,283 @@ export const ClubEventsView: React.FC = () => {
               setSelectedEventModal(null);
               setSelectedEventId(null);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-slate-700 bg-white border border-slate-200 shadow-xs hover:bg-slate-50 transition-all cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-slate-700 bg-white border border-slate-200 shadow-xs hover:bg-[#DAF1DE]/40 hover:border-[#8EB69B] transition-all cursor-pointer active:scale-95"
           >
-            <ArrowLeft size={16} strokeWidth={1.75} />
+            <ArrowLeft size={15} strokeWidth={2} />
             <span>Back to Club Events</span>
           </button>
 
-          <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider border shadow-2xs ${statusBadgeColor}`}
-          >
-            {selectedEventModal.status === 'live' && (
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-            )}
-            <span>{selectedEventModal.status}</span>
-          </span>
-        </div>
-
-        {/* Hero Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col gap-3">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-1.5">
-              <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
-                {selectedEventModal.category || 'GIS Expedition'}
-              </span>
-              <span className="text-[11px] font-semibold text-slate-400">
-                Created by {selectedEventModal.createdBy || 'Core Team'}
-              </span>
-            </div>
-
-            <h1
-              className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug"
-              style={{ fontFamily: 'var(--font-family)' }}
+          <div className="flex items-center gap-2">
+            <span
+              className="px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border shadow-2xs inline-flex items-center gap-1.5"
+              style={{
+                backgroundColor:
+                  selectedEventModal.status === 'live'
+                    ? '#FFF1F2'
+                    : selectedEventModal.status === 'approved'
+                    ? '#DAF1DE'
+                    : selectedEventModal.status === 'completed'
+                    ? '#EFF6FF'
+                    : '#FFFBEB',
+                color:
+                  selectedEventModal.status === 'live'
+                    ? '#BE123C'
+                    : selectedEventModal.status === 'approved'
+                    ? '#0B2B26'
+                    : selectedEventModal.status === 'completed'
+                    ? '#1E40AF'
+                    : '#B45309',
+                borderColor:
+                  selectedEventModal.status === 'live'
+                    ? '#FECDD3'
+                    : selectedEventModal.status === 'approved'
+                    ? '#8EB69B'
+                    : selectedEventModal.status === 'completed'
+                    ? '#BFDBFE'
+                    : '#FDE68A',
+              }}
             >
-              {selectedEventModal.title}
-            </h1>
-
-            <p className="text-xs text-slate-600 font-medium mt-1 leading-relaxed">
-              {selectedEventModal.description}
-            </p>
+              {selectedEventModal.status === 'live' && (
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping inline-block" />
+              )}
+              {selectedEventModal.status === 'approved' && <ShieldCheck size={13} color="#235347" />}
+              <span>{selectedEventModal.status}</span>
+            </span>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-xs">
-            <div className="flex items-center gap-2 text-slate-700 font-medium">
-              <MapPin size={16} strokeWidth={1.75} className="text-emerald-600 shrink-0" />
-              <span className="truncate">{selectedEventModal.venue}</span>
+        {/* Executive Event Dossier Hero Card */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #051F20 0%, #0B2B26 48%, #163832 100%)',
+            borderRadius: '26px',
+            padding: '24px 26px',
+            color: '#FFFFFF',
+            border: '1px solid rgba(142, 182, 155, 0.28)',
+            boxShadow: '0 14px 36px -4px rgba(5, 31, 32, 0.35)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Ambient radial glow decorations */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '-40px',
+              right: '-40px',
+              width: '200px',
+              height: '200px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(142, 182, 155, 0.22) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '-30px',
+              left: '10%',
+              width: '160px',
+              height: '160px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(35, 83, 71, 0.35) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    color: '#DAF1DE',
+                    backgroundColor: 'rgba(218, 241, 222, 0.14)',
+                    border: '1px solid rgba(142, 182, 155, 0.35)',
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                  }}
+                >
+                  <Sparkles size={11} color="#DAF1DE" />
+                  <span>{selectedEventModal.category || 'CULTURAL & ACADEMIC'}</span>
+                </span>
+                <span style={{ fontSize: '11px', color: '#8EB69B', fontWeight: 600 }}>
+                  Created by {selectedEventModal.createdBy || 'Core Team'}
+                </span>
+              </div>
+
+              <h1
+                style={{
+                  fontSize: '22px',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  margin: 0,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.25,
+                }}
+              >
+                {selectedEventModal.title}
+              </h1>
+
+              <p
+                style={{
+                  fontSize: '13px',
+                  color: '#DAF1DE',
+                  opacity: 0.88,
+                  margin: '8px 0 0 0',
+                  lineHeight: 1.6,
+                  maxWidth: '680px',
+                }}
+              >
+                {selectedEventModal.description}
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-slate-700 font-medium">
-              <Calendar size={16} strokeWidth={1.75} className="text-emerald-600 shrink-0" />
-              <span>
-                {selectedEventModal.startDate
-                  ? new Date(selectedEventModal.startDate).toLocaleDateString(undefined, {
-                      weekday: 'short',
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })
-                  : 'Date TBA'}
-              </span>
+
+            {/* Frosted Metadata Strip */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '12px',
+                padding: '12px 16px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                <MapPin size={16} color="#DAF1DE" className="shrink-0" />
+                <span style={{ color: '#FFFFFF', fontWeight: 600 }} className="truncate">
+                  {selectedEventModal.venue}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                <Calendar size={16} color="#DAF1DE" className="shrink-0" />
+                <span style={{ color: '#FFFFFF', fontWeight: 600 }}>
+                  {selectedEventModal.startDate
+                    ? new Date(selectedEventModal.startDate).toLocaleDateString(undefined, {
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : 'Date TBA'}
+                </span>
+              </div>
+
+              {selectedEventModal.capacity && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
+                  <Users size={16} color="#DAF1DE" className="shrink-0" />
+                  <span style={{ color: '#FFFFFF', fontWeight: 600 }}>
+                    Target Capacity: {selectedEventModal.capacity} Scholars
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 1. Lifecycle Progress */}
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <span className="block text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2.5">
-            Event Lifecycle Progress
-          </span>
-          <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+        {/* 1. Event Lifecycle Pipeline */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Clock size={13} color="#235347" />
+              <span>Event Lifecycle Progress</span>
+            </span>
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 800,
+                padding: '2px 8px',
+                borderRadius: '999px',
+                backgroundColor: '#DAF1DE',
+                color: '#0B2B26',
+                border: '1px solid #8EB69B',
+              }}
+            >
+              Phase: {selectedEventModal.status.toUpperCase()}
+            </span>
+          </div>
+
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', overflowX: 'auto', padding: '6px 2px' }}>
+            {/* Connecting baseline */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '20px',
+                left: '24px',
+                right: '24px',
+                height: '3px',
+                backgroundColor: '#E2E8F0',
+                zIndex: 0,
+              }}
+            />
+
             {lifecycleStages.map((stage, idx) => {
               const isCurrent = selectedEventModal.status === stage.key;
               const isPassed =
                 lifecycleStages.findIndex((s) => s.key === selectedEventModal.status) >= idx;
 
               return (
-                <div key={stage.key} className="flex-1 flex flex-col items-center min-w-[44px]">
+                <div key={stage.key} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: '56px' }}>
                   <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold transition-all ${
-                      isCurrent
-                        ? 'bg-emerald-600 text-white ring-4 ring-emerald-100 shadow-xs'
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      transition: 'all 0.2s ease',
+                      backgroundColor: isCurrent ? '#0B2B26' : isPassed ? '#235347' : '#FFFFFF',
+                      color: isCurrent ? '#DAF1DE' : isPassed ? '#FFFFFF' : '#94A3B8',
+                      border: isCurrent
+                        ? '3px solid #8EB69B'
                         : isPassed
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-slate-200 text-slate-400'
-                    }`}
+                        ? '2px solid #235347'
+                        : '2px solid #CBD5E1',
+                      boxShadow: isCurrent ? '0 0 0 4px rgba(218, 241, 222, 0.7), 0 2px 6px rgba(0,0,0,0.15)' : 'none',
+                    }}
                   >
-                    {idx + 1}
+                    {isPassed && !isCurrent ? <Check size={14} strokeWidth={2.5} /> : idx + 1}
                   </div>
                   <span
-                    className={`text-[11px] font-bold mt-1 text-center truncate w-full ${
-                      isCurrent ? 'text-emerald-700' : isPassed ? 'text-slate-700' : 'text-slate-400'
-                    }`}
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: isCurrent ? 800 : isPassed ? 700 : 500,
+                      marginTop: '6px',
+                      color: isCurrent ? '#0B2B26' : isPassed ? '#334155' : '#94A3B8',
+                      textAlign: 'center',
+                    }}
                   >
                     {stage.label}
                   </span>
@@ -776,230 +898,321 @@ export const ClubEventsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. Executive Action Bar */}
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200 flex flex-wrap items-center gap-2">
-          <span className="w-full text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5">
-            {isFaculty ? 'Faculty Governance Actions' : 'Event Management Actions'}
+        {/* 2. Executive Governance Actions */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '18px 20px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 800,
+              color: '#64748B',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <ShieldCheck size={13} color="#235347" />
+            <span>{isFaculty ? 'Faculty Governance Actions' : 'Event Management Actions'}</span>
           </span>
-          <button
-            type="button"
-            onClick={handleOpenEdit}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800 hover:bg-slate-200 cursor-pointer active:scale-95 transition-all"
-          >
-            <Edit3 size={16} strokeWidth={1.75} />
-            <span>Edit</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsAssignDutiesOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer active:scale-95 transition-all"
-          >
-            <UserCheck size={16} strokeWidth={1.75} />
-            <span>Assign Duties</span>
-          </button>
-          {selectedEventModal.status !== 'live' && (
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
             <button
               type="button"
-              onClick={() => handleUpdateStatus('live')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 cursor-pointer active:scale-95 transition-all"
+              onClick={handleOpenEdit}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#FFFFFF',
+                color: '#334155',
+                border: '1px solid #CBD5E1',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              className="hover:bg-slate-50 hover:border-slate-300 active:scale-95"
             >
-              <Play size={16} strokeWidth={1.75} />
-              <span>Start Live Event</span>
+              <Edit3 size={14} strokeWidth={2} />
+              <span>Edit</span>
             </button>
-          )}
-          {selectedEventModal.status !== 'completed' && (
+
             <button
               type="button"
-              onClick={() => handleUpdateStatus('completed')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100 cursor-pointer active:scale-95 transition-all"
+              onClick={() => setIsAssignDutiesOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 18px',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #0B2B26 0%, #235347 100%)',
+                color: '#FFFFFF',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(11, 43, 38, 0.25)',
+                transition: 'all 0.15s ease',
+              }}
+              className="hover:opacity-95 active:scale-95"
             >
-              <CheckCircle2 size={16} strokeWidth={1.75} />
-              <span>Mark Completed</span>
+              <UserCheck size={14} strokeWidth={2} />
+              <span>Assign Duties</span>
             </button>
-          )}
-          {canArchive && (
+
+            {selectedEventModal.status !== 'live' && (
+              <button
+                type="button"
+                onClick={() => handleUpdateStatus('live')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  backgroundColor: '#FFFBEB',
+                  color: '#B45309',
+                  border: '1px solid #FDE68A',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                className="hover:bg-amber-100/60 active:scale-95"
+              >
+                <Play size={14} strokeWidth={2} />
+                <span>Start Live Event</span>
+              </button>
+            )}
+
+            {selectedEventModal.status !== 'completed' && (
+              <button
+                type="button"
+                onClick={() => handleUpdateStatus('completed')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  backgroundColor: '#DAF1DE',
+                  color: '#0B2B26',
+                  border: '1px solid #8EB69B',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                className="hover:bg-[#cbe8d0] active:scale-95"
+              >
+                <CheckCircle2 size={14} strokeWidth={2} />
+                <span>Mark Completed</span>
+              </button>
+            )}
+
+            {canArchive && (
+              <button
+                type="button"
+                onClick={() => handleUpdateStatus('archived')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: '#F1F5F9',
+                  color: '#475569',
+                  border: '1px solid #E2E8F0',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                className="hover:bg-slate-200 active:scale-95"
+              >
+                <Archive size={14} strokeWidth={2} />
+                <span>Archive</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={() => handleUpdateStatus('archived')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer active:scale-95 transition-all"
+              onClick={() => setIsCancelDialogOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '999px',
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#FFFFFF',
+                color: '#DC2626',
+                border: '1px solid #FECACA',
+                cursor: 'pointer',
+                marginLeft: 'auto',
+                transition: 'all 0.15s ease',
+              }}
+              className="hover:bg-red-50 active:scale-95"
             >
-              <Archive size={16} strokeWidth={1.75} />
-              <span>Archive</span>
+              <Ban size={14} strokeWidth={2} />
+              <span>Cancel Event</span>
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setIsCancelDialogOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 ml-auto cursor-pointer active:scale-95 transition-all"
-          >
-            <Ban size={16} strokeWidth={1.75} />
-            <span>Cancel Event</span>
-          </button>
+          </div>
         </div>
 
         {/* 3. Operational Duties Checklist */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-              Operational Duties Roster
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Users size={13} color="#235347" />
+              <span>Operational Duties Roster</span>
             </span>
-            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 800,
+                color: '#0B2B26',
+                backgroundColor: '#DAF1DE',
+                padding: '2px 8px',
+                borderRadius: '999px',
+                border: '1px solid #8EB69B',
+              }}
+            >
               Verified Roster
             </span>
           </div>
-          <div className="flex flex-col gap-2 text-xs">
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50">
-              <span className="font-bold text-slate-800">1. Documentation & MoM</span>
-              <span className="text-slate-600 font-medium">Priya Sharma (Done ✓)</span>
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50">
-              <span className="font-bold text-slate-800">2. Signage & Entrance Badges</span>
-              <span className="text-slate-600 font-medium">Kiran Kumar (Ready ✓)</span>
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50">
-              <span className="font-bold text-slate-800">3. Shortlisted Students</span>
-              <span className="text-slate-600 font-medium">Vikram Patel (45 Scholars)</span>
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50">
-              <span className="font-bold text-slate-800">4. Food & Refreshments</span>
-              <span className="text-slate-600 font-medium">Ananya Sen (Arranged)</span>
-            </div>
-          </div>
-        </div>
 
-        {/* 4. Attendance Check & Quick Gate Scanner */}
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-3">
-          <div>
-            <span className="block text-[11px] font-extrabold text-emerald-800 uppercase tracking-wide">
-              Turnstile Gate Headcount
-            </span>
-            <span className="font-black text-lg text-emerald-950 mt-0.5 block">
-              {selectedEventModal.registeredUserIds.length} Registered Attendees
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedEventModal(null);
-              setActiveTab('scan_qr');
-            }}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 cursor-pointer active:scale-95 transition-all shrink-0"
-          >
-            <Scan size={16} strokeWidth={1.75} />
-            <span>Launch Scanner</span>
-          </button>
-        </div>
-
-        {/* 5. Budget & Fiscal Status */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <DollarSign size={16} className="text-emerald-600" />
-              <span className="text-[11px] font-extrabold text-slate-900 uppercase tracking-wider">
-                Event Budget & Fiscal Status
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEventExpTitle('');
-                setEventExpAmount('');
-                setEventExpVendor('');
-                setIsEventExpenseModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer active:scale-95"
-            >
-              <Plus size={16} strokeWidth={1.75} />
-              <span>Add Expense</span>
-            </button>
-          </div>
-
-          {/* 3 Metric Tiles */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col">
-              <span className="text-[11px] font-bold text-slate-500">Allocated</span>
-              <span className="text-xs font-extrabold text-slate-900 font-mono mt-0.5">
-                {formatINR(eventAllocated)}
-              </span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200/60 flex flex-col">
-              <span className="text-[11px] font-bold text-amber-700">Spent</span>
-              <span className="text-xs font-extrabold text-amber-950 font-mono mt-0.5">
-                {formatINR(eventSpent)}
-              </span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/60 flex flex-col">
-              <span className="text-[11px] font-bold text-emerald-700">Remaining</span>
-              <span className="text-xs font-extrabold text-emerald-950 font-mono mt-0.5">
-                {formatINR(eventRemaining)}
-              </span>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between text-[11px] font-medium text-slate-500">
-              <span>Burn Rate</span>
-              <span className="font-bold text-slate-900">{eventUsedPct}% used</span>
-            </div>
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+            {[
+              { role: '1. Documentation & MoM', officer: 'Priya Sharma', status: 'Done ✓', statusColor: '#0B2B26', statusBg: '#DAF1DE', statusBorder: '#8EB69B' },
+              { role: '2. Signage & Badges', officer: 'Kiran Kumar', status: 'Ready ✓', statusColor: '#0B2B26', statusBg: '#DAF1DE', statusBorder: '#8EB69B' },
+              { role: '3. Shortlisted Students', officer: 'Vikram Patel (45 Scholars)', status: 'Active', statusColor: '#1E40AF', statusBg: '#EFF6FF', statusBorder: '#BFDBFE' },
+              { role: '4. Food & Refreshments', officer: 'Ananya Sen', status: 'Arranged', statusColor: '#92400E', statusBg: '#FEF3C7', statusBorder: '#FDE68A' },
+            ].map((d, i) => (
               <div
-                className={`h-full rounded-full transition-all duration-300 ${
-                  eventUsedPct > 85 ? 'bg-amber-500' : 'bg-emerald-500'
-                }`}
-                style={{ width: `${eventUsedPct}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Expense Line Items List */}
-          <div className="flex flex-col gap-1.5 pt-1">
-            <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-              Event Expenses Logged ({eventExpensesList.length})
-            </span>
-            {eventExpensesList.length === 0 ? (
-              <div className="p-3 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-400 text-xs font-medium">
-                No expenses logged yet. Tap "+ Add Expense" to record a voucher.
-              </div>
-            ) : (
-              eventExpensesList.map((exp) => (
-                <div
-                  key={exp.id}
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs gap-2"
-                >
-                  <div className="min-w-0">
-                    <div className="font-bold text-slate-900 truncate">{exp.title}</div>
-                    <div className="text-[11px] text-slate-500 truncate">
-                      {exp.vendorName} • {exp.category} • {exp.buyingDate}
-                    </div>
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 14px',
+                  borderRadius: '14px',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <div style={{ minWidth: 0, paddingRight: '8px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }} className="truncate">
+                    {d.role}
                   </div>
-                  <span className="font-mono font-extrabold text-emerald-950 shrink-0">
-                    {formatINR(exp.amount)}
-                  </span>
+                  <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }} className="truncate">
+                    {d.officer}
+                  </div>
                 </div>
-              ))
-            )}
+                <span
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    color: d.statusColor,
+                    backgroundColor: d.statusBg,
+                    border: `1px solid ${d.statusBorder}`,
+                    flexShrink: 0,
+                  }}
+                >
+                  {d.status}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* 6. Meetings & Standups for this Event */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-              Associated Chapter Meetings & MoM
+
+
+        {/* 5. Associated Chapter Meetings & MoMs */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Calendar size={13} color="#235347" />
+              <span>Associated Chapter Meetings & MoM</span>
             </span>
+
             <button
               type="button"
               onClick={() => {
                 setSelectedEventModal(null);
                 setActiveTab('meetings');
               }}
-              className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#235347',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              className="hover:underline"
             >
               View All ({meetings.length})
             </button>
           </div>
-          <div className="flex flex-col gap-2 text-xs">
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
             {meetings
               .filter(
                 (m) =>
@@ -1010,20 +1223,32 @@ export const ClubEventsView: React.FC = () => {
               .map((m) => (
                 <div
                   key={m.id}
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between"
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '14px',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
                 >
                   <div>
-                    <div className="font-bold text-slate-900">{m.title}</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
+                    <div style={{ fontWeight: 800, color: '#0F172A' }}>{m.title}</div>
+                    <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>
                       {m.venue} • {new Date(m.dateTime).toLocaleDateString()}
                     </div>
                   </div>
                   <span
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                      m.status === 'completed'
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-purple-50 text-purple-700'
-                    }`}
+                    style={{
+                      fontSize: '10.5px',
+                      fontWeight: 800,
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      backgroundColor: m.status === 'completed' ? '#DAF1DE' : '#F3E8FF',
+                      color: m.status === 'completed' ? '#0B2B26' : '#6B21A8',
+                      border: m.status === 'completed' ? '1px solid #8EB69B' : '1px solid #E9D5FF',
+                    }}
                   >
                     {m.status === 'completed' ? 'MoM Filed ✓' : 'Scheduled'}
                   </span>
@@ -1034,33 +1259,64 @@ export const ClubEventsView: React.FC = () => {
                 m.eventId === selectedEventModal.id ||
                 m.title.toLowerCase().includes(selectedEventModal.title.toLowerCase().split(' ')[0])
             ).length === 0 && (
-              <div className="text-[11px] text-slate-500 p-2.5 bg-slate-50 rounded-xl">
+              <div style={{ fontSize: '11.5px', color: '#64748B', padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '12px', border: '1px solid #F1F5F9' }}>
                 Pre-event briefing standup scheduled with Core Committee.
               </div>
             )}
           </div>
         </div>
 
-        {/* 7. Documentation Checklist */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs">
-          <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-              Documentation & Archival Checklist
+        {/* 6. Documentation Checklist */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <FileText size={13} color="#235347" />
+              <span>Documentation & Archival Checklist</span>
             </span>
-            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+
+            <span
+              style={{
+                fontSize: '10.5px',
+                fontWeight: 700,
+                color: '#235347',
+                backgroundColor: '#DAF1DE',
+                padding: '2px 8px',
+                borderRadius: '999px',
+                border: '1px solid #8EB69B',
+              }}
+            >
               Tap chip to cycle
             </span>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
-              { key: 'report', label: 'Event report', icon: <FileText size={16} strokeWidth={1.75} className="text-emerald-600" /> },
-              { key: 'photos', label: 'Photos (geotagged or normal)', icon: <Camera size={16} strokeWidth={1.75} className="text-blue-600" /> },
-              { key: 'videos', label: 'Videos (as links)', icon: <Video size={16} strokeWidth={1.75} className="text-purple-600" /> },
-              { key: 'dailyNews', label: 'Daily news', icon: <Newspaper size={16} strokeWidth={1.75} className="text-amber-600" /> },
-              { key: 'mom', label: 'MoM (Minutes of Meeting)', icon: <Calendar size={16} strokeWidth={1.75} className="text-indigo-600" /> },
-              { key: 'feedback', label: 'Feedback summary', icon: <Star size={16} strokeWidth={1.75} className="text-teal-600" /> },
-              { key: 'attendanceSheet', label: 'Attendance sheet', icon: <FileSpreadsheet size={16} strokeWidth={1.75} className="text-emerald-600" /> },
+              { key: 'report', label: 'Event report', icon: <FileText size={15} color="#235347" /> },
+              { key: 'photos', label: 'Photos (geotagged or normal)', icon: <Camera size={15} color="#2563EB" /> },
+              { key: 'videos', label: 'Videos (as links)', icon: <Video size={15} color="#7C3AED" /> },
+              { key: 'dailyNews', label: 'Daily news', icon: <Newspaper size={15} color="#D97706" /> },
+              { key: 'mom', label: 'MoM (Minutes of Meeting)', icon: <Calendar size={15} color="#4F46E5" /> },
+              { key: 'feedback', label: 'Feedback summary', icon: <Star size={15} color="#0D9488" /> },
+              { key: 'attendanceSheet', label: 'Attendance sheet', icon: <FileSpreadsheet size={15} color="#235347" /> },
             ].map((item) => {
               const status = getDocItemStatus(selectedEventModal.id, item.key);
               const chipClass =
@@ -1073,11 +1329,21 @@ export const ClubEventsView: React.FC = () => {
               return (
                 <div
                   key={item.key}
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-2 hover:bg-slate-100/60 transition-colors"
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '14px',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #E2E8F0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '8px',
+                  }}
+                  className="hover:bg-slate-100/70 transition-colors"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                     <span className="shrink-0">{item.icon}</span>
-                    <span className="font-bold text-xs text-slate-800 truncate">
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#1E293B' }} className="truncate">
                       {item.label}
                     </span>
                   </div>
@@ -1085,7 +1351,7 @@ export const ClubEventsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleCycleEventDocStatus(selectedEventModal.id, item.key, item.label)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] border shadow-2xs transition-all cursor-pointer active:scale-95 uppercase tracking-wide shrink-0 ${chipClass}`}
+                    className={`px-3 py-1 rounded-full text-[11px] border shadow-2xs transition-all cursor-pointer active:scale-95 uppercase tracking-wide shrink-0 ${chipClass}`}
                     title="Tap to toggle: Missing → Draft → Submitted"
                   >
                     {status === 'submitted' ? '✓ Submitted' : status === 'draft' ? '✎ Draft' : '✗ Missing'}
@@ -1096,22 +1362,55 @@ export const ClubEventsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 8. Promotion & Social Broadcasts */}
-        <div className="p-4 rounded-2xl bg-white border border-purple-100 shadow-xs flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Megaphone size={16} className="text-purple-600" />
-              <span className="text-[11px] font-extrabold text-purple-950 uppercase tracking-wider">
+        {/* 7. Promotion & Social Broadcasts */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Megaphone size={16} color="#7C3AED" />
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
                 Promotion & Social Broadcasts
               </span>
             </div>
+
             <button
               type="button"
               onClick={() => {
                 setSelectedEventModal(null);
                 setActiveTab('campaigns');
               }}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 transition-colors cursor-pointer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 12px',
+                borderRadius: '999px',
+                fontSize: '11px',
+                fontWeight: 800,
+                backgroundColor: '#F5F3FF',
+                color: '#6D28D9',
+                border: '1px solid #DDD6FE',
+                cursor: 'pointer',
+              }}
+              className="hover:bg-purple-100 transition-colors"
             >
               <span>Campaign Studio</span>
             </button>
@@ -1119,17 +1418,38 @@ export const ClubEventsView: React.FC = () => {
 
           {/* Campaign checklist */}
           {eventCampaign ? (
-            <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-purple-50/50 border border-purple-100">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-purple-900 truncate">
+            <div
+              style={{
+                padding: '14px',
+                borderRadius: '16px',
+                backgroundColor: '#FAF5FF',
+                border: '1px solid #E9D5FF',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#581C87' }} className="truncate">
                   Campaign: {eventCampaign.title}
                 </span>
-                <span className="text-[11px] font-extrabold text-purple-700 bg-white px-2.5 py-0.5 rounded-full border border-purple-200 shrink-0">
+                <span
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 800,
+                    color: '#6D28D9',
+                    backgroundColor: '#FFFFFF',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    border: '1px solid #DDD6FE',
+                    flexShrink: 0,
+                  }}
+                >
                   {Object.values(eventCampaign.checklist).filter(Boolean).length}/5 Done
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 gap-1.5 mt-1">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '6px', marginTop: '4px' }}>
                 {[
                   { key: 'poster', label: 'Official Promotional Poster' },
                   { key: 'teaser', label: 'Teaser Post & Story Sequence' },
@@ -1146,26 +1466,49 @@ export const ClubEventsView: React.FC = () => {
                         updateCampaignChecklist(eventCampaign.id, t.key as keyof CampaignChecklist, !done);
                         showToast(`✓ Toggled ${t.label}`);
                       }}
-                      className={`p-2 rounded-lg border text-left flex items-center justify-between text-xs transition-all cursor-pointer ${
-                        done
-                          ? 'bg-purple-100/60 border-purple-300 text-purple-900 font-bold'
-                          : 'bg-white border-slate-200 text-slate-600 font-medium'
-                      }`}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        border: done ? '1px solid #C084FC' : '1px solid #E2E8F0',
+                        textAlign: 'left',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: '12px',
+                        backgroundColor: done ? 'rgba(243, 232, 255, 0.7)' : '#FFFFFF',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
                     >
-                      <div className="flex items-center gap-2">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span
-                          className={`w-4 h-4 rounded-md flex items-center justify-center text-[11px] ${
-                            done ? 'bg-purple-600 text-white' : 'border border-slate-300'
-                          }`}
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            backgroundColor: done ? '#7C3AED' : '#FFFFFF',
+                            color: '#FFFFFF',
+                            border: done ? 'none' : '1px solid #CBD5E1',
+                          }}
                         >
                           {done ? '✓' : ''}
                         </span>
-                        <span>{t.label}</span>
+                        <span style={{ fontWeight: done ? 700 : 500, color: done ? '#581C87' : '#334155' }}>
+                          {t.label}
+                        </span>
                       </div>
                       <span
-                        className={`text-[11px] uppercase font-extrabold ${
-                          done ? 'text-purple-700' : 'text-slate-400'
-                        }`}
+                        style={{
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          textTransform: 'uppercase',
+                          color: done ? '#7C3AED' : '#94A3B8',
+                        }}
                       >
                         {done ? 'Done' : 'Pending'}
                       </span>
@@ -1175,7 +1518,18 @@ export const ClubEventsView: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="p-3 text-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 text-xs font-medium">
+            <div
+              style={{
+                padding: '14px',
+                textAlign: 'center',
+                borderRadius: '14px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                color: '#64748B',
+                fontSize: '12px',
+                fontWeight: 500,
+              }}
+            >
               No standalone campaign chartered yet.{' '}
               <button
                 type="button"
@@ -1183,100 +1537,71 @@ export const ClubEventsView: React.FC = () => {
                   setSelectedEventModal(null);
                   setActiveTab('campaigns');
                 }}
-                className="font-bold text-purple-700 hover:underline inline cursor-pointer"
+                style={{ fontWeight: 800, color: '#7C3AED', background: 'none', border: 'none', cursor: 'pointer' }}
+                className="hover:underline"
               >
                 Launch Campaign in Studio
               </button>
             </div>
           )}
-
-          {/* Social posts list */}
-          <div className="flex flex-col gap-1.5 pt-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-                Social Posts ({eventPosts.length})
-              </span>
-              <span className="text-[11px] text-slate-400">
-                {eventPosts.filter((p) => p.status === 'Posted').length} posted •{' '}
-                {eventPosts.filter((p) => p.status === 'Scheduled').length} scheduled
-              </span>
-            </div>
-
-            {eventPosts.length === 0 ? (
-              <div className="p-3 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-400 text-xs">
-                No promotional posts created for this event yet.
-              </div>
-            ) : (
-              eventPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between gap-2"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span
-                        className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
-                          post.platform === 'Instagram'
-                            ? 'bg-pink-100 text-pink-700'
-                            : post.platform === 'LinkedIn'
-                            ? 'bg-blue-100 text-blue-700'
-                            : post.platform === 'WhatsApp'
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        {post.platform}
-                      </span>
-                      <span className="text-[11px] font-semibold text-slate-500">
-                        {post.status === 'Posted'
-                          ? `Published ${post.publishedDate || 'Oct 2'}`
-                          : post.status === 'Scheduled'
-                          ? `Drop on ${post.scheduledDate} • ${post.scheduledTime || '11:00'}`
-                          : 'Draft Mode'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-800 line-clamp-2 leading-relaxed">
-                      {post.caption}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md shrink-0 ${
-                      post.status === 'Posted'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : post.status === 'Scheduled'
-                        ? 'bg-purple-100 text-purple-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}
-                  >
-                    {post.status}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
         </div>
 
-        {/* 9. Feedback & Ratings */}
-        <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] font-extrabold text-emerald-800 uppercase tracking-wider">
+        {/* 8. Participant & Faculty Feedback */}
+        <div
+          style={{
+            backgroundColor: '#F0FDF4',
+            borderRadius: '22px',
+            border: '1px solid #BBF7D0',
+            padding: '18px 22px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#166534',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
               Participant & Faculty Feedback
             </span>
-            <div className="flex items-center gap-1 text-xs font-extrabold text-amber-600">
-              <Star size={16} strokeWidth={1.75} className="fill-amber-400 text-amber-500" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 900, color: '#D97706' }}>
+              <Star size={15} className="fill-amber-400 text-amber-500" />
               <span>{selectedEventModal.completedData?.feedbackRating || 4.9} / 5.0</span>
             </div>
           </div>
-          <p className="text-xs text-slate-700 font-medium leading-relaxed">
+          <p style={{ fontSize: '12.5px', color: '#14532D', lineHeight: 1.55, margin: 0, fontStyle: 'italic' }}>
             "{selectedEventModal.completedData?.feedbackNotes || 'Exemplary fieldwork execution. All scholars demonstrated GPS data collection and GIS map compilation.'}"
           </p>
         </div>
 
-        {/* 10. Event Media Gallery Preview */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 shadow-xs">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
-              Expedition Media Gallery
+        {/* 9. Expedition Media Gallery Preview */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid #E5EBE7',
+            padding: '20px 22px',
+            boxShadow: '0 4px 16px -2px rgba(11, 43, 38, 0.04)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#64748B',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Camera size={13} color="#235347" />
+              <span>Expedition Media Gallery</span>
             </span>
             <button
               type="button"
@@ -1284,27 +1609,40 @@ export const ClubEventsView: React.FC = () => {
                 setSelectedEventModal(null);
                 setActiveTab('archives');
               }}
-              className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+              style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                color: '#235347',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+              className="hover:underline"
             >
               Open Archive
             </button>
           </div>
-          <div
-            className="grid grid-cols-2 gap-2"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px' }}
-          >
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
             {(gallery.filter((g) => g.eventId === selectedEventModal.id).length > 0
               ? gallery.filter((g) => g.eventId === selectedEventModal.id)
               : gallery.slice(0, 2)
             ).map((g) => (
-              <div key={g.id} className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 relative group">
+              <div
+                key={g.id}
+                style={{
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  border: '1px solid #E2E8F0',
+                  backgroundColor: '#F8FAFC',
+                }}
+              >
                 <img
                   src={g.url}
                   alt={g.title}
-                  className="w-full h-20 object-cover"
-                  style={{ width: '100%', height: '80px', objectFit: 'cover' }}
+                  style={{ width: '100%', height: '88px', objectFit: 'cover' }}
                 />
-                <div className="p-1.5 bg-white text-[11px] font-bold text-slate-800 truncate">
+                <div style={{ padding: '8px 10px', fontSize: '11px', fontWeight: 700, color: '#1E293B' }} className="truncate">
                   {g.title}
                 </div>
               </div>
@@ -1312,14 +1650,27 @@ export const ClubEventsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 11. RSVP / Registration Toggle for Member */}
+        {/* 10. RSVP / Registration Toggle for Member */}
         <button
           type="button"
           onClick={() => {
             registerForEvent(selectedEventModal.id);
             showToast(`✓ RSVP Updated for ${selectedEventModal.title}`);
           }}
-          className="w-full py-3.5 rounded-full font-bold text-xs bg-slate-900 text-white shadow-sm hover:bg-slate-800 transition-all cursor-pointer active:scale-98"
+          style={{
+            width: '100%',
+            padding: '14px',
+            borderRadius: '999px',
+            fontSize: '13px',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #0B2B26 0%, #163832 100%)',
+            color: '#FFFFFF',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(11, 43, 38, 0.25)',
+            transition: 'all 0.15s ease',
+          }}
+          className="hover:opacity-95 active:scale-98"
         >
           Toggle Personal RSVP
         </button>
@@ -1523,102 +1874,7 @@ export const ClubEventsView: React.FC = () => {
           </form>
         </BottomSheet>
 
-        {/* Add Expense Modal */}
-        <BottomSheet
-          isOpen={isEventExpenseModalOpen}
-          onClose={() => setIsEventExpenseModalOpen(false)}
-          title="Add Event Expense"
-          subtitle={selectedEventModal ? `Log bill or voucher for ${selectedEventModal.title}` : 'Record expense voucher'}
-        >
-          <form onSubmit={handleAddEventExpense} className="flex flex-col gap-3 py-1">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Expense Title / Item</label>
-              <input
-                type="text"
-                required
-                value={eventExpTitle}
-                onChange={(e) => setEventExpTitle(e.target.value)}
-                placeholder="e.g. Refreshment Boxes or Sound Rigging"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-              />
-            </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Category</label>
-                <select
-                  value={eventExpCategory}
-                  onChange={(e) => setEventExpCategory(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white focus:border-emerald-500"
-                >
-                  <option value="Logistics">Logistics</option>
-                  <option value="Stage">Stage & AV</option>
-                  <option value="Printing">Printing & Kits</option>
-                  <option value="Refreshments">Refreshments</option>
-                  <option value="Equipment">Equipment</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Amount (₹ INR)</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">₹</span>
-                  <input
-                    type="number"
-                    min="1"
-                    required
-                    value={eventExpAmount}
-                    onChange={(e) => setEventExpAmount(e.target.value)}
-                    placeholder="5000"
-                    className="w-full pl-7 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Vendor / Payee</label>
-                <input
-                  type="text"
-                  required
-                  value={eventExpVendor}
-                  onChange={(e) => setEventExpVendor(e.target.value)}
-                  placeholder="e.g. Apex Audio & Stage"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Payment Date</label>
-                <input
-                  type="date"
-                  required
-                  value={eventExpDate}
-                  onChange={(e) => setEventExpDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Notes / Purpose</label>
-              <textarea
-                rows={2}
-                value={eventExpNotes}
-                onChange={(e) => setEventExpNotes(e.target.value)}
-                placeholder="e.g. Microphone batteries and stage truss safety clamps."
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all mt-1 cursor-pointer"
-            >
-              Record Event Expense
-            </button>
-          </form>
-        </BottomSheet>
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Sun,
   FileText,
@@ -24,6 +24,12 @@ import {
   FacultyHomeView,
   CoordinatorHomeView,
 } from '../roles';
+import {
+  formatLocalDate,
+  getMonday,
+  chapterActivitiesList,
+  getWeekDaysForStart,
+} from '../../data/activitiesData';
 
 export interface EventDocStatus {
   eventId: string;
@@ -60,9 +66,41 @@ export const HomeView: React.FC = () => {
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  // Calendar State (for Coordinator & Faculty)
-  const [currentMonth, setCurrentMonth] = useState('October 2026');
-  const [selectedDate, setSelectedDate] = useState('2026-10-03');
+  // Dynamic Date & Calendar State (Faculty & Coordinator)
+  const todayDate = useMemo(() => new Date(), []);
+  const todayStr = useMemo(() => formatLocalDate(todayDate), [todayDate]);
+
+  const [weekStart, setWeekStart] = useState(() => getMonday(todayDate));
+  const [selectedDate, setSelectedDate] = useState(() => todayStr);
+
+  const currentMonth = useMemo(() => {
+    return weekStart.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    });
+  }, [weekStart]);
+
+  const handlePrevWeek = () => {
+    setWeekStart((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() - 7);
+      return next;
+    });
+  };
+
+  const handleNextWeek = () => {
+    setWeekStart((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + 7);
+      return next;
+    });
+  };
+
+  const handleToday = () => {
+    const now = new Date();
+    setWeekStart(getMonday(now));
+    setSelectedDate(formatLocalDate(now));
+  };
 
   // Review Attention Modal State (Faculty & Coordinator)
   const [reviewItem, setReviewItem] = useState<{
@@ -332,37 +370,16 @@ export const HomeView: React.FC = () => {
     });
   };
 
-  // WeekDays Data (Mon 28 Sep to Sun 4 Oct 2026)
-  const weekDays = [
-    { dateStr: '2026-09-28', dayName: 'Mon', dayNum: 28, hasDot: false },
-    { dateStr: '2026-09-29', dayName: 'Tue', dayNum: 29, hasDot: true },
-    { dateStr: '2026-09-30', dayName: 'Wed', dayNum: 30, hasDot: false },
-    { dateStr: '2026-10-01', dayName: 'Thu', dayNum: 1, hasDot: true },
-    { dateStr: '2026-10-02', dayName: 'Fri', dayNum: 2, hasDot: false },
-    { dateStr: '2026-10-03', dayName: 'Sat', dayNum: 3, hasDot: true, isToday: true },
-    { dateStr: '2026-10-04', dayName: 'Sun', dayNum: 4, hasDot: false },
-  ];
+  // Dynamic Week Days & Filtered Current Agenda
+  const weekDays = useMemo(
+    () => getWeekDaysForStart(weekStart, todayStr, chapterActivitiesList),
+    [weekStart, todayStr]
+  );
 
-  // Agendas mapped by date
-  const agendaByDate: Record<string, { time: string; item: string; venue: string; tag: string }[]> = {
-    '2026-10-03': [
-      { time: '10:00 AM', item: 'Core Committee Briefing & MoM Review', venue: 'Seminar Hall B', tag: 'Meeting' },
-      { time: '02:00 PM', item: 'Poster & Media Review (Promotion Squad)', venue: 'GIS Lab 2', tag: 'Review' },
-      { time: '05:00 PM', item: 'Venue Booking & Turnstile Gate Confirmation', venue: 'Grand Auditorium', tag: 'Deadline' },
-    ],
-    '2026-09-29': [
-      { time: '11:00 AM', item: 'GIS Map Lab Equipment Calibration & Drone Test', venue: 'Lab 1', tag: 'Lab' },
-      { time: '04:00 PM', item: 'Quarterly Dean of Sciences Consultation', venue: 'Dean Office', tag: 'Faculty' },
-    ],
-    '2026-10-01': [
-      { time: '03:00 PM', item: 'Auditorium AV Testing & Stage Fabrication for GEO FEST', venue: 'Auditorium', tag: 'Rehearsal' },
-    ],
-  };
-
-  const currentAgenda = agendaByDate[selectedDate] || [
-    { time: '09:30 AM', item: 'Faculty office hours & student inquiry desk', venue: 'Room 304', tag: 'Routine' },
-    { time: '02:30 PM', item: 'Field GIS curriculum & expedition briefing', venue: 'Seminar Hall', tag: 'Briefing' },
-  ];
+  const currentAgenda = useMemo(
+    () => chapterActivitiesList.filter((item) => item.dateStr === selectedDate),
+    [selectedDate]
+  );
 
   // Needs Your Attention Items (Faculty & Coordinator)
   const allAttentionItems = [
@@ -431,20 +448,26 @@ export const HomeView: React.FC = () => {
     setReviewItem(item);
   };
 
-  const handleApproveCurrent = () => {
-    if (!reviewItem) return;
-    approveItem(reviewItem.id);
-    setAttentionItems((prev) => prev.filter((i) => i.id !== reviewItem.id));
-    showToast(`✓ Sanctioned & Approved: ${reviewItem.title}`);
-    setReviewItem(null);
+  const handleApproveCurrent = (itemToApprove?: any) => {
+    const target = itemToApprove || reviewItem;
+    if (!target) return;
+    approveItem(target.id);
+    setAttentionItems((prev) => prev.filter((i) => i.id !== target.id));
+    showToast(`✓ Sanctioned & Approved: ${target.title}`);
+    if (reviewItem && reviewItem.id === target.id) {
+      setReviewItem(null);
+    }
   };
 
-  const handleDeclineCurrent = () => {
-    if (!reviewItem) return;
-    rejectItem(reviewItem.id, isFaculty ? 'Declined by Faculty Advisor' : 'Declined by Coordinator');
-    setAttentionItems((prev) => prev.filter((i) => i.id !== reviewItem.id));
-    showToast(`Declined: ${reviewItem.title}`);
-    setReviewItem(null);
+  const handleDeclineCurrent = (itemToDecline?: any) => {
+    const target = itemToDecline || reviewItem;
+    if (!target) return;
+    rejectItem(target.id, isFaculty ? 'Declined by Faculty Advisor' : 'Declined by Coordinator');
+    setAttentionItems((prev) => prev.filter((i) => i.id !== target.id));
+    showToast(`Declined: ${target.title}`);
+    if (reviewItem && reviewItem.id === target.id) {
+      setReviewItem(null);
+    }
   };
 
   // Helper for Completion Ring
@@ -526,7 +549,7 @@ export const HomeView: React.FC = () => {
       ) : isFaculty ? (
         <FacultyHomeView
           currentMonth={currentMonth}
-          setCurrentMonth={setCurrentMonth}
+          setCurrentMonth={() => {}}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           weekDays={weekDays}
@@ -534,11 +557,17 @@ export const HomeView: React.FC = () => {
           attentionItems={attentionItems}
           handleReviewAttention={handleReviewAttention}
           timeLeft={timeLeft}
+          onPrevWeek={handlePrevWeek}
+          onNextWeek={handleNextWeek}
+          onToday={handleToday}
+          allMonthActivities={chapterActivitiesList}
+          onApproveAttention={handleApproveCurrent}
+          onDeclineAttention={handleDeclineCurrent}
         />
       ) : (
         <CoordinatorHomeView
           currentMonth={currentMonth}
-          setCurrentMonth={setCurrentMonth}
+          setCurrentMonth={() => {}}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
           weekDays={weekDays}
@@ -546,6 +575,12 @@ export const HomeView: React.FC = () => {
           attentionItems={attentionItems}
           handleReviewAttention={handleReviewAttention}
           timeLeft={timeLeft}
+          onPrevWeek={handlePrevWeek}
+          onNextWeek={handleNextWeek}
+          onToday={handleToday}
+          allMonthActivities={chapterActivitiesList}
+          onApproveAttention={handleApproveCurrent}
+          onDeclineAttention={handleDeclineCurrent}
         />
       )}
 

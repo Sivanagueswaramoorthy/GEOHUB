@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Calendar,
   Clock,
@@ -30,6 +30,13 @@ import {
 import { useApp } from '../../context/AppContext';
 import { AppAvatar } from '../../components/common/AppAvatar';
 import { Modal } from '../../components/common/Modal';
+import { DonutCard } from '../../components/DonutCard';
+import {
+  formatLocalDate,
+  getMonday,
+  chapterActivitiesList,
+  getWeekDaysForStart,
+} from '../../data/activitiesData';
 
 export const SuperAdminDashboardView: React.FC = () => {
   const {
@@ -48,7 +55,52 @@ export const SuperAdminDashboardView: React.FC = () => {
   } = useApp();
 
   // State
-  const [selectedDate, setSelectedDate] = useState('2026-10-03');
+  // Dynamic Date & Calendar State
+  const todayDate = useMemo(() => new Date(), []);
+  const todayStr = useMemo(() => formatLocalDate(todayDate), [todayDate]);
+  const [weekStart, setWeekStart] = useState(() => getMonday(todayDate));
+  const [selectedDate, setSelectedDate] = useState(() => todayStr);
+
+  const currentMonth = useMemo(() => {
+    return weekStart.toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    });
+  }, [weekStart]);
+
+  const handlePrevWeek = () => {
+    setWeekStart((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() - 7);
+      return next;
+    });
+  };
+
+  const handleNextWeek = () => {
+    setWeekStart((prev) => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + 7);
+      return next;
+    });
+  };
+
+  const handleToday = () => {
+    const now = new Date();
+    setWeekStart(getMonday(now));
+    setSelectedDate(formatLocalDate(now));
+  };
+
+  // 1. Dynamic Week Strip Data
+  const weekDays = useMemo(
+    () => getWeekDaysForStart(weekStart, todayStr, chapterActivitiesList),
+    [weekStart, todayStr]
+  );
+
+  const currentAgenda = useMemo(
+    () => chapterActivitiesList.filter((item) => item.dateStr === selectedDate),
+    [selectedDate]
+  );
+
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Review Approval Modal State
@@ -72,35 +124,6 @@ export const SuperAdminDashboardView: React.FC = () => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
-
-  // 1. Week Strip Data (Mon 28 Sep to Sun 4 Oct 2026)
-  const weekDays = [
-    { dateStr: '2026-09-28', dayName: 'Mon', dayNum: 28, hasDot: false },
-    { dateStr: '2026-09-29', dayName: 'Tue', dayNum: 29, hasDot: true },
-    { dateStr: '2026-09-30', dayName: 'Wed', dayNum: 30, hasDot: false },
-    { dateStr: '2026-10-01', dayName: 'Thu', dayNum: 1, hasDot: true },
-    { dateStr: '2026-10-02', dayName: 'Fri', dayNum: 2, hasDot: false },
-    { dateStr: '2026-10-03', dayName: 'Sat', dayNum: 3, hasDot: true, isToday: true },
-    { dateStr: '2026-10-04', dayName: 'Sun', dayNum: 4, hasDot: false },
-  ];
-
-  // Agendas mapped by date
-  const agendaByDate: Record<string, { time: string; item: string }[]> = {
-    '2026-10-03': [
-      { time: '10:00 AM', item: 'Core committee meeting, Seminar Hall' },
-      { time: '2:00 PM', item: 'Poster review (Promotion team)' },
-      { time: '5:00 PM', item: 'Venue booking deadline (Management)' },
-    ],
-    '2026-09-29': [
-      { time: '11:00 AM', item: 'GIS Map Lab Equipment Inspection' },
-      { time: '4:00 PM', item: 'Dean of Sciences Quarterly Consultation' },
-    ],
-    '2026-10-01': [
-      { time: '3:00 PM', item: 'Auditorium Audio-Visual Testing for GEO FEST' },
-    ],
-  };
-
-  const currentAgenda = agendaByDate[selectedDate] || [];
 
   // 2. Needs Your Attention Approvals (Specification Data)
   const [attentionItems, setAttentionItems] = useState([
@@ -444,110 +467,18 @@ export const SuperAdminDashboardView: React.FC = () => {
 
 
       {/* Members per team (Donut Chart) - Positioned Above Calendar */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '20px',
-          border: '1px solid #E8ECF2',
-          padding: '16px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-            Members per team
-          </h4>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-            128 Total
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', gap: '16px' }}>
-          {/* SVG Donut */}
-          <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-            <svg width="100" height="100" viewBox="0 0 40 40">
-              <circle cx="20" cy="20" r="15.915" fill="transparent" stroke="#E2E8F0" strokeWidth="4" />
-              {/* Promotion 34 (26.5%) */}
-              <circle
-                cx="20"
-                cy="20"
-                r="15.915"
-                fill="transparent"
-                stroke="#0B2B26"
-                strokeWidth="4"
-                strokeDasharray="26.5 73.5"
-                strokeDashoffset="25"
-              />
-              {/* Entertainment 34 (26.5%) */}
-              <circle
-                cx="20"
-                cy="20"
-                r="15.915"
-                fill="transparent"
-                stroke="#235347"
-                strokeWidth="4"
-                strokeDasharray="26.5 73.5"
-                strokeDashoffset="-1.5"
-              />
-              {/* Management 32 (25%) */}
-              <circle
-                cx="20"
-                cy="20"
-                r="15.915"
-                fill="transparent"
-                stroke="#8EB69B"
-                strokeWidth="4"
-                strokeDasharray="25 75"
-                strokeDashoffset="-28"
-              />
-              {/* Documentation 28 (22%) */}
-              <circle
-                cx="20"
-                cy="20"
-                r="15.915"
-                fill="transparent"
-                stroke="#DAF1DE"
-                strokeWidth="4"
-                strokeDasharray="22 78"
-                strokeDashoffset="-53"
-              />
-            </svg>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>128</span>
-              <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>Scholars</span>
-            </div>
-          </div>
-
-          {/* Donut Legend */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#0B2B26' }} />
-              <span>Promotion: <strong>34</strong></span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#235347' }} />
-              <span>Entertainment: <strong>34</strong></span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#8EB69B' }} />
-              <span>Management: <strong>32</strong></span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#DAF1DE', border: '1px solid #8EB69B' }} />
-              <span>Documentation: <strong>28</strong></span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DonutCard
+        title="Members per team"
+        subtitle="128 Total active chapter scholars"
+        centerTotal="128"
+        centerLabel="Scholars"
+        segments={[
+          { label: 'Promotion', count: 34, color: '#0B2B26' },
+          { label: 'Entertainment', count: 34, color: '#235347' },
+          { label: 'Management', count: 32, color: '#163832' },
+          { label: 'Documentation', count: 28, color: '#8EB69B' },
+        ]}
+      />
 
       {/* Week Strip (Calendar) */}
       <div
@@ -560,11 +491,32 @@ export const SuperAdminDashboardView: React.FC = () => {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <span style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
-            October 2026
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+              {currentMonth}
+            </span>
+            <button
+              type="button"
+              onClick={handleToday}
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '999px',
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                border: '1px solid #8EB69B',
+                cursor: 'pointer',
+              }}
+            >
+              Today
+            </button>
+          </div>
+
           <div style={{ display: 'flex', gap: '6px' }}>
             <button
+              type="button"
+              onClick={handlePrevWeek}
               style={{
                 width: '28px',
                 height: '28px',
@@ -575,11 +527,15 @@ export const SuperAdminDashboardView: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#64748B',
+                cursor: 'pointer',
               }}
+              title="Previous Week"
             >
               <ChevronLeft size={16} />
             </button>
             <button
+              type="button"
+              onClick={handleNextWeek}
               style={{
                 width: '28px',
                 height: '28px',
@@ -590,7 +546,9 @@ export const SuperAdminDashboardView: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#64748B',
+                cursor: 'pointer',
               }}
+              title="Next Week"
             >
               <ChevronRight size={16} />
             </button>

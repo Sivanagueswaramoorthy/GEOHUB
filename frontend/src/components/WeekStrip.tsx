@@ -36,22 +36,34 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
             key={item.dateStr}
             type="button"
             onClick={() => onSelectDate(item.dateStr)}
-            className="flex-1 flex flex-col items-center justify-center py-2.5 px-1 rounded-2xl transition-all duration-200 cursor-pointer min-w-[42px]"
+            className="flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 cursor-pointer min-w-[42px] relative"
             style={{
-              backgroundColor: isSelected ? '#235347' : '#FFFFFF',
-              border: isSelected ? '1px solid #235347' : '1px solid #EEF1F5',
+              backgroundColor: isSelected
+                ? '#235347'
+                : item.isToday
+                ? '#DAF1DE'
+                : '#FFFFFF',
+              border: isSelected
+                ? '1px solid #235347'
+                : item.isToday
+                ? '1.5px solid #8EB69B'
+                : '1px solid #EEF1F5',
               boxShadow: isSelected
                 ? '0 6px 16px rgba(35, 83, 71, 0.35)'
                 : '0 2px 6px rgba(15, 23, 42, 0.02)',
-              color: isSelected ? '#FFFFFF' : '#051F20',
+              color: isSelected ? '#FFFFFF' : item.isToday ? '#0B2B26' : '#051F20',
             }}
           >
             {/* Day name (Mon, Tue) */}
             <span
               style={{
                 fontSize: '11px',
-                fontWeight: 600,
-                color: isSelected ? 'rgba(255, 255, 255, 0.9)' : '#94A3B8',
+                fontWeight: item.isToday ? 700 : 600,
+                color: isSelected
+                  ? 'rgba(255, 255, 255, 0.95)'
+                  : item.isToday
+                  ? '#163832'
+                  : '#94A3B8',
                 marginBottom: '2px',
               }}
             >

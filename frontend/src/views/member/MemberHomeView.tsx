@@ -58,14 +58,14 @@ export const MemberHomeView: React.FC = () => {
             value: '92%',
             label: 'Attendance Rate',
             subtext: 'Top 5%',
-            bgColor: '#F0FDF4',
+            bgColor: '#DAF1DE',
           },
           {
             icon: <Calendar size={16} />,
             value: userEvents.length > 0 ? userEvents.length : 2,
             label: 'Events Enrolled',
             subtext: 'This term',
-            bgColor: '#E6FBF2',
+            bgColor: '#DAF1DE',
           },
         ]}
         briefTitle="Member Daily Brief"
