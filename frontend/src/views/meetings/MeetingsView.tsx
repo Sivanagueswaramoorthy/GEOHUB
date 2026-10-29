@@ -6,18 +6,20 @@ import {
   Users,
   Plus,
   Search,
-  CheckCircle2,
   FileText,
-  ArrowRight,
-  ShieldCheck,
   Check,
   X,
-  Sparkles,
-  AlertCircle,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { MeetingModel } from '../../types';
-import { Modal } from '../../components/common/Modal';
+import {
+  PillButton,
+  StatusChip,
+  BottomSheet,
+  EmptyState,
+  SegmentedTabs,
+  Avatar,
+} from '../../components/shared';
 
 export const MeetingsView: React.FC = () => {
   const {
@@ -38,22 +40,12 @@ export const MeetingsView: React.FC = () => {
   const [newType, setNewType] = useState<'pre_event' | 'post_event' | 'general'>('pre_event');
   const [newEventId, setNewEventId] = useState('');
   const [newDateTime, setNewDateTime] = useState(() => new Date(Date.now() + 86400000).toISOString().slice(0, 16));
-  const [newVenue, setNewVenue] = useState('Seminar Hall 3B / Virtual Bridge');
+  const [newVenue, setNewVenue] = useState('Seminar Hall 3B');
   const [newAgenda, setNewAgenda] = useState('');
 
   // MoM Editor Modal
   const [isMoMModalOpen, setIsMoMModalOpen] = useState(false);
   const [momNotesText, setMomNotesText] = useState('');
-  const [actionItemsList, setActionItemsList] = useState<{ task: string; assignedTo: string; isDone: boolean }[]>([]);
-  const [newActionTask, setNewActionTask] = useState('');
-  const [newActionAssignee, setNewActionAssignee] = useState('');
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const filteredMeetings = useMemo(() => {
     return meetings
@@ -63,7 +55,7 @@ export const MeetingsView: React.FC = () => {
           const q = searchQuery.toLowerCase();
           const matchTitle = m.title.toLowerCase().includes(q);
           const matchVenue = m.venue.toLowerCase().includes(q);
-          const matchAgenda = m.agenda.toLowerCase().includes(q);
+          const matchAgenda = (m.agenda || '').toLowerCase().includes(q);
           if (!matchTitle && !matchVenue && !matchAgenda) return false;
         }
         return true;
@@ -81,13 +73,12 @@ export const MeetingsView: React.FC = () => {
       eventTitle: eventObj ? eventObj.title : undefined,
       dateTime: new Date(newDateTime).toISOString(),
       venue: newVenue,
-      organizerName: `${currentUser.name} (${currentUser.role === 'super_admin' ? 'Faculty' : 'Coordinator'})`,
+      organizerName: currentUser.name,
       attendeeIds: [currentUser.uid],
       agenda: newAgenda,
       status: 'scheduled',
     });
     setIsCreateModalOpen(false);
-    showToast(`✓ Scheduled: "${newTitle}"`);
     setNewTitle('');
     setNewAgenda('');
   };
@@ -95,310 +86,198 @@ export const MeetingsView: React.FC = () => {
   const handleOpenMoMEditor = (meeting: MeetingModel) => {
     setSelectedMeeting(meeting);
     setMomNotesText(meeting.momNotes || '');
-    setActionItemsList(meeting.actionItems || []);
     setIsMoMModalOpen(true);
   };
 
-  const handleSaveMoM = () => {
+  const handleSaveMoM = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedMeeting) return;
-    updateMeetingMoM(selectedMeeting.id, momNotesText, actionItemsList);
+    updateMeetingMoM(selectedMeeting.id, momNotesText, selectedMeeting.actionItems || []);
     setIsMoMModalOpen(false);
-    showToast(`✓ Minutes of Meeting (MoM) saved & published!`);
   };
 
-  const handleAddActionItem = () => {
-    if (!newActionTask.trim()) return;
-    setActionItemsList((prev) => [
-      ...prev,
-      { task: newActionTask.trim(), assignedTo: newActionAssignee || 'Unassigned', isDone: false },
-    ]);
-    setNewActionTask('');
-    setNewActionAssignee('');
-  };
-
-  const handleToggleActionDone = (index: number) => {
-    setActionItemsList((prev) =>
-      prev.map((item, idx) => (idx === index ? { ...item, isDone: !item.isDone } : item))
-    );
-  };
+  const tabs = [
+    { key: 'all', label: 'All' },
+    { key: 'pre_event', label: 'Pre-Event Briefings' },
+    { key: 'post_event', label: 'Post-Event Reviews' },
+    { key: 'general', label: 'General Syncs' },
+  ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9999,
-            backgroundColor: '#0F172A',
-            color: '#FFFFFF',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <CheckCircle2 size={16} color="#235347" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Header Banner */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                color: '#163832',
-                backgroundColor: '#DAF1DE',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                border: '1px solid #8EB69B',
-                letterSpacing: '0.04em',
-              }}
-            >
-              GOVERNANCE & PLANNING
-            </span>
-          </div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Meetings & Minutes of Meeting (MoM)
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Meetings & MoM
           </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Official syncs & minutes
+          </p>
         </div>
 
-        {(currentUser.role === 'super_admin' || currentUser.role === 'admin' || currentUser.role === 'team_admin') && (
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            style={{
-              padding: '10px 16px',
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
-              cursor: 'pointer',
-            }}
-          >
-            <Plus size={16} /> Schedule Meeting
-          </button>
-        )}
+        <PillButton
+          variant="primary"
+          icon={<Plus size={16} />}
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          Schedule
+        </PillButton>
       </div>
 
-      {/* Quick Filter Tabs */}
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
-        {[
-          { key: 'all', label: 'All Sessions' },
-          { key: 'pre_event', label: 'Pre-Event Briefings' },
-          { key: 'post_event', label: 'Post-Event Reviews' },
-          { key: 'general', label: 'General Body Syncs' },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveFilter(tab.key as any)}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '999px',
-              fontSize: '12px',
-              fontWeight: 700,
-              border: activeFilter === tab.key ? '1px solid #235347' : '1px solid #E2E8F0',
-              backgroundColor: activeFilter === tab.key ? '#DAF1DE' : '#FFFFFF',
-              color: activeFilter === tab.key ? '#163832' : '#64748B',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Search Input */}
-      <div style={{ position: 'relative' }}>
-        <input
-          type="text"
-          className="input-field"
-          style={{
-            paddingLeft: '40px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E8ECF2',
-            borderRadius: '16px',
-            fontSize: '13px',
-            height: '46px',
-          }}
-          placeholder="Search by meeting title, agenda, or venue..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+      {/* Tabs and Search */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <SegmentedTabs
+          tabs={tabs}
+          activeTab={activeFilter}
+          onChange={(k) => setActiveFilter(k as any)}
         />
-        <Search size={20} strokeWidth={1.75} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            style={{
+              width: '100%',
+              height: '44px',
+              boxSizing: 'border-box',
+              paddingLeft: '40px',
+              paddingRight: '14px',
+              fontSize: '13px',
+              color: '#051F20',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #DAF1DE',
+              borderRadius: '16px',
+              outline: 'none',
+              boxShadow: '0 4px 14px rgba(5,31,32,0.03)',
+            }}
+            placeholder="Search meetings by title or agenda..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search
+            size={18}
+            strokeWidth={2}
+            color="#8EB69B"
+            style={{ position: 'absolute', left: 14, top: 13 }}
+          />
+        </div>
       </div>
 
-      {/* Meetings List Feed */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      {/* Meetings List: 24px cards with linked event pill, time, attendee count, StatusChip */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {filteredMeetings.length === 0 ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              border: '1px solid #E8ECF2',
-              padding: '36px 20px',
-              textAlign: 'center',
-            }}
-          >
-            <Calendar size={48} strokeWidth={1.75} color="#235347" style={{ margin: '0 auto 10px' }} />
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
-              No meetings found
-            </h3>
-            <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
-              No meetings currently match the selected filter.
-            </p>
-          </div>
+          <EmptyState
+            mascot="calendar"
+            title="No meetings"
+            description="Scheduled briefings and minutes appear here"
+            actionLabel="Schedule"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
         ) : (
           filteredMeetings.map((m) => {
-            const mDate = new Date(m.dateTime);
-            const isCompleted = m.status === 'completed';
-            const actionCompletedCount = (m.actionItems || []).filter((a) => a.isDone).length;
-            const totalActionCount = (m.actionItems || []).length;
-
+            const hasMom = Boolean(m.momNotes && m.momNotes.trim());
             return (
               <div
                 key={m.id}
                 style={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #E8ECF2',
-                  padding: '18px 20px',
-                  boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)',
+                  borderRadius: '24px',
+                  border: '1px solid #DAF1DE',
+                  padding: '20px',
+                  boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
                 }}
               >
-                {/* Header row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        backgroundColor:
-                          m.type === 'pre_event' ? '#DAF1DE' : m.type === 'post_event' ? '#EEF2FF' : '#FEF3C7',
-                        color:
-                          m.type === 'pre_event' ? '#163832' : m.type === 'post_event' ? '#4338CA' : '#B45309',
-                        border:
-                          m.type === 'pre_event' ? '1px solid #8EB69B' : m.type === 'post_event' ? '1px solid #C7D2FE' : '1px solid #FDE68A',
-                      }}
-                    >
-                      {m.type === 'pre_event' ? 'Pre-Event Briefing' : m.type === 'post_event' ? 'Post-Event Review' : 'General Sync'}
-                    </span>
-
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                  <div>
                     {m.eventTitle && (
-                      <span style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
-                        • Linked: {m.eventTitle}
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          backgroundColor: '#DAF1DE',
+                          color: '#0B2B26',
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          border: '1px solid #8EB69B',
+                          display: 'inline-block',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        {m.eventTitle}
                       </span>
                     )}
+                    <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                      {m.title}
+                    </h3>
                   </div>
 
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: isCompleted ? '#163832' : '#D97706',
-                      backgroundColor: isCompleted ? '#DAF1DE' : '#FFFBEB',
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                    }}
-                  >
-                    {isCompleted ? '✓ MoM Published' : 'Scheduled'}
-                  </span>
+                  <StatusChip
+                    status={hasMom ? 'done' : 'live'}
+                    label={hasMom ? 'Published' : 'Scheduled'}
+                  />
                 </div>
 
-                {/* Title */}
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  {m.title}
-                </h3>
-
-                {/* Date & Logistics */}
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '12px', color: '#64748B' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Clock size={16} strokeWidth={1.75} color="#235347" />
-                    <strong style={{ color: '#1E293B' }}>
-                      {mDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                    </strong>{' '}
-                    at {mDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={16} strokeWidth={1.75} color="#235347" />
-                    {m.venue}
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={16} strokeWidth={1.75} color="#235347" />
-                    Host: {m.organizerName}
-                  </span>
-                </div>
-
-                {/* Agenda */}
-                <div style={{ backgroundColor: '#F8FAFC', padding: '12px 14px', borderRadius: '12px', fontSize: '12px', color: '#334155' }}>
-                  <div style={{ fontWeight: 700, color: '#0F172A', marginBottom: '4px' }}>Agenda & Objectives:</div>
-                  {m.agenda}
-                </div>
-
-                {/* MoM Snippet if present */}
-                {m.momNotes && (
-                  <div style={{ backgroundColor: '#DAF1DE', padding: '12px 14px', borderRadius: '12px', fontSize: '12px', color: '#163832', border: '1px solid #8EB69B' }}>
-                    <div style={{ fontWeight: 800, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <FileText size={16} strokeWidth={1.75} /> Recorded Minutes of Meeting (MoM):
-                    </div>
-                    {m.momNotes}
+                {/* Metadata Row: time, venue, attendee count */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', fontSize: '12px', color: '#235347', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Clock size={14} color="#163832" />
+                    <span>
+                      {new Date(m.dateTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} •{' '}
+                      {new Date(m.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <MapPin size={14} color="#163832" />
+                    <span>{m.venue}</span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Users size={14} color="#163832" />
+                    <span>{(m.attendeeIds || []).length} Attendees</span>
+                  </div>
+                </div>
+
+                {m.agenda && (
+                  <p style={{ fontSize: '13px', color: '#051F20', margin: 0, lineHeight: 1.45 }}>
+                    {m.agenda}
+                  </p>
                 )}
 
-                {/* Action Items status pill */}
-                {totalActionCount > 0 && (
-                  <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <CheckCircle2 size={16} strokeWidth={1.75} color="#235347" />
-                    <span>Action Items Progress:</span>
-                    <strong style={{ color: '#0F172A' }}>{actionCompletedCount} of {totalActionCount} completed</strong>
-                  </div>
-                )}
+                {/* MoM preview / action */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingTop: '10px',
+                    borderTop: '1px solid #DAF1DE',
+                  }}
+                >
+                  <span style={{ fontSize: '12px', color: '#235347', fontWeight: 600 }}>
+                    {hasMom ? 'Minutes recorded' : 'Pending minutes'}
+                  </span>
 
-                {/* Action Footer */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
-                  <button
+                  <PillButton
+                    variant={hasMom ? 'secondary' : 'primary'}
+                    size="sm"
+                    icon={<FileText size={14} />}
                     onClick={() => handleOpenMoMEditor(m)}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: '999px',
-                      backgroundColor: isCompleted ? '#F1F5F9' : '#235347',
-                      color: isCompleted ? '#0F172A' : '#FFFFFF',
-                      border: 'none',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
                   >
-                    <FileText size={16} strokeWidth={1.75} />
-                    {isCompleted ? 'View / Edit MoM Record' : 'Record Minutes of Meeting (MoM)'}
-                  </button>
+                    {hasMom ? 'View MoM' : 'Submit MoM'}
+                  </PillButton>
                 </div>
               </div>
             );
@@ -406,226 +285,201 @@ export const MeetingsView: React.FC = () => {
         )}
       </div>
 
-      {/* Create Meeting Modal */}
-      <Modal
+      {/* Schedule Meeting BottomSheet */}
+      <BottomSheet
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Schedule Club Meeting"
-        subtitle="Organize pre-event briefing, volunteer alignment or post-event review"
+        title="Schedule Meeting"
+        subtitle="Book briefing or review"
       >
-        <form onSubmit={handleCreateMeeting} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="input-group">
-            <label className="input-label">Meeting Type</label>
-            <select
-              className="input-field"
-              value={newType}
-              onChange={(e) => setNewType(e.target.value as any)}
-            >
-              <option value="pre_event">Pre-Event Briefing (Volunteer station duties, safety)</option>
-              <option value="post_event">Post-Event Review (Feedback analysis, finances)</option>
-              <option value="general">General Body & Squad Sync</option>
-            </select>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Meeting Title</label>
+        <form onSubmit={handleCreateMeeting} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Meeting Title
+            </label>
             <input
               type="text"
               required
-              className="input-field"
-              placeholder="e.g. Pre-Event Volunteer Briefing: Drone Survey"
+              placeholder="e.g. Volunteer Pre-Briefing"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Link to Club Event (Optional)</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Type
+            </label>
             <select
-              className="input-field"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={newType}
+              onChange={(e) => setNewType(e.target.value as any)}
+            >
+              <option value="pre_event">Pre-Event Briefing</option>
+              <option value="post_event">Post-Event Review</option>
+              <option value="general">General Sync</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Linked Event
+            </label>
+            <select
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newEventId}
               onChange={(e) => setNewEventId(e.target.value)}
             >
-              <option value="">-- No specific event link --</option>
+              <option value="">-- No Linked Event --</option>
               {events.map((ev) => (
                 <option key={ev.id} value={ev.id}>
-                  {ev.title} ({new Date(ev.startDate).toLocaleDateString()})
+                  {ev.title}
                 </option>
               ))}
             </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            <div className="input-group">
-              <label className="input-label">Date & Time</label>
-              <input
-                type="datetime-local"
-                required
-                className="input-field"
-                value={newDateTime}
-                onChange={(e) => setNewDateTime(e.target.value)}
-              />
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Venue / Room</label>
-              <input
-                type="text"
-                required
-                className="input-field"
-                value={newVenue}
-                onChange={(e) => setNewVenue(e.target.value)}
-              />
-            </div>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Date & Time
+            </label>
+            <input
+              type="datetime-local"
+              required
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={newDateTime}
+              onChange={(e) => setNewDateTime(e.target.value)}
+            />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Agenda & Topics for Discussion</label>
-            <textarea
-              className="input-field"
-              rows={3}
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Venue
+            </label>
+            <input
+              type="text"
               required
-              placeholder="1. Hardware checklist. 2. Station assignments. 3. Refreshment delivery timing..."
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={newVenue}
+              onChange={(e) => setNewVenue(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Agenda
+            </label>
+            <textarea
+              rows={3}
+              placeholder="Key discussion points..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={newAgenda}
               onChange={(e) => setNewAgenda(e.target.value)}
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-block"
-            style={{
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-              height: '46px',
-              fontSize: '14px',
-              fontWeight: 700,
-              marginTop: '6px',
-            }}
-          >
-            Schedule & Notify Attendees
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Schedule
+          </PillButton>
         </form>
-      </Modal>
+      </BottomSheet>
 
-      {/* Record / View MoM Modal */}
-      <Modal
+      {/* MoM Editor BottomSheet */}
+      <BottomSheet
         isOpen={isMoMModalOpen}
         onClose={() => setIsMoMModalOpen(false)}
-        title="Minutes of Meeting (MoM) Editor"
-        subtitle={selectedMeeting?.title || 'Formal record of deliberations and action items'}
+        title="Minutes of Meeting"
+        subtitle={selectedMeeting?.title || 'Sync Minutes'}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          <div className="input-group">
-            <label className="input-label">Deliberations & Decisions (MoM Notes)</label>
+        <form onSubmit={handleSaveMoM} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Official Minutes
+            </label>
             <textarea
-              className="input-field"
-              rows={5}
-              placeholder="Record points discussed, decisions made, approved budget amounts, hardware permissions granted..."
+              required
+              rows={6}
+              placeholder="Record official decisions, duties assigned, and deliberations..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+                lineHeight: 1.5,
+              }}
               value={momNotesText}
               onChange={(e) => setMomNotesText(e.target.value)}
             />
           </div>
 
-          {/* Action Items Checklist */}
-          <div>
-            <label className="input-label" style={{ marginBottom: '8px' }}>Action Items & Assigned Scholars</label>
-            
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-              <input
-                type="text"
-                className="input-field"
-                style={{ flex: 2 }}
-                placeholder="Action task description..."
-                value={newActionTask}
-                onChange={(e) => setNewActionTask(e.target.value)}
-              />
-              <input
-                type="text"
-                className="input-field"
-                style={{ flex: 1 }}
-                placeholder="Assignee name"
-                value={newActionAssignee}
-                onChange={(e) => setNewActionAssignee(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleAddActionItem}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: '12px',
-                  backgroundColor: '#235347',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                }}
-              >
-                Add
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {actionItemsList.length === 0 ? (
-                <div style={{ fontSize: '12px', color: '#94A3B8', fontStyle: 'italic' }}>
-                  No action items added yet.
-                </div>
-              ) : (
-                actionItemsList.map((item, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '8px 12px',
-                      backgroundColor: item.isDone ? '#DAF1DE' : '#F8FAFC',
-                      borderRadius: '10px',
-                      border: item.isDone ? '1px solid #8EB69B' : '1px solid #E2E8F0',
-                      fontSize: '12px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <input
-                        type="checkbox"
-                        checked={item.isDone}
-                        onChange={() => handleToggleActionDone(idx)}
-                        style={{ width: '16px', height: '16px', accentColor: '#235347' }}
-                      />
-                      <span style={{ textDecoration: item.isDone ? 'line-through' : 'none', color: item.isDone ? '#163832' : '#0F172A' }}>
-                        {item.task}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 600 }}>
-                      @{item.assignedTo}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSaveMoM}
-            style={{
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-              color: '#FFFFFF',
-              border: 'none',
-              height: '46px',
-              fontSize: '14px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
-              marginTop: '8px',
-            }}
-          >
-            Save & Publish Minutes of Meeting (MoM)
-          </button>
-        </div>
-      </Modal>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Submit
+          </PillButton>
+        </form>
+      </BottomSheet>
     </div>
   );
 };
+
+export default MeetingsView;

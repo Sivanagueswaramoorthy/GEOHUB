@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, MapPin } from 'lucide-react';
 import { EventModel } from '../types';
 import { Chip } from './Chip';
+import { StatusChip } from './shared/StatusChip';
 import { TYPOGRAPHY } from '../styles/tokens';
 
 export interface EventCardProps {
@@ -37,14 +38,14 @@ export const EventCard: React.FC<EventCardProps> = ({
           onClick(event);
         }
       }}
-      className={`flex flex-col rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#235347] transition-all duration-150 overflow-hidden w-full ${className}`}
+      className={`flex flex-col rounded-[24px] bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.08)] cursor-pointer hover:border-[#8EB69B] pressable transition-all duration-200 overflow-hidden w-full ${className}`}
       style={{
         display: 'flex',
         flexDirection: 'column',
         borderRadius: '24px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid #EEF1F5',
-        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+        border: '1px solid #DAF1DE',
+        boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
         cursor: 'pointer',
         boxSizing: 'border-box',
         width: '100%',
@@ -134,11 +135,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             zIndex: 2,
           }}
         >
-          <Chip
-            label={event.status === 'live' ? 'Happening Now' : event.status}
-            variant="status"
-            size="sm"
-          />
+          <StatusChip status={event.status} />
         </div>
       </div>
 
@@ -153,17 +150,29 @@ export const EventCard: React.FC<EventCardProps> = ({
           gap: '8px',
         }}
       >
-        {/* Category Chip */}
+        {/* Category Pill */}
         <div className="flex items-center">
-          <Chip label={event.category} variant="squad" size="sm" />
+          <span
+            style={{
+              padding: '3px 10px',
+              borderRadius: '9999px',
+              backgroundColor: '#DAF1DE',
+              color: '#0B2B26',
+              fontSize: '11px',
+              fontWeight: 700,
+              border: '1px solid #8EB69B',
+            }}
+          >
+            {event.category || 'Event'}
+          </span>
         </div>
 
         {/* Event Title (Title 18/24 700 with line-clamp 2) */}
         <h3
           style={{
-            fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
-            lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
-            fontWeight: TYPOGRAPHY.scale.title.fontWeight,
+            fontSize: '16px',
+            lineHeight: '22px',
+            fontWeight: 700,
             color: '#051F20',
             fontFamily: 'var(--font-family)',
             display: '-webkit-box',
@@ -179,34 +188,30 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* Venue & Time (Small 13/18 500) */}
         <div
-          className="flex flex-col gap-1.5 mt-1"
+          className="flex flex-col gap-1 mt-1"
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
+            gap: '4px',
           }}
         >
           <div
-            className="flex items-center gap-2 text-slate-500"
+            className="flex items-center gap-1.5 text-xs font-medium"
             style={{
-              fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
-              lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
-              fontWeight: TYPOGRAPHY.scale.small.fontWeight,
+              color: '#235347',
             }}
           >
-            <MapPin size={16} strokeWidth={1.75} className="shrink-0 text-slate-400" />
+            <MapPin size={14} strokeWidth={1.75} className="shrink-0" style={{ color: '#8EB69B' }} />
             <span className="truncate">{event.venue}</span>
           </div>
 
           <div
-            className="flex items-center gap-2 text-slate-500"
+            className="flex items-center gap-1.5 text-xs font-medium"
             style={{
-              fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
-              lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
-              fontWeight: TYPOGRAPHY.scale.small.fontWeight,
+              color: '#235347',
             }}
           >
-            <Clock size={16} strokeWidth={1.75} className="shrink-0 text-slate-400" />
+            <Clock size={14} strokeWidth={1.75} className="shrink-0" style={{ color: '#8EB69B' }} />
             <span>{timeStr}</span>
           </div>
         </div>

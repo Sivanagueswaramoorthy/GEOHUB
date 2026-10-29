@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Hourglass, RefreshCw, LogOut, Mail, Sparkles, ShieldAlert } from 'lucide-react';
+import { RefreshCw, LogOut } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { Mascot } from '../../components/shared/Mascot';
+import { StatusChip } from '../../components/shared/StatusChip';
+import { PillButton } from '../../components/shared/PillButton';
 
 export interface PendingApprovalViewProps {
   onCheckStatus?: () => void;
@@ -20,7 +23,7 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
     setStatusMessage(null);
     setTimeout(() => {
       setIsRefreshing(false);
-      setStatusMessage('Registration status: Pending executive review by Faculty Advisor & Squad Lead.');
+      setStatusMessage('Verification in progress by chapter faculty.');
     }, 800);
     if (onCheckStatus) onCheckStatus();
   };
@@ -37,202 +40,78 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
 
   return (
     <div
+      className="min-h-screen w-full flex items-center justify-center p-5 select-none"
       style={{
-        minHeight: '100vh',
-        backgroundColor: '#FFFFFF',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '32px 20px',
-        boxSizing: 'border-box',
+        background: 'radial-gradient(circle at 50% 25%, rgba(218, 241, 222, 0.7) 0%, rgba(246, 251, 247, 0) 70%), #F6FBF7',
       }}
     >
       <div
+        className="w-full max-w-sm bg-white p-7 text-center flex flex-col items-center border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.08)]"
         style={{
-          width: '100%',
-          maxWidth: '460px',
-          textAlign: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          borderRadius: '24px',
         }}
       >
-        {/* Amber Circular Hourglass Icon */}
-        <div
-          style={{
-            width: '88px',
-            height: '88px',
-            borderRadius: '50%',
-            backgroundColor: '#FEF3C7',
-            border: '1px solid #FDE68A',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#D97706',
-            boxShadow: '0 8px 24px rgba(217, 119, 6, 0.16)',
-            marginBottom: '24px',
-          }}
-        >
-          <Hourglass size={48} strokeWidth={1.75} className="animate-pulse" />
+        {/* Shield Mascot on mint halo */}
+        <div className="relative mb-5 flex items-center justify-center">
+          <div
+            className="absolute w-28 h-28 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, #DAF1DE 0%, rgba(218, 241, 222, 0) 70%)',
+              filter: 'blur(10px)',
+            }}
+          />
+          <Mascot name="shield" size={88} floating />
         </div>
 
-        {/* Overline Tag */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '4px 12px',
-            borderRadius: '999px',
-            backgroundColor: '#FFF8E6',
-            border: '1px solid #FDE68A',
-            color: '#92400E',
-            fontSize: '11px',
-            lineHeight: '14px',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginBottom: '12px',
-          }}
-        >
-          <Sparkles size={16} strokeWidth={1.75} color="#D97706" />
-          <span>Induction Status: Under Review</span>
+        {/* Pending Review Chip */}
+        <div className="mb-3">
+          <StatusChip status="pending" label="Pending Review" />
         </div>
 
-        {/* Heading */}
+        {/* 1 Headline, 1 Subtitle */}
         <h1
-          style={{
-            fontSize: '28px',
-            fontWeight: 800,
-            color: '#0F172A',
-            letterSpacing: '-0.02em',
-            lineHeight: '34px',
-            marginBottom: '8px',
-            fontFamily: 'var(--font-family)',
-          }}
+          className="font-bold text-[#051F20] tracking-tight mb-1"
+          style={{ fontSize: '24px', lineHeight: '28px' }}
         >
-          Approval in Progress
+          Clearance pending
         </h1>
+        <p className="text-xs font-medium text-[#235347] max-w-xs mb-6 leading-relaxed">
+          Faculty advisor verification required
+        </p>
 
-        {/* Explanation Copy */}
-        <span
-          style={{
-            fontSize: '13px',
-            color: '#64748B',
-            fontWeight: 600,
-            marginBottom: '16px',
-            display: 'block',
-          }}
-        >
-          {currentUser.name || 'Scholar'} • {currentUser.team || 'Geo Club'} Squad
-        </span>
-
-        {/* User Email Pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            borderRadius: '12px',
-            backgroundColor: '#F8FAFC',
-            border: '1px solid #E2E8F0',
-            color: '#334155',
-            fontSize: '13px',
-            lineHeight: '18px',
-            fontWeight: 600,
-            marginBottom: '28px',
-          }}
-        >
-          <Mail size={16} strokeWidth={1.75} color="#64748B" />
-          <span>{currentUser.email || 'scholar@college.edu'}</span>
-        </div>
-
-        {/* Status Toast Notice if refreshed */}
         {statusMessage && (
           <div
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              borderRadius: '12px',
-              backgroundColor: '#FEF3C7',
-              border: '1px solid #FDE68A',
-              color: '#92400E',
-              fontSize: '12px',
-              fontWeight: 600,
-              lineHeight: '16px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              textAlign: 'left',
-            }}
+            className="w-full p-3 rounded-2xl mb-4 text-xs font-semibold text-[#051F20] bg-[rgba(242,184,75,0.16)] border border-[#F2B84B]"
+            style={{ borderRadius: '16px' }}
           >
-            <ShieldAlert size={16} strokeWidth={1.75} className="shrink-0" />
-            <span>{statusMessage}</span>
+            {statusMessage}
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <button
-            type="button"
+        {/* Two CTAs: Primary "Check Status" and Ghost "Sign out" */}
+        <div className="w-full flex flex-col gap-2.5">
+          <PillButton
+            variant="primary"
+            fullWidth
+            loading={isRefreshing}
             onClick={handleRefresh}
-            disabled={isRefreshing}
-            style={{
-              width: '100%',
-              height: '52px',
-              minHeight: '52px',
-              padding: '0 24px',
-              borderRadius: '999px',
-              backgroundColor: '#235347',
-              color: '#FFFFFF',
-              fontSize: '15px',
-              lineHeight: '20px',
-              fontWeight: 700,
-              border: 'none',
-              cursor: isRefreshing ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 14px rgba(35, 83, 71, 0.25)',
-              transition: 'all 150ms ease',
-            }}
+            icon={<RefreshCw size={14} strokeWidth={2.2} />}
           >
-            <RefreshCw size={16} strokeWidth={1.75} className={isRefreshing ? 'animate-spin' : ''} />
-            <span>{isRefreshing ? 'Checking Status...' : 'Check Status / Refresh'}</span>
-          </button>
+            Check Status
+          </PillButton>
 
-          <button
-            type="button"
+          <PillButton
+            variant="ghost"
+            fullWidth
             onClick={handleSignOut}
-            style={{
-              width: '100%',
-              height: '48px',
-              minHeight: '48px',
-              padding: '0 20px',
-              borderRadius: '999px',
-              backgroundColor: '#FFFFFF',
-              color: '#475569',
-              fontSize: '15px',
-              lineHeight: '20px',
-              fontWeight: 700,
-              border: '1px solid #E2E8F0',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'all 150ms ease',
-            }}
+            icon={<LogOut size={14} strokeWidth={2.2} />}
           >
-            <LogOut size={16} strokeWidth={1.75} />
-            <span>Sign Out & Return</span>
-          </button>
+            Sign out
+          </PillButton>
         </div>
       </div>
     </div>
   );
 };
+
+export default PendingApprovalView;

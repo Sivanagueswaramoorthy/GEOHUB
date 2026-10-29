@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { getRoleNavTabs, NavTabKey } from '../core/nav';
-import { COMPONENTS } from '../styles/tokens';
 
 export interface FloatingNavProps {
   className?: string;
@@ -33,27 +32,27 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
 
   const tabs = getRoleNavTabs(currentUser.role, currentUser.post);
 
-  const getLucideIcon = (iconName: string, size = 24) => {
+  const getLucideIcon = (iconName: string, size = 20, color = 'currentColor') => {
     switch (iconName) {
       case 'house':
-        return <House size={size} strokeWidth={1.75} />;
+        return <House size={size} strokeWidth={2} color={color} />;
       case 'calendar':
-        return <Calendar size={size} strokeWidth={1.75} />;
+        return <Calendar size={size} strokeWidth={2} color={color} />;
       case 'layers':
-        return <Layers size={size} strokeWidth={1.75} />;
+        return <Layers size={size} strokeWidth={2} color={color} />;
       case 'user-check':
-        return <UserCheck size={size} strokeWidth={1.75} />;
+        return <UserCheck size={size} strokeWidth={2} color={color} />;
       case 'folder-archive':
-        return <FolderArchive size={size} strokeWidth={1.75} />;
+        return <FolderArchive size={size} strokeWidth={2} color={color} />;
       case 'wallet':
-        return <Wallet size={size} strokeWidth={1.75} />;
+        return <Wallet size={size} strokeWidth={2} color={color} />;
       case 'megaphone':
-        return <Megaphone size={size} strokeWidth={1.75} />;
+        return <Megaphone size={size} strokeWidth={2} color={color} />;
       case 'images':
-        return <Images size={size} strokeWidth={1.75} />;
+        return <Images size={size} strokeWidth={2} color={color} />;
       case 'user':
       default:
-        return <User size={size} strokeWidth={1.75} />;
+        return <User size={size} strokeWidth={2} color={color} />;
     }
   };
 
@@ -63,7 +62,6 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
     setSelectedTeamId(null);
     setSelectedUserId(null);
 
-    // Map tab key to view key
     switch (key) {
       case 'home':
         setActiveTab('home');
@@ -105,16 +103,26 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       return activeTab === 'events';
     }
     if (key === 'operations') {
-      return activeTab === 'operations' || activeTab === 'explore';
+      return (
+        activeTab === 'operations' ||
+        activeTab === 'tasks' ||
+        activeTab === 'teams' ||
+        activeTab === 'team_home' ||
+        activeTab === 'attendance' ||
+        activeTab === 'reports' ||
+        activeTab === 'approvals' ||
+        activeTab === 'meetings' ||
+        activeTab === 'doc_studio'
+      );
     }
     if (key === 'members') {
-      return activeTab === 'members';
+      return activeTab === 'members' || activeTab === 'add_students';
     }
     if (key === 'archives') {
       return activeTab === 'gallery' || activeTab === 'doc_studio';
     }
     if (key === 'finance') {
-      return activeTab === 'treasurer';
+      return activeTab === 'treasurer' || activeTab === 'finance';
     }
     if (key === 'campaigns') {
       return activeTab === 'campaigns' || activeTab === 'ai_social';
@@ -123,34 +131,34 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       return activeTab === 'memories';
     }
     if (key === 'profile') {
-      return activeTab === 'profile' || activeTab === 'my_qr';
+      return activeTab === 'profile';
     }
     return activeTab === key;
   };
 
   return (
     <nav
-      className={`fixed transition-all duration-200 ${className}`}
+      className={`fixed transition-all duration-200 select-none ${className}`}
       style={{
-        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+        bottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
         width: 'calc(100% - 32px)',
-        maxWidth: isPhoneFrame ? '440px' : '560px',
-        height: `${COMPONENTS.floatingNav.height}px`,
+        maxWidth: isPhoneFrame ? '420px' : '520px',
+        height: '60px',
         backgroundColor: '#FFFFFF',
-        borderRadius: '32px',
-        border: '1px solid #E2E8F0',
-        boxShadow: '0 10px 30px rgba(15, 23, 42, 0.12)',
+        borderRadius: '9999px',
+        border: '1px solid #DAF1DE',
+        boxShadow: '0 12px 36px rgba(5, 31, 32, 0.12)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 8px',
+        padding: '0 6px',
         boxSizing: 'border-box',
         zIndex: 40,
         ...style,
       }}
-      aria-label="Bottom Navigation"
+      aria-label="Floating Navigation"
     >
       {tabs.slice(0, 5).map((tab) => {
         const active = isTabActive(tab.key);
@@ -159,29 +167,27 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           <div
             key={tab.key}
             className="flex-1 flex items-center justify-center h-full"
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             {active ? (
               <button
                 type="button"
                 onClick={() => handleTabClick(tab.key)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full cursor-pointer transition-all duration-150 active:scale-95"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 pressable"
                 style={{
-                  backgroundColor: '#DAF1DE',
-                  border: '1px solid #8EB69B',
-                  color: '#163832',
-                  boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
-                  height: '44px',
+                  backgroundColor: '#163832', // pine-800
+                  color: '#FFFFFF',
+                  boxShadow: '0 4px 14px rgba(22, 56, 50, 0.28)',
+                  height: '42px',
                   boxSizing: 'border-box',
                 }}
               >
-                <span className="shrink-0">{getLucideIcon(tab.iconName, 20)}</span>
+                <span className="shrink-0">{getLucideIcon(tab.iconName, 18, '#FFFFFF')}</span>
                 <span
                   style={{
-                    fontSize: `${COMPONENTS.floatingNav.labelFontSize}px`,
+                    fontSize: '12px',
                     lineHeight: '16px',
-                    fontWeight: COMPONENTS.floatingNav.labelFontWeight,
-                    color: '#163832',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
                     whiteSpace: 'nowrap',
                     fontFamily: 'var(--font-family)',
                   }}
@@ -193,20 +199,20 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
               <button
                 type="button"
                 onClick={() => handleTabClick(tab.key)}
-                className="relative flex items-center justify-center p-2 rounded-full text-slate-400 hover:text-slate-600 transition-colors cursor-pointer active:scale-95"
+                className="relative flex items-center justify-center p-2 rounded-full transition-colors cursor-pointer pressable"
                 style={{
                   width: '44px',
                   height: '44px',
+                  color: '#235347', // pine-700
                   boxSizing: 'border-box',
                 }}
                 title={tab.label}
                 aria-label={tab.label}
               >
-                {getLucideIcon(tab.iconName, 24)}
+                {getLucideIcon(tab.iconName, 22, '#235347')}
                 {tab.hasUpdates && (
                   <span
-                    className="absolute bottom-1 w-2 h-2 rounded-full"
-                    style={{ backgroundColor: '#235347' }}
+                    className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832]"
                   />
                 )}
               </button>
@@ -217,3 +223,5 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
     </nav>
   );
 };
+
+export default FloatingNav;

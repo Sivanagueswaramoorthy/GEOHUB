@@ -1,16 +1,30 @@
-export type UserRole =
+export type FinalRole =
+  | 'faculty'
+  | 'coordinator'
+  | 'documentation'
+  | 'treasurer'
+  | 'promotion'
+  | 'student';
+
+export type LegacyRole =
   | 'super_admin'
   | 'admin'
   | 'team_admin'
   | 'member'
   | 'volunteer'
-  | 'faculty'
-  | 'coordinator'
-  | 'treasurer'
-  | 'documentation'
   | 'social_media';
 
+export type UserRole = FinalRole | LegacyRole;
+
 export type UserStatus = 'active' | 'pending' | 'disabled';
+
+export interface UserPostAssignment {
+  post: string;
+  squad?: 'Management' | 'Promotion' | 'Documentation' | 'Entertainment' | string;
+  assignedBy: string;
+  assignedAt: string;
+  tenureEnd?: string; // Optional tenure end date
+}
 
 export interface UserModel {
   uid: string;
@@ -18,7 +32,9 @@ export interface UserModel {
   rollNo?: string;
   name: string;
   role: UserRole;
-  post?: string; // e.g. 'Faculty Advisor', 'President', 'Vice President', 'Treasurer', 'Documentation Lead', 'Social Media Lead', 'Student Volunteer'
+  post?: string; // e.g. 'President', 'Vice President', 'Treasurer', 'Documentation Lead', 'Promotion Lead', 'Team Admin'
+  tenureEnd?: string; // ISO string - optional end date after which post permissions expire
+  postAssignments?: UserPostAssignment[];
   team?: 'Management' | 'Promotion' | 'Documentation' | 'Entertainment' | string;
   teamRole?: string;
   isVolunteer: boolean;
@@ -42,7 +58,15 @@ export interface TeamModel {
   iconName: string;
 }
 
-export type EventStatus = 'draft' | 'submitted' | 'approved' | 'live' | 'completed' | 'cancelled' | 'archived';
+export type EventStatus =
+  | 'draft'
+  | 'submitted'
+  | 'approved'
+  | 'live'
+  | 'done'
+  | 'completed'
+  | 'cancelled'
+  | 'archived';
 
 export interface VolunteerAssignments {
   documentation: string[]; // volunteer user IDs
@@ -96,6 +120,8 @@ export interface EventModel {
   posterUrl?: string;
   venue: string;
   geoCoordinates?: { lat: number; lng: number; locationName?: string };
+  geofenceEnabled?: boolean;
+  geofenceRadiusMeters?: number;
   startDate: string; // ISO string
   endDate: string; // ISO string
   status: EventStatus;
@@ -103,6 +129,7 @@ export interface EventModel {
   capacity: number;
   registeredUserIds: string[];
   volunteerIds: string[];
+  assignedScannerUserIds?: string[];
   budget: number;
   createdBy: string;
   qrToken?: string;
@@ -112,6 +139,33 @@ export interface EventModel {
   preEventMoM?: EventMoM;
   postEventMoM?: EventMoM;
   completedData?: EventCompletedData;
+}
+
+export interface AuditLogItem {
+  id: string;
+  actorId: string;
+  actorName: string;
+  actorRole?: string;
+  action:
+    | 'role_change'
+    | 'post_assignment'
+    | 'post_revocation'
+    | 'budget_approval'
+    | 'budget_rejection'
+    | 'budget_request'
+    | 'event_status_change'
+    | 'event_cancellation'
+    | 'scanner_assignment_change'
+    | 'attendance_override'
+    | 'report_export'
+    | string;
+  targetType: 'user' | 'event' | 'budget' | 'attendance' | 'report' | 'post' | string;
+  targetId: string;
+  targetName: string;
+  beforeState?: string;
+  afterState?: string;
+  details?: string;
+  timestamp: string; // ISO string
 }
 
 // ------------------------------------------
@@ -381,8 +435,8 @@ export interface NotificationModel {
 // ------------------------------------------
 // PROMOTION & SOCIAL MEDIA CAMPAIGNS
 // ------------------------------------------
-export type SocialPlatform = 'Instagram' | 'LinkedIn' | 'WhatsApp' | 'Other';
-export type SocialPostStatus = 'Draft' | 'Scheduled' | 'Posted';
+export type SocialPlatform = 'Instagram' | 'LinkedIn' | 'WhatsApp' | 'YouTube' | 'Other';
+export type SocialPostStatus = 'Draft' | 'Scheduled' | 'Posted' | 'Published';
 
 export interface SocialPost {
   id: string;
@@ -397,6 +451,7 @@ export interface SocialPost {
   postUrl?: string; // Live post URL
   hashtags?: string[];
   authorName?: string;
+  createdBy?: string;
   mediaUrl?: string;
   likesCount?: number;
   reachCount?: number;
@@ -434,5 +489,9 @@ export interface DailyNewsItem {
   author: string;
   content: string;
   hashtags: string[];
+  tags?: string[];
+  category?: string;
+  authorName?: string;
+  isPriority?: boolean;
   status: 'draft' | 'published';
 }

@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- GeoHub Brand Palette & Soft Pastel Tokens -->
+    <color name="pine_950">#051F20</color>
+    <color name="pine_900">#0B2B26</color>
+    <color name="pine_800">#163832</color>
+    <color name="pine_700">#235347</color>
+    <color name="sage_400">#8EB69B</color>
+    <color name="mint_100">#DAF1DE</color>
+
+    <!-- Derived Neutrals -->
+    <color name="app_bg">#F6FBF7</color>
+    <color name="card_white">#FFFFFF</color>
+    <color name="text_primary">#051F20</color>
+    <color name="text_secondary">#235347</color>
+    <color name="amber_warn">#F2B84B</color>
+    <color name="red_danger">#D9534F</color>
+
+    <!-- Launcher -->
+    <color name="ic_launcher_background">#F6FBF7</color>
 </resources>

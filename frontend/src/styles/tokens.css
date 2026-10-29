@@ -1,314 +1,222 @@
 :root {
   /* ==========================================================================
-     GeoHub Design System - Normalized Tokens (Green Eco Organization Spec)
+     GeoHub Design System - Soft Rounded Pastel 3D Tokens (Single Source of Truth)
      ========================================================================== */
 
   /* --------------------------------------------------------------------------
-     1. Background Surfaces (Strict Pure White Invariant)
+     1. Brand Palette (Only Brand Colors Allowed)
      -------------------------------------------------------------------------- */
-  --bg-scaffold: #FFFFFF;
+  --pine-950: #051F20; /* darkest text, dark hero cards, scanner background */
+  --pine-900: #0B2B26; /* dark surfaces, headings on mint */
+  --pine-800: #163832; /* primary buttons, active pill tabs, key icons */
+  --pine-700: #235347; /* secondary text, links, helper meta, chart lines */
+  --sage-400: #8EB69B; /* dividers, chips, progress fills, secondary borders, focus ring */
+  --mint-100: #DAF1DE; /* selected states, card tints, hero radial glow */
+
+  /* --------------------------------------------------------------------------
+     2. Derived & Semantic Palette
+     -------------------------------------------------------------------------- */
+  --app-bg: #F6FBF7;
+  --bg-scaffold: #F6FBF7;
   --bg-card: #FFFFFF;
   --bg-sheet: #FFFFFF;
   --bg-modal: #FFFFFF;
-  --bg-subtle: #F8FAFC;
-  --bg-input: #FFFFFF;
+  --bg-subtle: #F6FBF7;
+  --card-white: #FFFFFF;
 
-  /* --------------------------------------------------------------------------
-     2. Brand Colors (Forest Pine Rebuild)
-     -------------------------------------------------------------------------- */
+  --text-primary: #051F20;   /* min 4.5:1 contrast */
+  --text-secondary: #235347; /* secondary text */
+  --text-on-dark: #FFFFFF;
+  --text-muted: #8EB69B;
+
+  /* Semantic (small chips/icons only) */
+  --amber-warn: #F2B84B;  /* pending, review, low stock */
+  --red-danger: #D9534F;  /* cancel, reject, delete */
+
+  /* Semantic backgrounds (translucent) */
+  --amber-bg: rgba(242, 184, 75, 0.14);
+  --amber-border: rgba(242, 184, 75, 0.40);
+  --red-bg: rgba(217, 83, 79, 0.12);
+  --red-border: rgba(217, 83, 79, 0.35);
+
+  /* Hairline and border tokens */
+  --hairline-mint: 1px solid #DAF1DE;
+  --border-hairline: 1px solid #DAF1DE;
+  --divider: #DAF1DE;
+  --card-border: #DAF1DE;
+  --input-border: #DAF1DE;
+
+  /* Compatibility aliases */
   --brand-green: #235347;
   --dark-green: #0B2B26;
   --darkest-pine: #051F20;
   --spruce-green: #163832;
   --sage-green: #8EB69B;
   --mint-tint: #DAF1DE;
-  --mint-border: #8EB69B;
-  --mint-text: #163832;
-
-  /* Primary compatibility aliases */
-  --primary: #235347;
+  --mint-border: #DAF1DE;
+  --mint-text: #051F20;
+  --primary: #163832;
   --primary-dark: #0B2B26;
   --primary-light: #DAF1DE;
-  --primary-border: #8EB69B;
-  --accent: #235347;
-
-  /* --------------------------------------------------------------------------
-     3. Pastel Stat Tile Color Sets
-     -------------------------------------------------------------------------- */
-  --stat-mint-bg: #DAF1DE;
-  --stat-mint-border: #8EB69B;
-  --stat-mint-text: #163832;
-  --stat-mint-num: #0B2B26;
-
-  --stat-lavender-bg: #F3EEFF;
-  --stat-lavender-border: #DDD1FF;
-  --stat-lavender-text: #5B21B6;
-  --stat-lavender-num: #5B21B6;
-
-  --stat-amber-bg: #FFF8E6;
-  --stat-amber-border: #FDE68A;
-  --stat-amber-text: #92400E;
-  --stat-amber-num: #7C2D12;
-
-  --stat-teal-bg: #DAF1DE;
-  --stat-teal-border: #8EB69B;
-  --stat-teal-text: #163832;
-  --stat-teal-num: #0B2B26;
-
-  /* --------------------------------------------------------------------------
-     4. Neutrals, Text & Dividers
-     -------------------------------------------------------------------------- */
   --text-main: #051F20;
-  --text-primary: #051F20;
-  --text-secondary: #163832;
-  --text-tertiary: #64748B;
-  --text-muted: #8EB69B;
-  --divider: #EEF1F5;
-  --card-border: #EEF1F5;
-  --border-soft: #EEF1F5;
-  --input-border: #E2E8F0;
+  --danger-red: #D9534F;
+  --warning-amber: #F2B84B;
 
   /* --------------------------------------------------------------------------
-     5. Special / Danger / Status Colors
+     3. Radius (Strict Scale)
+     Cards & Bento: 24px | Hero: 32px | Pills: 9999px | Inputs: 16px | Sheets: 24px | Phone: 36px
      -------------------------------------------------------------------------- */
-  --danger-red: #EF4444;
-  --danger-bg: #FEF2F2;
-  --danger-border: #FECACA;
-  --danger-text: #DC2626;
-
-  --success-green: #235347;
-  --success-bg: #DAF1DE;
-  --warning-amber: #F59E0B;
-  --warning-bg: #FFF8E6;
-  --info-blue: #3B82F6;
-  --info-bg: #EFF6FF;
+  --radius-cards: 24px;
+  --radius-bento: 24px;
+  --radius-card: 24px;
+  --radius-tile: 24px;
+  --radius-hero: 32px;
+  --radius-pills: 9999px;
+  --radius-pill: 9999px;
+  --radius-btn: 9999px;
+  --radius-inputs: 16px;
+  --radius-input: 16px;
+  --radius-sheet: 24px;
+  --radius-phone: 36px;
+  --radius-frame: 36px;
 
   /* --------------------------------------------------------------------------
-     6. Typography Scale (Plus Jakarta Sans; sizes in px, line-height in px)
+     4. Shadows
+     Cards: 0 10px 30px rgba(5,31,32,0.08)
+     Nav: 0 12px 36px rgba(5,31,32,0.12)
      -------------------------------------------------------------------------- */
-  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow-card: 0 10px 30px rgba(5, 31, 32, 0.08);
+  --shadow-soft: 0 10px 30px rgba(5, 31, 32, 0.08);
+  --shadow-floating-nav: 0 12px 36px rgba(5, 31, 32, 0.12);
+  --shadow-nav: 0 12px 36px rgba(5, 31, 32, 0.12);
+  --shadow-sheet: 0 -12px 40px rgba(5, 31, 32, 0.12);
+  --shadow-modal: 0 24px 60px rgba(5, 31, 32, 0.18);
+  --shadow-icon-btn: 0 4px 14px rgba(5, 31, 32, 0.06);
 
-  /* Display 28/34, 800 */
-  --font-display-size: 28px;
-  --font-display-line: 34px;
-  --font-display-weight: 800;
-  --font-display-spacing: -0.02em;
+  /* --------------------------------------------------------------------------
+     5. Typography Scale (Plus Jakarta Sans, fallback Inter)
+     Headline 28/32 bold (max 2 lines)
+     Section title 18 semibold
+     Body 14-15
+     Caption 12 (HARD FLOOR, NEVER BELOW 12)
+     Stat numbers 24 extra bold
+     -------------------------------------------------------------------------- */
+  --font-family: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Title-L 22/28, 800 */
-  --font-title-l-size: 22px;
-  --font-title-l-line: 28px;
-  --font-title-l-weight: 800;
-  --font-title-l-spacing: -0.01em;
+  --font-headline-size: 28px;
+  --font-headline-line: 32px;
+  --font-headline-weight: 700;
 
-  /* Title 18/24, 700 */
-  --font-title-size: 18px;
-  --font-title-line: 24px;
-  --font-title-weight: 700;
+  --font-section-size: 18px;
+  --font-section-line: 24px;
+  --font-section-weight: 600;
 
-  /* Subtitle 16/24, 600 */
-  --font-subtitle-size: 16px;
-  --font-subtitle-line: 24px;
-  --font-subtitle-weight: 600;
-
-  /* Body 14/22, 400 (Default text, minimum body size) */
-  --font-body-size: 14px;
+  --font-body-size: 14.5px;
   --font-body-line: 22px;
   --font-body-weight: 400;
 
-  /* Body-strong 14/22, 600 */
-  --font-body-strong-size: 14px;
+  --font-body-strong-size: 14.5px;
   --font-body-strong-line: 22px;
   --font-body-strong-weight: 600;
 
-  /* Small 13/18, 500 (Helper text, metadata) */
-  --font-small-size: 13px;
-  --font-small-line: 18px;
-  --font-small-weight: 500;
-  --font-small-label-weight: 600;
-
-  /* Caption 12/16, 500 (Chips, nav labels, timestamps) */
   --font-caption-size: 12px;
   --font-caption-line: 16px;
-  --font-caption-weight: 500;
-  --font-caption-strong-weight: 600;
+  --font-caption-weight: 600;
 
-  /* Overline 11/14, 700, uppercase, letter-spacing .08em */
-  --font-overline-size: 11px;
-  --font-overline-line: 14px;
-  --font-overline-weight: 700;
-  --font-overline-spacing: 0.08em;
-
-  /* Stat number 32/36, 800 with tabular-nums */
-  --font-stat-number-size: 32px;
-  --font-stat-number-line: 36px;
+  --font-stat-number-size: 24px;
+  --font-stat-number-line: 28px;
   --font-stat-number-weight: 800;
 
-  /* Button 15/20, 700 */
+  /* Aliases for components */
+  --font-title-size: 18px;
+  --font-title-line: 24px;
+  --font-title-weight: 600;
+  --font-subtitle-size: 15px;
+  --font-subtitle-line: 22px;
+  --font-subtitle-weight: 600;
   --font-button-size: 15px;
   --font-button-line: 20px;
   --font-button-weight: 700;
 
   /* --------------------------------------------------------------------------
-     7. Spacing Scale (4px Base)
+     6. Layout & Spacing
      -------------------------------------------------------------------------- */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-7: 28px;
-  --space-8: 32px;
-  --space-9: 36px;
-  --space-10: 40px;
-  --space-11: 44px;
-  --space-12: 48px;
-  --space-13: 52px;
-  --space-14: 56px;
-  --space-16: 64px;
-  --space-18: 72px;
-  --space-24: 96px;
-  --space-28: 112px;
-
-  /* Spacing aliases */
-  --page-gutter-mobile: 20px;
-  --page-gutter-desktop: 24px;
   --page-padding-x: 20px;
   --page-padding-bottom: 112px;
-  --content-max-width: 1200px;
-  --mobile-max-width: 480px;
-
-  --section-gap: 24px;
-  --card-padding: 16px;
-  --card-hero-padding: 20px;
-  --gap-icon-label: 8px;
-  --gap-chips: 8px;
-  --gap-stacked-cards: 16px;
-  --gap-stat-tiles: 12px;
-  --list-row-min-height: 56px;
+  --min-tap-target: 44px;
+  --focus-ring: 2px solid #8EB69B;
 
   /* --------------------------------------------------------------------------
-     8. Icon Sizes & Containers (Lucide only, Stroke 1.75)
+     7. Motion
+     200-250ms ease-out, 4s float on hero mascots, press scale 0.97
+     Respects prefers-reduced-motion
      -------------------------------------------------------------------------- */
-  --icon-sm: 16px;
-  --icon-md: 20px;
-  --icon-lg: 24px;
-  --icon-xl: 28px;
-  --icon-stroke-width: 1.75;
-
-  --icon-container-list: 40px;
-  --icon-container-tile: 44px;
-  --icon-container-chevron: 36px;
-  --radius-icon-container: 12px;
-
-  /* --------------------------------------------------------------------------
-     9. Images, Media & Avatars
-     -------------------------------------------------------------------------- */
-  --img-hero-aspect: 16 / 9;
-  --img-hero-radius: 24px;
-  --img-hero-overlay: linear-gradient(180deg, rgba(15, 23, 42, 0) 40%, rgba(15, 23, 42, 0.85) 100%);
-
-  --img-event-aspect: 16 / 9;
-  --img-event-radius: 24px 24px 0 0;
-  --img-badge-offset: 12px;
-
-  --avatar-sm: 32px;
-  --avatar-md: 40px;
-  --avatar-lg: 48px;
-  --avatar-xl: 72px;
-  --avatar-online-dot: 10px;
-
-  --org-logo-size: 72px;
-  --org-logo-radius: 22px;
-  --org-logo-padding: 12px;
-
-  --gallery-thumb-aspect: 1 / 1;
-  --gallery-thumb-gap: 8px;
-  --lightbox-ctrl-size: 44px;
-
-  /* --------------------------------------------------------------------------
-     10. Search Bars & Filter Pills
-     -------------------------------------------------------------------------- */
-  --search-height: 48px;
-  --search-radius: 16px;
-  --search-border: 1px solid #E2E8F0;
-  --search-bg: #FFFFFF;
-  --search-icon-size: 20px;
-  --search-icon-inset: 16px;
-  --search-clear-size: 24px;
-  --search-clear-hit: 44px;
-  --search-focus-ring: 0 0 0 2px #235347, 0 0 0 4px rgba(35, 83, 71, 0.20);
-  --search-margin-top: 16px;
-  --search-margin-bottom: 12px;
-
-  --filter-pill-height: 40px;
-  --filter-pill-touch-height: 44px;
-  --filter-pill-radius: 999px;
-  --filter-pill-icon: 16px;
-  --filter-badge-pill-size: 22px;
-  --filter-gap: 8px;
-  --results-count-margin-top: 16px;
-
-  /* --------------------------------------------------------------------------
-     11. Headers, Modals, Forms & Floating Nav
-     -------------------------------------------------------------------------- */
-  --header-height: 64px;
-  --header-btn-size: 44px;
-  --header-btn-gap: 12px;
-
-  --floating-nav-height: 64px;
-  --floating-nav-margin: 16px;
-  --floating-nav-slots: 5;
-
-  --btn-primary-height: 52px;
-  --btn-secondary-height: 48px;
-  --btn-small-height: 36px;
-  --btn-radius-pill: 999px;
-
-  --input-height: 48px;
-  --input-radius: 16px;
-  --form-gap-label: 8px;
-  --form-gap-helper: 4px;
-  --form-gap-field: 20px;
-
-  --sheet-handle-width: 36px;
-  --sheet-handle-height: 4px;
-  --sheet-padding: 20px;
-  --sheet-radius-top: 24px;
-  --dialog-radius: 20px;
-  --sheet-close-hit: 44px;
-  --sheet-max-height: 90vh;
-
-  --table-row-height: 56px;
-
-  /* --------------------------------------------------------------------------
-     12. General Radii & Shadows
-     -------------------------------------------------------------------------- */
-  --radius-xs: 8px;
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
-  --radius-full: 999px;
-  --radius-card: 24px;
-  --radius-tile: 20px;
-  --radius-pill: 999px;
-  --radius-input: 16px;
-  --radius-btn: 999px;
-
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow-card: 0 6px 24px rgba(15, 23, 42, 0.06);
-  --shadow-floating-nav: 0 10px 30px rgba(15, 23, 42, 0.12);
-  --shadow-sheet: 0 -10px 40px rgba(15, 23, 42, 0.14);
-  --shadow-modal: 0 20px 48px rgba(15, 23, 42, 0.18);
-
-  --trans-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --trans-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-duration: 220ms;
+  --motion-ease: ease-out;
+  --motion-press-scale: 0.97;
+  --trans-normal: 220ms ease-out;
+  --trans-float: 4s ease-in-out infinite;
 }
 
-@media (min-width: 768px) {
+@media (prefers-reduced-motion: reduce) {
   :root {
-    --page-padding-x: 24px;
+    --motion-duration: 0ms;
+    --trans-normal: 0ms;
+    --trans-float: none;
   }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Background Radial Mint Glow Utility */
+.radial-mint-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(218, 241, 222, 0.6) 0%, rgba(246, 251, 247, 0) 70%), #F6FBF7;
+}
+
+/* Shimmer animation for Skeleton */
+@keyframes mintShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.mint-shimmer {
+  background: linear-gradient(90deg, #DAF1DE 25%, #F6FBF7 50%, #DAF1DE 75%);
+  background-size: 200% 100%;
+  animation: mintShimmer 1.8s infinite ease-in-out;
+}
+
+/* Mascot floating animation */
+@keyframes mascotFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.mascot-floating {
+  animation: mascotFloat 4s ease-in-out infinite;
+}
+
+/* Pressable micro-interaction */
+.pressable {
+  transition: transform 200ms ease-out;
+}
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* Accessible focus ring */
+.focus-ring-sage:focus-visible {
+  outline: 2px solid #8EB69B;
+  outline-offset: 2px;
 }

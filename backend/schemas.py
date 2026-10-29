@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Auth Schemas
 class UserRegister(BaseModel):
@@ -17,6 +17,8 @@ class UserResponse(BaseModel):
     email: str
     name: str
     role: str
+    post: Optional[str] = None
+    tenure_end: Optional[datetime] = None
     team: Optional[str] = None
     team_role: Optional[str] = None
     is_volunteer: bool
@@ -34,12 +36,16 @@ class TokenResponse(BaseModel):
 class RoleAssignRequest(BaseModel):
     user_id: str
     role: str
+    post: Optional[str] = None
+    tenure_end: Optional[datetime] = None
     team: Optional[str] = None
     is_volunteer: Optional[bool] = False
 
 class TeamAdminAssignRequest(BaseModel):
     user_id: str
     team: str
+    post: Optional[str] = "Team Admin"
+    tenure_end: Optional[datetime] = None
 
 # Team Schemas
 class TeamResponse(BaseModel):
@@ -83,6 +89,10 @@ class EventCreate(BaseModel):
     budget: Optional[float] = 0.0
     poster_url: Optional[str] = None
     academic_year: Optional[str] = "2025-26"
+    geofence_enabled: Optional[bool] = False
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    geofence_radius_meters: Optional[float] = 100.0
 
 class EventUpdate(BaseModel):
     title: Optional[str] = None
@@ -95,6 +105,12 @@ class EventUpdate(BaseModel):
     status: Optional[str] = None
     academic_year: Optional[str] = None
 
+class EventCancelRequest(BaseModel):
+    reason: str = Field(..., min_length=1, description="Mandatory non-empty reason for cancellation")
+
+class ScannerAssignRequest(BaseModel):
+    scanner_user_ids: List[str]
+
 class EventResponse(BaseModel):
     id: str
     title: str
@@ -105,8 +121,14 @@ class EventResponse(BaseModel):
     budget: float
     poster_url: Optional[str]
     status: str
+    cancellation_reason: Optional[str] = None
     academic_year: str
     volunteer_user_ids: List[str]
+    assigned_scanner_user_ids: List[str]
+    geofence_enabled: bool = False
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    geofence_radius_meters: float = 100.0
     created_by: str
     created_at: datetime
     attendance_count: int
@@ -151,6 +173,8 @@ class QrGenerateResponse(BaseModel):
 class QrVerifyRequest(BaseModel):
     event_id: str
     token: str
+    scanner_latitude: Optional[float] = None
+    scanner_longitude: Optional[float] = None
 
 class QrVerifyResponse(BaseModel):
     success: bool
@@ -170,6 +194,44 @@ class DocumentResponse(BaseModel):
     uploaded_by: str
     uploaded_at: datetime
     team_id: str
+
+    class Config:
+        from_attributes = True
+
+# Audit Log Schemas
+class AuditLogResponse(BaseModel):
+    id: str
+    actor_id: str
+    actor_name: str
+    action: str
+    target_type: str
+    target_id: str
+    target_name: Optional[str]
+    before_state: Optional[str]
+    after_state: Optional[str]
+    details: Optional[str]
+    timestamp: datetime
+
+    class Config:
+        from_attributes = True
+
+# Budget Schemas
+class BudgetSubmitRequest(BaseModel):
+    team_name: str
+    requested_amount: float
+    current_allocation: Optional[float] = 0.0
+    reason: str
+
+class BudgetResponse(BaseModel):
+    id: str
+    team_name: str
+    requested_amount: float
+    current_allocation: float
+    reason: str
+    requested_by: str
+    reviewed_by: Optional[str]
+    status: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

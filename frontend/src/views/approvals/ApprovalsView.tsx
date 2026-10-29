@@ -1,196 +1,157 @@
 import React, { useState } from 'react';
-import { Check, X, ShieldCheck, DollarSign, Calendar, UserCheck, AlertCircle } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { StatusChip } from '../../components/common/StatusChip';
-import { Modal } from '../../components/common/Modal';
-import { ApprovalType } from '../../types';
+import {
+  SegmentedTabs,
+  PillButton,
+  StatusChip,
+  Avatar,
+  EmptyState,
+  ConfirmDialog,
+} from '../../components/shared';
 
 export const ApprovalsView: React.FC = () => {
   const { approvals, approveItem, rejectItem } = useApp();
-  const [activeTab, setActiveTab] = useState<ApprovalType | 'all'>('all');
-
-  const [rejectModalItem, setRejectModalItem] = useState<{ id: string; title: string } | null>(null);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [activeTab, setActiveTab] = useState<string>('all');
+  const [rejectItemTarget, setRejectItemTarget] = useState<{ id: string; title: string } | null>(null);
 
   const filteredItems = approvals.filter((item) => {
     if (activeTab !== 'all' && item.type !== activeTab) return false;
     return true;
   });
 
-  const handleConfirmReject = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!rejectModalItem) return;
-    rejectItem(rejectModalItem.id, rejectionReason || 'Declined by club administration');
-    setRejectModalItem(null);
-    setRejectionReason('');
+  const handleConfirmReject = (reason?: string) => {
+    if (!rejectItemTarget) return;
+    rejectItem(rejectItemTarget.id, reason || 'Declined by administration');
+    setRejectItemTarget(null);
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'event':
-        return <Calendar size={20} strokeWidth={1.75} color="#0F766E" />;
-      case 'budget':
-        return <DollarSign size={20} strokeWidth={1.75} color="#16A34A" />;
-      case 'join_request':
-      default:
-        return <UserCheck size={20} strokeWidth={1.75} color="#2563EB" />;
-    }
-  };
+  const tabs = [
+    { key: 'all', label: `All (${approvals.length})` },
+    { key: 'event', label: `Events (${approvals.filter((a) => a.type === 'event').length})` },
+    { key: 'budget', label: `Budget (${approvals.filter((a) => a.type === 'budget').length})` },
+    { key: 'join_request', label: `Squads (${approvals.filter((a) => a.type === 'join_request').length})` },
+  ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#4F46E5', backgroundColor: '#EEF2FF', padding: '2px 8px', borderRadius: '999px', border: '1px solid #C7D2FE', letterSpacing: '0.04em' }}>
-            SUPER ADMIN & FACULTY SANCTIONING DESK
-          </span>
-        </div>
-        <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-          Executive Approvals & Sanctions
+        <h1
+          style={{
+            fontSize: '28px',
+            lineHeight: '32px',
+            fontWeight: 800,
+            color: '#051F20',
+            margin: 0,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Approvals
         </h1>
-        <p style={{ fontSize: '12px', color: '#64748B', marginTop: '4px', margin: 0 }}>
-          Direct operational authority for Faculty In-Charge to sanction student proposals, budget allocations, and membership inductions.
+        <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+          Sanction proposals & budget
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="pill-tabs">
-        <button
-          className={`pill-tab ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
-        >
-          All ({approvals.length})
-        </button>
-        <button
-          className={`pill-tab ${activeTab === 'event' ? 'active' : ''}`}
-          onClick={() => setActiveTab('event')}
-        >
-          Events ({approvals.filter((a) => a.type === 'event').length})
-        </button>
-        <button
-          className={`pill-tab ${activeTab === 'join_request' ? 'active' : ''}`}
-          onClick={() => setActiveTab('join_request')}
-        >
-          Join Requests ({approvals.filter((a) => a.type === 'join_request').length})
-        </button>
-        <button
-          className={`pill-tab ${activeTab === 'budget' ? 'active' : ''}`}
-          onClick={() => setActiveTab('budget')}
-        >
-          Budgets ({approvals.filter((a) => a.type === 'budget').length})
-        </button>
-      </div>
+      {/* SegmentedTabs */}
+      <SegmentedTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
       {/* Items List */}
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {filteredItems.length === 0 ? (
-          <div className="empty-state">
-            <ShieldCheck size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>No approvals pending</h3>
-            <p style={{ fontSize: '13px', color: '#64748B' }}>
-              All submissions in this category have been processed.
-            </p>
-          </div>
+          <EmptyState
+            mascot="shield"
+            title="All cleared"
+            description="No pending proposals to review"
+          />
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.id}
-              className="app-card"
               style={{
-                marginBottom: '12px',
-                borderLeft:
-                  item.status === 'approved'
-                    ? '4px solid #16A34A'
-                    : item.status === 'rejected'
-                    ? '4px solid #DC2626'
-                    : '4px solid #D97706',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '24px',
+                border: '1px solid #DAF1DE',
+                padding: '18px 20px',
+                boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '8px',
-                      backgroundColor: '#F8FAFC',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {getTypeIcon(item.type)}
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: '#64748B' }}>
-                      {item.type.replace('_', ' ')}
-                    </span>
-                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>
+              {/* Header: Requester Avatar + 1-line title + StatusChip */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <Avatar name={item.applicantName || 'Scholar'} size={40} />
+                  <div style={{ minWidth: 0 }}>
+                    <h3
+                      style={{
+                        fontSize: '15px',
+                        fontWeight: 700,
+                        color: '#051F20',
+                        margin: 0,
+                        lineHeight: 1.3,
+                      }}
+                      className="truncate"
+                    >
                       {item.title}
                     </h3>
+                    <div style={{ fontSize: '12px', color: '#235347', fontWeight: 500 }} className="truncate">
+                      {item.applicantName || 'Scholar'} • {item.subtitle || new Date(item.createdAt || Date.now()).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
-                <StatusChip status={item.status} />
+
+                <StatusChip status={item.status as any} />
               </div>
 
-              <div style={{ fontSize: '12px', color: '#0F766E', fontWeight: 600, marginBottom: '6px' }}>
-                {item.subtitle}
-              </div>
-
-              {item.details && (
-                <p style={{ fontSize: '13px', color: '#475569', lineHeight: 1.4, marginBottom: '12px' }}>
-                  {item.details}
-                </p>
-              )}
-
+              {/* Amount / Meta Pill */}
               {item.requestedBudget && (
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    color: '#16A34A',
-                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    marginBottom: '12px',
-                  }}
-                >
-                  <DollarSign size={16} strokeWidth={1.75} /> Requested: ${item.requestedBudget.toLocaleString()}
-                </div>
-              )}
-
-              {item.status === 'rejected' && item.rejectionReason && (
-                <div style={{ fontSize: '12px', color: '#DC2626', backgroundColor: '#FEF2F2', padding: '6px 10px', borderRadius: '6px', marginBottom: '10px' }}>
-                  <strong>Reason:</strong> {item.rejectionReason}
-                </div>
-              )}
-
-              {item.status === 'approved' && item.reviewedBy && (
-                <div style={{ fontSize: '12px', color: '#16A34A', marginBottom: '8px' }}>
-                  Approved by {item.reviewedBy} on {new Date(item.reviewedAt || Date.now()).toLocaleDateString()}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 800,
+                      color: '#0B2B26',
+                      backgroundColor: '#DAF1DE',
+                      padding: '3px 10px',
+                      borderRadius: '9999px',
+                      border: '1px solid #8EB69B',
+                    }}
+                  >
+                    Requested: ₹{item.requestedBudget.toLocaleString()}
+                  </span>
                 </div>
               )}
 
               {/* Action Buttons if Pending */}
               {item.status === 'pending' && (
-                <div style={{ display: 'flex', gap: '8px', borderTop: '1px solid #E8ECF2', paddingTop: '12px' }}>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    style={{ flex: 1 }}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    paddingTop: '10px',
+                    borderTop: '1px solid #DAF1DE',
+                  }}
+                >
+                  <PillButton
+                    variant="primary"
+                    fullWidth
                     onClick={() => approveItem(item.id)}
                   >
-                    <Check size={16} /> Approve Proposal
-                  </button>
-                  <button
-                    className="btn btn-secondary btn-sm"
-                    style={{ color: '#DC2626' }}
-                    onClick={() => setRejectModalItem({ id: item.id, title: item.title })}
+                    Approve
+                  </PillButton>
+                  <PillButton
+                    variant="destructive"
+                    onClick={() => setRejectItemTarget({ id: item.id, title: item.title })}
                   >
-                    <X size={16} /> Decline
-                  </button>
+                    Reject
+                  </PillButton>
                 </div>
               )}
             </div>
@@ -198,31 +159,21 @@ export const ApprovalsView: React.FC = () => {
         )}
       </div>
 
-      {/* Decline Reason Modal */}
-      <Modal
-        isOpen={rejectModalItem !== null}
-        onClose={() => setRejectModalItem(null)}
-        title="Decline Submission"
-        subtitle={`Specify rationale for refusing "${rejectModalItem?.title}"`}
-      >
-        <form onSubmit={handleConfirmReject}>
-          <div className="input-group">
-            <label className="input-label">Administrative Rejection Notes</label>
-            <textarea
-              className="input-field"
-              rows={3}
-              required
-              placeholder="e.g. Exceeds semester budget allocations, schedule clash with university exams..."
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-            />
-          </div>
-
-          <button type="submit" className="btn btn-danger btn-block">
-            Confirm Rejection
-          </button>
-        </form>
-      </Modal>
+      {/* Required-Reason Rejection ConfirmDialog */}
+      <ConfirmDialog
+        isOpen={rejectItemTarget !== null}
+        onClose={() => setRejectItemTarget(null)}
+        onConfirm={handleConfirmReject}
+        title="Reject Proposal"
+        message={`Specify the official reason for declining "${rejectItemTarget?.title}".`}
+        confirmLabel="Confirm"
+        cancelLabel="Cancel"
+        variant="destructive"
+        requireReason={true}
+        reasonPlaceholder="e.g. Budget exceeds ceiling, reschedule required..."
+      />
     </div>
   );
 };
+
+export default ApprovalsView;

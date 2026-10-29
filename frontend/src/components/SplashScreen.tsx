@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import './SplashScreen.css';
+import { Mascot } from './shared/Mascot';
 
 interface SplashScreenProps {
   onFinish?: () => void;
   duration?: number;
 }
 
-const FULL_TEXT = 'Green Eco Organization';
-
 export const SplashScreen: React.FC<SplashScreenProps> = ({
   onFinish,
-  duration = 2700,
+  duration = 1800,
 }) => {
-  const [displayedLength, setDisplayedLength] = useState(0);
   const [isClosing, setIsClosing] = useState(false);
   const [isMounted, setIsMounted] = useState(true);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -23,33 +20,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
     setTimeout(() => {
       setIsMounted(false);
       onFinish?.();
-    }, 450);
+    }, 300);
   }, [isClosing, onFinish]);
 
-  // Letter-by-letter typewriter display
-  useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-
-    // Start typing smoothly after logo springs in (300ms)
-    const startTimeout = setTimeout(() => {
-      intervalId = setInterval(() => {
-        setDisplayedLength((prev) => {
-          if (prev >= FULL_TEXT.length) {
-            if (intervalId) clearInterval(intervalId);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 55);
-    }, 300);
-
-    return () => {
-      clearTimeout(startTimeout);
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, []);
-
-  // Overall splash auto-dismiss duration
+  // Overall splash auto-fade duration at 1.8s or tap
   useEffect(() => {
     timerRef.current = setTimeout(() => {
       handleDismiss();
@@ -62,40 +36,82 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
   if (!isMounted) return null;
 
-  const isTypingComplete = displayedLength >= FULL_TEXT.length;
-  const currentText = FULL_TEXT.slice(0, displayedLength);
-
   return (
     <aside
-      className={`splash-screen-overlay ${isClosing ? 'splash-closing' : ''}`}
       onClick={handleDismiss}
       role="status"
       aria-live="polite"
-      aria-label={FULL_TEXT}
+      aria-label="Green Eco Organization Hub"
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer select-none transition-opacity duration-300"
+      style={{
+        background: 'radial-gradient(circle at 50% 45%, rgba(218, 241, 222, 0.75) 0%, rgba(246, 251, 247, 0.98) 70%), #F6FBF7',
+        opacity: isClosing ? 0 : 1,
+      }}
     >
-      {/* Ambient background glow */}
-      <div className="splash-ambient-bg" aria-hidden="true">
-        <div className="splash-glow-disc" />
-      </div>
-
-      {/* Center Brand Identity: ONLY Logo + Letter-by-letter Animated Text */}
-      <div className="splash-brand-center">
-        <div className="splash-logo-container">
-          <img
-            src="/app-logo-clean.png"
-            alt="Green Eco Organization Logo"
-            className="splash-logo-img"
+      <div className="flex flex-col items-center text-center p-6">
+        {/* Centered floating leaf mascot */}
+        <div className="relative mb-6 flex items-center justify-center">
+          <div
+            className="absolute w-40 h-40 rounded-full -z-10"
+            style={{
+              background: 'radial-gradient(circle, #DAF1DE 0%, rgba(218, 241, 222, 0) 70%)',
+              filter: 'blur(16px)',
+            }}
           />
+          <Mascot name="leaf" size={100} floating />
         </div>
 
-        <h1 className="splash-brand-text" aria-label={FULL_TEXT}>
-          <span className="splash-text-content">{currentText}</span>
+        {/* GEO HUB Wordmark */}
+        <div className="flex items-center gap-1 mb-2">
           <span
-            className={`splash-cursor ${isTypingComplete ? 'cursor-finished' : 'cursor-typing'}`}
-            aria-hidden="true"
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            GEO
+          </span>
+          <span
+            style={{
+              display: 'inline-block',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: '#8EB69B',
+              margin: '0 4px',
+            }}
           />
-        </h1>
+          <span
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: '32px',
+              fontWeight: 800,
+              color: '#235347',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            HUB
+          </span>
+        </div>
+
+        {/* Subtitle */}
+        <p
+          style={{
+            fontFamily: 'var(--font-family)',
+            fontSize: '14px',
+            fontWeight: 600,
+            color: '#235347',
+            letterSpacing: '0.02em',
+          }}
+        >
+          Green Eco Organization Hub
+        </p>
       </div>
     </aside>
   );
 };
+
+export default SplashScreen;

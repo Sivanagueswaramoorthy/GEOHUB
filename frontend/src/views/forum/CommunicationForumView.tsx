@@ -4,23 +4,32 @@ import {
   Send,
   Heart,
   Pin,
-  Sparkles,
   Search,
   Plus,
-  Users,
   Compass,
-  CheckCircle2,
   Megaphone,
   Briefcase,
-  ShieldCheck,
-  Award,
+  CornerDownRight,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ForumMessage } from '../../types';
-import { Modal } from '../../components/common/Modal';
+import {
+  Avatar,
+  PillButton,
+  BottomSheet,
+  EmptyState,
+  StatusChip,
+} from '../../components/shared';
 
 export const CommunicationForumView: React.FC = () => {
-  const { forumMessages, addForumMessage, addForumReply, likeForumMessage, togglePinForumMessage, currentUser } = useApp();
+  const {
+    forumMessages,
+    addForumMessage,
+    addForumReply,
+    likeForumMessage,
+    togglePinForumMessage,
+    currentUser,
+  } = useApp();
 
   const [activeChannel, setActiveChannel] = useState<'announcements' | 'coordination' | 'tech_geo' | 'general'>('announcements');
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,43 +40,12 @@ export const CommunicationForumView: React.FC = () => {
   const [replyInputMap, setReplyInputMap] = useState<Record<string, string>>({});
   const [openReplyBoxId, setOpenReplyBoxId] = useState<string | null>(null);
 
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const channelInfo = {
-    announcements: {
-      name: 'Official Announcements',
-      desc: 'Faculty notices, DGCA drone permits, symposium dates and college directives',
-      icon: <Megaphone size={16} />,
-      color: '#163832',
-      bg: '#DAF1DE',
-    },
-    coordination: {
-      name: 'Event & Volunteer Coordination',
-      desc: 'Volunteer rosters, signage, food delivery timings, and station checklists',
-      icon: <Briefcase size={16} />,
-      color: '#4338CA',
-      bg: '#EEF2FF',
-    },
-    tech_geo: {
-      name: 'Geomatics & Tech Forum',
-      desc: 'QGIS plugins, satellite multispectral datasets, Python automation scripts',
-      icon: <Compass size={16} />,
-      color: '#D97706',
-      bg: '#FFFBEB',
-    },
-    general: {
-      name: 'General Discussion & Q&A',
-      desc: 'Open student conversations, suggestions, and peer collaboration',
-      icon: <MessageSquare size={16} />,
-      color: '#0284C7',
-      bg: '#F0F9FF',
-    },
-  };
+  const channels = [
+    { id: 'announcements', label: '#Announcements', icon: Megaphone },
+    { id: 'coordination', label: '#Coordination', icon: Briefcase },
+    { id: 'tech_geo', label: '#Tech-Geo', icon: Compass },
+    { id: 'general', label: '#General', icon: MessageSquare },
+  ] as const;
 
   const filteredMessages = forumMessages
     .filter((msg) => {
@@ -92,455 +70,415 @@ export const CommunicationForumView: React.FC = () => {
       content: newContent.trim(),
     });
     setIsPostModalOpen(false);
-    showToast(`✓ Published message to #${channelInfo[activeChannel].name}`);
     setNewTitle('');
     setNewContent('');
   };
 
   const handleSendReply = (messageId: string) => {
-    const text = replyInputMap[messageId];
-    if (!text || !text.trim()) return;
-    addForumReply(messageId, text.trim());
+    const replyText = replyInputMap[messageId];
+    if (!replyText || !replyText.trim()) return;
+    addForumReply(messageId, replyText.trim());
     setReplyInputMap((prev) => ({ ...prev, [messageId]: '' }));
     setOpenReplyBoxId(null);
-    showToast(`✓ Reply posted!`);
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9999,
-            backgroundColor: '#0F172A',
-            color: '#FFFFFF',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <CheckCircle2 size={16} color="#235347" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Header Banner */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                color: '#163832',
-                backgroundColor: '#DAF1DE',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                border: '1px solid #8EB69B',
-                letterSpacing: '0.04em',
-              }}
-            >
-              COMMUNICATION FORUM
-            </span>
-          </div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Club Discussion Channels
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Discussions
           </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Channels & community chat
+          </p>
         </div>
 
-        <button
+        <PillButton
+          variant="primary"
+          icon={<Plus size={16} />}
           onClick={() => setIsPostModalOpen(true)}
-          style={{
-            padding: '10px 18px',
-            borderRadius: '999px',
-            background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-            color: '#FFFFFF',
-            border: 'none',
-            fontSize: '13px',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
-            cursor: 'pointer',
-          }}
         >
-          <Plus size={16} /> New Discussion Post
-        </button>
+          New post
+        </PillButton>
       </div>
 
-      {/* Channel Navigation Pills */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
-        {(Object.keys(channelInfo) as (keyof typeof channelInfo)[]).map((cKey) => {
-          const ch = channelInfo[cKey];
-          const isSelected = activeChannel === cKey;
+      {/* 20px channel pills */}
+      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }} className="no-scrollbar">
+        {channels.map((ch) => {
+          const isActive = activeChannel === ch.id;
+          const Icon = ch.icon;
           return (
-            <div
-              key={cKey}
-              onClick={() => setActiveChannel(cKey)}
+            <button
+              type="button"
+              key={ch.id}
+              onClick={() => setActiveChannel(ch.id)}
               style={{
-                backgroundColor: isSelected ? ch.bg : '#FFFFFF',
-                borderRadius: '16px',
-                border: isSelected ? `2px solid ${ch.color}` : '1px solid #E8ECF2',
-                padding: '12px 14px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '6px',
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: isActive ? '#163832' : '#FFFFFF',
+                color: isActive ? '#FFFFFF' : '#235347',
+                border: isActive ? '1px solid #163832' : '1px solid #DAF1DE',
+                boxShadow: isActive ? '0 4px 14px rgba(5,31,32,0.12)' : '0 2px 8px rgba(5,31,32,0.04)',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 200ms ease-out',
+                flexShrink: 0,
               }}
             >
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '10px',
-                  backgroundColor: isSelected ? ch.color : '#F1F5F9',
-                  color: isSelected ? '#FFFFFF' : ch.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                {ch.icon}
-              </div>
-              <div style={{ overflow: 'hidden' }}>
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                  {ch.name}
-                </div>
-                <div style={{ fontSize: '11px', color: '#64748B', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                  {ch.desc}
-                </div>
-              </div>
-            </div>
+              <Icon size={14} strokeWidth={2.2} />
+              <span>{ch.label}</span>
+            </button>
           );
         })}
       </div>
 
-      {/* Search Bar */}
+      {/* Search Input */}
       <div style={{ position: 'relative' }}>
         <input
           type="text"
-          className="input-field"
           style={{
-            paddingLeft: '40px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E8ECF2',
-            borderRadius: '16px',
-            fontSize: '13px',
+            width: '100%',
             height: '44px',
+            boxSizing: 'border-box',
+            paddingLeft: '40px',
+            paddingRight: '14px',
+            fontSize: '13px',
+            color: '#051F20',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #DAF1DE',
+            borderRadius: '16px',
+            outline: 'none',
+            boxShadow: '0 4px 14px rgba(5,31,32,0.03)',
           }}
-          placeholder={`Search in #${channelInfo[activeChannel].name}...`}
+          placeholder="Search discussions..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Search size={20} strokeWidth={1.75} color="#94A3B8" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }} />
+        <Search
+          size={18}
+          strokeWidth={2}
+          color="#8EB69B"
+          style={{ position: 'absolute', left: 14, top: 13 }}
+        />
       </div>
 
-      {/* Posts Feed */}
+      {/* Chat cards (24px, white, #DAF1DE border) with avatars, role badges, reaction pills */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {filteredMessages.length === 0 ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              border: '1px solid #E8ECF2',
-              padding: '36px 20px',
-              textAlign: 'center',
-            }}
-          >
-            <MessageSquare size={48} strokeWidth={1.75} color="#235347" style={{ margin: '0 auto 10px' }} />
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
-              No messages in this channel yet
-            </h3>
-            <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 14px 0' }}>
-              Be the first to start a conversation in #{channelInfo[activeChannel].name}.
-            </p>
-            <button
-              onClick={() => setIsPostModalOpen(true)}
+          <EmptyState
+            mascot="megaphone"
+            title="No messages"
+            description="Start the discussion in this channel"
+            actionLabel="New post"
+            onAction={() => setIsPostModalOpen(true)}
+          />
+        ) : (
+          filteredMessages.map((msg) => (
+            <div
+              key={msg.id}
               style={{
-                padding: '8px 16px',
-                borderRadius: '999px',
-                backgroundColor: '#235347',
-                color: '#FFFFFF',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '24px',
+                border: msg.pinned ? '1.5px solid #8EB69B' : '1px solid #DAF1DE',
+                padding: '20px',
+                boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
               }}
             >
-              Post Message
-            </button>
-          </div>
-        ) : (
-          filteredMessages.map((msg) => {
-            const hasLiked = msg.likedBy?.includes(currentUser.uid);
-            return (
-              <div
-                key={msg.id}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: msg.pinned ? '2px solid #235347' : '1px solid #E8ECF2',
-                  padding: '18px 20px',
-                  boxShadow: msg.pinned ? '0 8px 24px rgba(35, 83, 71, 0.1)' : '0 4px 16px rgba(15, 23, 42, 0.03)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                }}
-              >
-                {/* Author Strip */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        backgroundColor: '#DAF1DE',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 800,
-                        color: '#163832',
-                        fontSize: '14px',
-                      }}
-                    >
-                      {msg.authorName[0]}
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
-                          {msg.authorName}
-                        </span>
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '2px 7px',
-                            borderRadius: '999px',
-                            backgroundColor: '#F1F5F9',
-                            color: '#475569',
-                          }}
-                        >
-                          {msg.authorRole}
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '11px', color: '#94A3B8' }}>
-                        {new Date(msg.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              {/* Header with Avatar, Name, Role badge, Pinned indicator */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <Avatar name={msg.authorName} size={40} />
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#051F20' }}>
+                        {msg.authorName}
                       </span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {msg.pinned && (
                       <span
                         style={{
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          color: '#163832',
-                          backgroundColor: '#DAF1DE',
-                          padding: '3px 8px',
-                          borderRadius: '6px',
-                          border: '1px solid #8EB69B',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <Pin size={16} strokeWidth={1.75} /> PINNED
-                      </span>
-                    )}
-                    {(currentUser.role === 'super_admin' || currentUser.role === 'admin') && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          togglePinForumMessage(msg.id);
-                          showToast(msg.pinned ? 'Unpinned message' : '✓ Pinned announcement to top!');
-                        }}
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '6px',
-                          backgroundColor: msg.pinned ? '#DAF1DE' : '#F1F5F9',
-                          color: msg.pinned ? '#163832' : '#64748B',
-                          border: 'none',
-                          fontSize: '11px',
+                          fontSize: '12px',
                           fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
+                          backgroundColor: '#DAF1DE',
+                          color: '#0B2B26',
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          border: '1px solid #8EB69B',
+                          textTransform: 'capitalize',
                         }}
-                        title={msg.pinned ? 'Unpin message' : 'Pin message to top'}
                       >
-                        <Pin size={16} strokeWidth={1.75} />
-                        <span>{msg.pinned ? 'Unpin' : 'Pin'}</span>
-                      </button>
-                    )}
+                        {msg.authorRole.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#235347', fontWeight: 500 }}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
                 </div>
 
-                {/* Post Content */}
-                <div>
-                  {msg.title && (
-                    <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0' }}>
-                      {msg.title}
-                    </h3>
-                  )}
-                  <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.55, margin: 0, whiteSpace: 'pre-line' }}>
-                    {msg.content}
-                  </p>
-                </div>
-
-                {/* Actions: Likes & Reply trigger */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingTop: '8px', borderTop: '1px solid #F1F5F9' }}>
-                  <button
-                    onClick={() => likeForumMessage(msg.id)}
+                {msg.pinned && (
+                  <div
                     style={{
-                      background: 'none',
-                      border: 'none',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px',
+                      gap: '4px',
+                      padding: '4px 8px',
+                      borderRadius: '9999px',
+                      backgroundColor: '#DAF1DE',
+                      color: '#163832',
                       fontSize: '12px',
                       fontWeight: 700,
-                      color: hasLiked ? '#E11D48' : '#64748B',
-                      cursor: 'pointer',
                     }}
                   >
-                    <Heart size={16} strokeWidth={1.75} fill={hasLiked ? '#E11D48' : 'none'} color={hasLiked ? '#E11D48' : '#64748B'} />
-                    <span>{msg.likes} Likes</span>
-                  </button>
-
-                  <button
-                    onClick={() => setOpenReplyBoxId(openReplyBoxId === msg.id ? null : msg.id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                      color: '#235347',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <MessageSquare size={16} strokeWidth={1.75} />
-                    <span>{(msg.replies || []).length} Replies</span>
-                  </button>
-                </div>
-
-                {/* Replies Thread */}
-                {msg.replies && msg.replies.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingLeft: '16px', borderLeft: '2px solid #E2E8F0', marginTop: '4px' }}>
-                    {msg.replies.map((rep) => (
-                      <div key={rep.id} style={{ backgroundColor: '#F8FAFC', borderRadius: '12px', padding: '10px 12px', fontSize: '12px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                          <strong style={{ color: '#0F172A' }}>{rep.authorName}</strong>
-                          <span style={{ fontSize: '11px', color: '#94A3B8' }}>• {rep.authorRole}</span>
-                        </div>
-                        <div style={{ color: '#334155', lineHeight: 1.4 }}>{rep.content}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Reply Input Box */}
-                {openReplyBoxId === msg.id && (
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-                    <input
-                      type="text"
-                      className="input-field"
-                      style={{ flex: 1, fontSize: '12px', height: '40px' }}
-                      placeholder="Write a constructive reply..."
-                      value={replyInputMap[msg.id] || ''}
-                      onChange={(e) => setReplyInputMap({ ...replyInputMap, [msg.id]: e.target.value })}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSendReply(msg.id);
-                      }}
-                    />
-                    <button
-                      onClick={() => handleSendReply(msg.id)}
-                      style={{
-                        padding: '0 16px',
-                        borderRadius: '12px',
-                        backgroundColor: '#235347',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <Send size={16} strokeWidth={1.75} />
-                    </button>
+                    <Pin size={12} strokeWidth={2.5} />
+                    <span>Pinned</span>
                   </div>
                 )}
               </div>
-            );
-          })
+
+              {/* Title & Content */}
+              {msg.title && (
+                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                  {msg.title}
+                </h3>
+              )}
+              <p style={{ fontSize: '13px', color: '#051F20', lineHeight: 1.5, margin: 0 }}>
+                {msg.content}
+              </p>
+
+              {/* Reaction & Action Pills */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  paddingTop: '8px',
+                  borderTop: '1px solid #DAF1DE',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => likeForumMessage(msg.id)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    height: '32px',
+                    padding: '0 12px',
+                    borderRadius: '9999px',
+                    backgroundColor: msg.likes > 0 ? '#DAF1DE' : '#F6FBF7',
+                    color: '#163832',
+                    border: '1px solid #8EB69B',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Heart
+                    size={14}
+                    fill={msg.likes > 0 ? '#163832' : 'none'}
+                    strokeWidth={2}
+                  />
+                  <span>{msg.likes}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setOpenReplyBoxId(openReplyBoxId === msg.id ? null : msg.id)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    height: '32px',
+                    padding: '0 12px',
+                    borderRadius: '9999px',
+                    backgroundColor: '#F6FBF7',
+                    color: '#235347',
+                    border: '1px solid #DAF1DE',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <MessageSquare size={14} strokeWidth={2} />
+                  <span>{(msg.replies || []).length} Replies</span>
+                </button>
+
+                {(currentUser.role === 'super_admin' || currentUser.role === 'coordinator' || currentUser.role === 'faculty') && (
+                  <button
+                    type="button"
+                    onClick={() => togglePinForumMessage(msg.id)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      height: '32px',
+                      padding: '0 10px',
+                      borderRadius: '9999px',
+                      backgroundColor: '#F6FBF7',
+                      color: '#235347',
+                      border: '1px solid #DAF1DE',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    <Pin size={13} strokeWidth={2} />
+                    <span>{msg.pinned ? 'Unpin' : 'Pin'}</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Replies Thread */}
+              {(msg.replies || []).length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '6px' }}>
+                  {(msg.replies || []).map((rep) => (
+                    <div
+                      key={rep.id}
+                      style={{
+                        padding: '10px 14px',
+                        borderRadius: '16px',
+                        backgroundColor: '#F6FBF7',
+                        border: '1px solid #DAF1DE',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Avatar name={rep.authorName} size={24} />
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#051F20' }}>
+                          {rep.authorName}
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#235347', fontWeight: 500 }}>
+                          {new Date(rep.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '12px', color: '#051F20', margin: 0, paddingLeft: '30px' }}>
+                        {rep.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Inline Reply Input */}
+              {openReplyBoxId === msg.id && (
+                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                  <input
+                    type="text"
+                    style={{
+                      flex: 1,
+                      height: '38px',
+                      borderRadius: '16px',
+                      border: '1px solid #DAF1DE',
+                      padding: '0 12px',
+                      fontSize: '12px',
+                      outline: 'none',
+                    }}
+                    placeholder="Write a reply..."
+                    value={replyInputMap[msg.id] || ''}
+                    onChange={(e) =>
+                      setReplyInputMap((prev) => ({ ...prev, [msg.id]: e.target.value }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSendReply(msg.id);
+                    }}
+                  />
+                  <PillButton
+                    variant="primary"
+                    size="sm"
+                    icon={<Send size={14} />}
+                    onClick={() => handleSendReply(msg.id)}
+                  >
+                    Reply
+                  </PillButton>
+                </div>
+              )}
+            </div>
+          ))
         )}
       </div>
 
-      {/* New Post Modal */}
-      <Modal
+      {/* New Post BottomSheet */}
+      <BottomSheet
         isOpen={isPostModalOpen}
         onClose={() => setIsPostModalOpen(false)}
-        title={`New Post in #${channelInfo[activeChannel].name}`}
-        subtitle="Share updates, coordinate tasks or initiate a geospatial discussion"
+        title="New Post"
+        subtitle={`Post to #${channels.find((c) => c.id === activeChannel)?.label || 'General'}`}
       >
-        <form onSubmit={handleCreatePost} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="input-group">
-            <label className="input-label">Title / Headline (Optional)</label>
+        <form onSubmit={handleCreatePost} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Subject
+            </label>
             <input
               type="text"
-              className="input-field"
-              placeholder="e.g. Volunteer station briefing for Saturday"
+              placeholder="e.g. Schedule update for Saturday"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Message Content</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Message
+            </label>
             <textarea
-              className="input-field"
-              rows={4}
               required
-              placeholder="Type your message, notes, links or questions here..."
+              rows={4}
+              placeholder="Type your message..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={newContent}
               onChange={(e) => setNewContent(e.target.value)}
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-block"
-            style={{
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-              height: '46px',
-              fontSize: '14px',
-              fontWeight: 700,
-              marginTop: '6px',
-            }}
-          >
-            Post to Channel
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Send
+          </PillButton>
         </form>
-      </Modal>
+      </BottomSheet>
     </div>
   );
 };
+
+export default CommunicationForumView;

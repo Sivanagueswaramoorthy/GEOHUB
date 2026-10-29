@@ -1,28 +1,71 @@
 import React, { useState } from 'react';
 import {
   FileText,
-  Download,
   Copy,
-  CheckCircle2,
-  Sparkles,
-  BookOpen,
   Printer,
-  FileCheck,
   FileSpreadsheet,
-  Edit3,
-  Layers,
   Check,
+  ArrowRight,
+  Bold,
+  Italic,
+  List,
+  Table as TableIcon,
+  Archive,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocTemplate } from '../../types';
-import { AuditModeBanner } from '../../components';
+import {
+  PillButton,
+  StatusChip,
+  Mascot,
+  SegmentedTabs,
+} from '../../components/shared';
 
 export const DocumentationStudioView: React.FC = () => {
-  const { docTemplates, events, attendance, users, currentUser } = useApp();
-  const isSuperAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'faculty';
+  const { docTemplates, events, attendance, users } = useApp();
 
-  const [selectedTemplate, setSelectedTemplate] = useState<DocTemplate>(docTemplates[0]);
-  const [docContent, setDocContent] = useState<string>(docTemplates[0].defaultContent);
+  const [activeTab, setActiveTab] = useState<'editor' | 'archives'>('editor');
+
+  const standardTemplates: DocTemplate[] = [
+    {
+      id: 'tpl_summary',
+      name: 'Event Summary',
+      description: 'Official chapter retrospective',
+      category: 'event_summary',
+      defaultContent: '# Event Summary\n\n**Event:** [Event Title]\n**Date:** [Date]\n**Venue:** [Venue / Auditorium]\n**Verified Attendance:** [Verified Attendance]\n\n## Key Highlights\n- Successful execution of technical sessions.\n- Drone flight telemetry recorded and filed.\n- Resolution passed by chapter leadership.',
+    },
+    {
+      id: 'tpl_permission',
+      name: 'Permission Letter',
+      description: 'DGCA & Dean clearance letter',
+      category: 'permission_letter',
+      defaultContent: 'To,\nThe Dean of Student Affairs,\nCollege Campus,\n\nSubject: Request for Official Clearance for [Event Title]\n\nRespected Sir/Madam,\n\nWe hereby request permission to conduct [Event Title] on [Date] at [Venue / Auditorium]. All safety protocols and institutional mandates will be strictly adhered to.\n\nSincerely,\nGreen Eco Organization Hub (GeoHub)',
+    },
+    {
+      id: 'tpl_budget',
+      name: 'Budget Statement',
+      description: 'Financial sanction statement',
+      category: 'budget_statement',
+      defaultContent: '# Budget Statement\n\n**Event:** [Event Title]\n**Allocated Ceiling:** ₹[Budget Amount]\n**Expended Amount:** ₹[Spent Amount]\n\n| Expense Head | Amount (₹) |\n| --- | --- |\n| Logistics & Stage | 12,000 |\n| Printing & Badges | 4,500 |\n| Refreshments | 8,000 |\n| Honorarium | 5,000 |',
+    },
+    {
+      id: 'tpl_attendance',
+      name: 'Attendance Manifest',
+      description: 'Turnstile gate verification roster',
+      category: 'attendance_manifest',
+      defaultContent: '# Official Attendance Manifest\n\n**Event:** [Event Title]\n**Gate Check-ins:** [Verified Attendance]\n**Date:** [Date]\n\n| Scholar UID | Name | Department | Check-in Time |\n| --- | --- | --- | --- |\n| 2026-GEO-01 | Elena Rostova | Geoinformatics | 09:30 AM |\n| 2026-GEO-02 | Alex Rivera | Computer Science | 09:35 AM |',
+    },
+    {
+      id: 'tpl_mom',
+      name: 'Meeting Minutes',
+      description: 'Executive committee minutes',
+      category: 'meeting_minutes',
+      defaultContent: '# Minutes of Meeting (MoM)\n\n**Body:** Executive Board Sync\n**Date:** [Date]\n**Presided By:** Faculty Advisor & Coordinator\n\n## Agenda\n1. Review of campus geomatics survey.\n2. Volunteer duty roster finalization.\n3. Turnstile pass cryptographic verification.',
+    },
+  ];
+
+  const [selectedTemplate, setSelectedTemplate] = useState<DocTemplate>(standardTemplates[0]);
+  const [docContent, setDocContent] = useState<string>(selectedTemplate.defaultContent);
   const [selectedEventId, setSelectedEventId] = useState<string>(events[0]?.id || '');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -47,7 +90,6 @@ export const DocumentationStudioView: React.FC = () => {
         .replace(/\[Spent Amount\]/g, `${(targetEvent.budget || 5000) * 0.9}`);
     }
     setDocContent(populated);
-    showToast(`Loaded "${tpl.name}"`);
   };
 
   const handleEventChange = (eventId: string) => {
@@ -66,46 +108,24 @@ export const DocumentationStudioView: React.FC = () => {
     setDocContent(populated);
   };
 
-  // 1. Export as Word (.doc)
-  const handleExportWord = () => {
-    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-    <head><meta charset='utf-8'><title>${selectedTemplate.name}</title>
-    <style>body{font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;} h1{color:#0B2B26;} h2{color:#0F172A;}</style>
-    </head><body><pre style="font-family:Arial,sans-serif;white-space:pre-wrap;">${docContent}</pre></body></html>`;
-    const blob = new Blob(['\ufeff', header], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${selectedTemplate.name.replace(/\s+/g, '_')}.doc`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast(`✓ Downloaded as Word Document (.doc)`);
-  };
-
-  // 2. Export as PDF (Print Window)
   const handleExportPdf = () => {
     const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      showToast('Please allow popups to generate PDF preview.');
-      return;
-    }
+    if (!printWindow) return;
     printWindow.document.write(`
       <html>
         <head>
           <title>${selectedTemplate.name}</title>
           <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #0F172A; line-height: 1.6; }
-            .header { border-bottom: 2px solid #235347; padding-bottom: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
-            .header-title { font-size: 20px; font-weight: 800; color: #0B2B26; margin: 0; }
-            .content { white-space: pre-wrap; font-size: 13px; line-height: 1.65; }
-            @media print { body { padding: 0; } }
+            body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 40px; color: #051F20; line-height: 1.6; }
+            .header { border-bottom: 2px solid #235347; padding-bottom: 12px; margin-bottom: 24px; }
+            .header-title { font-size: 20px; font-weight: 800; color: #051F20; margin: 0; }
+            .content { white-space: pre-wrap; font-size: 14px; line-height: 1.6; }
           </style>
         </head>
         <body>
           <div class="header">
             <h1 class="header-title">COLLEGE GEO CLUB (GEOHUB) - OFFICIAL DOCUMENT</h1>
-            <div style="font-size: 11px; color: #64748B;">Generated: ${new Date().toLocaleDateString()}</div>
+            <div style="font-size: 12px; color: #235347; margin-top: 4px;">Generated: ${new Date().toLocaleDateString()}</div>
           </div>
           <div class="content">${docContent}</div>
           <script>
@@ -115,14 +135,26 @@ export const DocumentationStudioView: React.FC = () => {
       </html>
     `);
     printWindow.document.close();
-    showToast(`✓ Opened PDF Print Dialog`);
   };
 
-  // 3. Export as Excel / CSV (Attendance & Metrics)
+  const handleExportWord = () => {
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>${selectedTemplate.name}</title>
+    <style>body{font-family:'Plus Jakarta Sans',Arial,sans-serif;font-size:11pt;line-height:1.5;} h1{color:#051F20;}</style>
+    </head><body><pre style="font-family:'Plus Jakarta Sans',Arial,sans-serif;white-space:pre-wrap;">${docContent}</pre></body></html>`;
+    const blob = new Blob(['\ufeff', header], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedTemplate.name.replace(/\s+/g, '_')}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleExportExcel = () => {
     const targetEvent = events.find((e) => e.id === selectedEventId) || events[0];
     const eventAttendance = attendance.filter((a) => a.eventId === targetEvent.id);
-    
     const headers = ['Record ID', 'Event Name', 'Student UID', 'Student Name', 'Email', 'Team', 'Check-In Timestamp', 'Verified By'];
     const rows = (eventAttendance.length > 0 ? eventAttendance : targetEvent.registeredUserIds.map((uid, idx) => {
       const u = users.find((usr) => usr.uid === uid);
@@ -155,17 +187,20 @@ export const DocumentationStudioView: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast(`✓ Exported Attendance & Roster to Excel/CSV!`);
   };
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(docContent);
-    showToast('✓ Copied document text to clipboard!');
+    showToast('Copied to clipboard');
+  };
+
+  const insertText = (prefix: string, suffix = '') => {
+    setDocContent((prev) => `${prev}\n${prefix}Text${suffix}\n`);
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
-      {/* Toast Alert */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Toast */}
       {toastMessage && (
         <div
           style={{
@@ -174,244 +209,405 @@ export const DocumentationStudioView: React.FC = () => {
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 9999,
-            backgroundColor: '#0F172A',
+            backgroundColor: '#051F20',
             color: '#FFFFFF',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.25)',
+            padding: '8px 16px',
+            borderRadius: '9999px',
+            fontSize: '12px',
+            fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}
         >
-          <CheckCircle2 size={16} color="#235347" />
+          <Check size={14} color="#8EB69B" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Header Banner */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                color: '#163832',
-                backgroundColor: '#DAF1DE',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                border: '1px solid #8EB69B',
-                letterSpacing: '0.04em',
-              }}
-            >
-              DOCUMENTATION WING & EXPORTS
-            </span>
-          </div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Pre-Defined Documentation Templates & Export
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Studio
           </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Official templates & exports
+          </p>
         </div>
 
-        {/* 3 Export Action Buttons */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            onClick={handleExportPdf}
-            style={{
-              padding: '9px 15px',
-              borderRadius: '999px',
-              backgroundColor: '#DC2626',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '12px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(220, 38, 38, 0.25)',
-            }}
-          >
-            <Printer size={16} strokeWidth={1.75} /> Export PDF
-          </button>
-
-          <button
-            onClick={handleExportWord}
-            style={{
-              padding: '9px 15px',
-              borderRadius: '999px',
-              backgroundColor: '#2563EB',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '12px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(37, 99, 235, 0.25)',
-            }}
-          >
-            <FileText size={16} strokeWidth={1.75} /> Export Word (.doc)
-          </button>
-
-          <button
-            onClick={handleExportExcel}
-            style={{
-              padding: '9px 15px',
-              borderRadius: '999px',
-              backgroundColor: '#235347',
-              color: '#FFFFFF',
-              border: 'none',
-              fontSize: '12px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(35, 83, 71, 0.25)',
-            }}
-          >
-            <FileSpreadsheet size={16} strokeWidth={1.75} /> Export Excel / CSV
-          </button>
-        </div>
+        <Mascot name="notebook" size="sm" />
       </div>
 
-      {/* Institutional Audit Mode Notice for Super Admin */}
-      {isSuperAdmin && (
-        <AuditModeBanner
-          moduleName="Documentation Studio & Dossier Exports"
-          operatedByRole="Documentation Wing & Archival Team"
-          actionRestrictions="Template drafting and editorial revisions are operated by the Documentation Lead. You have full inspection and export capabilities across PDF, Word (.doc), and Excel/CSV."
-        />
-      )}
+      <SegmentedTabs
+        tabs={[
+          { key: 'editor', label: 'Studio Editor' },
+          { key: 'archives', label: 'Archives' },
+        ]}
+        activeTab={activeTab}
+        onChange={(k) => setActiveTab(k as any)}
+      />
 
-      {/* Template Chooser Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
-        {docTemplates.map((tpl) => {
-          const isSelected = selectedTemplate.id === tpl.id;
-          return (
+      {activeTab === 'archives' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {standardTemplates.map((tpl) => (
             <div
               key={tpl.id}
-              onClick={() => handleSelectTemplate(tpl)}
               style={{
-                backgroundColor: isSelected ? '#DAF1DE' : '#FFFFFF',
-                borderRadius: '16px',
-                border: isSelected ? '2px solid #235347' : '1px solid #E8ECF2',
-                padding: '14px',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '24px',
+                border: '1px solid #DAF1DE',
+                padding: '16px 20px',
+                boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div
                   style={{
-                    fontSize: '11px',
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    color: isSelected ? '#163832' : '#64748B',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '9999px',
+                    backgroundColor: '#DAF1DE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#163832',
                   }}
                 >
-                  {tpl.category.replace('_', ' ')}
-                </span>
-                {isSelected && <Check size={16} color="#235347" strokeWidth={3} />}
+                  <Archive size={18} strokeWidth={2} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                    {tpl.name}
+                  </h4>
+                  <span style={{ fontSize: '12px', color: '#235347' }}>
+                    {tpl.description}
+                  </span>
+                </div>
               </div>
-              <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                {tpl.name}
-              </h4>
-              <p style={{ fontSize: '11px', color: '#64748B', margin: 0, lineHeight: 1.4 }}>
-                {tpl.description}
-              </p>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Editor & Autofill Bar */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '20px',
-          border: '1px solid #E8ECF2',
-          padding: '18px 20px',
-          boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Auto-Fill Data from Event:</label>
-            <select
-              className="input-field"
-              style={{ height: '36px', fontSize: '12px', padding: '0 12px', width: 'auto' }}
-              value={selectedEventId}
-              onChange={(e) => handleEventChange(e.target.value)}
+              <PillButton
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  handleSelectTemplate(tpl);
+                  setActiveTab('editor');
+                }}
+              >
+                Load
+              </PillButton>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          {/* BentoGrid of template cards with circular arrow buttons */}
+          <div>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '10px' }}>
+              Templates
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '12px',
+              }}
             >
-              {events.map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.title}
-                </option>
-              ))}
-            </select>
+              {standardTemplates.map((tpl) => {
+                const isSelected = selectedTemplate.id === tpl.id;
+                return (
+                  <button
+                    type="button"
+                    key={tpl.id}
+                    onClick={() => handleSelectTemplate(tpl)}
+                    style={{
+                      textAlign: 'left',
+                      backgroundColor: isSelected ? '#DAF1DE' : '#FFFFFF',
+                      borderRadius: '24px',
+                      border: isSelected ? '2px solid #163832' : '1px solid #DAF1DE',
+                      padding: '16px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '120px',
+                      boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+                      transition: 'all 200ms ease-out',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                      <div
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '9999px',
+                          backgroundColor: '#FFFFFF',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 4px 12px rgba(5,31,32,0.06)',
+                          color: '#163832',
+                        }}
+                      >
+                        <FileText size={18} strokeWidth={2} />
+                      </div>
+
+                      {/* 40px circular arrow button */}
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '9999px',
+                          backgroundColor: isSelected ? '#163832' : '#F6FBF7',
+                          color: isSelected ? '#FFFFFF' : '#235347',
+                          border: '1px solid #DAF1DE',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {isSelected ? <Check size={14} strokeWidth={3} /> : <ArrowRight size={14} strokeWidth={2} />}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#051F20', margin: '8px 0 2px 0' }}>
+                        {tpl.name}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: '#235347', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {tpl.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <button
-            onClick={handleCopyText}
+          {/* Editor Card (24px white) with event auto-fill select, Auto-saved mint chip, micro-toolbar, body font preview */}
+          <div
             style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '20px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
               display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: '#334155',
-              cursor: 'pointer',
+              flexDirection: 'column',
+              gap: '14px',
             }}
           >
-            <Copy size={16} strokeWidth={1.75} /> Copy Document Text
-          </button>
-        </div>
+            {/* Event Autofill Selector & Status */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '200px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>Event:</span>
+                <select
+                  style={{
+                    height: '38px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: '#051F20',
+                    backgroundColor: '#F6FBF7',
+                    border: '1px solid #DAF1DE',
+                    borderRadius: '16px',
+                    padding: '0 12px',
+                    outline: 'none',
+                    width: '100%',
+                    maxWidth: '260px',
+                  }}
+                  value={selectedEventId}
+                  onChange={(e) => handleEventChange(e.target.value)}
+                >
+                  {events.map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        {/* Live Document Editor */}
-        <div className="input-group">
-          <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>
-              {isSuperAdmin
-                ? 'Live Document Audit Preview (Read-Only for Super Admin)'
-                : 'Live Document Editor (Editable Markdown & Text)'}
-            </span>
-            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>
-              {isSuperAdmin
-                ? 'Managed by Documentation Wing • Ready for Official Export'
-                : 'Changes will be included in exported file'}
-            </span>
-          </label>
-          <textarea
-            className="input-field"
-            rows={18}
-            readOnly={isSuperAdmin}
-            style={{
-              fontFamily: 'Consolas, Monaco, monospace',
-              fontSize: '12px',
-              lineHeight: 1.6,
-              backgroundColor: isSuperAdmin ? '#F1F5F9' : '#F8FAFC',
-              cursor: isSuperAdmin ? 'default' : 'text',
-            }}
-            value={docContent}
-            onChange={(e) => setDocContent(e.target.value)}
-          />
-        </div>
-      </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <StatusChip status="done" label="Auto-saved" />
+                <button
+                  type="button"
+                  onClick={handleCopyText}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: '#F6FBF7',
+                    border: '1px solid #DAF1DE',
+                    padding: '6px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#235347',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Copy size={13} strokeWidth={2} />
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Micro Toolbar (Bold, Italic, Bullet List, Table) */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 10px',
+                backgroundColor: '#F6FBF7',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => insertText('**', '**')}
+                title="Bold"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#051F20',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(5,31,32,0.04)',
+                }}
+              >
+                <Bold size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertText('*', '*')}
+                title="Italic"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#051F20',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(5,31,32,0.04)',
+                }}
+              >
+                <Italic size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertText('- ')}
+                title="Bullet List"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#051F20',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(5,31,32,0.04)',
+                }}
+              >
+                <List size={14} strokeWidth={2.5} />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertText('| Header 1 | Header 2 |\n| --- | --- |\n| Data 1 | Data 2 |')}
+                title="Table"
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  backgroundColor: '#FFFFFF',
+                  color: '#051F20',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(5,31,32,0.04)',
+                }}
+              >
+                <TableIcon size={14} strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Clean White Card Textarea with Body Font (per Conflict Resolution 2) */}
+            <textarea
+              rows={14}
+              value={docContent}
+              onChange={(e) => setDocContent(e.target.value)}
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                fontFamily: 'Plus Jakarta Sans, Inter, system-ui, sans-serif',
+                fontSize: '13px',
+                lineHeight: 1.6,
+                color: '#051F20',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #DAF1DE',
+                borderRadius: '16px',
+                padding: '14px',
+                outline: 'none',
+                resize: 'vertical',
+              }}
+            />
+
+            {/* Sticky Action Bar max 3 Pills: PDF, Word, Excel */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', paddingTop: '6px' }}>
+              <PillButton
+                icon={<Printer size={16} />}
+                variant="primary"
+                onClick={handleExportPdf}
+              >
+                PDF
+              </PillButton>
+              <PillButton
+                icon={<FileText size={16} />}
+                variant="secondary"
+                onClick={handleExportWord}
+              >
+                Word
+              </PillButton>
+              <PillButton
+                icon={<FileSpreadsheet size={16} />}
+                variant="ghost"
+                onClick={handleExportExcel}
+              >
+                Excel
+              </PillButton>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
+
+export default DocumentationStudioView;

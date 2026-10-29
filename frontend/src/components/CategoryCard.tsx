@@ -35,7 +35,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <div className="flex items-center justify-between mb-3">
         <Overline pill>{title}</Overline>
         {countBadge !== undefined && (
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
             {countBadge} Modules
           </span>
         )}
@@ -46,8 +46,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         <div
           className="flex items-center justify-between p-2.5 mb-3.5 rounded-2xl border transition-all"
           style={{
-            backgroundColor: '#F8FAFC',
-            borderColor: '#E2E8F0',
+            backgroundColor: '#F6FBF7',
+            borderColor: '#DAF1DE',
           }}
         >
           <div className="flex items-center gap-2.5 min-w-0">

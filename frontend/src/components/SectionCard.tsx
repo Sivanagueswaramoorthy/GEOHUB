@@ -22,8 +22,8 @@ export const SectionCard: React.FC<SectionCardProps> = ({
       style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '24px',
-        border: '1px solid #EEF1F5',
-        boxShadow: '0 6px 24px rgba(15, 23, 42, 0.06)',
+        border: '1px solid #DAF1DE',
+        boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
         padding,
         boxSizing: 'border-box',
         cursor: onClick ? 'pointer' : undefined,

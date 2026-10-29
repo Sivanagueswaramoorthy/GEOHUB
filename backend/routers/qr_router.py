@@ -1,6 +1,7 @@
 import secrets
+import math
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 import json
 from database import get_db
@@ -8,18 +9,39 @@ import models, schemas, auth
 
 router = APIRouter(prefix="/qr", tags=["Smart QR Attendance"])
 
+def calculate_distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Haversine formula to calculate geodesic distance between two lat/lng coordinates in meters."""
+    R = 6371000 # Radius of earth in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+
+    a = math.sin(delta_phi / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
 @router.post("/generate", response_model=schemas.QrGenerateResponse)
 def generate_event_qr(
     req: schemas.QrGenerateRequest,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
-    # Verify user is registered for the event (or admin)
+    """Server-side QR Token Generation:
+    Token is strictly bound to userId + eventId + 60s TTL.
+    Client only displays what the server issued.
+    """
+    event = db.query(models.Event).filter(models.Event.id == req.event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    # Verify user is registered for the event (or organizer)
     reg_id = f"{req.event_id}_{current_user.id}"
-    is_admin = current_user.role in ["admin", "super_admin"]
+    norm_role = auth.normalize_role(current_user.role)
+    is_organizer = norm_role in ["faculty", "coordinator"]
     reg = db.query(models.EventRegistration).filter(models.EventRegistration.id == reg_id).first()
 
-    if not reg and not is_admin:
+    if not reg and not is_organizer:
         raise HTTPException(
             status_code=400,
             detail="You must register for this event before generating attendance QR."
@@ -57,45 +79,75 @@ def verify_attendance_qr(
     db: Session = Depends(get_db),
     scanner: models.User = Depends(auth.get_current_active_user)
 ):
-    # Check scanner privileges
+    """Server-Side Verification:
+    (a) The scanner is assigned to THIS event (Layer 3 resource-level check)
+    (b) The attendee is registered for it
+    (c) The token is valid, unexpired and unused (marked used in single atomic transaction)
+    (d) Optional geofence check (off by default)
+    """
+    # 1. Fetch event
     event = db.query(models.Event).filter(models.Event.id == req.event_id).first()
     if not event:
         raise HTTPException(status_code=404, detail="Event not found.")
 
-    volunteers = json.loads(event.volunteer_user_ids or "[]")
-    is_admin = scanner.role in ["admin", "super_admin"]
-    is_volunteer = scanner.id in volunteers or scanner.is_volunteer
-
-    if not is_admin and not is_volunteer:
+    # (a) Verify scanner assignment for THIS event
+    assigned_scanners = json.loads(event.assigned_scanner_user_ids or "[]")
+    if scanner.id not in assigned_scanners:
         raise HTTPException(
-            status_code=403,
-            detail="You are not authorized as an attendance volunteer for this event."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Forbidden: You are not assigned as an attendance scanner for this event."
         )
 
-    # Find QR session
+    # (d) Optional geofence check
+    if event.geofence_enabled and event.latitude is not None and event.longitude is not None:
+        if req.scanner_latitude is not None and req.scanner_longitude is not None:
+            distance = calculate_distance_meters(
+                event.latitude, event.longitude,
+                req.scanner_latitude, req.scanner_longitude
+            )
+            max_radius = event.geofence_radius_meters or 100.0
+            if distance > max_radius:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Geofence violation: Scanner is {distance:.1f}m away from event venue (allowed radius: {max_radius}m)."
+                )
+
+    # (c) Find QR session & verify token
+    clean_token = req.token.strip()
     qr = db.query(models.QrSession).filter(
         models.QrSession.event_id == req.event_id,
-        models.QrSession.token == req.token.strip()
+        models.QrSession.token == clean_token
     ).first()
 
     if not qr:
-        raise HTTPException(status_code=400, detail="Invalid QR code for this event.")
+        raise HTTPException(status_code=400, detail="Invalid QR code: Token not recognized for this event.")
 
     if qr.used:
-        raise HTTPException(status_code=400, detail="This QR code has already been scanned.")
+        raise HTTPException(status_code=400, detail="Duplicate scan: This QR code has already been scanned.")
 
     if datetime.utcnow() > qr.expires_at:
-        raise HTTPException(status_code=400, detail="This QR code has expired. Please ask attendee to refresh.")
+        raise HTTPException(status_code=400, detail="QR code expired: The 60-second validity window has lapsed.")
 
-    # Mark as used
+    # (b) Verify attendee registration
+    reg_id = f"{req.event_id}_{qr.user_id}"
+    reg = db.query(models.EventRegistration).filter(models.EventRegistration.id == reg_id).first()
+    if not reg:
+        raise HTTPException(
+            status_code=400,
+            detail="Attendance denied: Attendee is not registered for this event."
+        )
+
+    # Single atomic transaction: mark token used + write attendance record + increment event attendance count
     qr.used = True
 
-    # Get attendee
     attendee = db.query(models.User).filter(models.User.id == qr.user_id).first()
     attendee_name = attendee.name if attendee else "Student"
 
-    # Create Attendance Record
     att_id = f"{req.event_id}_{qr.user_id}"
+    existing_att = db.query(models.Attendance).filter(models.Attendance.id == att_id).first()
+    if existing_att:
+        raise HTTPException(status_code=400, detail=f"Attendee {attendee_name} is already checked in.")
+
     attendance = models.Attendance(
         id=att_id,
         event_id=req.event_id,
@@ -105,37 +157,25 @@ def verify_attendance_qr(
         check_in_time=datetime.utcnow(),
         method="qr"
     )
-    db.merge(attendance)
-
-    # Increment event attendance count
+    db.add(attendance)
     event.attendance_count = (event.attendance_count or 0) + 1
     db.commit()
 
-    return schemas.QrVerifyResponse(
-        success=True,
-        message=f"Checked in {attendee_name} successfully!",
-        attendee_name=attendee_name,
-        attendee_id=qr.user_id,
-        check_in_time=datetime.utcnow()
+    # Write audit record
+    auth.log_audit(
+        db=db,
+        actor=scanner,
+        action="attendance_scan_verified",
+        target_type="attendance",
+        target_id=att_id,
+        target_name=attendee_name,
+        details=f"Verified attendance check-in for {attendee_name} at event {event.title}"
     )
 
-@router.get("/{event_id}/attendance")
-def get_event_attendance(
-    event_id: str,
-    db: Session = Depends(get_db),
-    admin: models.User = Depends(auth.require_admin)
-):
-    records = db.query(models.Attendance).filter(models.Attendance.event_id == event_id).all()
-    return {
-        "count": len(records),
-        "records": [
-            {
-                "user_id": r.user_id,
-                "user_name": r.user_name,
-                "scanned_by": r.scanned_by,
-                "check_in_time": r.check_in_time,
-                "method": r.method
-            }
-            for r in records
-        ]
-    }
+    return schemas.QrVerifyResponse(
+        success=True,
+        message=f"Attendance confirmed for {attendee_name}",
+        attendee_name=attendee_name,
+        attendee_id=qr.user_id,
+        check_in_time=attendance.check_in_time
+    )

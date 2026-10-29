@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Calendar as CalendarIcon,
   Send,
@@ -6,42 +6,24 @@ import {
   Newspaper,
   Plus,
   Clock,
-  ExternalLink,
-  Copy,
-  Edit2,
-  Trash2,
-  CheckCircle2,
+  Download,
   Share2,
-  Filter,
   Check,
   ChevronLeft,
   ChevronRight,
-  AlertCircle,
-  Eye,
-  Camera,
-  MessageCircle,
-  Loader2,
-  Flame,
-  ThumbsUp,
-  RotateCw,
-  X,
-  FileText,
   Megaphone,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { SocialPlatform, SocialPostStatus, SocialPost, DailyNewsItem } from '../../types';
+import { SocialPlatform, SocialPostStatus, SocialPost } from '../../types';
 import {
-  SectionCard,
-  Overline,
+  PillButton,
+  StatusChip,
   StatTile,
   BottomSheet,
-  Toast,
-  ConfirmDialog,
-  WeekStrip,
-  WeekDayItem,
-  AuditModeBanner,
-} from '../../components';
-import { getRolePermissions } from '../../core/permissions';
+  EmptyState,
+  SegmentedTabs,
+  UploadCard,
+} from '../../components/shared';
 
 export const CampaignsView: React.FC = () => {
   const {
@@ -49,1286 +31,499 @@ export const CampaignsView: React.FC = () => {
     events,
     posts,
     addPost,
-    updatePost,
-    deletePost,
     markPostPublished,
     dailyNews,
     addDailyNews,
-    updateDailyNews,
-    deleteDailyNews,
-    setActiveTab,
   } = useApp();
 
-  const perms = getRolePermissions(currentUser.role);
-  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
-  const canManageCampaigns = perms.canManageCampaigns && !isSuperAdmin;
-
-  // Active top-level subtab
-  const [activeSubTab, setActiveSubTab] = useState<'calendar' | 'posts' | 'ai' | 'news'>('posts');
+  const [activeSubTab, setActiveSubTab] = useState<'posts' | 'calendar' | 'ai' | 'news'>('posts');
+  const [selectedPlatform, setSelectedPlatform] = useState<string>('All');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Post Composer State
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [postPlatform, setPostPlatform] = useState<SocialPlatform>('Instagram');
+  const [postCaption, setPostCaption] = useState('');
+  const [postEventId, setPostEventId] = useState(events[0]?.id || '');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  // Content Calendar State
+  const [selectedDayIndex, setSelectedDayIndex] = useState(3);
+
+  // Daily News State
+  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
+  const [newsTitle, setNewsTitle] = useState('');
+  const [newsContent, setNewsContent] = useState('');
+  const [newsAudience, setNewsAudience] = useState<'all' | 'squad'>('all');
+
+  const platforms: ('All' | SocialPlatform)[] = ['All', 'Instagram', 'LinkedIn', 'YouTube', 'WhatsApp'];
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  // -------------------------------------------------------------
-  // POSTS SUB-TAB STATE & FILTERS
-  // -------------------------------------------------------------
-  const [selectedPlatformFilter, setSelectedPlatformFilter] = useState<'All' | SocialPlatform>('All');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<'All' | SocialPostStatus>('All');
-
-  // Add / Edit Post Modal
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [postEventId, setPostEventId] = useState(events[0]?.id || '');
-  const [postPlatform, setPostPlatform] = useState<SocialPlatform>('Instagram');
-  const [postStatus, setPostStatus] = useState<SocialPostStatus>('Scheduled');
-  const [postCaption, setPostCaption] = useState('');
-  const [postScheduledDate, setPostScheduledDate] = useState(() => new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0]);
-  const [postScheduledTime, setPostScheduledTime] = useState('11:00');
-  const [postLiveUrl, setPostLiveUrl] = useState('');
-  const [postMediaUrl, setPostMediaUrl] = useState('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80');
-
-  // Mark Posted Modal
-  const [isMarkPostedOpen, setIsMarkPostedOpen] = useState(false);
-  const [targetPostForMark, setTargetPostForMark] = useState<SocialPost | null>(null);
-  const [inputLiveUrl, setInputLiveUrl] = useState('');
-
-  // Delete Confirm Dialog
-  const [deleteConfirmPostId, setDeleteConfirmPostId] = useState<string | null>(null);
-
-  // -------------------------------------------------------------
-  // CALENDAR SUB-TAB STATE
-  // -------------------------------------------------------------
-  const [currentMonth, setCurrentMonth] = useState('October 2026');
-  const [selectedDateStr, setSelectedDateStr] = useState('2026-10-08');
-
-  const weekDays: WeekDayItem[] = [
-    { dateStr: '2026-10-05', dayName: 'Mon', dayNum: 5, hasDot: posts.some((p) => p.scheduledDate === '2026-10-05') },
-    { dateStr: '2026-10-06', dayName: 'Tue', dayNum: 6, hasDot: posts.some((p) => p.scheduledDate === '2026-10-06') },
-    { dateStr: '2026-10-07', dayName: 'Wed', dayNum: 7, hasDot: posts.some((p) => p.scheduledDate === '2026-10-07') },
-    { dateStr: '2026-10-08', dayName: 'Thu', dayNum: 8, hasDot: posts.some((p) => p.scheduledDate === '2026-10-08') },
-    { dateStr: '2026-10-09', dayName: 'Fri', dayNum: 9, hasDot: posts.some((p) => p.scheduledDate === '2026-10-09') },
-    { dateStr: '2026-10-10', dayName: 'Sat', dayNum: 10, hasDot: posts.some((p) => p.scheduledDate === '2026-10-10') },
-    { dateStr: '2026-10-11', dayName: 'Sun', dayNum: 11, hasDot: posts.some((p) => p.scheduledDate === '2026-10-11') },
-  ];
-
-  // -------------------------------------------------------------
-  // AI SUB-TAB STATE
-  // -------------------------------------------------------------
-  const [aiSelectedEventId, setAiSelectedEventId] = useState(events[0]?.id || 'event_01');
-  const [aiTone, setAiTone] = useState<'Formal' | 'Friendly' | 'Energetic'>('Energetic');
-  const [aiIsLoading, setAiIsLoading] = useState(false);
-  const [aiCustomPrompt, setAiCustomPrompt] = useState('');
-  const [aiGeneratedCards, setAiGeneratedCards] = useState<{
-    instagram: { headline: string; caption: string; hashtags: string[]; cta: string };
-    linkedin: { headline: string; caption: string; hashtags: string[]; cta: string };
-    dailyNews: { title: string; paragraph: string; hashtags: string[] };
-  } | null>(null);
-
-  // In-place draft editing state
-  const [editingDraftChannel, setEditingDraftChannel] = useState<'instagram' | 'linkedin' | 'news' | null>(null);
-  const [editedCaption, setEditedCaption] = useState('');
-
-  // -------------------------------------------------------------
-  // DAILY NEWS SUB-TAB STATE
-  // -------------------------------------------------------------
-  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
-  const [newsTitle, setNewsTitle] = useState('');
-  const [newsContent, setNewsContent] = useState('');
-  const [newsEventId, setNewsEventId] = useState(events[0]?.id || '');
-  const [deleteConfirmNewsId, setDeleteConfirmNewsId] = useState<string | null>(null);
-
-  // Prepopulate AI drafts on mount if empty
-  const selectedAiEvent = events.find((e) => e.id === aiSelectedEventId) || events[0] || {
-    id: 'event_01',
-    title: 'Annual Geo-Symposium & Tech Expo',
-    venue: 'Grand Auditorium',
-    startDate: '2026-10-10T09:00:00Z',
-    description: 'Flagship convention featuring research in autonomous spatial sensing and UAV photogrammetry.',
-    registeredUserIds: ['u_1', 'u_2', 'u_3'],
-  };
-
-  const handleGenerateAiSuggestions = async () => {
-    setAiIsLoading(true);
-    setAiGeneratedCards(null);
-
-    // Simulated 1.2s skeleton adapter with realistic delay
+  const handleSuggestAi = () => {
+    setIsAiLoading(true);
     setTimeout(() => {
-      const evTitle = selectedAiEvent.title;
-      const venue = selectedAiEvent.venue;
-      const dateStr = new Date(selectedAiEvent.startDate).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-
-      if (aiTone === 'Energetic') {
-        setAiGeneratedCards({
-          instagram: {
-            headline: `🚀 READY TO UNLOCK THE FUTURE OF GEOMATICS? ${evTitle} is HERE! ✨`,
-            caption: `Get hands-on with autonomous LiDAR point-clouds, drone flight telemetry, and satellite radar mapping! 🛰️💥\n\nWhether you're gearing up for internships or mapping your first digital elevation model, this is the marquee event of the semester!\n\n🗓️ Date: ${dateStr}\n📍 Venue: ${venue}\n🎟️ Exclusive student access badges now available!`,
-            hashtags: ['#GeoHub', '#Geomatics', '#DroneMapping', '#GISLife', '#InnovationInSTEM', '#CollegeCampus'],
-            cta: '📲 Tap link in bio or visit GeoHub portal to secure your badge!',
-          },
-          linkedin: {
-            headline: `Advancing Applied Geospatial Engineering: Join Us for ${evTitle}`,
-            caption: `The Department of Geomatics and Green Eco Organization (GeoHub) are proud to present "${evTitle}" on ${dateStr} at ${venue}.\n\nThis high-impact seminar bridges academic theory with industry standards, featuring hands-on labs in:\n• Multispectral terrain classification & RTK positioning\n• Open-source GIS workflows adhering to ISO geospatial standards\n• High-precision UAV survey protocols with faculty oversight\n\nStudent scholars from all engineering disciplines are encouraged to attend and network with technical chapter mentors.`,
-            hashtags: ['#GeospatialEngineering', '#GIS', '#RemoteSensing', '#HigherEducation', '#STEMLeadership'],
-            cta: 'Student delegate registrations are managed through the official college portal.',
-          },
-          dailyNews: {
-            title: `CAMPUS BULLETIN: ${evTitle} Scheduled for ${dateStr}`,
-            paragraph: `The Department of Geomatics in collaboration with the GeoHub Student Chapter will host "${evTitle}" on ${dateStr} at ${venue}. The session will feature field demonstrations of Topcon RTK GNSS systems and autonomous UAV mapping under the supervision of Faculty Advisor Dr. Sarah Jenkins. Over 180 delegates have registered, making this one of the largest collaborative geospatial initiatives of the academic year.`,
-            hashtags: ['#CollegeDailyNews', '#DepartmentOfGeomatics', '#StudentExcellence', '#GeoHub'],
-          },
-        });
-      } else if (aiTone === 'Formal') {
-        setAiGeneratedCards({
-          instagram: {
-            headline: `Official Academic Notice: ${evTitle}`,
-            caption: `We cordially invite faculty, researchers, and students to attend "${evTitle}".\n\nThe symposium will provide structured demonstrations in advanced remote sensing methodologies and geospatial analytics.\n\nDate: ${dateStr}\nLocation: ${venue}`,
-            hashtags: ['#Geomatics', '#AcademicExcellence', '#GeoHubChapter', '#SurveyScience'],
-            cta: 'Formal registration verification is required at the turnstile gate.',
-          },
-          linkedin: {
-            headline: `Institutional Announcement: Departmental Symposium on ${evTitle}`,
-            caption: `Green Eco Organization (GeoHub) announces the schedule for "${evTitle}" taking place on ${dateStr} at ${venue}.\n\nUnder the advisory leadership of Dr. Sarah Jenkins, this session addresses regional environmental monitoring and digital spatial twins for disaster mitigation.\n\nWe commend our student executive committee for organizing this technical seminar.`,
-            hashtags: ['#SpatialDataScience', '#HigherEducation', '#Geodesy', '#CivilEngineering'],
-            cta: 'Official delegate clearance is open via the chapter portal.',
-          },
-          dailyNews: {
-            title: `OFFICIAL DISPATCH: Department Confirms Dates for ${evTitle}`,
-            paragraph: `The collegiate chapter of Green Eco Organization confirmed that "${evTitle}" will take place on ${dateStr} at ${venue}. The proceedings will document student research in geospatial analytics and autonomous mapping. Dean and faculty mentors will review technical presentations delivered by student squads.`,
-            hashtags: ['#OfficialDispatch', '#AcademicIntegrity', '#GeomaticsDepartment'],
-          },
-        });
-      } else {
-        // Friendly
-        setAiGeneratedCards({
-          instagram: {
-            headline: `Hey Geo-Scholars! 🌍 What are your plans for ${dateStr}?`,
-            caption: `Join us at ${venue} for ${evTitle}! 🤗 We'll have drone flight demos, GPS treasure hunts, and free stickers for everyone who checks in via the app!\n\nNo prior GIS experience needed - our student mentors will guide you step by step. Bring your friends and let's map something cool together! ✨`,
-            hashtags: ['#GeoHubFamily', '#ClubLife', '#GeomaticsFun', '#CollegeVibes'],
-            cta: 'Tag a friend in the comments and tap the link in bio to RSVP! 👇',
-          },
-          linkedin: {
-            headline: `Empowering Student Exploration: Announcing ${evTitle}`,
-            caption: `Student-led learning is at the heart of GeoHub! On ${dateStr}, we are hosting "${evTitle}" at ${venue}.\n\nIt is always inspiring to see junior scholars collaborating across departments on real-world spatial challenges. Special thanks to our volunteer crews for coordinating gate check-ins and hardware distribution.`,
-            hashtags: ['#StudentLeadership', '#HandsOnLearning', '#GeoHub', '#PeerMentoring'],
-            cta: 'Check out the event details on our chapter app.',
-          },
-          dailyNews: {
-            title: `STUDENT SPOTLIGHT: Hands-on Tech Experience at ${evTitle}`,
-            paragraph: `The GeoHub Student Chapter welcomes all undergraduates to participate in "${evTitle}" on ${dateStr} at ${venue}. The student-driven event offers an approachable introduction to spatial mapping, GPS receivers, and club activities. Event lead David Chen highlighted that peer mentorship will be provided throughout the day.`,
-            hashtags: ['#StudentLife', '#HandsOnTech', '#GeoHubCommunity'],
-          },
-        });
-      }
-
-      setAiIsLoading(false);
-      showToast('✓ AI content draft ready for review!');
-    }, 1200);
+      const targetEvent = events.find((e) => e.id === postEventId) || events[0];
+      setPostCaption(
+        `🌿 Join us for ${targetEvent?.title || 'our next expedition'}! Exploring geomatics, remote sensing, and environmental tech on campus. Reserve your spot today! #GeoHub #CampusGeomatics`
+      );
+      setIsAiLoading(false);
+      showToast('Generated AI caption!');
+    }, 600);
   };
 
-  // Copy helper
-  const handleCopyText = (text: string, label = 'Content') => {
-    navigator.clipboard?.writeText(text);
-    showToast(`✓ Copied ${label} to clipboard!`);
-  };
-
-  // Convert AI draft directly into a SocialPost (Draft status)
-  const handleSaveAiDraftAsPost = (platform: SocialPlatform, caption: string, hashtags: string[]) => {
-    addPost({
-      eventId: selectedAiEvent.id,
-      eventTitle: selectedAiEvent.title,
-      platform,
-      status: 'Draft',
-      caption,
-      hashtags,
-      authorName: `${currentUser.name} (AI Studio)`,
-      createdAt: new Date().toISOString(),
-    });
-    showToast(`✓ Saved as ${platform} Draft in Posts!`);
-  };
-
-  // Convert AI draft directly into a SocialPost (Posted status with link)
-  const handleMarkAiDraftAsPosted = (platform: SocialPlatform, caption: string, hashtags: string[]) => {
-    const liveLink = prompt('Enter the live post URL (Instagram, LinkedIn, or Web):', 'https://instagram.com/p/geohub_live');
-    if (!liveLink) return;
-    addPost({
-      eventId: selectedAiEvent.id,
-      eventTitle: selectedAiEvent.title,
-      platform,
-      status: 'Posted',
-      caption,
-      hashtags,
-      postUrl: liveLink,
-      publishedDate: new Date().toISOString().split('T')[0],
-      authorName: `${currentUser.name} (AI Studio)`,
-      createdAt: new Date().toISOString(),
-    });
-    showToast(`✓ Recorded as Posted on ${platform}!`);
-  };
-
-  // Post Submission handler (Add/Edit)
-  const handlePostFormSubmit = (e: React.FormEvent) => {
+  const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!postCaption.trim()) return;
-
     const targetEvent = events.find((ev) => ev.id === postEventId);
-
-    if (editingPostId) {
-      updatePost(editingPostId, {
-        eventId: postEventId || undefined,
-        eventTitle: targetEvent?.title,
-        platform: postPlatform,
-        status: postStatus,
-        caption: postCaption,
-        scheduledDate: postStatus === 'Scheduled' ? postScheduledDate : undefined,
-        scheduledTime: postStatus === 'Scheduled' ? postScheduledTime : undefined,
-        postUrl: postStatus === 'Posted' ? postLiveUrl || undefined : undefined,
-        publishedDate: postStatus === 'Posted' ? new Date().toISOString().split('T')[0] : undefined,
-      });
-      showToast('✓ Updated post details!');
-    } else {
-      addPost({
-        eventId: postEventId || undefined,
-        eventTitle: targetEvent?.title,
-        platform: postPlatform,
-        status: postStatus,
-        caption: postCaption,
-        scheduledDate: postStatus === 'Scheduled' ? postScheduledDate : undefined,
-        scheduledTime: postStatus === 'Scheduled' ? postScheduledTime : undefined,
-        postUrl: postStatus === 'Posted' ? postLiveUrl || undefined : undefined,
-        publishedDate: postStatus === 'Posted' ? new Date().toISOString().split('T')[0] : undefined,
-        mediaUrl: postMediaUrl,
-        authorName: `${currentUser.name} (${currentUser.post || 'Promotion Lead'})`,
-        createdAt: new Date().toISOString(),
-      });
-      showToast(`✓ Created new ${postStatus} on ${postPlatform}!`);
-    }
-
-    setIsPostModalOpen(false);
-    setEditingPostId(null);
+    addPost({
+      platform: postPlatform,
+      caption: postCaption,
+      eventId: postEventId,
+      eventTitle: targetEvent?.title || 'Chapter Initiative',
+      scheduledDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+      scheduledTime: '11:00',
+      status: 'Scheduled',
+      mediaUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80',
+      createdBy: currentUser.name,
+    });
+    setIsComposerOpen(false);
+    setPostCaption('');
+    showToast('Post scheduled successfully');
   };
 
-  // Open Edit Post
-  const handleOpenEditPost = (post: SocialPost) => {
-    setEditingPostId(post.id);
-    setPostEventId(post.eventId || events[0]?.id || '');
-    setPostPlatform(post.platform);
-    setPostStatus(post.status);
-    setPostCaption(post.caption);
-    setPostScheduledDate(post.scheduledDate || new Date().toISOString().split('T')[0]);
-    setPostScheduledTime(post.scheduledTime || '11:00');
-    setPostLiveUrl(post.postUrl || '');
-    setPostMediaUrl(post.mediaUrl || '');
-    setIsPostModalOpen(true);
-  };
-
-  // Confirm Mark Posted
-  const handleConfirmMarkPosted = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!targetPostForMark) return;
-    markPostPublished(targetPostForMark.id, inputLiveUrl || undefined);
-    showToast(`✓ Marked post as Posted on ${targetPostForMark.platform}!`);
-    setIsMarkPostedOpen(false);
-    setTargetPostForMark(null);
-    setInputLiveUrl('');
-  };
-
-  // Daily News submit
-  const handleNewsFormSubmit = (e: React.FormEvent) => {
+  const handleCreateNews = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsTitle.trim() || !newsContent.trim()) return;
-
-    const targetEv = events.find((ev) => ev.id === newsEventId);
     addDailyNews({
-      title: newsTitle,
+      title: newsTitle.trim(),
+      content: newsContent.trim(),
+      category: 'Announcements',
+      author: currentUser.name,
+      authorName: currentUser.name,
       date: new Date().toISOString().split('T')[0],
-      eventId: newsEventId || undefined,
-      eventTitle: targetEv?.title,
-      author: `${currentUser.name} (Promotion Lead)`,
-      content: newsContent,
-      hashtags: ['#CollegeDailyNews', '#DepartmentOfGeomatics', '#GeoHub'],
+      isPriority: true,
+      hashtags: [],
       status: 'published',
+      tags: [newsAudience === 'all' ? 'All Members' : 'Squad Only'],
     });
-
-    showToast('✓ Published chapter daily news bulletin!');
     setIsNewsModalOpen(false);
     setNewsTitle('');
     setNewsContent('');
+    showToast('Bulletin broadcasted');
   };
 
-  // Filtered posts
   const filteredPosts = posts.filter((p) => {
-    const matchesPlatform = selectedPlatformFilter === 'All' || p.platform === selectedPlatformFilter;
-    const matchesStatus = selectedStatusFilter === 'All' || p.status === selectedStatusFilter;
-    return matchesPlatform && matchesStatus;
+    if (selectedPlatform !== 'All' && p.platform !== selectedPlatform) return false;
+    return true;
   });
 
-  // Scheduled posts for calendar
-  const scheduledForSelectedDate = posts.filter(
-    (p) => p.status === 'Scheduled' && (p.scheduledDate === selectedDateStr || !p.scheduledDate)
-  );
+  const subTabs = [
+    { key: 'posts', label: 'Posts' },
+    { key: 'calendar', label: 'Calendar' },
+    { key: 'ai', label: 'AI Studio' },
+    { key: 'news', label: 'Daily News' },
+  ];
+
+  // 4-stage campaign progress: Teaser, Speaker Reveal, Registration, Recap
+  const campaignStages = [
+    { name: 'Teaser', done: true },
+    { name: 'Speaker Reveal', done: true },
+    { name: 'Registration', done: false },
+    { name: 'Recap', done: false },
+  ];
+
+  const daysOfWeek = ['Mon 26', 'Tue 27', 'Wed 28', 'Thu 29', 'Fri 30', 'Sat 31', 'Sun 01'];
 
   return (
-    <div className="flex flex-col gap-5 pb-12">
-      {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Toast Alert */}
+      {toastMsg && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            backgroundColor: '#051F20',
+            color: '#FFFFFF',
+            padding: '8px 16px',
+            borderRadius: '9999px',
+            fontSize: '12px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <Check size={14} color="#8EB69B" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
-      {/* Header Area */}
-      <div className="flex items-center justify-between pt-1">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <Overline dot>CAMPAIGNS & SOCIAL MEDIA COMMAND</Overline>
           <h1
-            className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight mt-0.5"
-            style={{ fontFamily: 'var(--font-family)' }}
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
           >
-            Campaigns Hub
+            Chapter Campaigns
           </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Publicity, social media & releases
+          </p>
         </div>
 
-        {canManageCampaigns ? (
-          <button
-            type="button"
-            onClick={() => {
-              setEditingPostId(null);
-              setPostCaption('');
-              setPostStatus('Scheduled');
-              setPostPlatform('Instagram');
-              setIsPostModalOpen(true);
-            }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all cursor-pointer active:scale-95 shrink-0"
+        {activeSubTab === 'news' ? (
+          <PillButton
+            variant="primary"
+            icon={<Plus size={16} />}
+            onClick={() => setIsNewsModalOpen(true)}
           >
-            <Plus size={16} strokeWidth={1.75} />
-            <span>New Post</span>
-          </button>
+            New post
+          </PillButton>
         ) : (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
-            <Eye size={14} className="text-slate-500" />
-            <span>Audit Mode</span>
-          </div>
+          <PillButton
+            variant="primary"
+            icon={<Plus size={16} />}
+            onClick={() => setIsComposerOpen(true)}
+          >
+            New post
+          </PillButton>
         )}
       </div>
 
-      {/* Institutional Audit Mode Notice for Super Admin */}
-      {isSuperAdmin && (
-        <AuditModeBanner
-          moduleName="Campaigns Hub & Media Directives"
-          operatedByRole="Promotion & Social Media Lead"
-          actionRestrictions="Campaign scheduling, live publishing, and daily bulletin drafting are operated by the Promotion Lead. Faculty reviews and approves campaigns on the Approvals Desk."
-          facultyActionLabel="Open Faculty Approvals & Sanctions Desk"
-          onFacultyActionClick={() => setActiveTab('approvals')}
-        />
-      )}
+      {/* Sub-tabs: Posts, Calendar, AI Studio, Daily News */}
+      <SegmentedTabs
+        tabs={subTabs}
+        activeTab={activeSubTab}
+        onChange={(k) => setActiveSubTab(k as any)}
+      />
 
-      {/* 4 Segmented Sub-Tabs */}
-      <div
-        className="flex items-center p-1 rounded-2xl bg-[#F1F5F9] border border-[#E2E8F0] gap-1"
-        style={{ fontFamily: 'var(--font-family)' }}
-      >
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('posts')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-            activeSubTab === 'posts'
-              ? 'bg-white text-purple-900 shadow-xs border border-purple-200/50'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Posts ({posts.length})
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('calendar')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-            activeSubTab === 'calendar'
-              ? 'bg-white text-purple-900 shadow-xs border border-purple-200/50'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Calendar
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('ai')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer inline-flex items-center justify-center gap-1 ${
-            activeSubTab === 'ai'
-              ? 'bg-white text-purple-900 shadow-xs border border-purple-200/50'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <Sparkles size={16} strokeWidth={1.75} className="text-amber-500" />
-          <span>AI Studio</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveSubTab('news')}
-          className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-            activeSubTab === 'news'
-              ? 'bg-white text-purple-900 shadow-xs border border-purple-200/50'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Daily News ({dailyNews.length})
-        </button>
-      </div>
-
-      {/* =========================================================================
-          SUB-TAB 1: POSTS LIST
-          ========================================================================= */}
+      {/* SUB-TAB 1: POSTS */}
       {activeSubTab === 'posts' && (
-        <div className="flex flex-col gap-4 min-w-0 w-full max-w-full">
-          {/* Filters Bar */}
-          <div className="flex flex-col gap-2 min-w-0 w-full max-w-full">
-            {/* Platform filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0 w-full max-w-full">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
-                Platform:
-              </span>
-              {(['All', 'Instagram', 'LinkedIn', 'WhatsApp', 'Other'] as const).map((plat) => (
-                <button
-                  key={plat}
-                  type="button"
-                  onClick={() => setSelectedPlatformFilter(plat)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                    selectedPlatformFilter === plat
-                      ? 'bg-purple-700 text-white shadow-xs'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  {plat}
-                </button>
-              ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Campaign Overview Card with 4-Stage Progress Bar */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '20px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                  Annual Symposium 2026
+                </h3>
+                <span style={{ fontSize: '12px', color: '#235347' }}>
+                  4-stage publicity timeline
+                </span>
+              </div>
+              <StatusChip status="live" label="Stage 2 Active" />
             </div>
 
-            {/* Status filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0 w-full max-w-full">
-              <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
-                Status:
-              </span>
-              {(['All', 'Draft', 'Scheduled', 'Posted'] as const).map((st) => (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => setSelectedStatusFilter(st)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                    selectedStatusFilter === st
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  {st}
-                </button>
+            {/* 4-Stage Progress Bar (Teaser, Speaker Reveal, Registration, Recap) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+              {campaignStages.map((st, idx) => (
+                <div key={st.name} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div
+                    style={{
+                      height: '8px',
+                      borderRadius: '9999px',
+                      backgroundColor: st.done ? '#163832' : '#DAF1DE',
+                      transition: 'all 200ms ease',
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: st.done ? '#163832' : '#235347',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {st.name}
+                  </span>
+                </div>
               ))}
             </div>
+          </div>
+
+          {/* Platform Filter Chips: Instagram, LinkedIn, YouTube, WhatsApp */}
+          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }} className="no-scrollbar">
+            {platforms.map((pl) => {
+              const isActive = selectedPlatform === pl;
+              return (
+                <button
+                  type="button"
+                  key={pl}
+                  onClick={() => setSelectedPlatform(pl)}
+                  style={{
+                    height: '32px',
+                    padding: '0 12px',
+                    borderRadius: '9999px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: isActive ? '#163832' : '#FFFFFF',
+                    color: isActive ? '#FFFFFF' : '#235347',
+                    border: isActive ? '1px solid #163832' : '1px solid #DAF1DE',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {pl}
+                </button>
+              );
+            })}
           </div>
 
           {/* Posts List */}
-          {filteredPosts.length === 0 ? (
-            <div className="p-8 rounded-3xl bg-white border border-slate-200 text-center flex flex-col items-center">
-              <Megaphone size={48} strokeWidth={1.75} className="text-slate-300 mb-2" />
-              <h3 className="font-extrabold text-sm text-slate-800">No Posts Found</h3>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPlatformFilter('All');
-                  setSelectedStatusFilter('All');
-                }}
-                className="mt-3 px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200"
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {filteredPosts.map((post) => (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {filteredPosts.length === 0 ? (
+              <EmptyState
+                mascot="megaphone"
+                title="No posts"
+                description="No releases scheduled for this channel"
+                actionLabel="New post"
+                onAction={() => setIsComposerOpen(true)}
+              />
+            ) : (
+              filteredPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5 transition-all hover:border-purple-200"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    border: '1px solid #DAF1DE',
+                    padding: '18px 20px',
+                    boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                  }}
                 >
-                  {/* Top Bar: Platform chip & Status chip */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span
-                        className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 ${
-                          post.platform === 'Instagram'
-                            ? 'bg-pink-50 text-pink-700 border border-pink-200'
-                            : post.platform === 'LinkedIn'
-                            ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                            : post.platform === 'WhatsApp'
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                            : 'bg-slate-100 text-slate-700 border border-slate-200'
-                        }`}
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          backgroundColor: '#DAF1DE',
+                          color: '#0B2B26',
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          border: '1px solid #8EB69B',
+                        }}
                       >
-                        {post.platform === 'Instagram' && <Camera size={16} strokeWidth={1.75} />}
-                        {post.platform === 'LinkedIn' && <Share2 size={16} strokeWidth={1.75} />}
-                        {post.platform === 'WhatsApp' && <MessageCircle size={16} strokeWidth={1.75} />}
-                        <span>{post.platform}</span>
+                        {post.platform}
                       </span>
-
-                      {post.eventTitle && (
-                        <span className="text-[11px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100 truncate max-w-[140px]">
-                          {post.eventTitle}
-                        </span>
-                      )}
+                      <span style={{ fontSize: '12px', color: '#235347', fontWeight: 600 }}>
+                        {post.eventTitle}
+                      </span>
                     </div>
 
-                    <span
-                      className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                        post.status === 'Posted'
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                          : post.status === 'Scheduled'
-                          ? 'bg-purple-50 text-purple-800 border border-purple-200'
-                          : 'bg-amber-50 text-amber-800 border border-amber-200'
-                      }`}
-                    >
-                      {post.status}
-                    </span>
+                    <StatusChip status={post.status === 'Published' ? 'done' : 'live'} label={post.status} />
                   </div>
 
-                  {/* Caption snippet */}
-                  <p className="text-xs text-slate-800 font-medium leading-relaxed whitespace-pre-line">
+                  <p style={{ fontSize: '13px', color: '#051F20', margin: 0, lineHeight: 1.5 }}>
                     {post.caption}
                   </p>
 
-                  {/* Hashtags */}
-                  {post.hashtags && post.hashtags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {post.hashtags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[11px] font-semibold text-purple-700 bg-purple-50/60 px-1.5 py-0.5 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Footer Bar: Date/Time + Action buttons */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-500">
-                    <div className="flex items-center gap-1.5">
-                      {post.status === 'Scheduled' && (
-                        <>
-                          <Clock size={16} strokeWidth={1.75} className="text-purple-600" />
-                          <span>
-                            {post.scheduledDate} at {post.scheduledTime || '11:00'}
-                          </span>
-                        </>
-                      )}
-                      {post.status === 'Posted' && (
-                        <>
-                          <CheckCircle2 size={16} strokeWidth={1.75} className="text-emerald-600" />
-                          <span>Published {post.publishedDate}</span>
-                        </>
-                      )}
-                      {post.status === 'Draft' && (
-                        <>
-                          <FileText size={16} strokeWidth={1.75} className="text-amber-600" />
-                          <span>Unscheduled Draft</span>
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      {/* Copy caption */}
-                      <button
-                        type="button"
-                        onClick={() => handleCopyText(post.caption, 'Caption')}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
-                        title="Copy caption"
-                      >
-                        <Copy size={16} strokeWidth={1.75} />
-                      </button>
-
-                      {/* Edit */}
-                      {canManageCampaigns && (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditPost(post)}
-                          className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer"
-                          title="Edit post"
-                        >
-                          <Edit2 size={16} strokeWidth={1.75} />
-                        </button>
-                      )}
-
-                      {/* If Draft or Scheduled, can Mark as Posted */}
-                      {canManageCampaigns && post.status !== 'Posted' && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTargetPostForMark(post);
-                            setInputLiveUrl(post.postUrl || '');
-                            setIsMarkPostedOpen(true);
-                          }}
-                          className="px-2 py-1 rounded-md text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
-                        >
-                          Mark Posted
-                        </button>
-                      )}
-
-                      {/* If Posted with Live Link */}
-                      {post.status === 'Posted' && post.postUrl && (
-                        <a
-                          href={post.postUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
-                        >
-                          <span>Live</span>
-                          <ExternalLink size={16} strokeWidth={1.75} />
-                        </a>
-                      )}
-
-                      {/* Delete */}
-                      {canManageCampaigns && (
-                        <button
-                          type="button"
-                          onClick={() => setDeleteConfirmPostId(post.id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                          title="Delete post"
-                        >
-                          <Trash2 size={16} strokeWidth={1.75} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* =========================================================================
-          SUB-TAB 2: CONTENT CALENDAR
-          ========================================================================= */}
-      {activeSubTab === 'calendar' && (
-        <div className="flex flex-col gap-4">
-          {/* Calendar Header with Month & Controls */}
-          <SectionCard padding="18px">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <CalendarIcon size={20} strokeWidth={1.75} className="text-purple-600" />
-                <h3 className="font-extrabold text-sm text-slate-900">{currentMonth}</h3>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => showToast('Navigated to September 2026')}
-                  className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
-                >
-                  <ChevronLeft size={16} strokeWidth={1.75} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedDateStr('2026-10-08')}
-                  className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 cursor-pointer"
-                >
-                  Today
-                </button>
-                <button
-                  type="button"
-                  onClick={() => showToast('Navigated to November 2026')}
-                  className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
-                >
-                  <ChevronRight size={16} strokeWidth={1.75} />
-                </button>
-              </div>
-            </div>
-
-            {/* WeekStrip */}
-            <WeekStrip
-              days={weekDays}
-              selectedDate={selectedDateStr}
-              onSelectDate={(dt) => setSelectedDateStr(dt)}
-            />
-
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-purple-600" />
-              <span>Purple dots indicate days with scheduled social media broadcasts</span>
-            </div>
-          </SectionCard>
-
-          {/* Timeline for Selected Day */}
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-700">
-                Scheduled for {new Date(selectedDateStr).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-              </span>
-              <span className="text-[11px] font-extrabold text-purple-700">
-                {scheduledForSelectedDate.length} Posts Queued
-              </span>
-            </div>
-
-            {scheduledForSelectedDate.length === 0 ? (
-              <div className="p-6 rounded-2xl bg-white border border-slate-100 text-center flex flex-col items-center">
-                <span className="text-xs font-bold text-slate-700">No Posts Scheduled</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingPostId(null);
-                    setPostScheduledDate(selectedDateStr);
-                    setPostStatus('Scheduled');
-                    setIsPostModalOpen(true);
-                  }}
-                  className="mt-3 px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 cursor-pointer"
-                >
-                  + Schedule Post for This Day
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2.5">
-                {scheduledForSelectedDate.map((p) => (
                   <div
-                    key={p.id}
-                    className="p-3.5 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingTop: '8px',
+                      borderTop: '1px solid #DAF1DE',
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-extrabold text-purple-800 font-mono">
-                          {p.scheduledTime || '11:00'}
-                        </span>
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                          {p.platform}
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-bold text-slate-500">{p.eventTitle}</span>
-                    </div>
+                    <span style={{ fontSize: '12px', color: '#235347', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={12} />
+                      {post.scheduledDate} at {post.scheduledTime}
+                    </span>
 
-                    <p className="text-xs text-slate-800 font-medium leading-snug">
-                      {p.caption}
-                    </p>
-
-                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-50">
-                      <button
-                        type="button"
-                        onClick={() => handleCopyText(p.caption)}
-                        className="text-[11px] font-bold text-slate-600 hover:text-purple-700"
-                      >
-                        Copy
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditPost(p)}
-                        className="text-[11px] font-bold text-blue-600 hover:text-blue-800"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
+                    {post.status !== 'Published' && (
+                      <PillButton
+                        variant="secondary"
+                        size="sm"
                         onClick={() => {
-                          setTargetPostForMark(p);
-                          setInputLiveUrl('');
-                          setIsMarkPostedOpen(true);
+                          markPostPublished(post.id);
+                          showToast('Post marked as live');
                         }}
-                        className="text-[11px] font-bold text-emerald-600 hover:text-emerald-800"
                       >
-                        Publish Now ✓
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* =========================================================================
-          SUB-TAB 3: AI SOCIAL STUDIO
-          ========================================================================= */}
-      {activeSubTab === 'ai' && (
-        <div className="flex flex-col gap-4">
-          {/* CRITICAL NOTE: Persistent & always visible */}
-          <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900 flex items-start gap-2.5">
-            <AlertCircle size={20} strokeWidth={1.75} className="text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-xs leading-relaxed">
-              <strong className="font-bold">Editorial Review Notice:</strong>{' '}
-              Drafts are suggestions for review. Nothing is posted automatically.
-            </div>
-          </div>
-
-          {/* Event Picker & Documentation Summary Card */}
-          <SectionCard padding="18px">
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Select Event for AI Content Generation
-            </label>
-            <select
-              value={aiSelectedEventId}
-              onChange={(e) => setAiSelectedEventId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 outline-none bg-white focus:border-purple-500 mb-3"
-            >
-              {events.map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.title} ({ev.venue})
-                </option>
-              ))}
-            </select>
-
-            {/* Event Description & Documentation Context Summary */}
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs flex flex-col gap-1.5 mb-3">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                <span>Event Scope & Takeaways:</span>
-                <span className="text-emerald-700 font-extrabold">
-                  {selectedAiEvent.registeredUserIds.length || 180} RSVPs
-                </span>
-              </div>
-              <p className="text-slate-700 text-xs leading-relaxed">
-                {selectedAiEvent.description ||
-                  'Advanced hands-on workshop covering open-source geospatial toolchains, RTK GNSS receivers, and digital terrain modeling.'}
-              </p>
-              <div className="flex items-center gap-3 text-[11px] text-slate-400 font-medium pt-1 border-t border-slate-200/50">
-                <span>📍 {selectedAiEvent.venue}</span>
-                <span>
-                  🗓️{' '}
-                  {new Date(selectedAiEvent.startDate).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                </span>
-              </div>
-            </div>
-
-            {/* Tone Selector */}
-            <div>
-              <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1.5">
-                Editorial Voice & Tone:
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {(['Formal', 'Friendly', 'Energetic'] as const).map((tone) => (
-                  <button
-                    key={tone}
-                    type="button"
-                    onClick={() => setAiTone(tone)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all text-center cursor-pointer border ${
-                      aiTone === tone
-                        ? 'bg-purple-50 text-purple-900 border-purple-300 shadow-xs'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    {tone === 'Energetic' && '⚡ '}
-                    {tone === 'Formal' && '🏛️ '}
-                    {tone === 'Friendly' && '🤝 '}
-                    {tone}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Generate CTA Button */}
-            <button
-              type="button"
-              onClick={handleGenerateAiSuggestions}
-              disabled={aiIsLoading}
-              className="w-full mt-4 py-3 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-75"
-            >
-              {aiIsLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Synthesizing Content from Event Documentation...</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={16} className="text-amber-300" />
-                  <span>Suggest Content</span>
-                </>
-              )}
-            </button>
-          </SectionCard>
-
-          {/* 1.2s Skeleton Loader */}
-          {aiIsLoading && (
-            <div className="flex flex-col gap-3 animate-pulse">
-              <div className="p-4 rounded-2xl bg-white border border-slate-100 flex flex-col gap-2">
-                <div className="h-4 bg-slate-200 rounded w-1/3" />
-                <div className="h-3 bg-slate-100 rounded w-full" />
-                <div className="h-3 bg-slate-100 rounded w-4/5" />
-                <div className="h-8 bg-slate-100 rounded mt-2" />
-              </div>
-              <div className="p-4 rounded-2xl bg-white border border-slate-100 flex flex-col gap-2">
-                <div className="h-4 bg-slate-200 rounded w-1/4" />
-                <div className="h-3 bg-slate-100 rounded w-full" />
-                <div className="h-3 bg-slate-100 rounded w-3/4" />
-                <div className="h-8 bg-slate-100 rounded mt-2" />
-              </div>
-            </div>
-          )}
-
-          {/* AI Generated Draft Cards */}
-          {aiGeneratedCards && !aiIsLoading && (
-            <div className="flex flex-col gap-3">
-              {/* 1. Instagram Card */}
-              <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-pink-700">
-                    <Camera size={16} strokeWidth={1.75} />
-                    <span>Instagram Reel / Teaser Draft</span>
-                  </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
-                    Social Copy
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-800 leading-relaxed whitespace-pre-line">
-                  <p className="font-extrabold text-slate-900 mb-1">
-                    {aiGeneratedCards.instagram.headline}
-                  </p>
-                  <p>{aiGeneratedCards.instagram.caption}</p>
-                  <p className="font-semibold text-purple-700 mt-2">
-                    {aiGeneratedCards.instagram.cta}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {aiGeneratedCards.instagram.hashtags.join(' ')}
-                  </p>
-                </div>
-
-                {/* Action Buttons: Copy, Edit, Save as Draft, Mark as Posted, Regenerate */}
-                <div className="flex items-center justify-between pt-1 gap-1 text-[11px] flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleCopyText(
-                        `${aiGeneratedCards.instagram.headline}\n\n${aiGeneratedCards.instagram.caption}\n\n${aiGeneratedCards.instagram.cta}\n\n${aiGeneratedCards.instagram.hashtags.join(' ')}`,
-                        'Instagram Draft'
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Copy size={16} strokeWidth={1.75} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingDraftChannel('instagram');
-                      setEditedCaption(
-                        `${aiGeneratedCards.instagram.headline}\n\n${aiGeneratedCards.instagram.caption}\n\n${aiGeneratedCards.instagram.cta}`
-                      );
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Edit2 size={16} strokeWidth={1.75} />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleSaveAiDraftAsPost(
-                        'Instagram',
-                        `${aiGeneratedCards.instagram.headline}\n\n${aiGeneratedCards.instagram.caption}\n\n${aiGeneratedCards.instagram.cta}`,
-                        aiGeneratedCards.instagram.hashtags
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 cursor-pointer font-bold"
-                  >
-                    <span>Save as Draft</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleMarkAiDraftAsPosted(
-                        'Instagram',
-                        `${aiGeneratedCards.instagram.headline}\n\n${aiGeneratedCards.instagram.caption}`,
-                        aiGeneratedCards.instagram.hashtags
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer font-bold"
-                  >
-                    <span>Mark as Posted</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleGenerateAiSuggestions}
-                    className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
-                    title="Regenerate"
-                  >
-                    <RotateCw size={16} strokeWidth={1.75} />
-                  </button>
-                </div>
-              </div>
-
-              {/* 2. LinkedIn Card */}
-              <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-700">
-                    <Share2 size={16} strokeWidth={1.75} />
-                    <span>LinkedIn Professional Article / Update</span>
-                  </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                    Professional
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-800 leading-relaxed whitespace-pre-line">
-                  <p className="font-extrabold text-slate-900 mb-1">
-                    {aiGeneratedCards.linkedin.headline}
-                  </p>
-                  <p>{aiGeneratedCards.linkedin.caption}</p>
-                  <p className="font-semibold text-blue-800 mt-2">
-                    {aiGeneratedCards.linkedin.cta}
-                  </p>
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    {aiGeneratedCards.linkedin.hashtags.join(' ')}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-1 gap-1 text-[11px] flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleCopyText(
-                        `${aiGeneratedCards.linkedin.headline}\n\n${aiGeneratedCards.linkedin.caption}\n\n${aiGeneratedCards.linkedin.cta}\n\n${aiGeneratedCards.linkedin.hashtags.join(' ')}`,
-                        'LinkedIn Draft'
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Copy size={16} strokeWidth={1.75} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingDraftChannel('linkedin');
-                      setEditedCaption(
-                        `${aiGeneratedCards.linkedin.headline}\n\n${aiGeneratedCards.linkedin.caption}`
-                      );
-                    }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Edit2 size={16} strokeWidth={1.75} />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleSaveAiDraftAsPost(
-                        'LinkedIn',
-                        `${aiGeneratedCards.linkedin.headline}\n\n${aiGeneratedCards.linkedin.caption}`,
-                        aiGeneratedCards.linkedin.hashtags
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-purple-50 text-purple-800 border border-purple-200 hover:bg-purple-100 cursor-pointer font-bold"
-                  >
-                    <span>Save as Draft</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleMarkAiDraftAsPosted(
-                        'LinkedIn',
-                        `${aiGeneratedCards.linkedin.headline}\n\n${aiGeneratedCards.linkedin.caption}`,
-                        aiGeneratedCards.linkedin.hashtags
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer font-bold"
-                  >
-                    <span>Mark as Posted</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleGenerateAiSuggestions}
-                    className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
-                    title="Regenerate"
-                  >
-                    <RotateCw size={16} strokeWidth={1.75} />
-                  </button>
-                </div>
-              </div>
-
-              {/* 3. Daily News Paragraph Card */}
-              <div className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-800">
-                    <Newspaper size={16} strokeWidth={1.75} />
-                    <span>College Press & Daily News Paragraph</span>
-                  </div>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                    Daily Digest
-                  </span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-800 leading-relaxed whitespace-pre-line">
-                  <p className="font-extrabold text-slate-900 mb-1">
-                    {aiGeneratedCards.dailyNews.title}
-                  </p>
-                  <p>{aiGeneratedCards.dailyNews.paragraph}</p>
-                  <p className="text-[11px] text-slate-500 mt-2">
-                    {aiGeneratedCards.dailyNews.hashtags.join(' ')}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-1 gap-1 text-[11px] flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleCopyText(
-                        `${aiGeneratedCards.dailyNews.title}\n\n${aiGeneratedCards.dailyNews.paragraph}\n\n${aiGeneratedCards.dailyNews.hashtags.join(' ')}`,
-                        'Daily News Paragraph'
-                      )
-                    }
-                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <Copy size={16} strokeWidth={1.75} />
-                    <span>Copy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      addDailyNews({
-                        title: aiGeneratedCards.dailyNews.title,
-                        date: new Date().toISOString().split('T')[0],
-                        eventId: selectedAiEvent.id,
-                        eventTitle: selectedAiEvent.title,
-                        author: `${currentUser.name} (AI Studio)`,
-                        content: aiGeneratedCards.dailyNews.paragraph,
-                        hashtags: aiGeneratedCards.dailyNews.hashtags,
-                        status: 'published',
-                      });
-                      showToast('✓ Saved directly to Daily News Bulletins!');
-                    }}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer font-bold"
-                  >
-                    <span>Publish to Daily News</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleGenerateAiSuggestions}
-                    className="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-purple-700 hover:bg-slate-50 cursor-pointer"
-                    title="Regenerate"
-                  >
-                    <RotateCw size={16} strokeWidth={1.75} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* =========================================================================
-          SUB-TAB 4: DAILY NEWS
-          ========================================================================= */}
-      {activeSubTab === 'news' && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700">
-              Published College Press Bulletins ({dailyNews.length})
-            </span>
-            {canManageCampaigns && (
-              <button
-                type="button"
-                onClick={() => setIsNewsModalOpen(true)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 cursor-pointer"
-              >
-                <Plus size={16} strokeWidth={1.75} />
-                <span>Write Bulletin</span>
-              </button>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {dailyNews.map((news) => (
-              <div
-                key={news.id}
-                className="p-4 rounded-2xl bg-white border border-[#EEF1F5] shadow-xs flex flex-col gap-2.5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-slate-900 leading-tight">
-                    {news.title}
-                  </span>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-                    {news.date}
-                  </span>
-                </div>
-
-                <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
-                  {news.content}
-                </p>
-
-                {news.hashtags && news.hashtags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {news.hashtags.map((h, i) => (
-                      <span key={i} className="text-[11px] font-bold text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded">
-                        {h}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-400">
-                  <span>Author: {news.author}</span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleCopyText(`${news.title}\n\n${news.content}`, 'Bulletin')}
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-purple-700 hover:bg-purple-50 transition-colors cursor-pointer"
-                      title="Copy bulletin"
-                    >
-                      <Copy size={16} strokeWidth={1.75} />
-                    </button>
-                    {canManageCampaigns && (
-                      <button
-                        type="button"
-                        onClick={() => setDeleteConfirmNewsId(news.id)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                        title="Delete bulletin"
-                      >
-                        <Trash2 size={16} strokeWidth={1.75} />
-                      </button>
+                        Publish
+                      </PillButton>
                     )}
                   </div>
                 </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SUB-TAB 2: CALENDAR (Month Strip with Colored Dots) */}
+      {activeSubTab === 'calendar' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Week / Month Strip with Colored Dots */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '16px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, 1fr)',
+              gap: '6px',
+            }}
+          >
+            {daysOfWeek.map((day, idx) => {
+              const isSelected = selectedDayIndex === idx;
+              return (
+                <button
+                  type="button"
+                  key={day}
+                  onClick={() => setSelectedDayIndex(idx)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    padding: '10px 4px',
+                    borderRadius: '16px',
+                    backgroundColor: isSelected ? '#163832' : '#F6FBF7',
+                    color: isSelected ? '#FFFFFF' : '#051F20',
+                    border: isSelected ? '1px solid #163832' : '1px solid #DAF1DE',
+                    cursor: 'pointer',
+                    gap: '6px',
+                  }}
+                >
+                  <span style={{ fontSize: '12px', fontWeight: 700 }}>{day}</span>
+                  <div
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '9999px',
+                      backgroundColor: isSelected ? '#DAF1DE' : '#8EB69B',
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Queue for Selected Day */}
+          <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
+            Queue for {daysOfWeek[selectedDayIndex]}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {posts.slice(0, 2).map((post) => (
+              <div
+                key={post.id}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '24px',
+                  border: '1px solid #DAF1DE',
+                  padding: '16px',
+                  boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                    {post.platform} • {post.scheduledTime}
+                  </span>
+                  <p style={{ fontSize: '13px', color: '#051F20', margin: '4px 0 0 0' }}>
+                    {post.caption}
+                  </p>
+                </div>
+                <StatusChip status="live" label="Queued" />
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* =========================================================================
-          MODALS & BOTTOM SHEETS
-          ========================================================================= */}
+      {/* SUB-TAB 3: AI STUDIO */}
+      {activeSubTab === 'ai' && (
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
+            border: '1px solid #DAF1DE',
+            padding: '24px',
+            boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '9999px',
+                backgroundColor: '#DAF1DE',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#163832',
+              }}
+            >
+              <Sparkles size={20} strokeWidth={2} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                Copywriter AI
+              </h3>
+              <span style={{ fontSize: '12px', color: '#235347' }}>
+                Generate social media captions tailored to club events
+              </span>
+            </div>
+          </div>
 
-      {/* 1. Add / Edit Post BottomSheet */}
-      <BottomSheet
-        isOpen={isPostModalOpen}
-        onClose={() => {
-          setIsPostModalOpen(false);
-          setEditingPostId(null);
-        }}
-        title={editingPostId ? 'Edit Social Post' : 'Create Social Media Post'}
-        subtitle="Schedule or publish content across official club channels"
-      >
-        <form onSubmit={handlePostFormSubmit} className="flex flex-col gap-3 py-1">
-          {/* Target Event */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Associated Event</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '6px' }}>
+              Select Event
+            </label>
             <select
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#F6FBF7',
+                outline: 'none',
+              }}
               value={postEventId}
               onChange={(e) => setPostEventId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
             >
-              <option value="">General Club Promotion (No Event)</option>
               {events.map((ev) => (
                 <option key={ev.id} value={ev.id}>
                   {ev.title}
@@ -1337,275 +532,291 @@ export const CampaignsView: React.FC = () => {
             </select>
           </div>
 
-          {/* Platform & Status */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Platform</label>
-              <select
-                value={postPlatform}
-                onChange={(e) => setPostPlatform(e.target.value as SocialPlatform)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
-              >
-                <option value="Instagram">Instagram</option>
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="WhatsApp">WhatsApp</option>
-                <option value="Other">Other (Web/Campus)</option>
-              </select>
-            </div>
+          <PillButton
+            variant="primary"
+            icon={<Sparkles size={16} />}
+            loading={isAiLoading}
+            onClick={handleSuggestAi}
+          >
+            Suggest
+          </PillButton>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Status</label>
-              <select
-                value={postStatus}
-                onChange={(e) => setPostStatus(e.target.value as SocialPostStatus)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
-              >
-                <option value="Scheduled">Scheduled</option>
-                <option value="Draft">Draft</option>
-                <option value="Posted">Posted (Live)</option>
-              </select>
+          {postCaption && (
+            <div
+              style={{
+                padding: '14px',
+                borderRadius: '16px',
+                backgroundColor: '#F6FBF7',
+                border: '1px solid #DAF1DE',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: '#051F20',
+              }}
+            >
+              {postCaption}
             </div>
+          )}
+        </div>
+      )}
+
+      {/* SUB-TAB 4: DAILY NEWS (Daily Bulletins Composer) */}
+      {activeSubTab === 'news' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+              Broadcast Bulletins
+            </h3>
+            <PillButton
+              variant="secondary"
+              size="sm"
+              icon={<Plus size={14} />}
+              onClick={() => setIsNewsModalOpen(true)}
+            >
+              Add bulletin
+            </PillButton>
           </div>
 
-          {/* Caption Textarea */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {dailyNews.map((news) => (
+              <div
+                key={news.id}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '24px',
+                  border: '1px solid #DAF1DE',
+                  padding: '18px 20px',
+                  boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      backgroundColor: '#DAF1DE',
+                      color: '#0B2B26',
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      border: '1px solid #8EB69B',
+                    }}
+                  >
+                    {news.tags?.[0] || 'All Members'}
+                  </span>
+                  <span style={{ fontSize: '12px', color: '#235347' }}>
+                    {news.date}
+                  </span>
+                </div>
+                <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                  {news.title}
+                </h4>
+                <p style={{ fontSize: '13px', color: '#235347', margin: 0, lineHeight: 1.45 }}>
+                  {news.content}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Post Composer BottomSheet */}
+      <BottomSheet
+        isOpen={isComposerOpen}
+        onClose={() => setIsComposerOpen(false)}
+        title="Schedule Post"
+        subtitle="Compose social media publication"
+      >
+        <form onSubmit={handleCreatePost} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Post Caption & Copy</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Target Platform
+            </label>
+            <select
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                outline: 'none',
+              }}
+              value={postPlatform}
+              onChange={(e) => setPostPlatform(e.target.value as any)}
+            >
+              <option value="Instagram">Instagram</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="YouTube">YouTube</option>
+              <option value="WhatsApp">WhatsApp</option>
+            </select>
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20' }}>
+                Caption
+              </label>
+              <button
+                type="button"
+                onClick={handleSuggestAi}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: '#163832',
+                  backgroundColor: '#DAF1DE',
+                  border: '1px solid #8EB69B',
+                  borderRadius: '9999px',
+                  padding: '2px 8px',
+                  cursor: 'pointer',
+                }}
+              >
+                <Sparkles size={12} />
+                <span>Suggest</span>
+              </button>
+            </div>
             <textarea
               required
               rows={4}
+              placeholder="Write post caption..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={postCaption}
               onChange={(e) => setPostCaption(e.target.value)}
-              placeholder="Write the announcement hook, event details, venue, and call to action..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500 resize-none"
             />
           </div>
-
-          {/* Schedule fields if Scheduled */}
-          {postStatus === 'Scheduled' && (
-            <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-purple-50/50 border border-purple-200/60">
-              <div>
-                <label className="block text-[11px] font-bold text-purple-900 mb-1">Scheduled Date</label>
-                <input
-                  type="date"
-                  required
-                  value={postScheduledDate}
-                  onChange={(e) => setPostScheduledDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-purple-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-purple-900 mb-1">Broadcast Time</label>
-                <input
-                  type="time"
-                  required
-                  value={postScheduledTime}
-                  onChange={(e) => setPostScheduledTime(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-purple-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Live Link if Posted */}
-          {postStatus === 'Posted' && (
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Live Post Link (URL)</label>
-              <input
-                type="url"
-                value={postLiveUrl}
-                onChange={(e) => setPostLiveUrl(e.target.value)}
-                placeholder="https://instagram.com/p/..."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500"
-              />
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="w-full py-3 rounded-full font-bold text-xs bg-purple-700 text-white shadow-sm hover:bg-purple-800 transition-all mt-1 cursor-pointer"
-          >
-            {editingPostId ? 'Save Changes' : postStatus === 'Posted' ? 'Publish Post Now' : 'Save to Content Schedule'}
-          </button>
-        </form>
-      </BottomSheet>
-
-      {/* 2. Mark as Posted BottomSheet */}
-      <BottomSheet
-        isOpen={isMarkPostedOpen}
-        onClose={() => {
-          setIsMarkPostedOpen(false);
-          setTargetPostForMark(null);
-        }}
-        title="Mark Post as Published"
-        subtitle={`Verify live link for ${targetPostForMark?.platform || 'Social Post'}`}
-      >
-        <form onSubmit={handleConfirmMarkPosted} className="flex flex-col gap-3 py-1">
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Provide the live URL where this post is published. This will record the post as{' '}
-            <strong className="text-emerald-700">Posted</strong> and display the live link chip.
-          </p>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Live Post URL</label>
-            <input
-              type="url"
-              required
-              value={inputLiveUrl}
-              onChange={(e) => setInputLiveUrl(e.target.value)}
-              placeholder="https://instagram.com/p/geohub_live"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500"
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Media
+            </label>
+            <UploadCard
+              label="Attach campaign banner"
+              onFileSelected={() => {}}
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-3 rounded-full font-bold text-xs bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 transition-all mt-1 cursor-pointer"
-          >
-            Confirm & Mark as Live Posted
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Schedule
+          </PillButton>
         </form>
       </BottomSheet>
 
-      {/* 3. In-Place AI Draft Editor Modal */}
-      {editingDraftChannel && (
-        <BottomSheet
-          isOpen={Boolean(editingDraftChannel)}
-          onClose={() => setEditingDraftChannel(null)}
-          title="Edit AI Suggested Copy"
-          subtitle="Refine wording before saving as draft or publishing"
-        >
-          <div className="flex flex-col gap-3 py-1">
-            <textarea
-              rows={6}
-              value={editedCaption}
-              onChange={(e) => setEditedCaption(e.target.value)}
-              className="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500 resize-none leading-relaxed"
-            />
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  const channel = editingDraftChannel === 'instagram' ? 'Instagram' : 'LinkedIn';
-                  addPost({
-                    eventId: selectedAiEvent.id,
-                    eventTitle: selectedAiEvent.title,
-                    platform: channel,
-                    status: 'Draft',
-                    caption: editedCaption,
-                    authorName: `${currentUser.name} (AI Studio)`,
-                    createdAt: new Date().toISOString(),
-                  });
-                  showToast('✓ Saved edited draft to Posts!');
-                  setEditingDraftChannel(null);
-                }}
-                className="flex-1 py-2.5 rounded-full font-bold text-xs bg-purple-700 text-white hover:bg-purple-800"
-              >
-                Save as Draft
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditingDraftChannel(null)}
-                className="px-4 py-2.5 rounded-full font-bold text-xs bg-slate-100 text-slate-700 hover:bg-slate-200"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </BottomSheet>
-      )}
-
-      {/* 4. Write Daily News Bulletin BottomSheet */}
+      {/* Daily News Composer BottomSheet */}
       <BottomSheet
         isOpen={isNewsModalOpen}
         onClose={() => setIsNewsModalOpen(false)}
-        title="Author Daily Chapter News"
-        subtitle="Official college press bulletin and media digest"
+        title="Broadcast Bulletin"
+        subtitle="Daily news feed publication"
       >
-        <form onSubmit={handleNewsFormSubmit} className="flex flex-col gap-3 py-1">
+        <form onSubmit={handleCreateNews} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          {/* Broadcast Chips: All Members / Squad Only */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Headline</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '6px' }}>
+              Target Audience
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setNewsAudience('all')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: newsAudience === 'all' ? '#163832' : '#FFFFFF',
+                  color: newsAudience === 'all' ? '#FFFFFF' : '#235347',
+                  border: newsAudience === 'all' ? '1px solid #163832' : '1px solid #DAF1DE',
+                  cursor: 'pointer',
+                }}
+              >
+                All Members
+              </button>
+              <button
+                type="button"
+                onClick={() => setNewsAudience('squad')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: newsAudience === 'squad' ? '#163832' : '#FFFFFF',
+                  color: newsAudience === 'squad' ? '#FFFFFF' : '#235347',
+                  border: newsAudience === 'squad' ? '1px solid #163832' : '1px solid #DAF1DE',
+                  cursor: 'pointer',
+                }}
+              >
+                Squad Only
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Headline
+            </label>
             <input
               type="text"
               required
+              placeholder="e.g. Field Kit Collection Notice"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newsTitle}
               onChange={(e) => setNewsTitle(e.target.value)}
-              placeholder="e.g. GeoHub Concludes Regional LiDAR Drone Survey"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Related Event</label>
-            <select
-              value={newsEventId}
-              onChange={(e) => setNewsEventId(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white focus:border-purple-500"
-            >
-              <option value="">General Club Bulletin</option>
-              {events.map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">News Article Body</label>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Content
+            </label>
             <textarea
               required
-              rows={5}
+              rows={4}
+              placeholder="Bulletin announcement text..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={newsContent}
               onChange={(e) => setNewsContent(e.target.value)}
-              placeholder="Write formal chapter bulletin with date, venue, attendance, and outcomes..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-purple-500 resize-none leading-relaxed"
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-3 rounded-full font-bold text-xs bg-amber-700 text-white shadow-sm hover:bg-amber-800 transition-all mt-1 cursor-pointer"
-          >
-            Publish Daily Bulletin
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Broadcast
+          </PillButton>
         </form>
       </BottomSheet>
-
-      {/* Delete Post Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={Boolean(deleteConfirmPostId)}
-        title="Delete Social Media Post?"
-        message="Are you sure you want to delete this post? This action will remove it from the schedule and cannot be undone."
-        confirmLabel="Delete Post"
-        cancelLabel="Keep Post"
-        isDanger
-        onConfirm={() => {
-          if (deleteConfirmPostId) {
-            deletePost(deleteConfirmPostId);
-            showToast('✓ Post deleted from schedule');
-            setDeleteConfirmPostId(null);
-          }
-        }}
-        onClose={() => setDeleteConfirmPostId(null)}
-      />
-
-      {/* Delete News Confirm Dialog */}
-      <ConfirmDialog
-        isOpen={Boolean(deleteConfirmNewsId)}
-        title="Delete Daily News Bulletin?"
-        message="Are you sure you want to remove this bulletin from the official college press digest?"
-        confirmLabel="Delete Bulletin"
-        cancelLabel="Keep Bulletin"
-        isDanger
-        onConfirm={() => {
-          if (deleteConfirmNewsId) {
-            deleteDailyNews(deleteConfirmNewsId);
-            showToast('✓ Bulletin removed');
-            setDeleteConfirmNewsId(null);
-          }
-        }}
-        onClose={() => setDeleteConfirmNewsId(null)}
-      />
     </div>
   );
 };
+
+export default CampaignsView;

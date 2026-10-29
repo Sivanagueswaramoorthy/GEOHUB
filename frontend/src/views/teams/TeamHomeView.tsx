@@ -1,17 +1,19 @@
 import React from 'react';
 import {
-  Users2,
   CheckSquare,
-  FileText,
-  UserPlus,
-  Plus,
-  ArrowRight,
-  Sparkles,
+  Users2,
   Award,
+  Plus,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ScreenTwoModel } from '../../components/common/ScreenTwoModel';
-import { AppAvatar } from '../../components/common/AppAvatar';
+import {
+  HeroCard,
+  StatTile,
+  PillButton,
+  StatusChip,
+  Avatar,
+  Mascot,
+} from '../../components/shared';
 
 export const TeamHomeView: React.FC = () => {
   const {
@@ -20,8 +22,6 @@ export const TeamHomeView: React.FC = () => {
     users,
     tasks,
     setActiveTab,
-    setSelectedTaskId,
-    updateTaskStatus,
   } = useApp();
 
   const currentTeamName = currentUser.team || 'Management';
@@ -33,125 +33,101 @@ export const TeamHomeView: React.FC = () => {
   const progressPercent = teamTasks.length > 0 ? Math.round((completedTasks.length / teamTasks.length) * 100) : 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <ScreenTwoModel
-        quickActionTitle={`Assign ${team.name} Task`}
-        quickActionSubtitle="Delegate deliverable to a squad member"
-        quickActionIcon={<CheckSquare size={24} strokeWidth={1.75} />}
-        onQuickActionClick={() => setActiveTab('tasks')}
-        metrics={[
-          {
-            icon: <CheckSquare size={16} />,
-            value: teamTasks.length,
-            label: 'Squad Tasks',
-            subtext: `${completedTasks.length} Done`,
-            bgColor: '#DAF1DE',
-          },
-          {
-            icon: <Users2 size={16} />,
-            value: teamMembers.length,
-            label: 'Squad Scholars',
-            subtext: 'Active',
-            bgColor: '#DAF1DE',
-          },
-          {
-            icon: <Award size={16} />,
-            value: `${progressPercent}%`,
-            label: 'Sprint Velocity',
-            subtext: 'On Track',
-            bgColor: '#DAF1DE',
-          },
-        ]}
-        briefTitle={`${team.name} Squad Brief`}
-        briefItems={[
-          {
-            title: `${teamTasks.length - completedTasks.length} deliverables in active sprint`,
-            subtitle: 'Next: Event logistics brief at 2:00 PM',
-            tag: 'Due',
-            tagType: 'due',
-          },
-          {
-            title: `Sprint Execution Rate: ${progressPercent}%`,
-            subtitle: `${completedTasks.length} of ${teamTasks.length} deliverables signed off`,
-            tag: 'Progress',
-            tagType: 'active',
-          },
-          {
-            title: '1 pending student induction request',
-            subtitle: 'Awaiting faculty advisor seal',
-            tag: 'Pending',
-            tagType: 'info',
-          },
-        ]}
-        tasksHeader={`${team.name} Squad Deliverables`}
-        tasks={teamTasks}
-        onTaskToggle={(id) => {
-          const t = tasks.find((item) => item.id === id);
-          if (t) {
-            updateTaskStatus(id, t.status === 'done' ? 'todo' : 'done');
-          }
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Hero Card */}
+      <HeroCard
+        variant="pine"
+        title={`${team.name} Squad`}
+        subtitle="Operational command and tasks"
+        mascot="clipboard"
+        mascotSize="lg"
+        ctaLabel="New task"
+        onCtaClick={() => setActiveTab('tasks')}
+        chip={<StatusChip status="live" label={`${teamMembers.length} Members`} />}
+      />
+
+      {/* 3 StatTiles */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+        <StatTile
+          icon={<CheckSquare size={18} strokeWidth={2} />}
+          value={teamTasks.length.toString()}
+          label="Tasks"
+          tint="mint"
+        />
+        <StatTile
+          icon={<Users2 size={18} strokeWidth={2} />}
+          value={teamMembers.length.toString()}
+          label="Scholars"
+          tint="sage"
+        />
+        <StatTile
+          icon={<Award size={18} strokeWidth={2} />}
+          value={`${progressPercent}%`}
+          label="Progress"
+          tint="white"
+        />
+      </div>
+
+      {/* Members Row */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '24px',
+          border: '1px solid #DAF1DE',
+          padding: '20px',
+          boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
         }}
       >
-        {/* Squad Members Roster */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '20px',
-            border: '1px solid #E8ECF2',
-            padding: '16px',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 800, color: '#0F172A' }}>
-              Squad Scholars ({teamMembers.length})
-            </span>
-            <button
-              onClick={() => setActiveTab('add_students')}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+            Squad Roster
+          </h3>
+          <PillButton
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveTab('members')}
+          >
+            See all
+          </PillButton>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {teamMembers.slice(0, 5).map((m) => (
+            <div
+              key={m.uid}
               style={{
-                fontSize: '12px',
-                fontWeight: 700,
-                color: '#163832',
-                backgroundColor: '#DAF1DE',
-                border: '1px solid #8EB69B',
-                padding: '4px 10px',
-                borderRadius: '999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 14px',
+                borderRadius: '16px',
+                backgroundColor: '#F6FBF7',
+                border: '1px solid #DAF1DE',
               }}
             >
-              + Add Scholar
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {teamMembers.map((m) => (
-              <div
-                key={m.uid}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '8px 10px',
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: '12px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AppAvatar name={m.name} size={28} strokeWidth={1.75} avatarUrl={m.avatarUrl} />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
-                      {m.name}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#64748B' }}>
-                      {m.role.replace('_', ' ')}
-                    </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Avatar name={m.name} size={36} />
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
+                    {m.name}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#235347' }}>
+                    {m.department || 'Geoinformatics'}
                   </div>
                 </div>
-                <span style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>Active</span>
               </div>
-            ))}
-          </div>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                {m.post || 'Member'}
+              </span>
+            </div>
+          ))}
         </div>
-      </ScreenTwoModel>
+      </div>
     </div>
   );
 };
+
+export default TeamHomeView;

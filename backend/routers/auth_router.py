@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-import json
+from datetime import datetime
 from config import settings
 from database import get_db
 import models, schemas, auth
@@ -22,9 +22,10 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="This email is already registered.")
 
-    # Check if first user in system: automatically make them super_admin!
+    # Rule: Every new user is a student by default.
+    # If the system has 0 users, the very first bootstrapping user can be faculty.
     user_count = db.query(models.User).count()
-    initial_role = "super_admin" if user_count == 0 else "member"
+    initial_role = "faculty" if user_count == 0 else "student"
     initial_status = "active" if user_count == 0 else "pending"
 
     new_user = models.User(
@@ -38,6 +39,17 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    auth.log_audit(
+        db=db,
+        actor=new_user,
+        action="user_registered",
+        target_type="user",
+        target_id=new_user.id,
+        target_name=new_user.name,
+        after_state=initial_role,
+        details=f"User registered with default role {initial_role}"
+    )
 
     token = auth.create_access_token(data={"sub": new_user.id, "role": new_user.role})
     return schemas.TokenResponse(
@@ -70,47 +82,92 @@ def get_me(current_user: models.User = Depends(auth.get_current_user)):
 def set_user_role(
     req: schemas.RoleAssignRequest,
     db: Session = Depends(get_db),
-    admin: models.User = Depends(auth.require_super_admin)
+    actor: models.User = Depends(auth.require_permission("canAssignPosts"))
 ):
+    """Assign or modify user roles and posts.
+    Enforces:
+    - Only Faculty can assign posts / change roles
+    - No self-escalation
+    - Last faculty account protection
+    - Audit logging
+    """
     target_user = db.query(models.User).filter(models.User.id == req.user_id).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    target_user.role = req.role
+    # Protection Rule 1: No self-escalation
+    auth.verify_no_self_escalation(actor, target_user.id)
+
+    # Protection Rule 2: Last faculty protection
+    auth.verify_last_faculty_protection(db, target_user, req.role)
+
+    before_role = target_user.role
+    before_post = target_user.post
+    normalized_new_role = auth.normalize_role(req.role)
+
+    target_user.role = normalized_new_role
+    if req.post is not None:
+        target_user.post = req.post
+    if req.tenure_end is not None:
+        target_user.tenure_end = req.tenure_end
     if req.team is not None:
         target_user.team = req.team
     if req.is_volunteer is not None:
         target_user.is_volunteer = req.is_volunteer
 
     db.commit()
-    return {"success": True, "message": f"Updated role to {req.role}"}
+
+    auth.log_audit(
+        db=db,
+        actor=actor,
+        action="role_change",
+        target_type="user",
+        target_id=target_user.id,
+        target_name=target_user.name,
+        before_state=f"role={before_role}, post={before_post}",
+        after_state=f"role={target_user.role}, post={target_user.post}",
+        details=f"Faculty updated role to {target_user.role} and post to {target_user.post}"
+    )
+
+    return {"success": True, "message": f"Updated role to {target_user.role}"}
 
 @router.post("/assign-team-admin")
 def assign_team_admin(
     req: schemas.TeamAdminAssignRequest,
     db: Session = Depends(get_db),
-    admin: models.User = Depends(auth.require_admin)
+    actor: models.User = Depends(auth.require_permission("canAssignPosts"))
 ):
+    """Squad-level post assignment.
+    Only Faculty can assign posts.
+    team_admin is a squad-level post, not a distinct identity role.
+    """
     target_user = db.query(models.User).filter(models.User.id == req.user_id).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    target_user.role = "team_admin"
+    # Protection: No self-escalation
+    auth.verify_no_self_escalation(actor, target_user.id)
+
+    before_post = target_user.post
+    # Preserve student role, set squad post
+    target_user.role = "student"
+    target_user.post = req.post or "Team Admin"
     target_user.team = req.team
+    target_user.tenure_end = req.tenure_end
     target_user.status = "active"
 
-    # Add to team table
-    team = db.query(models.Team).filter(models.Team.name == req.team).first()
-    if team:
-        admin_ids = json.loads(team.admin_user_ids or "[]")
-        if target_user.id not in admin_ids:
-            admin_ids.append(target_user.id)
-            team.admin_user_ids = json.dumps(admin_ids)
-
-        member_ids = json.loads(team.member_user_ids or "[]")
-        if target_user.id not in member_ids:
-            member_ids.append(target_user.id)
-            team.member_user_ids = json.dumps(member_ids)
-
     db.commit()
-    return {"success": True, "message": f"Assigned {target_user.name} as admin for {req.team}"}
+
+    auth.log_audit(
+        db=db,
+        actor=actor,
+        action="post_assignment",
+        target_type="user",
+        target_id=target_user.id,
+        target_name=target_user.name,
+        before_state=f"post={before_post}",
+        after_state=f"squad={req.team}, post={target_user.post}",
+        details=f"Assigned squad post {target_user.post} in {req.team} with tenure_end={req.tenure_end}"
+    )
+
+    return {"success": True, "message": f"Assigned {target_user.name} as {target_user.post} for {req.team}"}

@@ -22,38 +22,45 @@ export interface NavItemConfig {
  * Friendly display names for user roles
  */
 export const ROLE_LABELS: Record<string, string> = {
-  super_admin: 'Super Admin (Faculty Advisor)',
-  faculty: 'Super Admin (Faculty Advisor)',
-  admin: 'Coordinator / Lead',
-  coordinator: 'Coordinator / Lead',
-  documentation: 'Documentation Lead',
-  treasurer: 'Treasurer Lead',
-  social_media: 'Promotion Lead',
-  team_admin: 'Promotion Lead',
-  volunteer: 'Student Volunteer',
-  member: 'Student Volunteer',
+  faculty: 'Faculty',
+  coordinator: 'Coordinator',
+  documentation: 'Documentation',
+  treasurer: 'Treasurer',
+  promotion: 'Promotion',
+  student: 'Student',
+  // Legacy aliases
+  super_admin: 'Faculty',
+  admin: 'Coordinator',
+  social_media: 'Promotion',
+  team_admin: 'Student',
+  volunteer: 'Student',
+  member: 'Student',
 };
 
 export const getFriendlyRoleName = (role: UserRole | string, post?: string): string => {
   if (post && post.trim()) {
     if (post.toLowerCase().includes('faculty') || post.toLowerCase().includes('advisor')) {
-      return 'Super Admin (Faculty Advisor)';
+      return 'Faculty';
     }
     if (post.toLowerCase().includes('treasurer')) {
-      return 'Treasurer Lead';
+      return 'Treasurer';
     }
     if (post.toLowerCase().includes('documentation')) {
-      return 'Documentation Lead';
+      return 'Documentation';
     }
     if (post.toLowerCase().includes('promotion') || post.toLowerCase().includes('social')) {
-      return 'Promotion Lead';
+      return 'Promotion';
     }
-    if (post.toLowerCase().includes('president') || post.toLowerCase().includes('coordinator') || post.toLowerCase().includes('lead')) {
-      return 'Coordinator / Lead';
+    if (
+      post.toLowerCase().includes('president') ||
+      post.toLowerCase().includes('coordinator') ||
+      post.toLowerCase().includes('lead')
+    ) {
+      return 'Coordinator';
     }
   }
 
-  return ROLE_LABELS[role] || 'Student Volunteer';
+  return ROLE_LABELS[role] || 'Student';
 };
 
 /**

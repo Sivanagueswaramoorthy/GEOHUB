@@ -1,467 +1,246 @@
 import React from 'react';
 import {
-  LayoutDashboard,
-  Home,
-  Users2,
+  House,
   Calendar,
-  CheckSquare,
-  QrCode,
-  Scan,
+  Layers,
   UserCheck,
-  FileText,
-  ShieldCheck,
-  Shield,
+  FolderArchive,
+  Wallet,
+  Megaphone,
+  Images,
   User,
   LogOut,
-  Image,
   Smartphone,
-  ChevronRight,
-  Sparkles,
-  Award,
-  Layers,
-  Search,
-  BookOpen,
-  MessageSquare,
-  DollarSign,
-  Camera,
-  Share2,
+  ShieldAlert,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { UserRole } from '../../types';
-import { AppAvatar } from '../common/AppAvatar';
+import { getRoleNavTabs, NavTabKey } from '../../core/nav';
+import { Avatar } from '../shared/Avatar';
 
 export const DesktopSidebar: React.FC = () => {
   const {
     currentUser,
     activeTab,
     setActiveTab,
-    switchRole,
-    setIsRoleSwitcherOpen,
     setIsPhoneFrame,
+    setIsRoleSwitcherOpen,
     logout,
-    notifications,
-    approvals,
-    forumMessages,
   } = useApp();
 
-  const pendingApprovalsCount = approvals.filter((a) => a.status === 'pending').length;
-  const unreadNotifCount = notifications.filter((n) => !n.isRead).length;
+  const tabs = getRoleNavTabs(currentUser.role, currentUser.post);
 
-  const rolesList: { role: UserRole; label: string; icon: React.ReactNode; color: string; bg: string }[] = [
-    { role: 'faculty', label: 'Faculty Advisor', icon: <ShieldCheck size={16} strokeWidth={1.75} />, color: '#B45309', bg: '#FEF3C7' },
-    { role: 'coordinator', label: 'Coordinator', icon: <Shield size={16} strokeWidth={1.75} />, color: '#4338CA', bg: '#EEF2FF' },
-    { role: 'treasurer', label: 'Treasurer', icon: <DollarSign size={16} strokeWidth={1.75} />, color: '#163832', bg: '#DAF1DE' },
-    { role: 'documentation', label: 'Documentation', icon: <FileText size={16} strokeWidth={1.75} />, color: '#D97706', bg: '#FFFBEB' },
-    { role: 'social_media', label: 'Social Media', icon: <Share2 size={16} strokeWidth={1.75} />, color: '#E11D48', bg: '#FFF1F2' },
-    { role: 'volunteer', label: 'Volunteer', icon: <QrCode size={16} strokeWidth={1.75} />, color: '#BE185D', bg: '#FCE7F3' },
-    { role: 'member', label: 'Member', icon: <User size={16} strokeWidth={1.75} />, color: '#235347', bg: '#DAF1DE' },
-  ];
+  const getLucideIcon = (iconName: string, size = 20, color = 'currentColor') => {
+    switch (iconName) {
+      case 'house':
+        return <House size={size} strokeWidth={2} color={color} />;
+      case 'calendar':
+        return <Calendar size={size} strokeWidth={2} color={color} />;
+      case 'layers':
+        return <Layers size={size} strokeWidth={2} color={color} />;
+      case 'user-check':
+        return <UserCheck size={size} strokeWidth={2} color={color} />;
+      case 'folder-archive':
+        return <FolderArchive size={size} strokeWidth={2} color={color} />;
+      case 'wallet':
+        return <Wallet size={size} strokeWidth={2} color={color} />;
+      case 'megaphone':
+        return <Megaphone size={size} strokeWidth={2} color={color} />;
+      case 'images':
+        return <Images size={size} strokeWidth={2} color={color} />;
+      case 'user':
+      default:
+        return <User size={size} strokeWidth={2} color={color} />;
+    }
+  };
 
-  interface NavItem {
-    id: string;
-    label: string;
-    icon: React.ReactNode;
-    badge?: number | string;
-    roles?: UserRole[];
-  }
+  const handleTabClick = (key: NavTabKey) => {
+    switch (key) {
+      case 'home':
+        setActiveTab('home');
+        break;
+      case 'events':
+        setActiveTab('events');
+        break;
+      case 'operations':
+        setActiveTab('operations');
+        break;
+      case 'members':
+        setActiveTab('members');
+        break;
+      case 'archives':
+        setActiveTab('gallery');
+        break;
+      case 'finance':
+        setActiveTab('treasurer');
+        break;
+      case 'campaigns':
+        setActiveTab('campaigns');
+        break;
+      case 'memories':
+        setActiveTab('memories');
+        break;
+      case 'profile':
+        setActiveTab('profile');
+        break;
+      default:
+        setActiveTab(key);
+    }
+  };
 
-  const navSections: { title: string; items: NavItem[] }[] = [
-    {
-      title: 'OVERVIEW & HUB',
-      items: [
-        {
-          id: currentUser.role === 'super_admin' || currentUser.role === 'faculty' ? 'dashboard' : currentUser.role === 'team_admin' ? 'team_home' : currentUser.role === 'member' ? 'home' : 'dashboard',
-          label: currentUser.role === 'faculty' ? 'Faculty Command' : currentUser.role === 'coordinator' ? 'Executive Dashboard' : currentUser.role === 'team_admin' ? 'Squad Command' : currentUser.role === 'member' ? 'Scholar Portal' : 'Club Dashboard',
-          icon: <LayoutDashboard size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'events',
-          label: 'Events & Operations',
-          icon: <Calendar size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'memories',
-          label: 'Memories Hub (GeoTag)',
-          icon: <Camera size={20} strokeWidth={1.75} />,
-          badge: 'GPS',
-        },
-        {
-          id: 'forum',
-          label: 'Communication Forum',
-          icon: <MessageSquare size={20} strokeWidth={1.75} />,
-          badge: forumMessages.length > 0 ? `${forumMessages.length}` : undefined,
-        },
-      ],
-    },
-    {
-      title: 'GOVERNANCE & RECORDS',
-      items: [
-        {
-          id: 'meetings',
-          label: 'Meetings & MoM Hub',
-          icon: <BookOpen size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'treasurer',
-          label: 'Treasurer & Budget Ledger',
-          icon: <DollarSign size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'members',
-          label: 'Student Directory & Posts',
-          icon: <Layers size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'teams',
-          label: 'Squads & Teams',
-          icon: <Users2 size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'approvals',
-          label: 'Requests & Approvals',
-          icon: <ShieldCheck size={20} strokeWidth={1.75} />,
-          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
-        },
-      ],
-    },
-    {
-      title: 'QR PASS & GATES',
-      items: [
-        {
-          id: 'my_qr',
-          label: currentUser.role === 'faculty' || currentUser.role === 'coordinator' || currentUser.role === 'super_admin' || currentUser.role === 'admin' ? 'Smart Dynamic QR (20s)' : 'My QR Attendance Pass',
-          icon: <QrCode size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'scan_qr',
-          label: 'Volunteer Gate Terminal',
-          icon: <Scan size={20} strokeWidth={1.75} />,
-          badge: currentUser.isVolunteer || currentUser.role === 'volunteer' ? 'Active' : undefined,
-        },
-        {
-          id: 'attendance',
-          label: 'Attendance Rosters',
-          icon: <UserCheck size={20} strokeWidth={1.75} />,
-        },
-      ],
-    },
-    {
-      title: 'CREATIVE & DOCS ENGINE',
-      items: [
-        {
-          id: 'doc_studio',
-          label: 'Documentation & Templates',
-          icon: <FileText size={20} strokeWidth={1.75} />,
-          badge: 'PDF/Word/XLS',
-        },
-        {
-          id: 'ai_social',
-          label: 'AI Social Media Studio',
-          icon: <Share2 size={20} strokeWidth={1.75} />,
-          badge: 'AI',
-        },
-        {
-          id: 'tasks',
-          label: 'Tasks & Milestones',
-          icon: <CheckSquare size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'gallery',
-          label: 'Chapter Gallery',
-          icon: <Image size={20} strokeWidth={1.75} />,
-        },
-        {
-          id: 'reports',
-          label: 'Analytics & Reports',
-          icon: <FileText size={20} strokeWidth={1.75} />,
-        },
-      ],
-    },
-  ];
+  const isTabActive = (key: NavTabKey) => {
+    if (key === 'home') return activeTab === 'home' || activeTab === 'dashboard';
+    if (key === 'events') return activeTab === 'events';
+    if (key === 'operations') {
+      return (
+        activeTab === 'operations' ||
+        activeTab === 'tasks' ||
+        activeTab === 'teams' ||
+        activeTab === 'team_home' ||
+        activeTab === 'attendance' ||
+        activeTab === 'reports' ||
+        activeTab === 'approvals' ||
+        activeTab === 'meetings' ||
+        activeTab === 'doc_studio'
+      );
+    }
+    if (key === 'members') return activeTab === 'members' || activeTab === 'add_students';
+    if (key === 'archives') return activeTab === 'gallery' || activeTab === 'doc_studio';
+    if (key === 'finance') return activeTab === 'treasurer' || activeTab === 'finance';
+    if (key === 'campaigns') return activeTab === 'campaigns' || activeTab === 'ai_social';
+    if (key === 'memories') return activeTab === 'memories';
+    if (key === 'profile') return activeTab === 'profile';
+    return activeTab === key;
+  };
+
+  const canSwitchRole =
+    currentUser.role === 'faculty' ||
+    currentUser.role === 'super_admin' ||
+    Boolean(import.meta.env?.DEV);
 
   return (
     <aside
+      className="hidden lg:flex flex-col justify-between w-64 bg-white border-r border-[#DAF1DE] p-5 select-none shrink-0"
       style={{
-        width: '280px',
-        minWidth: '280px',
         height: '100vh',
-        backgroundColor: '#FFFFFF',
-        borderRight: '1px solid #E8ECF2',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        userSelect: 'none',
-        zIndex: 40,
-        boxShadow: '4px 0 24px rgba(0, 0, 0, 0.02)',
+        position: 'sticky',
+        top: 0,
+        boxShadow: '0 4px 20px rgba(5, 31, 32, 0.04)',
       }}
     >
-      {/* Top Header & Brand */}
-      <div style={{ padding: '20px 20px 14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <div
+      <div className="flex flex-col gap-6">
+        {/* Wordmark */}
+        <div
+          className="flex items-center gap-2 cursor-pointer pt-2"
+          onClick={() => setActiveTab('home')}
+        >
+          <span
             style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #DAF1DE 0%, #8EB69B 100%)',
-              border: '1px solid #8EB69B',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '4px',
-              boxShadow: '0 4px 12px rgba(35, 83, 71, 0.15)',
+              fontFamily: 'var(--font-family)',
+              fontSize: '22px',
+              fontWeight: 800,
+              color: '#051F20',
+              letterSpacing: '-0.02em',
             }}
           >
-            <img
-              src="./geo-hub-logo-hd.png"
-              alt="GeoHub Logo"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontWeight: 800, fontSize: '18px', color: '#051F20', letterSpacing: '-0.4px' }}>
-                GeoHub
-              </span>
-              <span
+            GEO
+          </span>
+          <span
+            style={{
+              display: 'inline-block',
+              width: '7px',
+              height: '7px',
+              borderRadius: '50%',
+              backgroundColor: '#8EB69B',
+            }}
+          />
+          <span
+            style={{
+              fontFamily: 'var(--font-family)',
+              fontSize: '22px',
+              fontWeight: 800,
+              color: '#235347',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            HUB
+          </span>
+        </div>
+
+        {/* Navigation Tabs */}
+        <nav className="flex flex-col gap-2" aria-label="Desktop Sidebar Navigation">
+          {tabs.map((tab) => {
+            const active = isTabActive(tab.key);
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => handleTabClick(tab.key)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-full text-xs font-bold transition-all cursor-pointer pressable ${
+                  active
+                    ? 'bg-[#163832] text-white shadow-[0_4px_14px_rgba(22,56,50,0.25)]'
+                    : 'text-[#235347] hover:bg-[#DAF1DE]/40 hover:text-[#051F20]'
+                }`}
                 style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  backgroundColor: '#DAF1DE',
-                  color: '#163832',
-                  padding: '2px 6px',
-                  borderRadius: '6px',
-                  border: '1px solid #8EB69B',
+                  borderRadius: '9999px',
+                  minHeight: '44px',
                 }}
               >
-                PRO
+                <span>{getLucideIcon(tab.iconName, 18, active ? '#FFFFFF' : '#235347')}</span>
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Footer controls & user profile */}
+      <div className="flex flex-col gap-3 pt-4 border-t border-[#DAF1DE]">
+        <button
+          type="button"
+          onClick={() => setIsPhoneFrame(true)}
+          className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold text-[#235347] hover:bg-[#DAF1DE]/40 transition-colors cursor-pointer"
+        >
+          <Smartphone size={16} strokeWidth={2} />
+          <span>Mobile frame</span>
+        </button>
+
+        {canSwitchRole && (
+          <button
+            type="button"
+            onClick={() => setIsRoleSwitcherOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold text-[#163832] hover:bg-[#DAF1DE]/40 transition-colors cursor-pointer"
+          >
+            <ShieldAlert size={16} strokeWidth={2} />
+            <span>Switch preview role</span>
+          </button>
+        )}
+
+        <div className="flex items-center justify-between p-2 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Avatar name={currentUser.name} src={currentUser.avatarUrl} size={36} />
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold text-[#051F20] truncate">
+                {currentUser.name}
+              </span>
+              <span className="text-xs font-medium text-[#235347] capitalize truncate">
+                {currentUser.role}
               </span>
             </div>
-            <div style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
-              Green Eco Organization
-            </div>
           </div>
-        </div>
 
-        {/* User Card with Role Badge */}
-        <div
-          style={{
-            backgroundColor: '#F8FAFC',
-            borderRadius: '14px',
-            border: '1px solid #E2E8F0',
-            padding: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '10px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-            <AppAvatar name={currentUser.name} avatarUrl={currentUser.avatarUrl} size={48} strokeWidth={1.75} />
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {currentUser.name}
-              </div>
-              <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
-                {currentUser.role.replace('_', ' ').toUpperCase()}
-              </div>
-            </div>
-          </div>
           <button
-            onClick={() => setIsRoleSwitcherOpen(true)}
-            title="Switch Role"
-            style={{
-              padding: '6px 10px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #CBD5E1',
-              borderRadius: '8px',
-              fontSize: '11px',
-              fontWeight: 600,
-              color: '#334155',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'all 0.15s ease',
-            }}
+            type="button"
+            onClick={logout}
+            className="flex items-center justify-center w-8 h-8 rounded-full text-[#D9534F] hover:bg-[rgba(217,83,79,0.12)] cursor-pointer"
+            title="Sign out"
+            aria-label="Sign out"
           >
-            Switch
+            <LogOut size={16} strokeWidth={2} />
           </button>
         </div>
-
-        {/* 1-Click Role Switcher Quick Bar */}
-        <div style={{ marginTop: '12px' }}>
-          <div style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', letterSpacing: '0.5px', marginBottom: '6px' }}>
-            QUICK ROLE DEMO
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-            {rolesList.map((r) => {
-              const isSelected = currentUser.role === r.role;
-              return (
-                <button
-                  key={r.role}
-                  onClick={() => switchRole(r.role)}
-                  style={{
-                    padding: '4px 8px',
-                    borderRadius: '8px',
-                    fontSize: '11px',
-                    fontWeight: isSelected ? 700 : 500,
-                    backgroundColor: isSelected ? r.color : r.bg,
-                    color: isSelected ? '#FFFFFF' : r.color,
-                    border: `1px solid ${isSelected ? r.color : 'transparent'}`,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {r.icon}
-                  {r.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Links Scrollable Section */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '6px 14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '18px',
-        }}
-      >
-        {navSections.map((sec, idx) => (
-          <div key={idx}>
-            <div
-              style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                color: '#94A3B8',
-                letterSpacing: '0.6px',
-                padding: '0 10px 6px',
-              }}
-            >
-              {sec.title}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              {sec.items.map((item) => {
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '9px 12px',
-                      borderRadius: '10px',
-                      backgroundColor: isActive ? '#DAF1DE' : 'transparent',
-                      color: isActive ? '#163832' : '#475569',
-                      fontWeight: isActive ? 700 : 500,
-                      fontSize: '13px',
-                      border: isActive ? '1px solid #8EB69B' : '1px solid transparent',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      textAlign: 'left',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = '#F8FAFC';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ color: isActive ? '#235347' : '#64748B' }}>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </div>
-                    {item.badge && (
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          backgroundColor: isActive ? '#235347' : '#E2E8F0',
-                          color: isActive ? '#FFFFFF' : '#475569',
-                          padding: '1px 7px',
-                          borderRadius: '10px',
-                        }}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom Footer Section */}
-      <div
-        style={{
-          padding: '14px 16px',
-          borderTop: '1px solid #E8ECF2',
-          backgroundColor: '#FAFCFF',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px',
-        }}
-      >
-        <button
-          onClick={() => setIsPhoneFrame(true)}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '8px 12px',
-            borderRadius: '10px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #CBD5E1',
-            color: '#334155',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          <Smartphone size={16} />
-          <span>Simulate Mobile Frame</span>
-        </button>
-
-        <button
-          onClick={logout}
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '8px 12px',
-            borderRadius: '10px',
-            backgroundColor: '#FEE2E2',
-            border: '1px solid #FECACA',
-            color: '#DC2626',
-            fontSize: '12px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          <LogOut size={16} />
-          <span>Sign Out</span>
-        </button>
       </div>
     </aside>
   );
 };
+
+export default DesktopSidebar;

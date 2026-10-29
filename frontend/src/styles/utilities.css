@@ -1462,4 +1462,35 @@ button,
 .gutter-aligned {
   padding-left: var(--page-padding-x, 20px);
   padding-right: var(--page-padding-x, 20px);
-}
+}
+
+/* Brand Palette Utility Classes */
+.bg-white { background-color: #FFFFFF !important; }
+.bg-transparent { background-color: transparent !important; }
+.bg-\[\#163832\] { background-color: #163832 !important; }
+.bg-\[\#051F20\] { background-color: #051F20 !important; }
+.bg-\[\#0B2B26\] { background-color: #0B2B26 !important; }
+.bg-\[\#235347\] { background-color: #235347 !important; }
+.bg-\[\#8EB69B\] { background-color: #8EB69B !important; }
+.bg-\[\#DAF1DE\] { background-color: #DAF1DE !important; }
+.bg-\[\#F6FBF7\] { background-color: #F6FBF7 !important; }
+.bg-\[\#DAF1DE\]\/40 { background-color: rgba(218, 241, 222, 0.4) !important; }
+
+.text-white { color: #FFFFFF !important; }
+.text-\[\#051F20\] { color: #051F20 !important; }
+.text-\[\#0B2B26\] { color: #0B2B26 !important; }
+.text-\[\#163832\] { color: #163832 !important; }
+.text-\[\#235347\] { color: #235347 !important; }
+.text-\[\#8EB69B\] { color: #8EB69B !important; }
+.text-\[\#DAF1DE\] { color: #DAF1DE !important; }
+.text-\[\#D9534F\] { color: #D9534F !important; }
+.text-\[\#F2B84B\] { color: #F2B84B !important; }
+
+.border-\[\#DAF1DE\] { border-color: #DAF1DE !important; }
+.border-\[\#8EB69B\] { border-color: #8EB69B !important; }
+.border-\[\#163832\] { border-color: #163832 !important; }
+.border-\[\#051F20\] { border-color: #051F20 !important; }
+
+.outline-none { outline: none !important; }
+.border-none { border: none !important; }
+

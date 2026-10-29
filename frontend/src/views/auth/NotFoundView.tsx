@@ -1,6 +1,8 @@
 import React from 'react';
-import { Compass, Home, ArrowLeft } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { Mascot } from '../../components/shared/Mascot';
+import { PillButton } from '../../components/shared/PillButton';
 
 export interface NotFoundViewProps {
   attemptedRoute?: string;
@@ -8,7 +10,6 @@ export interface NotFoundViewProps {
 }
 
 export const NotFoundView: React.FC<NotFoundViewProps> = ({
-  attemptedRoute,
   onGoHome,
 }) => {
   const { setActiveTab } = useApp();
@@ -18,120 +19,62 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
       onGoHome();
     } else {
       setActiveTab('home');
-      window.location.hash = 'home';
+      window.location.hash = '';
     }
   };
 
-  const routeName = attemptedRoute || (typeof window !== 'undefined' ? window.location.hash : '');
-
   return (
     <div
+      className="min-h-[75vh] w-full flex items-center justify-center p-5 select-none"
       style={{
-        minHeight: '80vh',
-        backgroundColor: '#FFFFFF',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '32px 20px',
-        textAlign: 'center',
+        background: 'radial-gradient(circle at 50% 30%, rgba(218, 241, 222, 0.6) 0%, rgba(246, 251, 247, 0) 70%), #F6FBF7',
       }}
     >
-      <div style={{ maxWidth: '420px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* Animated Compass Icon in Mint */}
-        <div
-          style={{
-            width: '84px',
-            height: '84px',
-            borderRadius: '50%',
-            backgroundColor: '#DAF1DE',
-            border: '1px solid #8EB69B',
-            color: '#163832',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '20px',
-            boxShadow: '0 8px 24px rgba(35, 83, 71, 0.15)',
-          }}
-        >
-          <Compass size={48} strokeWidth={1.75} className="animate-spin-slow" />
+      <div
+        className="w-full max-w-sm bg-white p-7 text-center flex flex-col items-center border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.08)]"
+        style={{
+          borderRadius: '24px',
+        }}
+      >
+        {/* Lock Mascot with halo */}
+        <div className="relative mb-5 flex items-center justify-center">
+          <div
+            className="absolute w-28 h-28 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, #DAF1DE 0%, rgba(218, 241, 222, 0) 70%)',
+              filter: 'blur(8px)',
+            }}
+          />
+          <Mascot name="lock" size={88} floating />
         </div>
 
-        {/* 404 Badge */}
-        <span
-          style={{
-            display: 'inline-block',
-            padding: '4px 12px',
-            borderRadius: '999px',
-            backgroundColor: '#FEF2F2',
-            border: '1px solid #FECACA',
-            color: '#DC2626',
-            fontSize: '11px',
-            lineHeight: '14px',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginBottom: '12px',
-          }}
-        >
-          404 Destination Uncharted
-        </span>
-
-        {/* Title */}
+        {/* 1 Headline (2-4 words): "No access" */}
         <h1
-          style={{
-            fontSize: '28px',
-            fontWeight: 800,
-            color: '#051F20',
-            letterSpacing: '-0.02em',
-            lineHeight: '34px',
-            marginBottom: '8px',
-            fontFamily: 'var(--font-family)',
-          }}
+          className="font-bold text-[#051F20] tracking-tight mb-1"
+          style={{ fontSize: '28px', lineHeight: '32px' }}
         >
-          Coordinates Not Found
+          No access
         </h1>
 
-        <span
-          style={{
-            fontSize: '13px',
-            color: '#64748B',
-            marginBottom: '24px',
-            display: 'block',
-            fontWeight: 600,
-          }}
-        >
-          Unrecognized route: <code style={{ backgroundColor: '#F1F5F9', padding: '2px 8px', borderRadius: '6px', color: '#051F20' }}>{routeName || '#unknown'}</code>
-        </span>
+        {/* 1 Subtitle (<6 words): "Clearance required" */}
+        <p className="text-xs font-semibold text-[#235347] mb-6">
+          Clearance required
+        </p>
 
-        {/* Action Button */}
-        <button
-          type="button"
-          onClick={handleReturnHome}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            height: '52px',
-            minHeight: '52px',
-            padding: '0 24px',
-            borderRadius: '999px',
-            backgroundColor: '#235347',
-            color: '#FFFFFF',
-            fontSize: '15px',
-            lineHeight: '20px',
-            fontWeight: 700,
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(35, 83, 71, 0.25)',
-            transition: 'all 150ms ease',
-          }}
-        >
-          <Home size={16} strokeWidth={1.75} />
-          <span>Return to Dashboard</span>
-        </button>
+        {/* Single "Go home" pill button routing to authorized role home */}
+        <div className="w-full">
+          <PillButton
+            variant="primary"
+            fullWidth
+            onClick={handleReturnHome}
+            icon={<Home size={16} strokeWidth={2} />}
+          >
+            Go home
+          </PillButton>
+        </div>
       </div>
     </div>
   );
 };
+
+export default NotFoundView;

@@ -11,34 +11,29 @@ import {
   Shield,
   Copy,
   Check,
+  Award,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
 import {
-  Overline,
-  RoleBadge,
-  InfoRow,
+  Avatar,
+  PillButton,
+  StatusChip,
   BottomSheet,
-  Toast,
-} from '../../components';
+} from '../../components/shared';
 
 export const ProfileView: React.FC = () => {
   const {
     currentUser,
     setIsRoleSwitcherOpen,
     logout,
+    attendance,
   } = useApp();
 
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
   const [qrToken, setQrToken] = useState(() => `GEO-AUTH-${currentUser.uid}-${Date.now().toString(36)}`);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [copiedToken, setCopiedToken] = useState(false);
-
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
-  };
 
   // Rotating 30-second token
   useEffect(() => {
@@ -55,314 +50,331 @@ export const ProfileView: React.FC = () => {
     return () => clearInterval(timer);
   }, [isQrModalOpen, currentUser.uid]);
 
-  // Initials
-  const names = (currentUser.name || 'User').trim().split(' ');
-  const initials =
-    names.length > 1
-      ? `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase()
-      : names[0].slice(0, 2).toUpperCase();
-
   const handleCopyToken = () => {
     navigator.clipboard?.writeText(qrToken);
     setCopiedToken(true);
-    showToast('Token copied to clipboard');
     setTimeout(() => setCopiedToken(false), 2000);
   };
 
   const isFaculty = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
-  const isPromotion =
-    currentUser.role === 'social_media' ||
-    (currentUser.role === 'team_admin' && (currentUser.team === 'Promotion' || Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
-  const isTreasurer =
-    currentUser.role === 'treasurer' ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('treasurer'));
-  const isDocLead =
-    currentUser.role === 'documentation' ||
-    (currentUser.post && currentUser.post.toLowerCase().includes('documentation'));
+  const canSwitchRole = isFaculty || Boolean(import.meta.env.DEV);
+
+  const userAttendanceCount = attendance.filter(
+    (a) => a.userId === currentUser.uid || a.userEmail === currentUser.email
+  ).length;
 
   return (
-    <div className="flex flex-col gap-5 pb-10">
-      {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+        <div>
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            My Profile
+          </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Scholar credentials & standing
+          </p>
+        </div>
 
-      {/* Top Bar: Overline with dot 'PROMOTION & MEDIA LEADERSHIP' / 'TREASURY & FISCAL GOVERNANCE' / 'DOCUMENTATION & ARCHIVAL LEAD' / 'INSTITUTIONAL GOVERNANCE' & UID Pill (#u_...) */}
-      <div className="flex items-center justify-between pt-1">
-        <Overline dot>
-          {isPromotion
-            ? 'PROMOTION & MEDIA LEADERSHIP'
-            : isTreasurer
-            ? 'TREASURY & FISCAL GOVERNANCE'
-            : isDocLead
-            ? 'DOCUMENTATION & ARCHIVAL LEAD'
-            : isFaculty
-            ? 'INSTITUTIONAL GOVERNANCE'
-            : 'COORDINATION & LEADERSHIP'}
-        </Overline>
         <span
-          className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full"
           style={{
-            backgroundColor: '#F1F5F9',
-            color: '#64748B',
-            border: '1px solid #E2E8F0',
+            fontSize: '12px',
+            fontWeight: 800,
+            padding: '4px 12px',
+            borderRadius: '9999px',
+            backgroundColor: '#DAF1DE',
+            color: '#0B2B26',
+            border: '1px solid #8EB69B',
           }}
         >
           #{currentUser.uid}
         </span>
       </div>
 
-      {/* Large Card with big initials avatar, online dot, QR button top-right, Name, RoleBadge */}
+      {/* Identity Card with 72px Avatar, Name, Roll number, Role badge, Squad and Post chips */}
       <div
-        className="relative w-full rounded-[24px] bg-white border border-[#EEF1F5] p-6 text-center"
         style={{
-          boxShadow: '0 6px 24px rgba(15, 23, 42, 0.06)',
+          position: 'relative',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '24px',
+          border: '1px solid #DAF1DE',
+          padding: '24px 20px',
+          boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
         }}
       >
-        {/* QR Icon Button Top-Right (opens member's own QR pass) */}
+        {/* Dynamic QR Quick Launcher Button */}
         <button
           type="button"
           onClick={() => setIsQrModalOpen(true)}
-          className="absolute top-4 right-4 flex items-center justify-center rounded-2xl cursor-pointer transition-all hover:scale-105 active:scale-95"
           style={{
-            width: '44px',
-            height: '44px',
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '9999px',
             backgroundColor: '#DAF1DE',
             border: '1px solid #8EB69B',
             color: '#163832',
-            boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(5, 31, 32, 0.08)',
           }}
-          title="Open Dynamic QR Pass"
-          aria-label="Open Dynamic QR Pass"
+          title="Open Chapter Pass"
+          aria-label="Open Chapter Pass"
         >
-          <QrCode size={24} strokeWidth={1.75} />
+          <QrCode size={18} strokeWidth={2} />
         </button>
 
-        {/* Big Initials Avatar with Online Dot */}
-        <div className="flex justify-center mb-3">
-          <div className="relative inline-flex items-center justify-center">
-            <div
-              className="flex items-center justify-center font-extrabold text-2xl"
-              style={{
-                width: '72px',
-                height: '72px',
-                borderRadius: '50%',
-                backgroundColor: '#DAF1DE',
-                border: '2.5px solid #8EB69B',
-                color: '#0B2B26',
-                fontFamily: 'var(--font-family)',
-                boxShadow: '0 4px 16px rgba(35, 83, 71, 0.15)',
-              }}
-            >
-              {initials}
-            </div>
-
-            {/* Online Dot */}
-            <span
-              className="absolute bottom-1 right-1 rounded-full bg-[#235347]"
-              title="Active Executive"
-            />
-          </div>
+        {/* 72px Avatar with online status */}
+        <div style={{ marginBottom: '12px' }}>
+          <Avatar name={currentUser.name} size={72} status="online" />
         </div>
 
         {/* Name */}
         <h2
-          className="text-xl font-extrabold text-slate-900 tracking-tight leading-tight mb-1.5"
-          style={{ fontFamily: 'var(--font-family)' }}
+          style={{
+            fontSize: '20px',
+            fontWeight: 800,
+            color: '#051F20',
+            margin: '0 0 4px 0',
+            letterSpacing: '-0.01em',
+          }}
         >
           {currentUser.name}
         </h2>
 
-        {/* RoleBadge */}
-        <div className="flex justify-center mb-1">
-          <RoleBadge role={currentUser.role} post={currentUser.post || currentUser.teamRole} size="md" />
+        {/* Roll Number */}
+        <p style={{ fontSize: '13px', color: '#235347', margin: '0 0 12px 0', fontWeight: 600 }}>
+          {currentUser.email}
+        </p>
+
+        {/* Role & Squad Chips */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+          <span
+            style={{
+              fontSize: '12px',
+              fontWeight: 700,
+              backgroundColor: '#163832',
+              color: '#FFFFFF',
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              textTransform: 'capitalize',
+            }}
+          >
+            {currentUser.role.replace(/_/g, ' ')}
+          </span>
+
+          {currentUser.post && (
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#DAF1DE',
+                color: '#0B2B26',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                border: '1px solid #8EB69B',
+              }}
+            >
+              {currentUser.post}
+            </span>
+          )}
+
+          {currentUser.team && (
+            <span
+              style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                backgroundColor: '#F6FBF7',
+                color: '#235347',
+                padding: '4px 12px',
+                borderRadius: '9999px',
+                border: '1px solid #DAF1DE',
+              }}
+            >
+              {currentUser.team} Squad
+            </span>
+          )}
         </div>
       </div>
 
-      {/* InfoRows: Institutional Email, Contact, Academic Department, Standing */}
+      {/* Dossier Card (branch, year, attendance count) */}
       <div
-        className="rounded-[24px] bg-white border border-[#EEF1F5] p-5"
         style={{
-          boxShadow: '0 6px 24px rgba(15, 23, 42, 0.06)',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '24px',
+          border: '1px solid #DAF1DE',
+          padding: '20px',
+          boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
         }}
       >
-        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-          Scholar Information
+        <h3
+          style={{
+            fontSize: '16px',
+            fontWeight: 800,
+            color: '#051F20',
+            margin: 0,
+          }}
+        >
+          Dossier
         </h3>
 
-        <div className="flex flex-col">
-          <InfoRow
-            label="Institutional Email"
-            value={currentUser.email}
-            icon={<Mail size={16} />}
-            iconBg="#EFF6FF"
-            iconColor="#1D4ED8"
-          />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Branch */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#235347', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Building size={16} color="#163832" />
+              Branch
+            </span>
+            <span style={{ color: '#051F20', fontWeight: 700 }}>
+              {currentUser.department || 'Geoinformatics'}
+            </span>
+          </div>
 
-          <InfoRow
-            label={isFaculty ? 'Advisory Contact' : 'Contact'}
-            value={
-              currentUser.phone ||
-              (isPromotion
-                ? '+1 (555) 018-7734'
-                : isTreasurer
-                ? '+1 (555) 013-5566'
-                : isDocLead
-                ? '+1 (555) 016-8844'
-                : isFaculty
-                ? '+1 (555) 019-2831'
-                : '+1 (555) 014-9921')
-            }
-            icon={<Phone size={16} />}
-            iconBg="#DAF1DE"
-            iconColor="#163832"
-          />
+          {/* Academic Year */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#235347', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <GraduationCap size={16} color="#163832" />
+              Year
+            </span>
+            <span style={{ color: '#051F20', fontWeight: 700 }}>
+              {currentUser.yearOfStudy || (isFaculty ? 'Faculty Board' : '3rd Year')}
+            </span>
+          </div>
 
-          <InfoRow
-            label="Academic Department"
-            value={
-              currentUser.department ||
-              (isPromotion
-                ? 'Earth Science & Media'
-                : isTreasurer
-                ? 'Economics & Financial Analytics'
-                : isDocLead
-                ? 'Geoinformatics & Archival Science'
-                : isFaculty
-                ? 'Geography & Geomatics'
-                : 'Geoinformatics Engineering')
-            }
-            icon={<Building size={16} />}
-            iconBg="#F3EEFF"
-            iconColor="#5B21B6"
-          />
+          {/* Verified Attendance Count */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#235347', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Award size={16} color="#163832" />
+              Attendance
+            </span>
+            <span style={{ color: '#051F20', fontWeight: 700 }}>
+              {userAttendanceCount || 12} check-ins
+            </span>
+          </div>
 
-          <InfoRow
-            label={isFaculty ? 'Institutional Standing' : 'Standing'}
-            value={
-              <div className="flex items-center gap-2">
-                <span>
-                  {currentUser.yearOfStudy ||
-                    (isPromotion || isTreasurer || isDocLead
-                      ? '3rd Year (Junior)'
-                      : isFaculty
-                      ? 'Faculty Staff'
-                      : 'Final Year (4th)')}
-                </span>
-                {(currentUser.team || isPromotion || isTreasurer || isDocLead) && (
-                  <span
-                    className="text-[11px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: isPromotion ? '#F5F3FF' : '#DAF1DE',
-                      color: isPromotion ? '#6D28D9' : '#163832',
-                      border: isPromotion ? '1px solid #DDD6FE' : '1px solid #8EB69B',
-                    }}
-                  >
-                    {currentUser.team || (isPromotion ? 'Promotion' : isTreasurer ? 'Management' : 'Documentation')} Squad
-                  </span>
-                )}
-              </div>
-            }
-            icon={<GraduationCap size={16} />}
-            iconBg="#FFF8E6"
-            iconColor="#92400E"
-          />
-
-          <InfoRow
-            label="Assigned Operational Squad"
-            value={
-              currentUser.team
-                ? `${currentUser.team} Squad`
-                : isPromotion
-                ? 'Promotion Squad'
-                : isTreasurer
-                ? 'Management Squad'
-                : isDocLead
-                ? 'Documentation Squad'
-                : 'Executive Administration'
-            }
-            icon={<Users2 size={16} />}
-            iconBg="#E8FBF8"
-            iconColor="#0F766E"
-          />
+          {/* Contact */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span style={{ color: '#235347', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Phone size={16} color="#163832" />
+              Contact
+            </span>
+            <span style={{ color: '#051F20', fontWeight: 700 }}>
+              {currentUser.phone || '+91 94420 18820'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Action Buttons: Switch Demo Role & Logout */}
-      <div className="flex flex-col gap-3 pt-1">
-        {/* Switch Demo Role outlined button with shield icon */}
-        <button
-          type="button"
-          onClick={() => setIsRoleSwitcherOpen(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs bg-white border border-slate-200 text-slate-800 shadow-xs hover:border-[#235347] hover:text-[#235347] transition-all cursor-pointer active:scale-98"
-        >
-          <Shield size={16} className="text-[#235347]" />
-          <span>Switch Demo Role (Preview As Another Role)</span>
-        </button>
+      {/* Action Buttons: Switch Role (if authorized) and Sign out */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {canSwitchRole && (
+          <PillButton
+            variant="secondary"
+            fullWidth
+            icon={<Shield size={16} strokeWidth={2} />}
+            onClick={() => setIsRoleSwitcherOpen(true)}
+          >
+            Switch Role
+          </PillButton>
+        )}
 
-        {/* Logout button in danger-soft style */}
-        <button
-          type="button"
+        <PillButton
+          variant="destructive"
+          fullWidth
+          icon={<LogOut size={16} strokeWidth={2} />}
           onClick={logout}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-bold text-xs transition-all cursor-pointer active:scale-98"
-          style={{
-            backgroundColor: '#FEF2F2',
-            border: '1px solid #FECACA',
-            color: '#DC2626',
-          }}
         >
-          <LogOut size={16} />
-          <span>Sign Out of GeoHub</span>
-        </button>
+          Sign out
+        </PillButton>
       </div>
 
-      {/* Dynamic QR Pass Bottom Sheet */}
+      {/* Dynamic QR Pass BottomSheet */}
       <BottomSheet
         isOpen={isQrModalOpen}
         onClose={() => setIsQrModalOpen(false)}
-        title="Dynamic Chapter Pass"
-        subtitle="30-second cryptographic token for gate entry verification"
+        title="Dynamic Pass"
+        subtitle="30s gate verification token"
       >
-        <div className="flex flex-col items-center text-center py-2">
-          {/* QR Code Container */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '14px', paddingTop: '8px' }}>
           <div
-            className="p-4 rounded-3xl bg-white border-2 border-[#8EB69B] shadow-md mb-4"
-            style={{ width: '220px', height: '220px' }}
+            style={{
+              padding: '16px',
+              borderRadius: '24px',
+              backgroundColor: '#FFFFFF',
+              border: '2px solid #8EB69B',
+              boxShadow: '0 8px 24px rgba(5,31,32,0.08)',
+            }}
           >
             <QRCodeSVG
               value={qrToken}
-              size={188}
+              size={180}
               level="H"
               includeMargin={false}
-              fgColor="#0B2B26"
+              fgColor="#051F20"
             />
           </div>
 
-          {/* Countdown timer pill */}
           <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full font-extrabold text-xs mb-3"
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: '9999px',
               backgroundColor: '#DAF1DE',
               border: '1px solid #8EB69B',
               color: '#163832',
+              fontSize: '12px',
+              fontWeight: 700,
             }}
           >
-            <RotateCw size={16} strokeWidth={1.75} className="animate-spin text-[#235347]" />
+            <RotateCw size={14} className="animate-spin text-[#235347]" />
             <span>Refreshes in {secondsLeft}s</span>
           </div>
 
-          {/* Security Token String */}
           <div
             onClick={handleCopyToken}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 cursor-pointer hover:bg-slate-100 mb-2"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 14px',
+              borderRadius: '16px',
+              backgroundColor: '#F6FBF7',
+              border: '1px solid #DAF1DE',
+              fontSize: '12px',
+              fontFamily: 'monospace',
+              color: '#051F20',
+              cursor: 'pointer',
+            }}
           >
             <span>{qrToken}</span>
-            {copiedToken ? <Check size={16} strokeWidth={1.75} className="text-[#235347]" /> : <Copy size={16} strokeWidth={1.75} />}
+            {copiedToken ? <Check size={14} color="#163832" /> : <Copy size={14} color="#235347" />}
           </div>
-
-          <span className="text-[11px] font-bold text-slate-400">
-            Dynamic 30s Security Token
-          </span>
         </div>
       </BottomSheet>
     </div>
   );
 };
+
+export default ProfileView;

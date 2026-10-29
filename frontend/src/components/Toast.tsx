@@ -13,44 +13,48 @@ export const Toast: React.FC<ToastProps> = ({
   onClose,
 }) => {
   let bg = '#DAF1DE';
-  let border = '#8EB69B';
-  let text = '#163832';
-  let icon = <CheckCircle2 size={20} strokeWidth={1.75} color="#235347" />;
+  let border = '1px solid #8EB69B';
+  let text = '#051F20';
+  let icon = <CheckCircle2 size={18} strokeWidth={2.2} color="#163832" />;
 
   if (type === 'error') {
-    bg = '#FEF2F2';
-    border = '#FECACA';
-    text = '#DC2626';
-    icon = <AlertCircle size={20} strokeWidth={1.75} color="#EF4444" />;
+    bg = 'rgba(217, 83, 79, 0.12)';
+    border = '1px solid rgba(217, 83, 79, 0.35)';
+    text = '#D9534F';
+    icon = <AlertCircle size={18} strokeWidth={2.2} color="#D9534F" />;
   } else if (type === 'info') {
-    bg = '#EFF6FF';
-    border = '#BFDBFE';
-    text = '#1D4ED8';
-    icon = <Info size={20} strokeWidth={1.75} color="#3B82F6" />;
+    bg = '#FFFFFF';
+    border = '1px solid #DAF1DE';
+    text = '#051F20';
+    icon = <Info size={18} strokeWidth={2.2} color="#235347" />;
   }
 
   return (
     <div
-      className="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg border transition-all animate-bounce"
+      className="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-full select-none transition-all shadow-[0_10px_30px_rgba(5,31,32,0.12)]"
       style={{
         backgroundColor: bg,
-        borderColor: border,
+        border,
         color: text,
         maxWidth: '90vw',
         width: 'max-content',
+        borderRadius: '9999px',
       }}
     >
       <span className="shrink-0">{icon}</span>
-      <span className="text-xs font-bold">{message}</span>
+      <span className="text-xs font-bold truncate">{message}</span>
       {onClose && (
         <button
           type="button"
           onClick={onClose}
-          className="p-1 -mr-1 text-slate-400 hover:text-slate-600 rounded-full"
+          className="p-1 -mr-1 text-current opacity-70 hover:opacity-100 rounded-full cursor-pointer pressable"
+          aria-label="Dismiss"
         >
-          <X size={16} strokeWidth={1.75} />
+          <X size={14} strokeWidth={2.2} />
         </button>
       )}
     </div>
   );
 };
+
+export default Toast;

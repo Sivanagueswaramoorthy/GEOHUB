@@ -32,12 +32,13 @@ import { MemoriesHubView } from './views/memories/MemoriesHubView';
 import { CommunicationForumView } from './views/forum/CommunicationForumView';
 import { TreasurerView } from './views/treasurer/TreasurerView';
 import { DocumentationStudioView } from './views/docs/DocumentationStudioView';
-import { AiSocialStudioView } from './views/social/AiSocialStudioView';
 import { CampaignsView } from './views/campaigns/CampaignsView';
 import { NotificationsView } from './views/notifications/NotificationsView';
 import { PendingApprovalView } from './views/auth/PendingApprovalView';
 import { NotFoundView } from './views/auth/NotFoundView';
 import { AuditDetailPage } from './features/audits/AuditDetailPage';
+import { AuditLogView } from './views/audit/AuditLogView';
+import { DesignSystemView } from './views/design/DesignSystemView';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -58,6 +59,12 @@ const MainAppContent: React.FC = () => {
 
     const hash = window.location.hash.replace(/^#\/?/, '').trim();
     const path = window.location.pathname.replace(/^\//, '').trim();
+    const isDesignSystem = hash === 'design-system' || path === 'design-system' || hash === 'design_system' || path === 'design_system';
+    if (isDesignSystem) {
+      setActiveTab('design-system');
+      return;
+    }
+
     const isLogin = hash === 'login' || path === 'login';
 
     if (isAuthenticated) {
@@ -83,6 +90,16 @@ const MainAppContent: React.FC = () => {
       }
     }
   }, [isAuthenticated, activeTab, setActiveTab]);
+
+  if (activeTab === 'design-system') {
+    return (
+      <div className="mobile-scaffold-root">
+        <div className="mobile-shell-column phone-frame-mode" style={{ width: '100%', maxWidth: '640px', margin: '0 auto', padding: '16px 20px' }}>
+          <DesignSystemView />
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || activeTab === 'login') {
     return <LoginPage />;
@@ -145,6 +162,10 @@ const MainAppContent: React.FC = () => {
         return 'AI Social Studio';
       case 'notifications':
         return 'Official Bulletins';
+      case 'audit_logs':
+      case 'audit-logs':
+      case 'audit_log':
+        return 'Institutional Audit Log';
       default:
         return 'Operation Module';
     }
@@ -213,11 +234,21 @@ const MainAppContent: React.FC = () => {
         return <CampaignsView />;
       case 'notifications':
         return <NotificationsView />;
+      case 'audit_logs':
+      case 'audit-logs':
+      case 'audit_log':
+        return <AuditLogView />;
+      case 'design-system':
+      case 'design_system':
+        return <DesignSystemView />;
 
       default:
-        if (activeTab.startsWith('audits/') || activeTab === 'audits') {
+        if (activeTab.startsWith('audits/')) {
           const auditId = activeTab.replace(/^audits\/?/, '') || 'daily-news-bulletin';
           return <AuditDetailPage auditId={auditId} />;
+        }
+        if (activeTab === 'audits') {
+          return <AuditLogView />;
         }
         return <NotFoundView attemptedRoute={activeTab} onGoHome={() => setActiveTab('home')} />;
     }

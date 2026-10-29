@@ -1,9 +1,9 @@
 import React from 'react';
-import { Check, ShieldCheck, Shield, Users2, User, QrCode, FileText, DollarSign, Megaphone } from 'lucide-react';
+import { Check, ShieldCheck, Shield, FileText, DollarSign, Megaphone, User } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
-import { Modal } from '../common/Modal';
-import { AppAvatar } from '../common/AppAvatar';
+import { BottomSheet } from '../shared/BottomSheet';
+import { Avatar } from '../shared/Avatar';
 
 export const RoleSwitcherModal: React.FC = () => {
   const { currentUser, switchRole, isRoleSwitcherOpen, setIsRoleSwitcherOpen } = useApp();
@@ -16,118 +16,102 @@ export const RoleSwitcherModal: React.FC = () => {
     icon: React.ReactNode;
   }[] = [
     {
-      role: 'super_admin',
+      role: 'faculty',
       name: 'Dr. Sarah Jenkins',
-      title: 'Super Admin • Faculty Advisor',
+      title: 'Faculty • Faculty Advisor',
       dept: 'Geography & Geomatics',
-      icon: <ShieldCheck size={20} color="#B45309" />,
+      icon: <ShieldCheck size={18} color="#163832" />,
     },
     {
-      role: 'admin',
+      role: 'coordinator',
       name: 'Alex Rivera',
-      title: 'Admin • Club President',
+      title: 'Coordinator • Club President',
       dept: 'Geoinformatics (4th Year)',
-      icon: <Shield size={20} color="#4338CA" />,
-    },
-    {
-      role: 'treasurer',
-      name: 'Ananya Iyer',
-      title: 'Treasurer Lead • Management Squad',
-      dept: 'Economics & Financial Analytics (3rd Year)',
-      icon: <DollarSign size={20} color="#235347" />,
+      icon: <Shield size={18} color="#163832" />,
     },
     {
       role: 'documentation',
       name: 'Aarav Patel',
       title: 'Documentation Lead • Documentation Squad',
       dept: 'Geoinformatics & Archival Science (3rd Year)',
-      icon: <FileText size={20} color="#7C3AED" />,
+      icon: <FileText size={18} color="#163832" />,
     },
     {
-      role: 'team_admin',
+      role: 'treasurer',
+      name: 'Ananya Iyer',
+      title: 'Treasurer • Management Squad',
+      dept: 'Economics & Financial Analytics (3rd Year)',
+      icon: <DollarSign size={18} color="#163832" />,
+    },
+    {
+      role: 'promotion',
       name: 'David Chen',
       title: 'Promotion Lead • Promotion Squad',
       dept: 'Earth Science & Media (3rd Year)',
-      icon: <Megaphone size={20} color="#7C3AED" />,
+      icon: <Megaphone size={18} color="#163832" />,
     },
     {
-      role: 'member',
+      role: 'student',
       name: 'Maya Patel',
-      title: 'Member • Content Writer',
-      dept: 'Documentation Team (2nd Year)',
-      icon: <User size={20} color="#475569" />,
-    },
-    {
-      role: 'volunteer',
-      name: 'Liam Vance',
-      title: 'Volunteer • Event Check-in Scanner',
-      dept: 'Entertainment Team (3rd Year)',
-      icon: <QrCode size={20} color="#BE185D" />,
+      title: 'Student • Active Member & QR Scanner',
+      dept: 'Cartography & Geography (2nd Year)',
+      icon: <User size={18} color="#163832" />,
     },
   ];
 
   return (
-    <Modal
+    <BottomSheet
       isOpen={isRoleSwitcherOpen}
       onClose={() => setIsRoleSwitcherOpen(false)}
-      title="Switch Demo Role"
-      subtitle="Experience GeoHub through different role permissions"
+      title="Switch Preview Role"
+      subtitle="Preview UI as another role (preview only)"
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div className="flex flex-col gap-2.5 p-2 select-none">
         {roleOptions.map((opt) => {
           const isSelected = currentUser.role === opt.role;
           return (
             <div
               key={opt.role}
-              onClick={() => switchRole(opt.role)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '14px',
-                borderRadius: '12px',
-                border: isSelected ? '2px solid #235347' : '1px solid #E8ECF2',
-                backgroundColor: isSelected ? '#DAF1DE' : '#FFFFFF',
-                cursor: 'pointer',
-                transition: 'all 150ms ease',
+              onClick={() => {
+                switchRole(opt.role);
+                setIsRoleSwitcherOpen(false);
               }}
+              className={`flex items-center justify-between p-3.5 transition-all cursor-pointer pressable border ${
+                isSelected
+                  ? 'bg-[#DAF1DE] border-[#163832] shadow-[0_4px_14px_rgba(5,31,32,0.06)]'
+                  : 'bg-white border-[#DAF1DE] hover:border-[#8EB69B]'
+              }`}
+              style={{ borderRadius: '16px' }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <AppAvatar name={opt.name} size={48} strokeWidth={1.75} />
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#051F20' }}>
+              <div className="flex items-center gap-3 min-w-0">
+                <Avatar name={opt.name} size={40} />
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-sm text-[#051F20] truncate">
                       {opt.name}
                     </span>
                     {opt.icon}
                   </div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#163832', marginTop: '1px' }}>
+                  <span className="text-xs font-semibold text-[#163832] truncate">
                     {opt.title}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#64748B' }}>{opt.dept}</div>
+                  </span>
+                  <span className="text-xs font-medium text-[#235347] truncate">
+                    {opt.dept}
+                  </span>
                 </div>
               </div>
 
               {isSelected && (
-                <div
-                  style={{
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    backgroundColor: '#235347',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#FFFFFF',
-                  }}
-                >
-                  <Check size={16} strokeWidth={1.75} />
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#163832] text-white shrink-0 ml-2">
+                  <Check size={14} strokeWidth={2.4} />
                 </div>
               )}
             </div>
           );
         })}
       </div>
-    </Modal>
+    </BottomSheet>
   );
 };
+
+export default RoleSwitcherModal;

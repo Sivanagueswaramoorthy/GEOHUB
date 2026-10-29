@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
 import {
-  Image,
   MapPin,
   Calendar,
-  Sparkles,
   Search,
   Plus,
-  Play,
-  Share2,
-  ExternalLink,
-  Layers,
   Compass,
-  CheckCircle2,
   X,
-  Eye,
-  Camera,
+  ExternalLink,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { MemoryItem } from '../../types';
-import { Modal } from '../../components/common/Modal';
-import { SearchBar } from '../../components/SearchBar';
-import { AuditModeBanner } from '../../components';
+import {
+  Mascot,
+  PillButton,
+  BottomSheet,
+  EmptyState,
+  SegmentedTabs,
+} from '../../components/shared';
 
 export const MemoriesHubView: React.FC = () => {
   const { memories, currentUser } = useApp();
-  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
-
-  const [viewMode, setViewMode] = useState<'grid' | 'geotag'>('grid');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeMemoryDetail, setActiveMemoryDetail] = useState<MemoryItem | null>(null);
@@ -41,15 +34,6 @@ export const MemoriesHubView: React.FC = () => {
   const [newLocationName, setNewLocationName] = useState('');
   const [newLat, setNewLat] = useState('10.0889');
   const [newLng, setNewLng] = useState('77.0595');
-  const [newInstaLink, setNewInstaLink] = useState('');
-  const [newYoutubeLink, setNewYoutubeLink] = useState('');
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const filteredMemories = memories.filter((mem) => {
     if (selectedCategory !== 'all' && mem.category !== selectedCategory) return false;
@@ -57,7 +41,7 @@ export const MemoriesHubView: React.FC = () => {
       const q = searchQuery.toLowerCase();
       const matchTitle = mem.title.toLowerCase().includes(q);
       const matchEvent = mem.eventTitle.toLowerCase().includes(q);
-      const matchCaption = mem.caption.toLowerCase().includes(q);
+      const matchCaption = (mem.caption || '').toLowerCase().includes(q);
       if (!matchTitle && !matchEvent && !matchCaption) return false;
     }
     return true;
@@ -83,584 +67,414 @@ export const MemoriesHubView: React.FC = () => {
           photoUrl: newCoverUrl || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80',
         },
       ],
-      socialLinks: {
-        instagram: newInstaLink || undefined,
-        youtube: newYoutubeLink || undefined,
-      },
       caption: newCaption,
       createdBy: currentUser.name,
     };
     memories.unshift(newMem);
     setIsAddModalOpen(false);
-    showToast(`✓ Published Memory to Chapter Archive!`);
     setNewTitle('');
     setNewCoverUrl('');
     setNewCaption('');
+    setNewLocationName('');
   };
 
+  const tabs = [
+    { key: 'all', label: 'All' },
+    { key: 'expedition', label: 'Expedition' },
+    { key: 'workshop', label: 'Workshop' },
+    { key: 'celebration', label: 'Celebration' },
+    { key: 'field_work', label: 'Field' },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', paddingBottom: '32px' }}>
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 9999,
-            backgroundColor: '#0F172A',
-            color: '#FFFFFF',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            fontSize: '13px',
-            fontWeight: 600,
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-        >
-          <CheckCircle2 size={16} color="#235347" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Header Banner */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                color: '#163832',
-                backgroundColor: '#DAF1DE',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                border: '1px solid #8EB69B',
-                letterSpacing: '0.04em',
-              }}
-            >
-              DIGITAL CHAPTER ARCHIVE
-            </span>
-          </div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
-            Memories Hub
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Chapter Memories
           </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Expeditions & field archives
+          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {/* View Mode Toggle: Normal Grid vs Geo-tag Map View */}
-          <div
-            style={{
-              display: 'flex',
-              backgroundColor: '#F1F5F9',
-              borderRadius: '999px',
-              padding: '4px',
-              border: '1px solid #E2E8F0',
-            }}
-          >
-            <button
-              onClick={() => setViewMode('grid')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '999px',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                backgroundColor: viewMode === 'grid' ? '#FFFFFF' : 'transparent',
-                color: viewMode === 'grid' ? '#0F172A' : '#64748B',
-                boxShadow: viewMode === 'grid' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none',
-              }}
-            >
-              <Image size={16} strokeWidth={1.75} /> Normal Grid
-            </button>
-            <button
-              onClick={() => setViewMode('geotag')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '999px',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                backgroundColor: viewMode === 'geotag' ? '#235347' : 'transparent',
-                color: viewMode === 'geotag' ? '#FFFFFF' : '#64748B',
-                boxShadow: viewMode === 'geotag' ? '0 2px 8px rgba(35, 83, 71, 0.3)' : 'none',
-              }}
-            >
-              <Compass size={16} strokeWidth={1.75} /> Geo-tag Mode
-            </button>
-          </div>
-
-          {!isSuperAdmin ? (
-            <button
-              onClick={() => setIsAddModalOpen(true)}
-              style={{
-                padding: '10px 16px',
-                borderRadius: '999px',
-                background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-                color: '#FFFFFF',
-                border: 'none',
-                fontSize: '13px',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 14px rgba(35, 83, 71, 0.28)',
-                cursor: 'pointer',
-              }}
-            >
-              <Camera size={16} /> Add Memory
-            </button>
-          ) : (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 14px',
-                borderRadius: '999px',
-                fontSize: '12px',
-                fontWeight: 700,
-                backgroundColor: '#F1F5F9',
-                color: '#334155',
-                border: '1px solid #CBD5E1',
-              }}
-            >
-              <Eye size={14} color="#64748B" />
-              <span>Audit Mode</span>
-            </div>
-          )}
-        </div>
+        <PillButton
+          variant="primary"
+          icon={<Plus size={16} />}
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Add memory
+        </PillButton>
       </div>
 
-      {/* Institutional Audit Mode Notice for Super Admin */}
-      {isSuperAdmin && (
-        <AuditModeBanner
-          moduleName="Chapter Memories & Visual Expeditions"
-          operatedByRole="Documentation & Media Wing"
-          actionRestrictions="Memory publishing and geotagged uploads are operated by the Media and Documentation leads. You have full archival inspection and relive access."
+      {/* Search and Tabs */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            style={{
+              width: '100%',
+              height: '44px',
+              boxSizing: 'border-box',
+              paddingLeft: '40px',
+              paddingRight: '14px',
+              fontSize: '13px',
+              color: '#051F20',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #DAF1DE',
+              borderRadius: '16px',
+              outline: 'none',
+              boxShadow: '0 4px 14px rgba(5,31,32,0.03)',
+            }}
+            placeholder="Search memories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search
+            size={18}
+            strokeWidth={2}
+            color="#8EB69B"
+            style={{ position: 'absolute', left: 14, top: 13 }}
+          />
+        </div>
+
+        <SegmentedTabs
+          tabs={tabs}
+          activeTab={selectedCategory}
+          onChange={setSelectedCategory}
         />
-      )}
-
-      {/* Filter Category Pills */}
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
-        {[
-          { key: 'all', label: 'All Expeditions' },
-          { key: 'expedition', label: 'Field Expeditions' },
-          { key: 'workshop', label: 'Bootcamps & Labs' },
-          { key: 'celebration', label: 'Award Galas & Celebrations' },
-        ].map((c) => (
-          <button
-            key={c.key}
-            onClick={() => setSelectedCategory(c.key)}
-            style={{
-              padding: '7px 14px',
-              borderRadius: '999px',
-              fontSize: '12px',
-              fontWeight: 700,
-              border: selectedCategory === c.key ? '1px solid #235347' : '1px solid #E2E8F0',
-              backgroundColor: selectedCategory === c.key ? '#DAF1DE' : '#FFFFFF',
-              color: selectedCategory === c.key ? '#163832' : '#64748B',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {c.label}
-          </button>
-        ))}
       </div>
 
-      {/* Search Bar */}
-      <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder="Search memory titles, events, or field locations..."
-        resultsCount={filteredMemories.length}
-        suggestions={[
-          'Western Ghats Drone Survey',
-          'LiDAR Terrain Mapping',
-          'Munnar Peak Survey',
-          'Campus Aerial Survey',
-        ]}
-      />
-
-      {/* VIEW MODE 1: NORMAL PHOTO GRID */}
-      {viewMode === 'grid' && (
+      {/* Masonry Grid with 24px Image Radius and Bottom-Left Location Chip */}
+      {filteredMemories.length === 0 ? (
+        <EmptyState
+          mascot="gps-pin"
+          title="No memories"
+          description="Photos and expeditions appear here"
+          actionLabel="Add memory"
+          onAction={() => setIsAddModalOpen(true)}
+        />
+      ) : (
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '16px',
+            columns: '2 260px',
+            columnGap: '16px',
           }}
         >
-          {filteredMemories.map((mem) => (
-            <div
-              key={mem.id}
-              onClick={() => setActiveMemoryDetail(mem)}
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '20px',
-                border: '1px solid #E8ECF2',
-                overflow: 'hidden',
-                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)',
-                cursor: 'pointer',
-                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 12px 28px rgba(35, 83, 71, 0.14)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(15, 23, 42, 0.03)';
-              }}
-            >
-              {/* Media Thumbnail */}
-              <div style={{ height: '190px', width: '100%', position: 'relative', backgroundColor: '#0F172A' }}>
-                <img
-                  src={mem.coverUrl}
-                  alt={mem.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, transparent 60%)',
-                  }}
-                />
-
-                {/* Top Badge */}
-                <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', gap: '6px' }}>
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      backgroundColor: 'rgba(15, 23, 42, 0.75)',
-                      backdropFilter: 'blur(6px)',
-                      color: '#FFFFFF',
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                    }}
-                  >
-                    {mem.category}
-                  </span>
-
-                  {mem.geotags && mem.geotags.length > 0 && (
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: 800,
-                        backgroundColor: '#235347',
-                        color: '#FFFFFF',
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '3px',
-                      }}
-                    >
-                      <MapPin size={16} strokeWidth={1.75} /> Geotagged
-                    </span>
-                  )}
-                </div>
-
-                {/* Bottom title on thumbnail */}
-                <div style={{ position: 'absolute', bottom: '12px', left: '14px', right: '14px' }}>
-                  <div style={{ fontSize: '11px', color: '#8EB69B', fontWeight: 700 }}>
-                    {mem.eventTitle}
-                  </div>
-                  <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', margin: '2px 0 0 0', lineHeight: 1.25 }}>
-                    {mem.title}
-                  </h3>
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.5, margin: 0 }}>
-                  {mem.caption}
-                </p>
-
-                {/* Social media links if available */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid #F1F5F9', fontSize: '11px' }}>
-                  <span style={{ color: '#94A3B8' }}>{mem.date} • {mem.createdBy}</span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {mem.socialLinks?.instagram && (
-                      <span style={{ color: '#E1306C', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                        <ExternalLink size={16} strokeWidth={1.75} /> Instagram
-                      </span>
-                    )}
-                    {mem.socialLinks?.youtube && (
-                      <span style={{ color: '#DC2626', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                        <Play size={16} strokeWidth={1.75} /> Video
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* VIEW MODE 2: GEOTAG MAP / COORDINATE MODE */}
-      {viewMode === 'geotag' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Spatial Overview Map Banner */}
-          <div
-            style={{
-              backgroundColor: '#0F172A',
-              borderRadius: '24px',
-              padding: '24px',
-              color: '#FFFFFF',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
-              border: '1px solid #1E293B',
-            }}
-          >
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                <Compass size={16} color="#8EB69B" />
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#8EB69B', letterSpacing: '0.06em' }}>
-                  SPATIAL GIS METRIC VIEW
-                </span>
-              </div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px 0' }}>
-                Geospatial Pinpoints & Coordinate Archive
-              </h2>
-              <p style={{ fontSize: '13px', color: '#94A3B8', margin: '0 0 16px 0', maxWidth: '600px' }}>
-                Every photo taken during field expeditions is logged with WGS84 GPS latitude and longitude coordinates.
-              </p>
-
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>WGS84</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>Datum Reference</div>
-                </div>
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>5 cm</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>RTK Baseline Accuracy</div>
-                </div>
-                <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 16px' }}>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#8EB69B' }}>Munnar / Chennai</div>
-                  <div style={{ fontSize: '11px', color: '#94A3B8' }}>Primary Baselines</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Coordinate Pinpoint Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-            {filteredMemories.map((mem) => (
+          {filteredMemories.map((mem) => {
+            const loc = mem.geotags?.[0]?.locationName || 'Field Expedition';
+            return (
               <div
-                key={`geo_${mem.id}`}
+                key={mem.id}
+                onClick={() => setActiveMemoryDetail(mem)}
                 style={{
+                  breakInside: 'avoid',
+                  marginBottom: '16px',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #8EB69B',
-                  padding: '16px',
-                  boxShadow: '0 4px 16px rgba(35, 83, 71, 0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
+                  border: '1px solid #DAF1DE',
+                  boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  transition: 'transform 200ms ease-out',
                 }}
               >
-                <div style={{ height: '150px', borderRadius: '14px', overflow: 'hidden', position: 'relative' }}>
-                  <img src={mem.coverUrl} alt={mem.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+                  <img
+                    src={mem.coverUrl}
+                    alt={mem.title}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block',
+                      borderRadius: '24px',
+                      objectFit: 'cover',
+                      maxHeight: '340px',
+                    }}
+                    loading="lazy"
+                  />
+
+                  {/* Bottom-left pill chip with map-pin and location tag */}
                   <div
                     style={{
                       position: 'absolute',
-                      top: '10px',
-                      left: '10px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.85)',
-                      color: '#8EB69B',
-                      fontSize: '11px',
-                      fontWeight: 800,
-                      padding: '4px 10px',
-                      borderRadius: '8px',
-                      display: 'flex',
+                      bottom: '12px',
+                      left: '12px',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px',
+                      gap: '4px',
+                      backgroundColor: 'rgba(5, 31, 32, 0.85)',
+                      backdropFilter: 'blur(8px)',
+                      color: '#DAF1DE',
+                      padding: '4px 10px',
+                      borderRadius: '9999px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      boxShadow: '0 4px 12px rgba(5,31,32,0.18)',
                     }}
                   >
-                    <MapPin size={16} strokeWidth={1.75} />
-                    {mem.geotags?.[0] ? `${mem.geotags[0].lat}° N, ${mem.geotags[0].lng}° E` : 'Geotagged'}
+                    <MapPin size={12} color="#DAF1DE" strokeWidth={2.5} />
+                    <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {loc}
+                    </span>
                   </div>
                 </div>
 
-                <div>
-                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
+                <div style={{ padding: '12px 14px' }}>
+                  <h3
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      color: '#051F20',
+                      margin: 0,
+                      lineHeight: 1.3,
+                    }}
+                  >
                     {mem.title}
-                  </h4>
-                  <div style={{ fontSize: '11px', color: '#235347', fontWeight: 600 }}>
-                    {mem.geotags?.[0]?.locationName || 'High-Altitude Survey Station'}
+                  </h3>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      marginTop: '4px',
+                      fontSize: '12px',
+                      color: '#235347',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Calendar size={12} strokeWidth={2} />
+                    <span>{new Date(mem.date).toLocaleDateString()}</span>
                   </div>
-                  <p style={{ fontSize: '12px', color: '#64748B', margin: '8px 0 0 0', lineHeight: 1.4 }}>
-                    {mem.caption}
-                  </p>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Add Memory Modal */}
-      <Modal
+      {/* Photo Detail Sheet */}
+      <BottomSheet
+        isOpen={activeMemoryDetail !== null}
+        onClose={() => setActiveMemoryDetail(null)}
+        title={activeMemoryDetail?.title || 'Memory Detail'}
+        subtitle={activeMemoryDetail?.eventTitle || 'Chapter Expedition'}
+      >
+        {activeMemoryDetail && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+            <div style={{ borderRadius: '24px', overflow: 'hidden', border: '1px solid #DAF1DE' }}>
+              <img
+                src={activeMemoryDetail.coverUrl}
+                alt={activeMemoryDetail.title}
+                style={{ width: '100%', maxHeight: '280px', objectFit: 'cover', display: 'block' }}
+              />
+            </div>
+
+            {/* GPS coordinates & Event date */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '8px',
+                padding: '12px',
+                backgroundColor: '#F6FBF7',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+              }}
+            >
+              <div>
+                <span style={{ fontSize: '12px', color: '#235347', fontWeight: 600, display: 'block' }}>
+                  Date
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
+                  {new Date(activeMemoryDetail.date).toLocaleDateString()}
+                </span>
+              </div>
+              <div>
+                <span style={{ fontSize: '12px', color: '#235347', fontWeight: 600, display: 'block' }}>
+                  Coordinates
+                </span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
+                  {activeMemoryDetail.geotags?.[0]
+                    ? `${activeMemoryDetail.geotags[0].lat.toFixed(4)}, ${activeMemoryDetail.geotags[0].lng.toFixed(4)}`
+                    : '10.0889° N, 77.0595° E'}
+                </span>
+              </div>
+            </div>
+
+            {/* Location and Caption */}
+            <div>
+              <span style={{ fontSize: '12px', color: '#235347', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+                Location
+              </span>
+              <p style={{ fontSize: '13px', color: '#051F20', margin: 0, fontWeight: 600 }}>
+                {activeMemoryDetail.geotags?.[0]?.locationName || 'Field survey venue'}
+              </p>
+            </div>
+
+            {activeMemoryDetail.caption && (
+              <div>
+                <span style={{ fontSize: '12px', color: '#235347', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+                  Caption
+                </span>
+                <p style={{ fontSize: '13px', color: '#051F20', margin: 0, lineHeight: 1.5 }}>
+                  {activeMemoryDetail.caption}
+                </p>
+              </div>
+            )}
+
+            <PillButton
+              variant="secondary"
+              fullWidth
+              onClick={() => setActiveMemoryDetail(null)}
+            >
+              Close
+            </PillButton>
+          </div>
+        )}
+      </BottomSheet>
+
+      {/* Add Memory BottomSheet */}
+      <BottomSheet
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Add Chapter Memory & Field Photos"
-        subtitle="Upload expedition photos, geotag coordinates and social links"
+        title="Add Memory"
+        subtitle="Upload chapter photograph"
       >
-        <form onSubmit={handleAddMemory} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="input-group">
-            <label className="input-label">Memory Title</label>
+        <form onSubmit={handleAddMemory} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Title
+            </label>
             <input
               type="text"
               required
-              className="input-field"
-              placeholder="e.g. Western Ghats Drone Survey Expedition"
+              placeholder="e.g. Western Ghats Canopy Survey"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Linked Event Name</label>
-            <input
-              type="text"
-              className="input-field"
-              placeholder="e.g. LiDAR Terrain Mapping Bootcamp"
-              value={newEventTitle}
-              onChange={(e) => setNewEventTitle(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Category</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Category
+            </label>
             <select
-              className="input-field"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value as any)}
             >
-              <option value="expedition">Field Expedition</option>
-              <option value="workshop">Workshop & Bootcamp</option>
-              <option value="celebration">Awards Gala & Celebration</option>
-              <option value="field_work">Field Research & Lab Work</option>
+              <option value="expedition">Expedition</option>
+              <option value="workshop">Workshop</option>
+              <option value="celebration">Celebration</option>
+              <option value="field_work">Field Work</option>
             </select>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Cover Photo URL (Unsplash or Image Link)</label>
-            <input
-              type="url"
-              required
-              className="input-field"
-              placeholder="https://images.unsplash.com/photo-..."
-              value={newCoverUrl}
-              onChange={(e) => setNewCoverUrl(e.target.value)}
-            />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            <div className="input-group">
-              <label className="input-label">Latitude (WGS84)</label>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="e.g. 10.0889"
-                value={newLat}
-                onChange={(e) => setNewLat(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label className="input-label">Longitude (WGS84)</label>
-              <input
-                type="text"
-                className="input-field"
-                placeholder="e.g. 77.0595"
-                value={newLng}
-                onChange={(e) => setNewLng(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Location / Landmark Name</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Location Name
+            </label>
             <input
               type="text"
-              className="input-field"
-              placeholder="e.g. Munnar Peak Survey Station 1"
+              placeholder="e.g. Munnar Forest Station"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newLocationName}
               onChange={(e) => setNewLocationName(e.target.value)}
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            <div className="input-group">
-              <label className="input-label">Instagram Post Link (Optional)</label>
-              <input
-                type="url"
-                className="input-field"
-                placeholder="https://instagram.com/p/..."
-                value={newInstaLink}
-                onChange={(e) => setNewInstaLink(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <label className="input-label">YouTube Video Link (Optional)</label>
-              <input
-                type="url"
-                className="input-field"
-                placeholder="https://youtube.com/watch?v=..."
-                value={newYoutubeLink}
-                onChange={(e) => setNewYoutubeLink(e.target.value)}
-              />
-            </div>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Image URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://..."
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={newCoverUrl}
+              onChange={(e) => setNewCoverUrl(e.target.value)}
+            />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Expedition Story / Caption</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Caption
+            </label>
             <textarea
-              className="input-field"
               rows={3}
-              required
-              placeholder="Describe achievements, scholar count, equipment tested..."
+              placeholder="Describe this memory..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={newCaption}
               onChange={(e) => setNewCaption(e.target.value)}
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-block"
-            style={{
-              borderRadius: '999px',
-              background: 'linear-gradient(135deg, #235347 0%, #0B2B26 100%)',
-              height: '46px',
-              fontSize: '14px',
-              fontWeight: 700,
-              marginTop: '6px',
-            }}
-          >
-            Publish to Memories Hub
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Save
+          </PillButton>
         </form>
-      </Modal>
+      </BottomSheet>
     </div>
   );
 };
+
+export default MemoriesHubView;

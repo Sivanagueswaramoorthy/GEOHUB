@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Calendar,
-  CheckSquare,
-  Sparkles,
-  Leaf,
-  X,
-} from 'lucide-react';
 import { orgConfig } from '../../config/org';
+import { Mascot } from '../../components/shared/Mascot';
 import { LoginForm } from './LoginForm';
 import { ForgotPasswordSheet } from './ForgotPasswordSheet';
 import { useLogin } from './useLogin';
@@ -24,7 +18,6 @@ export const LoginPage: React.FC = () => {
   } = useLogin();
 
   const [isForgotOpen, setIsForgotOpen] = useState(false);
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   // Set document title
   useEffect(() => {
@@ -36,67 +29,67 @@ export const LoginPage: React.FC = () => {
   }, []);
 
   return (
-    <main className="mascot-login-screen">
-      {/* 4 Floating Rounded Square Icon Cards in the upper corners */}
-      <div className="floating-corner-card top-left-high" aria-hidden="true">
-        <Leaf size={19} color="#235347" strokeWidth={2.2} />
-      </div>
-
-      <div className="floating-corner-card top-left-low" aria-hidden="true">
-        <Calendar size={18} color="#235347" strokeWidth={2.2} />
-      </div>
-
-      <div className="floating-corner-card top-right-high" aria-hidden="true">
-        <CheckSquare size={19} color="#235347" strokeWidth={2.2} />
-      </div>
-
-      <div className="floating-corner-card top-right-low" aria-hidden="true">
-        <Sparkles size={18} color="#235347" strokeWidth={2.2} />
-      </div>
-
-      {/* Main Column */}
-      <div className="mascot-column">
-        {/* Center Mascot Image floating directly on page */}
-        <div className="mascot-hero-wrap">
-          <div className="mascot-glow-disc" />
-          <img
-            src="/eco-mascot.png"
-            alt="Eco Mascot"
-            className="mascot-illustration"
+    <main
+      className="min-h-screen w-full flex flex-col items-center justify-center p-5 select-none"
+      style={{
+        background: 'radial-gradient(circle at 50% 20%, rgba(218, 241, 222, 0.65) 0%, rgba(246, 251, 247, 0) 70%), #F6FBF7',
+      }}
+    >
+      <div
+        className="w-full max-w-sm flex flex-col items-center"
+        style={{
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* Top Hero Mascot: Globe on soft mint halo */}
+        <div className="relative mb-3 flex items-center justify-center">
+          <div
+            className="absolute w-28 h-28 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, #DAF1DE 0%, rgba(218, 241, 222, 0) 70%)',
+              filter: 'blur(8px)',
+            }}
           />
+          <Mascot name="globe" size={84} floating />
         </div>
 
-        {/* Organization Brand Pill Badge */}
-        <div className="mascot-pill-badge">
-          <img
-            src="/geo-hub-logo.png"
-            alt="Logo"
-          />
-          <span>Green Eco Organization</span>
+        {/* Minimal Headline and subtitle: headline "Welcome back", subtitle "Sign in to GeoHub" */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DAF1DE] border border-[#8EB69B] text-xs font-semibold text-[#163832] mb-2 select-none">
+            <span>Green Eco Organization</span>
+          </div>
+          <h1
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
+          >
+            Welcome back
+          </h1>
+          <p className="text-xs font-semibold text-[#235347] mt-1">
+            Sign in to GeoHub
+          </p>
         </div>
 
         {/* Session Expired Banner if present */}
         {isSessionExpired && (
           <div
+            className="w-full p-3 rounded-2xl mb-4 text-xs font-semibold"
             style={{
-              width: '100%',
-              padding: '10px 14px',
-              borderRadius: '16px',
-              backgroundColor: '#FEF3C7',
-              border: '1px solid #FCD34D',
-              color: '#92400E',
-              fontSize: '12px',
-              fontWeight: 600,
-              marginBottom: '12px',
-              textAlign: 'left',
+              backgroundColor: 'rgba(242, 184, 75, 0.16)',
+              border: '1px solid rgba(242, 184, 75, 0.35)',
+              color: '#051F20',
             }}
           >
-            Your previous session expired. Please sign in with your Register Number to continue.
+            Session expired. Please sign in again.
           </div>
         )}
 
-        {/* Direct Register Number & Password Form Card */}
-        <div className="mascot-form-card">
+        {/* Rounded Card: 2 inputs, Sign in pill button, ghost Forgot link */}
+        <div
+          className="w-full bg-white p-6 shadow-[0_10px_30px_rgba(5,31,32,0.08)] border border-[#DAF1DE]"
+          style={{
+            borderRadius: '24px',
+          }}
+        >
           <LoginForm
             onSubmit={authenticate}
             isLoading={isLoading}
@@ -107,26 +100,6 @@ export const LoginPage: React.FC = () => {
             onClearError={clearError}
           />
         </div>
-
-        {/* Legal & Governance Notice */}
-        <p className="mascot-legal-notice">
-          By continuing, you agree to our{' '}
-          <button
-            type="button"
-            onClick={() => setIsPrivacyOpen(true)}
-            className="mascot-legal-btn"
-          >
-            Terms of Service
-          </button>{' '}
-          and{' '}
-          <button
-            type="button"
-            onClick={() => setIsPrivacyOpen(true)}
-            className="mascot-legal-btn"
-          >
-            Privacy Policy
-          </button>
-        </p>
       </div>
 
       {/* Forgot Password Bottom Sheet */}
@@ -134,36 +107,8 @@ export const LoginPage: React.FC = () => {
         isOpen={isForgotOpen}
         onClose={() => setIsForgotOpen(false)}
       />
-
-      {/* Privacy Policy Dialog */}
-      {isPrivacyOpen && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in"
-          onClick={() => setIsPrivacyOpen(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span className="font-extrabold text-sm text-slate-900">Institutional Governance & Privacy</span>
-              <button
-                type="button"
-                onClick={() => setIsPrivacyOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"
-              >
-                <X size={16} />
-              </button>
-            </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              GeoHub is governed by the College Department of Geography & Geoinformatics.
-              Your college Register Number / Roll Number is strictly utilized for verifying membership, recording event gate attendance via dynamic QR, and approving team task submissions.
-            </p>
-          </div>
-        </div>
-      )}
     </main>
   );
 };
+
+export default LoginPage;

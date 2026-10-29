@@ -14,6 +14,8 @@ from routers import (
     tasks_router,
     gallery_router,
     dashboard_router,
+    audit_router,
+    finance_router,
 )
 
 # Create database tables
@@ -65,6 +67,8 @@ app.include_router(qr_router.router, prefix=settings.API_V1_STR)
 app.include_router(tasks_router.router, prefix=settings.API_V1_STR)
 app.include_router(gallery_router.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard_router.router, prefix=settings.API_V1_STR)
+app.include_router(audit_router.router, prefix=settings.API_V1_STR)
+app.include_router(finance_router.router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
 def seed_default_teams():

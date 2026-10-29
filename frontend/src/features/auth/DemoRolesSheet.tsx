@@ -30,9 +30,9 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'System oversight, sanctions, club approvals & dossiers',
     user: demoSuperAdmin,
     initials: 'SJ',
-    badgeBg: '#FEF3C7',
-    badgeColor: '#92400E',
-    icon: <ShieldCheck size={20} strokeWidth={1.75} className="text-amber-700" />,
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <ShieldCheck size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'coordinator',
@@ -41,9 +41,9 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'Club leadership, master schedules & roster commands',
     user: demoAdmin,
     initials: 'AR',
-    badgeBg: '#EEF2FF',
-    badgeColor: '#4338CA',
-    icon: <Shield size={20} strokeWidth={1.75} className="text-indigo-700" />,
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <Shield size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'doc_lead',
@@ -52,9 +52,9 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'Meeting minutes, templates & digital archives',
     user: demoDocLead,
     initials: 'AP',
-    badgeBg: '#F3E8FF',
-    badgeColor: '#7E22CE',
-    icon: <FileText size={20} strokeWidth={1.75} className="text-purple-700" />,
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <FileText size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'treasurer_lead',
@@ -63,9 +63,9 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'Ledger records, requisitions, inventory & audits',
     user: demoTreasurer,
     initials: 'AI',
-    badgeBg: '#E0F2FE',
-    badgeColor: '#0369A1',
-    icon: <DollarSign size={20} strokeWidth={1.75} className="text-sky-700" />,
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <DollarSign size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'promo_lead',
@@ -74,9 +74,9 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     description: 'Campaign releases, content calendar & socials',
     user: demoTeamAdmin,
     initials: 'DC',
-    badgeBg: '#CCFBF1',
-    badgeColor: '#0F766E',
-    icon: <Megaphone size={20} strokeWidth={1.75} className="text-teal-700" />,
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <Megaphone size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'student_volunteer',
@@ -87,7 +87,7 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     initials: 'LV',
     badgeBg: '#DAF1DE',
     badgeColor: '#163832',
-    icon: <UserCheck size={20} strokeWidth={1.75} className="text-emerald-700" />,
+    icon: <UserCheck size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
 ];
 
@@ -140,7 +140,7 @@ export const DemoRolesSheet: React.FC<DemoRolesSheetProps> = ({
             <div className="flex items-center gap-2 mb-1">
               <span
                 className="px-2 py-0.5 rounded-full text-xs font-bold"
-                style={{ backgroundColor: '#FEF3C7', color: '#B45309' }}
+                style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
               >
                 TESTING ENVIRONMENT
               </span>
@@ -195,7 +195,7 @@ export const DemoRolesSheet: React.FC<DemoRolesSheetProps> = ({
                     {persona.roleTitle}
                   </span>
                   {persona.user.rollNo && (
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
                       Roll No: {persona.user.rollNo}
                     </span>
                   )}

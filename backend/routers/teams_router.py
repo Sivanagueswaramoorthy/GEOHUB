@@ -1,6 +1,7 @@
 import json
+from datetime import datetime
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 import models, schemas, auth
@@ -64,12 +65,12 @@ def get_pending_requests(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
-    # Check authorization: user must be team_admin for this team, or admin/super_admin
-    is_admin = current_user.role in ["admin", "super_admin"]
-    is_team_admin = current_user.role == "team_admin" and current_user.team == team_name
-
-    if not is_admin and not is_team_admin:
-        raise HTTPException(status_code=403, detail="Not authorized to view requests for this team.")
+    # Check Layer 1 & Layer 2 authorization:
+    # Faculty/Coordinator can view any team requests.
+    # Squad lead can view ONLY their own squad, and ONLY if tenure is active.
+    can_manage = auth.has_permission(current_user, "canManageMembers", context={"squad": team_name})
+    if not can_manage:
+        raise HTTPException(status_code=403, detail=f"Not authorized to view requests for {team_name} squad.")
 
     requests = db.query(models.JoinRequest).filter(
         models.JoinRequest.team_id == team_name,
@@ -88,44 +89,42 @@ def approve_join_request(
     if not req:
         raise HTTPException(status_code=404, detail="Join request not found.")
 
-    is_admin = current_user.role in ["admin", "super_admin"]
-    is_team_admin = current_user.role == "team_admin" and current_user.team == req.team_id
-
-    if not is_admin and not is_team_admin:
-        raise HTTPException(status_code=403, detail="Not authorized to approve for this team.")
+    # Check Layer 1 & Layer 2 authorization:
+    can_manage = auth.has_permission(current_user, "canManageMembers", context={"squad": req.team_id})
+    if not can_manage:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Not authorized to approve requests for {req.team_id} squad. Team admins can only manage their own squad."
+        )
 
     req.status = "approved"
     req.reviewed_by = current_user.id
 
     # Update student record
-    student = db.query(models.User).filter(models.User.id == req.user_id).first()
-    if student:
-        student.team = req.team_id
-        student.team_role = body.team_role
-        student.status = "active"
+    target_user = db.query(models.User).filter(models.User.id == req.user_id).first()
+    if target_user:
+        target_user.team = req.team_id
+        target_user.team_role = body.team_role
+        target_user.status = "active"
 
     # Add to team member list
     team = db.query(models.Team).filter(models.Team.name == req.team_id).first()
     if team:
-        members = json.loads(team.member_user_ids or "[]")
-        if req.user_id not in members:
-            members.append(req.user_id)
-            team.member_user_ids = json.dumps(members)
+        member_ids = json.loads(team.member_user_ids or "[]")
+        if req.user_id not in member_ids:
+            member_ids.append(req.user_id)
+            team.member_user_ids = json.dumps(member_ids)
 
     db.commit()
-    return {"success": True, "message": f"Approved {req.user_name} as {body.team_role}"}
 
-@router.post("/requests/{request_id}/reject")
-def reject_join_request(
-    request_id: str,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(auth.get_current_active_user)
-):
-    req = db.query(models.JoinRequest).filter(models.JoinRequest.id == request_id).first()
-    if not req:
-        raise HTTPException(status_code=404, detail="Request not found.")
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="join_request_approved",
+        target_type="user",
+        target_id=req.user_id,
+        target_name=req.user_name,
+        details=f"Approved join request for {req.team_id} with role {body.team_role}"
+    )
 
-    req.status = "rejected"
-    req.reviewed_by = current_user.id
-    db.commit()
-    return {"success": True, "message": "Join request rejected"}
+    return {"success": True, "message": f"Approved {req.user_name} for {req.team_id}."}

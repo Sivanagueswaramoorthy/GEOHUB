@@ -20,11 +20,13 @@ export const EventHero: React.FC<EventHeroProps> = ({
   return (
     <div
       onClick={() => onDetailsClick(event)}
-      className={`relative w-full overflow-hidden rounded-[24px] cursor-pointer group transition-transform duration-200 hover:scale-[1.01] ${className}`}
+      className={`relative w-full overflow-hidden rounded-[32px] cursor-pointer group transition-all duration-200 pressable hover:scale-[1.01] ${className}`}
       style={{
         height: '240px',
-        backgroundColor: '#0F172A',
-        boxShadow: '0 8px 30px rgba(15, 23, 42, 0.12)',
+        backgroundColor: '#051F20',
+        borderRadius: '32px',
+        border: '1px solid rgba(218, 241, 222, 0.25)',
+        boxShadow: '0 10px 30px rgba(5, 31, 32, 0.16)',
         ...style,
       }}
     >
@@ -38,12 +40,12 @@ export const EventHero: React.FC<EventHeroProps> = ({
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
       />
 
-      {/* Dark Gradient Overlay */}
+      {/* Dark Pine Gradient Overlay */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.75) 55%, rgba(15, 23, 42, 0.95) 100%)',
+            'linear-gradient(180deg, rgba(5, 31, 32, 0.15) 0%, rgba(5, 31, 32, 0.75) 55%, rgba(5, 31, 32, 0.96) 100%)',
         }}
       />
 
@@ -51,17 +53,18 @@ export const EventHero: React.FC<EventHeroProps> = ({
       <div className="absolute inset-0 p-5 flex flex-col justify-between z-10 box-border">
         {/* Top Badges */}
         <div className="flex items-center justify-between">
-          {/* Red HAPPENING NOW pill or status */}
+          {/* Live / Featured pill */}
           <span
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold text-xs uppercase tracking-wider"
             style={{
-              backgroundColor: isLive ? '#EF4444' : '#235347',
+              backgroundColor: isLive ? '#163832' : '#235347',
               color: '#FFFFFF',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+              boxShadow: '0 4px 12px rgba(5, 31, 32, 0.25)',
+              border: '1px solid #8EB69B',
             }}
           >
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            {isLive ? 'HAPPENING NOW' : 'FEATURED EVENT'}
+            <span className="w-2 h-2 rounded-full bg-[#DAF1DE] animate-pulse" />
+            {isLive ? 'LIVE NOW' : 'FEATURED EVENT'}
           </span>
 
           {/* White Details pill */}
@@ -71,10 +74,10 @@ export const EventHero: React.FC<EventHeroProps> = ({
               e.stopPropagation();
               onDetailsClick(event);
             }}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white text-slate-900 font-bold text-xs shadow-md transition-all hover:bg-slate-100"
+            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-[#051F20] font-bold text-xs shadow-md transition-all hover:bg-[#DAF1DE]"
           >
             <span>Details</span>
-            <ChevronRight size={16} strokeWidth={1.75} />
+            <ChevronRight size={14} strokeWidth={2} />
           </button>
         </div>
 

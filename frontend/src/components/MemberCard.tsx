@@ -31,7 +31,7 @@ export const MemberCard: React.FC<MemberCardProps> = ({
           onClick(user);
         }
       }}
-      className={`flex items-center gap-3 rounded-[24px] bg-white border border-[#EEF1F5] shadow-[0_4px_16px_rgba(15,23,42,0.04)] cursor-pointer hover:border-[#235347] transition-all duration-150 w-full ${className}`}
+      className={`flex items-center gap-3 rounded-[24px] bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.08)] cursor-pointer hover:border-[#8EB69B] pressable transition-all duration-200 w-full ${className}`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -40,8 +40,8 @@ export const MemberCard: React.FC<MemberCardProps> = ({
         minHeight: '56px',
         borderRadius: '24px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid #EEF1F5',
-        boxShadow: '0 4px 16px rgba(15, 23, 42, 0.04)',
+        border: '1px solid #DAF1DE',
+        boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
         cursor: 'pointer',
         boxSizing: 'border-box',
         width: '100%',
@@ -71,9 +71,9 @@ export const MemberCard: React.FC<MemberCardProps> = ({
         <div className="flex items-center gap-2 flex-wrap">
           <span
             style={{
-              fontSize: `${TYPOGRAPHY.scale.subtitle.fontSize}px`,
-              lineHeight: `${TYPOGRAPHY.scale.subtitle.lineHeight}px`,
-              fontWeight: TYPOGRAPHY.scale.subtitle.fontWeight,
+              fontSize: '15px',
+              lineHeight: '20px',
+              fontWeight: 700,
               color: '#051F20',
               fontFamily: 'var(--font-family)',
             }}
@@ -89,10 +89,10 @@ export const MemberCard: React.FC<MemberCardProps> = ({
         {user.email && (
           <span
             style={{
-              fontSize: `${TYPOGRAPHY.scale.small.fontSize}px`,
-              lineHeight: `${TYPOGRAPHY.scale.small.lineHeight}px`,
-              fontWeight: TYPOGRAPHY.scale.small.fontWeight,
-              color: '#163832',
+              fontSize: '12.5px',
+              lineHeight: '16px',
+              fontWeight: 500,
+              color: '#235347',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -116,20 +116,21 @@ export const MemberCard: React.FC<MemberCardProps> = ({
 
       {/* Chevron button 36px circular button vertically centered to card */}
       <div
-        className="flex items-center justify-center shrink-0 rounded-full text-slate-400"
+        className="flex items-center justify-center shrink-0 rounded-full"
         style={{
           width: '36px',
           height: '36px',
           borderRadius: '999px',
-          backgroundColor: '#F8FAFC',
-          border: '1px solid #EEF1F5',
+          backgroundColor: '#DAF1DE',
+          color: '#163832',
+          border: '1px solid #8EB69B',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
         }}
       >
-        <ChevronRight size={20} strokeWidth={1.75} />
+        <ChevronRight size={18} strokeWidth={2} />
       </div>
     </div>
   );

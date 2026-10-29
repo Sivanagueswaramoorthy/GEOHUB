@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { Plus, ArrowLeft, Send, CheckCircle2, Paperclip, MessageSquare, AlertCircle } from 'lucide-react';
+import { Plus, ArrowLeft, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../../components/common/TaskCard';
-import { StatusChip } from '../../components/common/StatusChip';
-import { AppAvatar } from '../../components/common/AppAvatar';
-import { Modal } from '../../components/common/Modal';
-import { AuditModeBanner } from '../../components';
 import { TaskPriority, TaskStatus } from '../../types';
+import {
+  PillButton,
+  StatusChip,
+  Avatar,
+  BottomSheet,
+  EmptyState,
+  SegmentedTabs,
+  Mascot,
+} from '../../components/shared';
 
 export const TasksListView: React.FC = () => {
   const {
@@ -20,18 +25,9 @@ export const TasksListView: React.FC = () => {
     createTask,
   } = useApp();
 
-  const isSuperAdmin = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
-
   const [statusFilter, setStatusFilter] = useState<'all' | 'todo' | 'in_progress' | 'done'>('all');
-  const [teamFilter, setTeamFilter] = useState<string>('All');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  // New Comment input
   const [commentText, setCommentText] = useState('');
-  // Proof input
-  const [proofNote, setProofNote] = useState('');
-  const [proofUrl, setProofUrl] = useState('');
-  const [isProofModalOpen, setIsProofModalOpen] = useState(false);
 
   // New Task form state
   const [newTitle, setNewTitle] = useState('');
@@ -43,10 +39,8 @@ export const TasksListView: React.FC = () => {
 
   const selectedTask = tasks.find((t) => t.id === selectedTaskId);
 
-  // Filter tasks
   const filteredTasks = tasks.filter((t) => {
     if (statusFilter !== 'all' && t.status !== statusFilter) return false;
-    if (teamFilter !== 'All' && t.team !== teamFilter) return false;
     return true;
   });
 
@@ -57,377 +51,218 @@ export const TasksListView: React.FC = () => {
     setCommentText('');
   };
 
-  const handleProofSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedTaskId) return;
-    updateTaskStatus(selectedTaskId, 'done', proofUrl || undefined, proofNote || undefined);
-    setIsProofModalOpen(false);
-    setProofNote('');
-    setProofUrl('');
-  };
-
   const handleCreateTask = (e: React.FormEvent) => {
     e.preventDefault();
-    const assignee = users.find((u) => u.uid === newAssigneeId) || currentUser;
+    if (!newTitle.trim()) return;
+    const assignee = users.find((u) => u.uid === newAssigneeId);
     createTask({
-      title: newTitle,
-      description: newDesc,
+      title: newTitle.trim(),
+      description: newDesc.trim(),
       team: newTeam,
-      assigneeId: assignee.uid,
-      assigneeName: assignee.name,
-      assigneeAvatar: assignee.avatarUrl,
+      assigneeId: newAssigneeId || currentUser.uid,
+      assigneeName: assignee ? assignee.name : currentUser.name,
       createdById: currentUser.uid,
       createdByName: currentUser.name,
-      dueDate: newDueDate || new Date(Date.now() + 86400000 * 3).toISOString(),
-      priority: newPriority,
       status: 'todo',
+      priority: newPriority,
+      dueDate: newDueDate || new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
     });
     setIsCreateModalOpen(false);
     setNewTitle('');
     setNewDesc('');
   };
 
-  // If viewing a single task's detail view
+  const tabs = [
+    { key: 'all', label: `All (${tasks.length})` },
+    { key: 'todo', label: `To Do (${tasks.filter((t) => t.status === 'todo').length})` },
+    { key: 'in_progress', label: `In Progress (${tasks.filter((t) => t.status === 'in_progress').length})` },
+    { key: 'done', label: `Done (${tasks.filter((t) => t.status === 'done').length})` },
+  ];
+
+  // If viewing a single task detail
   if (selectedTask) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <button
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="select-none">
+        <PillButton
+          variant="secondary"
+          size="sm"
+          icon={<ArrowLeft size={14} strokeWidth={2} />}
           onClick={() => setSelectedTaskId(null)}
+        >
+          Back
+        </PillButton>
+
+        <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#0F766E',
-            marginBottom: '4px',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
+            border: '1px solid #DAF1DE',
+            padding: '24px',
+            boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
           }}
         >
-          <ArrowLeft size={16} /> Back to Tasks
-        </button>
-
-        <div className="app-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span
               style={{
                 fontSize: '12px',
                 fontWeight: 700,
-                color: '#0F766E',
-                textTransform: 'uppercase',
+                backgroundColor: '#DAF1DE',
+                color: '#0B2B26',
+                padding: '3px 10px',
+                borderRadius: '9999px',
+                border: '1px solid #8EB69B',
               }}
             >
-              {selectedTask.team} Team
+              {selectedTask.team} Squad
             </span>
-            <StatusChip status={selectedTask.status} />
+            <StatusChip status={selectedTask.status === 'done' ? 'done' : 'live'} label={selectedTask.status} />
           </div>
 
-          <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', lineHeight: 1.3, marginBottom: '8px' }}>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#051F20', margin: 0 }}>
             {selectedTask.title}
-          </h2>
+          </h1>
 
-          {selectedTask.description && (
-            <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.5, marginBottom: '16px' }}>
-              {selectedTask.description}
-            </p>
-          )}
+          <p style={{ fontSize: '13px', color: '#235347', margin: 0, lineHeight: 1.5 }}>
+            {selectedTask.description || 'No description provided.'}
+          </p>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '12px',
-              borderTop: '1px solid #E8ECF2',
-              paddingTop: '14px',
-              fontSize: '13px',
-            }}
-          >
-            <div>
-              <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
-                Assignee
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-                <AppAvatar name={selectedTask.assigneeName} size={24} strokeWidth={1.75} />
-                <span style={{ fontWeight: 600, color: '#0F172A' }}>{selectedTask.assigneeName}</span>
-              </div>
-            </div>
-
-            <div>
-              <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
-                Priority
-              </span>
-              <span style={{ fontWeight: 600, textTransform: 'capitalize', color: selectedTask.priority === 'high' ? '#DC2626' : '#0F172A' }}>
-                {selectedTask.priority}
-              </span>
-            </div>
-
-            <div>
-              <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
-                Due Date
-              </span>
-              <span style={{ fontWeight: 600, color: '#0F172A' }}>
-                {new Date(selectedTask.dueDate).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-
-            <div>
-              <span style={{ color: '#64748B', display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' }}>
-                Created By
-              </span>
-              <span style={{ fontWeight: 500, color: '#64748B' }}>{selectedTask.createdByName}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Task Actions: Status Toggle & Proof Upload (restricted to assignees / leads) */}
-        {!isSuperAdmin ? (
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              className={`btn ${selectedTask.status === 'done' ? 'btn-secondary' : 'btn-primary'} btn-block`}
-              onClick={() => {
-                if (selectedTask.status !== 'done') {
-                  setIsProofModalOpen(true);
-                } else {
-                  updateTaskStatus(selectedTask.id, 'in_progress');
-                }
-              }}
-            >
-              {selectedTask.status === 'done' ? (
-                <>Mark as In Progress</>
-              ) : (
-                <>
-                  <CheckCircle2 size={20} strokeWidth={1.75} /> Mark Complete & Submit Proof
-                </>
-              )}
-            </button>
-          </div>
-        ) : (
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '10px 14px',
-              borderRadius: '12px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
+              justifyContent: 'space-between',
+              padding: '12px 14px',
+              borderRadius: '16px',
+              backgroundColor: '#F6FBF7',
+              border: '1px solid #DAF1DE',
               fontSize: '12px',
-              color: '#475569',
             }}
           >
-            <CheckCircle2 size={16} color="#64748B" />
-            <span>
-              Proof submissions and completion toggles are operated by the assigned scholar ({selectedTask.assigneeName}) and squad lead.
-            </span>
-          </div>
-        )}
-
-        {/* Proof of Work Card if submitted */}
-        {(selectedTask.proofUrl || selectedTask.proofNote) && (
-          <div className="app-card" style={{ backgroundColor: '#F0FDFA', border: '1px solid #99F6E4' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0F766E', marginBottom: '8px' }}>
-              <Paperclip size={20} strokeWidth={1.75} />
-              <h4 style={{ fontWeight: 700, fontSize: '14px' }}>Proof of Completion Attached</h4>
-            </div>
-            {selectedTask.proofNote && (
-              <p style={{ fontSize: '13px', color: '#334155', marginBottom: '8px' }}>
-                "{selectedTask.proofNote}"
-              </p>
-            )}
-            {selectedTask.proofUrl && (
-              <a
-                href={selectedTask.proofUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={{ fontSize: '12px', color: '#0F766E', fontWeight: 600, textDecoration: 'underline' }}
-              >
-                View Uploaded Artifact &rarr;
-              </a>
-            )}
-          </div>
-        )}
-
-        {/* Comments & Discussion */}
-        <div className="app-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-            <MessageSquare size={20} strokeWidth={1.75} color="#0F766E" />
-            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0F172A' }}>
-              Activity & Comments ({selectedTask.comments.length})
-            </h3>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
-            {selectedTask.comments.length === 0 ? (
-              <div style={{ fontSize: '13px', color: '#94A3B8', textAlign: 'center', padding: '12px 0' }}>
-                No comments yet. Start the conversation below.
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Avatar name={selectedTask.assigneeName} size={32} />
+              <div>
+                <span style={{ color: '#235347', display: 'block' }}>Assigned Scholar</span>
+                <span style={{ fontWeight: 700, color: '#051F20' }}>{selectedTask.assigneeName}</span>
               </div>
-            ) : (
-              selectedTask.comments.map((c) => (
+            </div>
+
+            <PillButton
+              variant={selectedTask.status === 'done' ? 'secondary' : 'primary'}
+              size="sm"
+              onClick={() =>
+                updateTaskStatus(selectedTask.id, selectedTask.status === 'done' ? 'in_progress' : 'done')
+              }
+            >
+              {selectedTask.status === 'done' ? 'Reopen' : 'Mark Done'}
+            </PillButton>
+          </div>
+
+          {/* Comments Thread */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '8px', borderTop: '1px solid #DAF1DE' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#051F20', margin: 0 }}>
+              Discussion ({(selectedTask.comments || []).length})
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {(selectedTask.comments || []).map((c) => (
                 <div
                   key={c.id}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '4px',
                     padding: '10px 12px',
-                    borderRadius: '10px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E8ECF2',
+                    borderRadius: '14px',
+                    backgroundColor: '#F6FBF7',
+                    border: '1px solid #DAF1DE',
+                    fontSize: '12px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ fontWeight: 700, color: '#0F766E' }}>{c.authorName}</span>
-                    <span style={{ color: '#94A3B8' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontWeight: 700, color: '#051F20' }}>{c.authorName}</span>
+                    <span style={{ color: '#235347' }}>
                       {new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <div style={{ fontSize: '13px', color: '#334155' }}>{c.text}</div>
+                  <p style={{ margin: 0, color: '#051F20' }}>{c.text}</p>
                 </div>
-              ))
-            )}
-          </div>
-
-          {/* Add Comment Input */}
-          <form onSubmit={handleCommentSubmit} style={{ display: 'flex', gap: '8px' }}>
-            <input
-              type="text"
-              className="input-field"
-              placeholder="Write a message or update..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary" style={{ padding: '0 16px' }}>
-              <Send size={16} />
-            </button>
-          </form>
-        </div>
-
-        {/* Proof of Work Modal */}
-        <Modal
-          isOpen={isProofModalOpen}
-          onClose={() => setIsProofModalOpen(false)}
-          title="Complete Task"
-          subtitle="Submit verification note or link for team lead approval"
-        >
-          <form onSubmit={handleProofSubmit}>
-            <div className="input-group">
-              <label className="input-label">Completion Note / Summary</label>
-              <textarea
-                className="input-field"
-                rows={3}
-                required
-                placeholder="Describe work completed (e.g. All banners printed, audio soundcheck passed...)"
-                value={proofNote}
-                onChange={(e) => setProofNote(e.target.value)}
-              />
+              ))}
             </div>
 
-            <div className="input-group">
-              <label className="input-label">Artifact or Photo URL (Optional)</label>
+            <form onSubmit={handleCommentSubmit} style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
               <input
-                type="url"
-                className="input-field"
-                placeholder="https://drive.google.com/... or image link"
-                value={proofUrl}
-                onChange={(e) => setProofUrl(e.target.value)}
+                type="text"
+                placeholder="Add a remark..."
+                style={{
+                  flex: 1,
+                  height: '38px',
+                  borderRadius: '16px',
+                  border: '1px solid #DAF1DE',
+                  padding: '0 12px',
+                  fontSize: '12px',
+                  outline: 'none',
+                }}
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
               />
-            </div>
-
-            <button type="submit" className="btn btn-primary btn-block">
-              Verify & Complete Task
-            </button>
-          </form>
-        </Modal>
+              <PillButton type="submit" variant="primary" size="sm" icon={<Send size={14} />}>
+                Post
+              </PillButton>
+            </form>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Club Tasks</h1>
-        </div>
-        {!isSuperAdmin && (currentUser.role === 'team_admin' || currentUser.role === 'admin') && (
-          <button className="btn btn-primary btn-sm" onClick={() => setIsCreateModalOpen(true)}>
-            <Plus size={16} /> Create Task
-          </button>
-        )}
-      </div>
-
-      {/* Institutional Audit Mode Notice for Super Admin */}
-      {isSuperAdmin && (
-        <AuditModeBanner
-          moduleName="Squad Task Deliverables"
-          operatedByRole="Department Leads & Assigned Scholars"
-          actionRestrictions="Task allocation and proof submissions are operated by Squad Leads and assignees. You have complete inspection access across all teams."
-        />
-      )}
-
-      {/* Status Filter Pills */}
-      <div className="pill-tabs">
-        <button
-          className={`pill-tab ${statusFilter === 'all' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('all')}
-        >
-          All ({tasks.length})
-        </button>
-        <button
-          className={`pill-tab ${statusFilter === 'in_progress' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('in_progress')}
-        >
-          In Progress
-        </button>
-        <button
-          className={`pill-tab ${statusFilter === 'todo' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('todo')}
-        >
-          To Do
-        </button>
-        <button
-          className={`pill-tab ${statusFilter === 'done' ? 'active' : ''}`}
-          onClick={() => setStatusFilter('done')}
-        >
-          Completed
-        </button>
-      </div>
-
-      {/* Team Filter Pills */}
-      <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
-        {['All', 'Management', 'Promotion', 'Documentation', 'Entertainment'].map((team) => (
-          <button
-            key={team}
-            onClick={() => setTeamFilter(team)}
+          <h1
             style={{
-              padding: '6px 12px',
-              borderRadius: '999px',
-              fontSize: '12px',
-              fontWeight: teamFilter === team ? 700 : 500,
-              backgroundColor: teamFilter === team ? '#0F766E' : '#F1F5F9',
-              color: teamFilter === team ? '#FFFFFF' : '#475569',
-              whiteSpace: 'nowrap',
-              transition: 'all 150ms ease',
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
             }}
           >
-            {team}
-          </button>
-        ))}
+            Task Deliverables
+          </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Squad duties & station checklists
+          </p>
+        </div>
+
+        <PillButton
+          variant="primary"
+          icon={<Plus size={16} />}
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          New task
+        </PillButton>
       </div>
 
+      {/* SegmentedTabs */}
+      <SegmentedTabs
+        tabs={tabs}
+        activeTab={statusFilter}
+        onChange={(k) => setStatusFilter(k as any)}
+      />
+
       {/* Tasks List */}
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {filteredTasks.length === 0 ? (
-          <div className="empty-state">
-            <AlertCircle size={48} strokeWidth={1.75} color="#94A3B8" style={{ marginBottom: '12px' }} />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#0F172A' }}>No tasks found</h3>
-            <p style={{ fontSize: '13px', color: '#64748B' }}>
-              No tasks currently match this status or team filter.
-            </p>
-          </div>
+          <EmptyState
+            mascot="clipboard"
+            title="No deliverables"
+            description="All tasks are completed or filtered"
+            actionLabel="New task"
+            onAction={() => setIsCreateModalOpen(true)}
+          />
         ) : (
           filteredTasks.map((task) => (
             <TaskCard
@@ -442,96 +277,119 @@ export const TasksListView: React.FC = () => {
         )}
       </div>
 
-      {/* Create Task Modal */}
-      <Modal
+      {/* New Task BottomSheet */}
+      <BottomSheet
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        title="Assign New Task"
-        subtitle="Delegate operational responsibilities to team members"
+        title="New Task"
+        subtitle="Create squad deliverable"
       >
-        <form onSubmit={handleCreateTask}>
-          <div className="input-group">
-            <label className="input-label">Task Title</label>
+        <form onSubmit={handleCreateTask} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Title
+            </label>
             <input
               type="text"
               required
-              className="input-field"
-              placeholder="e.g. Design 6 Exhibition Floor Posters"
+              placeholder="e.g. Set up drone battery charging station"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            <div className="input-group">
-              <label className="input-label">Team</label>
-              <select
-                className="input-field"
-                value={newTeam}
-                onChange={(e) => setNewTeam(e.target.value)}
-              >
-                <option value="Management">Management</option>
-                <option value="Promotion">Promotion</option>
-                <option value="Documentation">Documentation</option>
-                <option value="Entertainment">Entertainment</option>
-              </select>
-            </div>
-
-            <div className="input-group">
-              <label className="input-label">Priority</label>
-              <select
-                className="input-field"
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value as TaskPriority)}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Operational Squad
+            </label>
+            <select
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={newTeam}
+              onChange={(e) => setNewTeam(e.target.value)}
+            >
+              <option value="Management">Management</option>
+              <option value="Documentation">Documentation</option>
+              <option value="Promotion">Promotion</option>
+              <option value="Entertainment">Entertainment</option>
+            </select>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Assignee</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Assignee
+            </label>
             <select
-              className="input-field"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={newAssigneeId}
               onChange={(e) => setNewAssigneeId(e.target.value)}
             >
               {users.map((u) => (
                 <option key={u.uid} value={u.uid}>
-                  {u.name} ({u.team || 'Member'})
+                  {u.name} ({u.department || 'Student'})
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Due Date</label>
-            <input
-              type="date"
-              className="input-field"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label className="input-label">Task Instructions / Scope</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Description
+            </label>
             <textarea
-              className="input-field"
               rows={3}
-              placeholder="Specific guidelines, required dimensions, or deliverables..."
+              placeholder="Task instructions..."
+              style={{
+                width: '100%',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+                resize: 'none',
+              }}
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: '8px' }}>
-            Assign Task
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Save
+          </PillButton>
         </form>
-      </Modal>
+      </BottomSheet>
     </div>
   );
 };
+
+export default TasksListView;

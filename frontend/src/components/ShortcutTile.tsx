@@ -27,30 +27,31 @@ export const ShortcutTile: React.FC<ShortcutTileProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center p-2 rounded-2xl bg-white border border-[#E2E8F0] shadow-[0_2px_8px_rgba(15,23,42,0.03)] cursor-pointer hover:border-[#235347] hover:scale-105 transition-all duration-150 ${className}`}
+      className={`relative flex flex-col items-center justify-center p-2.5 rounded-[20px] bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.06)] cursor-pointer hover:border-[#8EB69B] hover:scale-105 transition-all duration-150 ${className}`}
       style={{
-        minWidth: '72px',
+        minWidth: '76px',
         ...style,
       }}
     >
       {badge !== undefined && (
         <span
-          className="absolute -top-1 -right-1 flex items-center justify-center px-2 min-w-[20px] h-[20px] rounded-full text-[11px] font-bold bg-[#EF4444] text-white shadow-sm"
+          className="absolute -top-1 -right-1 flex items-center justify-center px-2 min-w-[20px] h-[20px] rounded-full text-[11px] font-bold bg-[#D9534F] text-white shadow-sm"
         >
           {badge}
         </span>
       )}
 
-      {/* Icon Square (44px container, radius 12px) */}
+      {/* Circular Icon (40px container) */}
       <div
-        className="flex items-center justify-center mb-1"
+        className="flex items-center justify-center mb-1.5"
         style={{
-          width: '44px',
-          height: '44px',
-          borderRadius: '12px',
-          backgroundColor: iconBg,
-          border: `1px solid ${iconBorder}`,
-          color: iconColor,
+          width: '40px',
+          height: '40px',
+          borderRadius: '9999px',
+          backgroundColor: '#FFFFFF',
+          border: `1px solid #DAF1DE`,
+          color: '#163832',
+          boxShadow: '0 4px 12px rgba(5,31,32,0.06)',
         }}
       >
         {icon}
@@ -58,7 +59,7 @@ export const ShortcutTile: React.FC<ShortcutTileProps> = ({
 
       {/* Label (Caption 12px) */}
       <span
-        className="font-caption font-semibold text-slate-800 text-center line-clamp-1"
+        className="text-[12px] font-bold text-[#051F20] text-center line-clamp-1"
         style={{ fontFamily: 'var(--font-family)' }}
       >
         {label}

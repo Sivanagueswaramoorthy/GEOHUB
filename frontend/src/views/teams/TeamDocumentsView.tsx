@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
-import { FileText, Download, Upload, ArrowLeft, ExternalLink, Sparkles } from 'lucide-react';
+import { FileText, Download, ArrowLeft, Plus } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { Modal } from '../../components/common/Modal';
+import {
+  PillButton,
+  StatusChip,
+  BottomSheet,
+  EmptyState,
+  UploadCard,
+} from '../../components/shared';
 
 export const TeamDocumentsView: React.FC = () => {
-  const { currentUser, setActiveTab } = useApp();
+  const { setActiveTab } = useApp();
 
   const [documents, setDocuments] = useState([
     {
@@ -31,22 +37,6 @@ export const TeamDocumentsView: React.FC = () => {
       updatedAt: '3 days ago',
       author: 'Priya Sharma',
     },
-    {
-      id: 'doc_4',
-      title: 'QGIS Laboratory Tutorial Dataset Guide',
-      category: 'Academics',
-      size: '14.2 MB',
-      updatedAt: '2 weeks ago',
-      author: 'Maya Patel',
-    },
-    {
-      id: 'doc_5',
-      title: 'Stage Audio & Emcee Script Run of Show',
-      category: 'Entertainment',
-      size: '1.5 MB',
-      updatedAt: 'Yesterday',
-      author: 'Ananya Rao',
-    },
   ]);
 
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -55,14 +45,15 @@ export const TeamDocumentsView: React.FC = () => {
 
   const handleUpload = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!docTitle.trim()) return;
     setDocuments((prev) => [
       {
         id: `doc_${Date.now()}`,
-        title: docTitle,
+        title: docTitle.trim(),
         category: docCategory,
-        size: '3.2 MB',
+        size: '2.4 MB',
         updatedAt: 'Just now',
-        author: currentUser.name,
+        author: 'Lead Appointee',
       },
       ...prev,
     ]);
@@ -71,104 +62,147 @@ export const TeamDocumentsView: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <button
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
+      <PillButton
+        variant="secondary"
+        size="sm"
+        icon={<ArrowLeft size={14} strokeWidth={2} />}
         onClick={() => setActiveTab('team_home')}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          fontSize: '13px',
-          fontWeight: 600,
-          color: '#0F766E',
-        }}
       >
-        <ArrowLeft size={16} /> Back to Team Home
-      </button>
+        Back
+      </PillButton>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A' }}>Team Documents</h1>
+          <h1
+            style={{
+              fontSize: '28px',
+              lineHeight: '32px',
+              fontWeight: 800,
+              color: '#051F20',
+              margin: 0,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Squad Documents
+          </h1>
+          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+            Official dossiers & directives
+          </p>
         </div>
 
-        <button className="btn btn-primary btn-sm" onClick={() => setIsUploadOpen(true)}>
-          <Upload size={16} /> Upload Doc
-        </button>
+        <PillButton
+          variant="primary"
+          icon={<Plus size={16} />}
+          onClick={() => setIsUploadOpen(true)}
+        >
+          Upload
+        </PillButton>
       </div>
 
+      {/* Documents List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className="app-card interactive"
             style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '16px 20px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '14px 16px',
+              gap: '12px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
               <div
                 style={{
                   width: '40px',
                   height: '40px',
-                  borderRadius: '10px',
-                  backgroundColor: '#F0FDFA',
-                  color: '#0F766E',
+                  borderRadius: '9999px',
+                  backgroundColor: '#DAF1DE',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  color: '#163832',
                   flexShrink: 0,
                 }}
               >
-                <FileText size={20} />
+                <FileText size={18} strokeWidth={2} />
               </div>
-              <div>
-                <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', lineHeight: 1.3 }}>
+              <div style={{ minWidth: 0 }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#051F20', margin: 0 }} className="truncate">
                   {doc.title}
                 </h4>
-                <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
-                  {doc.category} • {doc.size} • Uploaded by {doc.author} ({doc.updatedAt})
+                <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
+                  {doc.category} • {doc.size} • {doc.author}
                 </div>
               </div>
             </div>
 
-            <button
-              className="icon-button"
-              onClick={() => alert(`Downloading: ${doc.title}`)}
-              title="Download file"
+            <PillButton
+              variant="secondary"
+              size="sm"
+              icon={<Download size={14} />}
+              onClick={() => alert(`Downloading ${doc.title}`)}
             >
-              <Download size={20} strokeWidth={1.75} color="#0F766E" />
-            </button>
+              Get
+            </PillButton>
           </div>
         ))}
       </div>
 
-      {/* Upload Document Modal */}
-      <Modal
+      {/* Upload BottomSheet */}
+      <BottomSheet
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
         title="Upload Document"
-        subtitle="Add resource file to team repository"
+        subtitle="Attach official chapter file"
       >
-        <form onSubmit={handleUpload}>
-          <div className="input-group">
-            <label className="input-label">Document Title</label>
+        <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Document Title
+            </label>
             <input
               type="text"
               required
-              className="input-field"
-              placeholder="e.g. Field Geocaching Clue Sheets"
+              placeholder="e.g. Flight Zone Map Protocol"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={docTitle}
               onChange={(e) => setDocTitle(e.target.value)}
             />
           </div>
 
-          <div className="input-group">
-            <label className="input-label">Category</label>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Category
+            </label>
             <select
-              className="input-field"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                backgroundColor: '#FFFFFF',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
               value={docCategory}
               onChange={(e) => setDocCategory(e.target.value)}
             >
@@ -176,32 +210,26 @@ export const TeamDocumentsView: React.FC = () => {
               <option value="Compliance & Safety">Compliance & Safety</option>
               <option value="Corporate Outreach">Corporate Outreach</option>
               <option value="Academics">Academics</option>
-              <option value="Entertainment">Entertainment</option>
             </select>
           </div>
 
-          <div
-            style={{
-              padding: '24px',
-              border: '2px dashed #E8ECF2',
-              borderRadius: '12px',
-              textAlign: 'center',
-              marginBottom: '16px',
-              backgroundColor: '#F8FAFC',
-            }}
-          >
-            <Upload size={28} color="#94A3B8" style={{ margin: '0 auto 8px' }} />
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A' }}>
-              Select PDF, DOCX or ZIP
-            </div>
-            <div style={{ fontSize: '11px', color: '#64748B' }}>Up to 50MB file size</div>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              File Attachment
+            </label>
+            <UploadCard
+              label="Select document"
+              onFileSelected={() => {}}
+            />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block">
-            Upload to Repository
-          </button>
+          <PillButton type="submit" variant="primary" fullWidth>
+            Upload
+          </PillButton>
         </form>
-      </Modal>
+      </BottomSheet>
     </div>
   );
 };
+
+export default TeamDocumentsView;

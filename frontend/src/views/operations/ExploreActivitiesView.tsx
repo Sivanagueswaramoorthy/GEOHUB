@@ -25,7 +25,7 @@ export const ExploreActivitiesView: React.FC = () => {
       (currentUser.team === 'Promotion' ||
         Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
-  const isStudent = currentUser.role === 'member';
+  const isStudent = currentUser.role === 'student' || currentUser.role === 'member' || currentUser.role === 'volunteer';
 
   if (isPromotion) {
     return <PromotionOperationsView />;

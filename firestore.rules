@@ -7,100 +7,130 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isSuperAdmin() {
-      return isAuthenticated() && request.auth.token.role == 'super_admin';
+    function getRole() {
+      return request.auth.token.role;
     }
 
-    function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.role == 'admin' || isSuperAdmin());
+    function isFaculty() {
+      return isAuthenticated() && (getRole() == 'faculty' || getRole() == 'super_admin');
+    }
+
+    function isCoordinator() {
+      return isAuthenticated() && (getRole() == 'coordinator' || getRole() == 'admin' || isFaculty());
+    }
+
+    function isDocumentation() {
+      return isAuthenticated() && (getRole() == 'documentation' || isCoordinator());
+    }
+
+    function isTreasurer() {
+      return isAuthenticated() && (getRole() == 'treasurer' || isFaculty());
+    }
+
+    function isPromotion() {
+      return isAuthenticated() && (getRole() == 'promotion' || getRole() == 'social_media' || isCoordinator());
     }
 
     function isTeamAdmin(teamName) {
       return isAuthenticated() && 
-        (isAdmin() || (request.auth.token.role == 'team_admin' && request.auth.token.team == teamName));
+        (isCoordinator() || (request.auth.token.post == 'Team Admin' && request.auth.token.team == teamName));
     }
 
-    function isDocumentationTeam() {
-      return isAuthenticated() && 
-        (isAdmin() || request.auth.token.team == 'Documentation');
+    function isAssignedScanner(eventId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/events/$(eventId)) &&
+        request.auth.uid in get(/databases/$(database)/documents/events/$(eventId)).data.assignedScannerUserIds;
     }
 
     // Users collection
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isSuperAdmin() || 
+      // Protection: Users cannot change their own role, post, status, or team
+      allow update: if isFaculty() || 
         (request.auth.uid == userId && 
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status', 'isVolunteer', 'team']));
-      allow delete: if isSuperAdmin();
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'post', 'status', 'isVolunteer', 'team', 'tenureEnd']));
+      allow delete: if isFaculty();
     }
 
     // Teams collection
     match /teams/{teamId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isCoordinator();
     }
 
     // Join requests
     match /join_requests/{requestId} {
       allow read: if isAuthenticated() && 
-        (isAdmin() || 
+        (isCoordinator() || 
          request.auth.uid == resource.data.userId || 
          isTeamAdmin(resource.data.teamId));
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update: if isTeamAdmin(resource.data.teamId) || isAdmin();
-      allow delete: if isAdmin();
+      allow update: if isTeamAdmin(resource.data.teamId) || isCoordinator();
+      allow delete: if isCoordinator();
     }
 
     // Events collection
     match /events/{eventId} {
       allow read: if isAuthenticated();
-      allow create, update: if isAdmin();
-      allow delete: if isSuperAdmin();
+      // Coordinator can create/update drafts, faculty can approve/archive
+      allow create: if isCoordinator();
+      allow update: if isFaculty() || (
+        isCoordinator() && 
+        request.resource.data.status != 'approved' && 
+        request.resource.data.status != 'archived'
+      );
+      allow delete: if isFaculty();
     }
 
     // Event Registrations
     match /event_registrations/{registrationId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow update, delete: if isCoordinator() || (isAuthenticated() && resource.data.userId == request.auth.uid);
     }
 
     // Tasks collection
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
-      allow create: if isAdmin() || isTeamAdmin(request.resource.data.teamId);
-      allow update: if isAdmin() || 
+      allow create: if isCoordinator() || isTeamAdmin(request.resource.data.teamId);
+      allow update: if isCoordinator() || 
                     isTeamAdmin(resource.data.teamId) || 
                     (isAuthenticated() && resource.data.assignedUserIds.hasAny([request.auth.uid]));
-      allow delete: if isAdmin() || isTeamAdmin(resource.data.teamId);
+      allow delete: if isCoordinator() || isTeamAdmin(resource.data.teamId);
     }
 
-    // QR Sessions (writes handled through Cloud Functions)
+    // QR Sessions
     match /qr_sessions/{sessionId} {
       allow read: if isAuthenticated() && 
-        (resource.data.userId == request.auth.uid || isAdmin());
-      allow write: if isAuthenticated(); // Restrict further in production to Cloud Functions
+        (resource.data.userId == request.auth.uid || isCoordinator());
+      allow write: if isFaculty(); // Writes strictly gated to server functions
     }
 
-    // Attendance records (writes handled through Cloud Functions)
+    // Attendance records: Only assigned scanner or faculty can write
     match /attendance/{attendanceId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin();
+      allow write: if isFaculty() || isAssignedScanner(resource.data.eventId);
     }
 
     // Documents / Gallery metadata
     match /documents/{docId} {
       allow read: if isAuthenticated();
-      allow create, update: if isDocumentationTeam() || isAdmin();
-      allow delete: if isAdmin();
+      allow create, update: if isDocumentation() || isCoordinator();
+      allow delete: if isCoordinator();
+    }
+
+    // Audit logs: Faculty read-only
+    match /audit_logs/{logId} {
+      allow read: if isFaculty();
+      allow write: if false; // Cloud Functions only
     }
 
     // Notifications
-    match /notifications/{notifId} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && 
+        (resource.data.recipientUserId == request.auth.uid || resource.data.recipientUserId == 'all');
+      allow write: if isCoordinator() || isPromotion();
     }
   }
 }

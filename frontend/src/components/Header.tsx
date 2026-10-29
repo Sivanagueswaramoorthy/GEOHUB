@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Plus } from 'lucide-react';
-import { orgConfig } from '../config/org';
-import { QuickActionsSheet } from './QuickActionsSheet';
+import { Bell, QrCode, Smartphone, Monitor } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { COMPONENTS } from '../styles/tokens';
 
 export interface HeaderProps {
   onOpenNotifications?: () => void;
@@ -16,19 +13,21 @@ export const Header: React.FC<HeaderProps> = ({
   className = '',
   style,
 }) => {
-  const { notifications, setActiveTab, isPhoneFrame } = useApp();
-  const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const {
+    currentUser,
+    notifications,
+    setActiveTab,
+    isPhoneFrame,
+    setIsPhoneFrame,
+    setIsRoleSwitcherOpen,
+  } = useApp();
 
+  const [isScrolled, setIsScrolled] = useState(false);
   const unreadCount = notifications ? notifications.filter((n) => !n.isRead).length : 0;
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 8) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 8);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -42,138 +41,266 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handleQrClick = () => {
+    // If student/member, open dynamic chapter pass (my_qr); if coordinator/faculty or assigned scanner, open scan_qr
+    if (currentUser.role === 'student' || currentUser.role === 'member') {
+      setActiveTab('my_qr');
+    } else {
+      setActiveTab('scan_qr');
+    }
+  };
+
+  // Role switcher allows faculty or developers to preview as other roles
+  const canSwitchRole =
+    currentUser.role === 'faculty' ||
+    currentUser.role === 'super_admin' ||
+    Boolean(import.meta.env?.DEV);
+
+  const getRoleBadgeLabel = () => {
+    if (currentUser.post && currentUser.post.trim()) {
+      return currentUser.post.toUpperCase();
+    }
+    switch (currentUser.role) {
+      case 'faculty':
+      case 'super_admin':
+        return 'FACULTY ADVISOR';
+      case 'coordinator':
+      case 'admin':
+        return 'CLUB PRESIDENT';
+      case 'treasurer':
+        return 'TREASURER';
+      case 'documentation':
+        return 'DOCUMENTATION LEAD';
+      case 'promotion':
+      case 'social_media':
+        return 'PROMOTION LEAD';
+      case 'student':
+      case 'member':
+      default:
+        return currentUser.team ? `${currentUser.team.toUpperCase()} SQUAD` : 'STUDENT MEMBER';
+    }
+  };
+
+  const badgeLabel = getRoleBadgeLabel();
+
   return (
-    <>
-      <header
-        className={`sticky top-0 z-40 w-full transition-colors duration-200 ${className}`}
+    <header
+      role="banner"
+      className={`sticky top-0 z-40 w-full transition-colors duration-200 select-none ${className}`}
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderBottom: '1px solid #DAF1DE',
+        boxShadow: isScrolled ? '0 4px 16px rgba(5, 31, 32, 0.05)' : 'none',
+        height: '64px',
+        minHeight: '64px',
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        className="mx-auto h-full flex items-center justify-between"
         style={{
-          backgroundColor: '#FFFFFF',
-          borderBottom: isScrolled ? '1px solid #EEF1F5' : '1px solid transparent',
-          height: `${COMPONENTS.header.height}px`,
-          minHeight: `${COMPONENTS.header.height}px`,
+          maxWidth: isPhoneFrame ? '480px' : '1200px',
+          paddingLeft: 'var(--page-padding-x, 20px)',
+          paddingRight: 'var(--page-padding-x, 20px)',
           boxSizing: 'border-box',
-          ...style,
+          height: '100%',
         }}
       >
-        <div
-          className="mx-auto h-full flex items-center justify-between"
-          style={{
-            maxWidth: isPhoneFrame ? '480px' : '1200px',
-            paddingLeft: 'var(--page-padding-x, 20px)',
-            paddingRight: 'var(--page-padding-x, 20px)',
-            boxSizing: 'border-box',
-            height: '100%',
-          }}
-        >
-          {/* Two-tone Wordmark Left (flush to gutter) */}
-          <div
-            className="flex items-center select-none cursor-pointer"
+        {/* Left Brand Lockup: Clean Leaf Logo + Two-tone GEO•HUB + Role Credential Pill */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <button
+            type="button"
             onClick={() => setActiveTab('home')}
-            style={{ cursor: 'pointer' }}
+            className="flex items-center gap-2 cursor-pointer bg-transparent border-0 p-0 text-left focus:outline-none transition-transform active:scale-95"
+            aria-label="GeoHub Home"
           >
-            <span
-              className="font-extrabold tracking-tight"
-              style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: '18px',
-                lineHeight: '24px',
-                fontWeight: 800,
-                color: orgConfig.darkGreen,
-                letterSpacing: '-0.02em',
+            {/* Official Clean App Logo */}
+            <img
+              src="./app-logo-clean.png"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/app-logo-clean.png';
               }}
-            >
-              {orgConfig.wordmarkPart1}{' '}
-            </span>
-            <span
-              className="font-extrabold tracking-tight ml-1"
+              alt="GeoHub Logo"
               style={{
-                fontFamily: 'var(--font-family)',
-                fontSize: '18px',
-                lineHeight: '24px',
-                fontWeight: 800,
-                color: orgConfig.brandGreen,
-                letterSpacing: '-0.02em',
+                height: '34px',
+                width: 'auto',
+                maxHeight: '34px',
+                objectFit: 'contain',
+                display: 'block',
               }}
-            >
-              {orgConfig.wordmarkPart2}
-            </span>
-          </div>
+              draggable={false}
+            />
 
-          {/* Right Action Buttons (44px circles, 12px apart, right-aligned to gutter) */}
-          <div
-            className="flex items-center"
-            style={{
-              gap: `${COMPONENTS.header.buttonGap}px`,
-            }}
-          >
-            {/* Bell Button (44px circular white button) */}
+            {/* Brand Wordmark GEO • HUB */}
+            <div className="flex items-center">
+              <span
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: '18px',
+                  lineHeight: '24px',
+                  fontWeight: 800,
+                  color: '#051F20',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                GEO
+              </span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  backgroundColor: '#8EB69B',
+                  margin: '0 4px',
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'var(--font-family)',
+                  fontSize: '18px',
+                  lineHeight: '24px',
+                  fontWeight: 800,
+                  color: '#235347',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                HUB
+              </span>
+            </div>
+          </button>
+
+          {/* Role Credential Pill */}
+          {canSwitchRole ? (
             <button
               type="button"
-              onClick={handleBellClick}
-              className="relative flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95 rounded-full"
+              onClick={() => setIsRoleSwitcherOpen(true)}
+              className="inline-flex items-center justify-center rounded-full font-bold uppercase transition-all duration-150 cursor-pointer active:scale-95 shrink-0 focus:outline-none"
               style={{
-                width: `${COMPONENTS.header.buttonSize}px`,
-                height: `${COMPONENTS.header.buttonSize}px`,
-                minWidth: `${COMPONENTS.header.buttonSize}px`,
-                minHeight: `${COMPONENTS.header.buttonSize}px`,
-                borderRadius: '999px',
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #EEF1F5',
-                color: '#0F172A',
-                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
-                boxSizing: 'border-box',
-              }}
-              title="Notifications"
-              aria-label="Notifications"
-            >
-              <Bell size={24} strokeWidth={1.75} className="text-slate-700" />
-              {unreadCount > 0 && (
-                <span
-                  className="absolute"
-                  style={{
-                    top: '10px',
-                    right: '10px',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    backgroundColor: '#235347',
-                    border: '2px solid #FFFFFF',
-                  }}
-                />
-              )}
-            </button>
-
-            {/* Plus Button (44px mint circular action button) */}
-            <button
-              type="button"
-              onClick={() => setIsQuickActionsOpen(true)}
-              className="flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95 rounded-full"
-              style={{
-                width: `${COMPONENTS.header.buttonSize}px`,
-                height: `${COMPONENTS.header.buttonSize}px`,
-                minWidth: `${COMPONENTS.header.buttonSize}px`,
-                minHeight: `${COMPONENTS.header.buttonSize}px`,
-                borderRadius: '999px',
+                height: '28px',
+                padding: '0 12px',
                 backgroundColor: '#DAF1DE',
                 border: '1px solid #8EB69B',
-                color: '#163832',
-                boxShadow: '0 2px 8px rgba(35, 83, 71, 0.16)',
-                boxSizing: 'border-box',
+                color: '#051F20',
+                fontSize: '12px',
+                lineHeight: '16px',
+                letterSpacing: '0.04em',
               }}
-              title="Quick Actions"
-              aria-label="Quick Actions"
+              title={`Role: ${badgeLabel} (Click to preview another role)`}
+              aria-label={`Current Role: ${badgeLabel}. Click to preview another role.`}
             >
-              <Plus size={24} strokeWidth={1.75} />
+              <span className="truncate max-w-[120px] sm:max-w-none">{badgeLabel}</span>
             </button>
-          </div>
+          ) : (
+            <div
+              className="inline-flex items-center justify-center rounded-full font-bold uppercase shrink-0"
+              style={{
+                height: '28px',
+                padding: '0 12px',
+                backgroundColor: '#DAF1DE',
+                border: '1px solid #8EB69B',
+                color: '#051F20',
+                fontSize: '12px',
+                lineHeight: '16px',
+                letterSpacing: '0.04em',
+              }}
+              title={`Role: ${badgeLabel}`}
+            >
+              <span className="truncate max-w-[120px] sm:max-w-none">{badgeLabel}</span>
+            </div>
+          )}
         </div>
-      </header>
 
-      {/* Role-based Quick Actions Bottom Sheet */}
-      <QuickActionsSheet
-        isOpen={isQuickActionsOpen}
-        onClose={() => setIsQuickActionsOpen(false)}
-      />
-    </>
+        {/* Right Action Buttons (40px circular white buttons with soft shadow) */}
+        <div className="flex items-center gap-2.5">
+          {/* Frame-mode toggle button */}
+          <button
+            type="button"
+            onClick={() => setIsPhoneFrame(!isPhoneFrame)}
+            className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-95 cursor-pointer focus:outline-none"
+            style={{
+              width: '40px',
+              height: '40px',
+              minWidth: '40px',
+              minHeight: '40px',
+              borderRadius: '9999px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #DAF1DE',
+              color: '#235347',
+              boxShadow: '0 2px 8px rgba(5, 31, 32, 0.05)',
+            }}
+            title={isPhoneFrame ? 'Switch to Fullscreen' : 'Switch to Phone Frame'}
+            aria-label={isPhoneFrame ? 'Switch to Fullscreen' : 'Switch to Phone Frame'}
+          >
+            {isPhoneFrame ? (
+              <Monitor size={18} strokeWidth={2} style={{ color: '#235347' }} />
+            ) : (
+              <Smartphone size={18} strokeWidth={2} style={{ color: '#235347' }} />
+            )}
+          </button>
+
+          {/* QR Pass Quick Launcher */}
+          <button
+            type="button"
+            onClick={handleQrClick}
+            className="flex items-center justify-center rounded-full transition-all duration-150 active:scale-95 cursor-pointer focus:outline-none"
+            style={{
+              width: '40px',
+              height: '40px',
+              minWidth: '40px',
+              minHeight: '40px',
+              borderRadius: '9999px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #DAF1DE',
+              color: '#235347',
+              boxShadow: '0 2px 8px rgba(5, 31, 32, 0.05)',
+            }}
+            title="Open Chapter Pass / Scanner"
+            aria-label="Open Chapter Pass / Scanner"
+          >
+            <QrCode size={18} strokeWidth={2} style={{ color: '#235347' }} />
+          </button>
+
+          {/* Notifications Bell */}
+          <button
+            type="button"
+            onClick={handleBellClick}
+            className="relative flex items-center justify-center rounded-full transition-all duration-150 active:scale-95 cursor-pointer focus:outline-none"
+            style={{
+              width: '40px',
+              height: '40px',
+              minWidth: '40px',
+              minHeight: '40px',
+              borderRadius: '9999px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #DAF1DE',
+              color: '#235347',
+              boxShadow: '0 2px 8px rgba(5, 31, 32, 0.05)',
+            }}
+            title="Notifications"
+            aria-label="Notifications"
+          >
+            <Bell size={18} strokeWidth={2} style={{ color: '#235347' }} />
+            {unreadCount > 0 && (
+              <span
+                className="absolute"
+                style={{
+                  top: '8px',
+                  right: '8px',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: '#D9534F',
+                  border: '2px solid #FFFFFF',
+                }}
+              />
+            )}
+          </button>
+        </div>
+      </div>
+    </header>
   );
 };
+
+export default Header;

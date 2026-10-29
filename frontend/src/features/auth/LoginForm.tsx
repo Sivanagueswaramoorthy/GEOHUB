@@ -129,7 +129,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     >
       {/* Quick Roll No Fill Chips */}
       <div className="login-quick-roles" style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
-        <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
           Roll Nos:
         </span>
         {[
@@ -155,7 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
               flexShrink: 0,
               padding: '4px 10px',
               borderRadius: '9999px',
-              fontSize: '11px',
+              fontSize: '12px',
               fontWeight: 600,
               backgroundColor: '#DAF1DE',
               color: '#163832',
@@ -168,7 +168,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             }}
           >
             <strong style={{ fontWeight: 800 }}>{item.roll}</strong>
-            <span style={{ opacity: 0.8, fontSize: '10px' }}>({item.label})</span>
+            <span style={{ opacity: 0.8, fontSize: '12px' }}>({item.label})</span>
           </button>
         ))}
       </div>
@@ -223,7 +223,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       {/* Options Row: Keep me signed in & Forgot password link */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#475569', cursor: 'pointer', fontWeight: 500 }}>
+        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#235347', cursor: 'pointer', fontWeight: 500 }}>
           <input
             type="checkbox"
             checked={rememberMe}
@@ -247,18 +247,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       {/* Error Banner (Visible when sign-in fails) */}
       {errorState.message && (
         <div
-          className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2 animate-fade-in"
+          className="p-3 rounded-2xl flex items-start gap-2 select-none"
+          style={{
+            backgroundColor: 'rgba(217, 83, 79, 0.12)',
+            border: '1px solid rgba(217, 83, 79, 0.35)',
+            color: '#D9534F',
+            fontSize: '12px',
+          }}
           role="alert"
           aria-live="polite"
         >
-          <AlertCircle size={16} className="shrink-0 text-red-600 mt-0.5" />
+          <AlertCircle size={16} className="shrink-0 text-[#D9534F] mt-0.5" />
           <div className="flex-1">
             <p className="font-semibold">{errorState.message}</p>
             {errorState.retryable && (
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="inline-flex items-center gap-1 text-xs font-bold underline mt-1 text-red-800"
+                className="inline-flex items-center gap-1 font-bold underline mt-1 text-[#D9534F] cursor-pointer"
+                style={{ fontSize: '12px' }}
               >
                 <RefreshCw size={14} /> Retry connection
               </button>
