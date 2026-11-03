@@ -11,6 +11,13 @@ import {
   List,
   Table as TableIcon,
   Archive,
+  Upload,
+  Newspaper,
+  Plus,
+  Download,
+  Calendar,
+  Tag,
+  Clock,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { DocTemplate } from '../../types';
@@ -19,12 +26,52 @@ import {
   StatusChip,
   Mascot,
   SegmentedTabs,
+  BottomSheet,
 } from '../../components/shared';
 
 export const DocumentationStudioView: React.FC = () => {
-  const { docTemplates, events, attendance, users } = useApp();
+  const { docTemplates, events, attendance, users, dailyNews, addDailyNews, currentUser } = useApp();
 
-  const [activeTab, setActiveTab] = useState<'editor' | 'archives'>('editor');
+  const [activeTab, setActiveTab] = useState<'editor' | 'uploads' | 'news' | 'archives'>('editor');
+
+  // Event Upload State
+  const [selectedUploadEventId, setSelectedUploadEventId] = useState(events[0]?.id || '');
+  const [uploadDocTitle, setUploadDocTitle] = useState('');
+  const [uploadDocCategory, setUploadDocCategory] = useState<'report' | 'circular' | 'permission' | 'signed_sheet'>('report');
+  const [uploadFileName, setUploadFileName] = useState('');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const [uploadedDocs, setUploadedDocs] = useState([
+    {
+      id: 'doc_1',
+      eventId: events[0]?.id || 'event_01',
+      eventTitle: events[0]?.title || 'Campus Odyssey',
+      title: 'Dean Clearance & Campus Permission Letter',
+      category: 'permission',
+      fileName: 'Dean_Permission_Sanction.pdf',
+      fileSize: '1.2 MB',
+      uploadedBy: 'Elena Rostova',
+      uploadedAt: '2026-10-24 10:30 AM',
+    },
+    {
+      id: 'doc_2',
+      eventId: events[0]?.id || 'event_01',
+      eventTitle: events[0]?.title || 'Campus Odyssey',
+      title: 'Post-Event Retrospective & Documentation Report',
+      category: 'report',
+      fileName: 'Post_Event_Documentation_Report.pdf',
+      fileSize: '3.4 MB',
+      uploadedBy: 'Aarav Patel',
+      uploadedAt: '2026-10-25 04:15 PM',
+    },
+  ]);
+
+  // Daily News State
+  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
+  const [newsTitle, setNewsTitle] = useState('');
+  const [newsContent, setNewsContent] = useState('');
+  const [newsEventId, setNewsEventId] = useState(events[0]?.id || '');
+  const [newsTags, setNewsTags] = useState('#DailyEcoNews, #GeoHub');
 
   const standardTemplates: DocTemplate[] = [
     {
@@ -250,12 +297,270 @@ export const DocumentationStudioView: React.FC = () => {
 
       <SegmentedTabs
         tabs={[
-          { key: 'editor', label: 'Studio Editor' },
+          { key: 'editor', label: 'Templates' },
+          { key: 'uploads', label: 'Event Uploads' },
+          { key: 'news', label: 'Daily News' },
           { key: 'archives', label: 'Archives' },
         ]}
         activeTab={activeTab}
         onChange={(k) => setActiveTab(k as any)}
       />
+
+      {/* TAB 1: EVENT DOCUMENT UPLOADS */}
+      {activeTab === 'uploads' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Top Bar with Event Selector and Upload Button */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '18px 20px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div>
+                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                  Event Document Upload
+                </h3>
+                <p style={{ fontSize: '12px', color: '#235347', margin: '2px 0 0 0' }}>
+                  Upload formal circulars, reports & signed sheets for respective events
+                </p>
+              </div>
+
+              <PillButton
+                variant="primary"
+                icon={<Upload size={15} />}
+                onClick={() => setIsUploadModalOpen(true)}
+              >
+                Upload Document
+              </PillButton>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                Select Event:
+              </label>
+              <select
+                value={selectedUploadEventId}
+                onChange={(e) => setSelectedUploadEventId(e.target.value)}
+                style={{
+                  height: '42px',
+                  borderRadius: '12px',
+                  border: '1px solid #8EB69B',
+                  backgroundColor: '#F6FBF7',
+                  padding: '0 12px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#051F20',
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                {events.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} ({ev.venue} • {new Date(ev.startDate).toLocaleDateString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* List of Uploaded Documents for Selected Event */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+              Uploaded Deliverables ({uploadedDocs.filter((d) => d.eventId === selectedUploadEventId).length})
+            </h4>
+
+            {uploadedDocs.filter((d) => d.eventId === selectedUploadEventId).length === 0 ? (
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  border: '1px dashed #8EB69B',
+                  padding: '28px',
+                  textAlign: 'center',
+                  color: '#235347',
+                  fontSize: '13px',
+                }}
+              >
+                No documents uploaded for this event yet. Tap <strong>"Upload Document"</strong> to attach reports or permissions.
+              </div>
+            ) : (
+              uploadedDocs.filter((d) => d.eventId === selectedUploadEventId).map((doc) => (
+                <div
+                  key={doc.id}
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '20px',
+                    border: '1px solid #DAF1DE',
+                    padding: '16px 18px',
+                    boxShadow: '0 4px 16px rgba(5,31,32,0.04)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                    <div
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '12px',
+                        backgroundColor: '#DAF1DE',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#163832',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <FileText size={20} strokeWidth={2} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <span className="truncate" style={{ fontSize: '13px', fontWeight: 800, color: '#051F20' }}>
+                        {doc.title}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#235347', marginTop: '2px' }}>
+                        <span style={{ fontWeight: 700, color: '#163832' }}>{doc.fileName}</span>
+                        <span>•</span>
+                        <span>{doc.fileSize}</span>
+                        <span>•</span>
+                        <span>By {doc.uploadedBy}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => showToast(`✓ Opening file: ${doc.fileName}`)}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: '9999px',
+                      backgroundColor: '#F6FBF7',
+                      border: '1px solid #8EB69B',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: '#163832',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Download size={13} />
+                    <span>View</span>
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: DAILY NEWS (Daily Eco Bulletins) */}
+      {activeTab === 'news' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              padding: '18px 20px',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+            }}
+          >
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                Daily Eco Bulletins & News
+              </h3>
+              <p style={{ fontSize: '12px', color: '#235347', margin: '2px 0 0 0' }}>
+                Publish and broadcast environmental alerts and chapter news
+              </p>
+            </div>
+
+            <PillButton
+              variant="primary"
+              icon={<Plus size={15} />}
+              onClick={() => setIsNewsModalOpen(true)}
+            >
+              Publish News
+            </PillButton>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {dailyNews.map((news) => (
+              <div
+                key={news.id}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  border: '1px solid #DAF1DE',
+                  padding: '16px 20px',
+                  boxShadow: '0 4px 16px rgba(5,31,32,0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        backgroundColor: '#DAF1DE',
+                        color: '#163832',
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      Daily Bulletin
+                    </span>
+                    {news.eventTitle && (
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#235347' }}>
+                        Linked: {news.eventTitle}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#235347', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Clock size={12} />
+                    {news.date}
+                  </span>
+                </div>
+
+                <h4 style={{ fontSize: '14px', fontWeight: 800, color: '#051F20', margin: 0 }}>
+                  {news.title}
+                </h4>
+
+                <p style={{ fontSize: '13px', color: '#235347', margin: 0, lineHeight: 1.5 }}>
+                  {news.content}
+                </p>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '6px', borderTop: '1px solid #F6FBF7' }}>
+                  <span style={{ fontSize: '12px', color: '#8EB69B', fontWeight: 600 }}>
+                    {news.hashtags ? news.hashtags.join(' ') : '#DailyEcoNews'}
+                  </span>
+                  <span style={{ fontSize: '12px', color: '#163832', fontWeight: 600 }}>
+                    By {news.author}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {activeTab === 'archives' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -606,6 +911,255 @@ export const DocumentationStudioView: React.FC = () => {
           </div>
         </>
       )}
+
+      {/* Upload Event Document BottomSheet */}
+      <BottomSheet
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        title="Upload Event Document"
+        subtitle="Publish formal circulars, reports or permission letters"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!uploadDocTitle.trim()) {
+              showToast('Please enter document title');
+              return;
+            }
+            const targetEvent = events.find((ev) => ev.id === selectedUploadEventId) || events[0];
+            const newDoc = {
+              id: `doc_${Date.now()}`,
+              eventId: selectedUploadEventId,
+              eventTitle: targetEvent?.title || 'Chapter Activity',
+              title: uploadDocTitle.trim(),
+              category: uploadDocCategory,
+              fileName: uploadFileName.trim() || `${uploadDocTitle.trim().replace(/\s+/g, '_')}.pdf`,
+              fileSize: '2.1 MB',
+              uploadedBy: currentUser.name,
+              uploadedAt: new Date().toLocaleString(),
+            };
+            setUploadedDocs((prev) => [newDoc, ...prev]);
+            showToast(`✓ Document uploaded for "${targetEvent?.title || 'Event'}"`);
+            setIsUploadModalOpen(false);
+            setUploadDocTitle('');
+            setUploadFileName('');
+          }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Target Event</label>
+            <select
+              value={selectedUploadEventId}
+              onChange={(e) => setSelectedUploadEventId(e.target.value)}
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                backgroundColor: '#F6FBF7',
+                padding: '0 10px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#051F20',
+                outline: 'none',
+              }}
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>{ev.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Document Category</label>
+            <select
+              value={uploadDocCategory}
+              onChange={(e) => setUploadDocCategory(e.target.value as any)}
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                backgroundColor: '#F6FBF7',
+                padding: '0 10px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#051F20',
+                outline: 'none',
+              }}
+            >
+              <option value="report">Post-Event Summary Report</option>
+              <option value="permission">Dean / Authority Permission Letter</option>
+              <option value="circular">Formal Notice / Executive Circular</option>
+              <option value="signed_sheet">Signed Attendance Manifest</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Document Title</label>
+            <input
+              type="text"
+              value={uploadDocTitle}
+              onChange={(e) => setUploadDocTitle(e.target.value)}
+              placeholder="e.g. DGCA Airspace Clearance Sanction"
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '12px',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Attachment File Name</label>
+            <input
+              type="text"
+              value={uploadFileName}
+              onChange={(e) => setUploadFileName(e.target.value)}
+              placeholder="e.g. Clearance_Sanction_Signed.pdf"
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '12px',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', paddingTop: '8px' }}>
+            <PillButton variant="primary" fullWidth type="submit">
+              Confirm & Upload
+            </PillButton>
+            <PillButton variant="secondary" fullWidth onClick={() => setIsUploadModalOpen(false)}>
+              Cancel
+            </PillButton>
+          </div>
+        </form>
+      </BottomSheet>
+
+      {/* Publish Daily News BottomSheet */}
+      <BottomSheet
+        isOpen={isNewsModalOpen}
+        onClose={() => setIsNewsModalOpen(false)}
+        title="Publish Daily News"
+        subtitle="Broadcast campus environmental announcements"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!newsTitle.trim() || !newsContent.trim()) {
+              showToast('Please enter news title and content.');
+              return;
+            }
+            const targetEvent = events.find((ev) => ev.id === newsEventId);
+            addDailyNews({
+              title: newsTitle.trim(),
+              content: newsContent.trim(),
+              date: new Date().toISOString().split('T')[0],
+              status: 'published',
+              eventId: newsEventId || undefined,
+              eventTitle: targetEvent?.title,
+              author: currentUser.name,
+              hashtags: newsTags.split(',').map((t) => t.trim()).filter(Boolean),
+            });
+            showToast(`✓ Daily News bulletin published!`);
+            setIsNewsModalOpen(false);
+            setNewsTitle('');
+            setNewsContent('');
+          }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Associate with Event (Optional)</label>
+            <select
+              value={newsEventId}
+              onChange={(e) => setNewsEventId(e.target.value)}
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                backgroundColor: '#F6FBF7',
+                padding: '0 10px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: '#051F20',
+                outline: 'none',
+              }}
+            >
+              <option value="">General Club Bulletin (No specific event)</option>
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>{ev.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Bulletin Headline</label>
+            <input
+              type="text"
+              value={newsTitle}
+              onChange={(e) => setNewsTitle(e.target.value)}
+              placeholder="e.g. Zero-Waste Campus Drive Achieves 92% Diversion"
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '12px',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Bulletin Content</label>
+            <textarea
+              rows={4}
+              value={newsContent}
+              onChange={(e) => setNewsContent(e.target.value)}
+              placeholder="State the environmental update, circular details or event recap..."
+              style={{
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                padding: '10px 12px',
+                fontSize: '12px',
+                outline: 'none',
+                resize: 'vertical',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>Hashtags (comma separated)</label>
+            <input
+              type="text"
+              value={newsTags}
+              onChange={(e) => setNewsTags(e.target.value)}
+              placeholder="#DailyEcoNews, #GeoHub, #ZeroWaste"
+              style={{
+                height: '40px',
+                borderRadius: '12px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '12px',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', paddingTop: '8px' }}>
+            <PillButton variant="primary" fullWidth type="submit">
+              Broadcast Bulletin
+            </PillButton>
+            <PillButton variant="secondary" fullWidth onClick={() => setIsNewsModalOpen(false)}>
+              Cancel
+            </PillButton>
+          </div>
+        </form>
+      </BottomSheet>
     </div>
   );
 };

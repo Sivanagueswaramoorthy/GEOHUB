@@ -43,8 +43,8 @@ export const ModuleSection: React.FC<ModuleSectionProps> = ({
         )}
       </div>
 
-      {/* 2-column grid: single column below 340px */}
-      <div className="grid grid-cols-1 min-[340px]:grid-cols-2 gap-3 sm:gap-3.5">
+      {/* Responsive grid: 1 column on mobile, 2 columns on tablet/desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
         {children}
       </div>
     </section>

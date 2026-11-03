@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, Plus } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../../components/common/TaskCard';
+import { canAddSquadMember, canAssignSquadLead } from '../../core/permissions';
 import {
   Mascot,
   MascotName,
@@ -28,6 +29,8 @@ export const TeamsListView: React.FC = () => {
 
   const [isAssignLeadModalOpen, setIsAssignLeadModalOpen] = useState(false);
   const [newLeadId, setNewLeadId] = useState('');
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [newMemberId, setNewMemberId] = useState('');
   const [requestedSquads, setRequestedSquads] = useState<Record<string, boolean>>({});
 
   const isStudent =
@@ -41,6 +44,7 @@ export const TeamsListView: React.FC = () => {
     Management: 'clipboard',
     Documentation: 'notebook',
     Promotion: 'megaphone',
+    Treasury: 'trophy',
     Entertainment: 'trophy',
   };
 
@@ -48,6 +52,9 @@ export const TeamsListView: React.FC = () => {
   if (selectedTeam) {
     const teamMembers = users.filter(
       (u) => u.team?.toLowerCase() === selectedTeam.name.toLowerCase()
+    );
+    const nonTeamMembers = users.filter(
+      (u) => u.team?.toLowerCase() !== selectedTeam.name.toLowerCase()
     );
     const teamTasks = tasks.filter(
       (t) => t.team.toLowerCase() === selectedTeam.name.toLowerCase()
@@ -58,6 +65,9 @@ export const TeamsListView: React.FC = () => {
         ? Math.round((completedTasks.length / teamTasks.length) * 100)
         : 0;
 
+    const canChangeLead = canAssignSquadLead(currentUser);
+    const canEnroll = canAddSquadMember(currentUser, selectedTeam.name);
+
     const handleAssignLead = (e: React.FormEvent) => {
       e.preventDefault();
       if (!newLeadId) return;
@@ -66,6 +76,18 @@ export const TeamsListView: React.FC = () => {
         updateUserRoleAndTeam(targetUser.uid, 'team_admin', selectedTeam.name);
       }
       setIsAssignLeadModalOpen(false);
+      setNewLeadId('');
+    };
+
+    const handleEnrollMember = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!newMemberId) return;
+      const targetUser = users.find((u) => u.uid === newMemberId);
+      if (targetUser) {
+        updateUserRoleAndTeam(targetUser.uid, targetUser.role || 'student', selectedTeam.name);
+      }
+      setIsAddMemberModalOpen(false);
+      setNewMemberId('');
     };
 
     return (
@@ -138,15 +160,27 @@ export const TeamsListView: React.FC = () => {
               </div>
             </div>
 
-            {currentUser.role === 'coordinator' && (
-              <PillButton
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsAssignLeadModalOpen(true)}
-              >
-                Change Lead
-              </PillButton>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {canEnroll && (
+                <PillButton
+                  variant="primary"
+                  size="sm"
+                  icon={<Plus size={14} />}
+                  onClick={() => setIsAddMemberModalOpen(true)}
+                >
+                  Enroll Scholar
+                </PillButton>
+              )}
+              {canChangeLead && (
+                <PillButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsAssignLeadModalOpen(true)}
+                >
+                  Change Lead
+                </PillButton>
+              )}
+            </div>
           </div>
 
           {/* Progress bar */}
@@ -257,12 +291,55 @@ export const TeamsListView: React.FC = () => {
             </PillButton>
           </form>
         </BottomSheet>
+
+        {/* Enroll Member BottomSheet */}
+        <BottomSheet
+          isOpen={isAddMemberModalOpen}
+          onClose={() => setIsAddMemberModalOpen(false)}
+          title="Enroll Scholar into Squad"
+          subtitle={`Enrolling into ${selectedTeam.name} Operations Track`}
+        >
+          <form onSubmit={handleEnrollMember} style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '6px' }}>
+                Select Student / Scholar
+              </label>
+              <select
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  borderRadius: '16px',
+                  border: '1px solid #DAF1DE',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  backgroundColor: '#FFFFFF',
+                  color: '#051F20',
+                  outline: 'none',
+                }}
+                value={newMemberId}
+                onChange={(e) => setNewMemberId(e.target.value)}
+                required
+              >
+                <option value="">-- Select Eligible Student --</option>
+                {nonTeamMembers.map((m) => (
+                  <option key={m.uid} value={m.uid}>
+                    {m.name} ({m.department || 'General'} - Current: {m.team || 'No squad'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <PillButton type="submit" variant="primary" fullWidth>
+              Enroll into {selectedTeam.name}
+            </PillButton>
+          </form>
+        </BottomSheet>
       </div>
     );
   }
 
   // Ensure 4 standard squads exist for bento tiles
-  const standardSquads = ['Management', 'Documentation', 'Promotion', 'Entertainment'];
+  const standardSquads = ['Management', 'Promotion', 'Treasury', 'Documentation'];
   const squadTiles = standardSquads.map((name) => {
     const existing = teams.find((t) => t.name.toLowerCase() === name.toLowerCase());
     return (

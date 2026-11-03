@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   CheckSquare,
   HelpCircle,
+  ChevronRight,
   LucideIcon,
 } from 'lucide-react';
 import { AccessLevel } from '../../core/permissions';
@@ -96,38 +97,43 @@ export const HubCard: React.FC<HubCardProps> = ({
       onClick={!disabled ? onClick : undefined}
       onKeyDown={handleKeyDown}
       data-testid={`hub-card-${id}`}
-      className={`group relative flex flex-col justify-between p-3.5 sm:p-4 rounded-2xl bg-white border border-[#8EB69B]/30 hover:border-[#8EB69B] shadow-[0_4px_16px_rgba(5,31,32,0.04)] hover:shadow-[0_8px_24px_rgba(5,31,32,0.09)] transition-all duration-200 text-left min-h-[120px] select-none ${
-        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer active:scale-[0.98]'
+      className={`group relative flex items-start sm:items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-2xl sm:rounded-3xl bg-white border border-[#DAF1DE] hover:border-[#8EB69B] shadow-[0_4px_16px_rgba(5,31,32,0.04)] hover:shadow-[0_8px_24px_rgba(5,31,32,0.08)] hover:-translate-y-0.5 transition-all duration-200 text-left select-none ${
+        disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer active:scale-[0.99]'
       } ${className}`}
     >
-      {/* Top Header: Icon + Status Chips / Badges */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="w-10 h-10 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] shrink-0 group-hover:scale-105 transition-transform duration-200">
-          <IconComponent size={20} className="text-[#163832]" />
-        </div>
-
-        <div className="flex items-center gap-1.5 flex-wrap justify-end">
-          {pendingCount > 0 && (
-            <span
-              className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-[12px] font-bold bg-[#F2B84B] text-[#051F20] shadow-xs"
-              data-testid={`badge-pending-${id}`}
-              title={`${pendingCount} pending items`}
-            >
-              {pendingCount}
-            </span>
-          )}
-          <AccessChip variant={accessType} access={access} />
-        </div>
+      {/* Icon Container */}
+      <div className="w-10 h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#DAF1DE] to-[#F6FBF7] border border-[#8EB69B]/40 flex items-center justify-center text-[#163832] shrink-0 group-hover:scale-105 transition-transform duration-200 shadow-xs">
+        <IconComponent size={19} className="text-[#163832]" strokeWidth={2.2} />
       </div>
 
-      {/* Title & Description */}
-      <div className="mt-3">
-        <h3 className="font-heading font-bold text-[#051F20] text-[14px] leading-tight group-hover:text-[#163832] transition-colors">
-          {title}
-        </h3>
-        <p className="text-[12px] text-[#235347] leading-normal line-clamp-2 mt-1">
+      {/* Main Content (Title, Description) */}
+      <div className="flex-1 min-w-0 pr-0.5">
+        <div className="flex items-center justify-between gap-1.5 mb-1">
+          <h3 className="font-heading font-bold text-[#051F20] text-sm sm:text-base leading-snug group-hover:text-[#163832] transition-colors line-clamp-1">
+            {title}
+          </h3>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {pendingCount > 0 && (
+              <span
+                className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold bg-[#F2B84B] text-[#051F20] shadow-xs"
+                data-testid={`badge-pending-${id}`}
+                title={`${pendingCount} pending items`}
+              >
+                {pendingCount}
+              </span>
+            )}
+            <AccessChip variant={accessType} access={access} />
+          </div>
+        </div>
+
+        <p className="text-xs text-[#235347] leading-relaxed line-clamp-2">
           {description}
         </p>
+      </div>
+
+      {/* Interactive chevron affordance */}
+      <div className="hidden sm:flex items-center text-[#8EB69B] group-hover:text-[#163832] group-hover:translate-x-0.5 transition-all self-center shrink-0">
+        <ChevronRight size={16} />
       </div>
     </div>
   );

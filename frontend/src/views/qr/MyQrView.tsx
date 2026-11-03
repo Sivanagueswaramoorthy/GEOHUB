@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   ArrowLeft,
@@ -6,6 +6,10 @@ import {
   Calendar,
   QrCode,
   X,
+  CheckCircle2,
+  Clock,
+  Search,
+  KeyRound,
   ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -16,7 +20,17 @@ import {
 } from '../../components/shared';
 
 export const MyQrView: React.FC = () => {
-  const { currentUser, events, selectedEventId, setSelectedEventId, setActiveTab, showToast } = useApp();
+  const {
+    currentUser,
+    events,
+    users,
+    attendance,
+    selectedEventId,
+    setSelectedEventId,
+    markAttendanceWithOtp,
+    setActiveTab,
+    showToast,
+  } = useApp();
 
   const [chosenEventId, setChosenEventId] = useState<string>(() => {
     if (selectedEventId) return selectedEventId;
@@ -25,10 +39,16 @@ export const MyQrView: React.FC = () => {
     return events[0]?.id || 'event_01';
   });
 
+  const [otpInput, setOtpInput] = useState('');
+  const [exitOtpInput, setExitOtpInput] = useState('');
+  const [isSubmittingOtp, setIsSubmittingOtp] = useState(false);
+
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(20);
   const [tokenSeed, setTokenSeed] = useState(() => Date.now().toString(36));
   const [otp, setOtp] = useState<string>(() => Math.floor(100000 + Math.random() * 900000).toString());
+  const [attendanceTab, setAttendanceTab] = useState<'marked' | 'not_marked'>('marked');
+  const [rosterSearch, setRosterSearch] = useState<string>('');
 
   const chosenEvent =
     events.find((e) => e.id === chosenEventId) ||
@@ -87,16 +107,80 @@ export const MyQrView: React.FC = () => {
     if (setSelectedEventId) {
       setSelectedEventId(newId);
     }
+    setRosterSearch('');
     const target = events.find((e) => e.id === newId);
     showToast(`✓ Selected event: ${target?.title || 'Selected Event'}`);
   };
+
+  // Compute registered scholars and attendance for chosen event
+  const registeredScholars = useMemo(() => {
+    const regIds = new Set<string>(chosenEvent.registeredUserIds || []);
+
+    // Also include any user with an attendance record for this event
+    (attendance || [])
+      .filter((a) => a.eventId === chosenEvent.id)
+      .forEach((a) => regIds.add(a.userId));
+
+    // Fallback if event has no registered IDs yet in mock data
+    const finalIds =
+      regIds.size > 0
+        ? Array.from(regIds)
+        : (users || []).slice(1, 7).map((u) => u.uid);
+
+    return finalIds.map((uid) => {
+      const user = (users || []).find((u) => u.uid === uid);
+      const attRec = (attendance || []).find(
+        (a) => a.eventId === chosenEvent.id && a.userId === uid
+      );
+      const isMarked = Boolean(
+        attRec &&
+        (attRec.status === 'Completed' ||
+         attRec.status === 'Entered' ||
+         attRec.status === 'verified')
+      );
+
+      return {
+        uid,
+        name: user?.name || attRec?.userName || 'Scholar Attendee',
+        rollNo: user?.rollNo || '21GEO000',
+        department: user?.department || 'Geoinformatics',
+        team: user?.team || attRec?.team,
+        status: isMarked ? (attRec?.status || 'Completed') : 'Not marked',
+        isMarked,
+        checkInTime: attRec?.checkInTime || attRec?.entryTime,
+      };
+    });
+  }, [chosenEvent, users, attendance]);
+
+  const markedList = useMemo(
+    () => registeredScholars.filter((s) => s.isMarked),
+    [registeredScholars]
+  );
+
+  const unmarkedList = useMemo(
+    () => registeredScholars.filter((s) => !s.isMarked),
+    [registeredScholars]
+  );
+
+  const currentTabList = attendanceTab === 'marked' ? markedList : unmarkedList;
+
+  const filteredRoster = useMemo(() => {
+    if (!rosterSearch.trim()) return currentTabList;
+    const q = rosterSearch.toLowerCase();
+    return currentTabList.filter(
+      (s) =>
+        s.name.toLowerCase().includes(q) ||
+        s.rollNo.toLowerCase().includes(q) ||
+        s.department.toLowerCase().includes(q)
+    );
+  }, [currentTabList, rosterSearch]);
 
   const dynamicQrPayload = `GEO-PASS:${chosenEvent.id}:${currentUser.uid}:${tokenSeed}:${currentUser.rollNo || '21GEO001'}:${otp}`;
   const progressPercent = Math.round((secondsLeft / 20) * 100);
 
   return (
     <div
-      className="flex flex-col items-center gap-3.5 px-3 sm:px-4 py-3 select-none animate-fadeIn pb-32"
+      className="flex flex-col items-center gap-3.5 px-3 sm:px-4 py-3 select-none animate-fadeIn pb-36"
       style={{
         background: 'radial-gradient(circle at 50% 20%, rgba(218, 241, 222, 0.7) 0%, rgba(246, 251, 247, 0) 65%), #F6FBF7',
         minHeight: '100vh',
@@ -168,37 +252,269 @@ export const MyQrView: React.FC = () => {
         </button>
       </div>
 
-      {/* 4) Information & Scholar Verification Card (on main screen) */}
-      <div
-        className="w-full max-w-sm bg-white p-4 sm:p-5 flex flex-col items-center border border-[#DAF1DE] shadow-[0_8px_24px_rgba(5,31,32,0.05)] rounded-3xl"
-      >
-        <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center mb-3 shadow-xs">
-          <ShieldCheck size={26} strokeWidth={2} />
-        </div>
-
-        <h3 className="text-base font-bold text-[#051F20] text-center mb-1">
-          Attendance Pass Ready
-        </h3>
-        <p className="text-[12px] font-medium text-[#235347] text-center max-w-[280px] mb-4">
-          Tap <strong className="text-[#051F20]">Generate QR</strong> above to open your 20-second dynamic attendance code and 6-digit verification OTP.
-        </p>
-
-        {/* Active Selected Event Indicator */}
-        <div className="w-full p-2.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between text-[12px] mb-3">
-          <span className="text-[#235347] font-medium">Selected Event:</span>
-          <span className="font-bold text-[#051F20] truncate max-w-[180px] text-right">
-            {chosenEvent.title}
+      {/* 3.5) 6-Digit OTP Self-Validation Card (Internal: 1 OTP, External: 2 OTPs) */}
+      <div className="w-full max-w-sm bg-white p-4 rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <KeyRound size={16} strokeWidth={2} className="text-[#163832]" />
+            <span className="text-[13px] font-bold text-[#051F20]">Self-Verify via OTP</span>
+          </div>
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#DAF1DE] text-[#051F20]">
+            {chosenEvent.eventType === 'external' ? 'Dual OTP (External)' : '1 OTP (Internal)'}
           </span>
         </div>
 
+        {(() => {
+          const myAttendance = attendance.find(
+            (a) => a.eventId === chosenEvent.id && (a.userId === currentUser.uid || a.userEmail === currentUser.email)
+          );
+          const isFullyMarked = myAttendance?.status === 'Completed' || myAttendance?.status === 'verified';
+          const isPhase1Marked = myAttendance?.status === 'Entered';
+          const isExternalEvent = chosenEvent.eventType === 'external';
+
+          const handleVerifyOtp = (phase: 'entry' | 'exit' = 'entry') => {
+            const code = (phase === 'entry' ? otpInput : exitOtpInput).trim();
+            if (code.length < 6) {
+              showToast('Please enter a valid 6-digit OTP.', 'error');
+              return;
+            }
+            setIsSubmittingOtp(true);
+            const res = markAttendanceWithOtp({
+              eventId: chosenEvent.id,
+              studentId: currentUser.uid,
+              otp: code,
+              phase,
+            });
+            setIsSubmittingOtp(false);
+            if (res.valid) {
+              if (phase === 'entry') setOtpInput('');
+              if (phase === 'exit') setExitOtpInput('');
+              showToast(
+                phase === 'exit'
+                  ? '✓ External event verified! Attendance complete.'
+                  : isExternalEvent
+                  ? '✓ Phase 1 check-in verified! Enter Phase 2 at departure.'
+                  : '✓ Attendance confirmed! Check-in verified.'
+              );
+            } else {
+              showToast(res.error || 'Invalid or expired OTP', 'error');
+            }
+          };
+
+          if (isFullyMarked) {
+            return (
+              <div className="p-3 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B] flex items-center gap-2.5 text-[#051F20]">
+                <CheckCircle2 size={18} className="text-[#163832] shrink-0" />
+                <div className="flex flex-col text-xs">
+                  <span className="font-bold">Attendance Verified</span>
+                  <span className="text-[#235347]">You are marked present for this event.</span>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex flex-col gap-2.5">
+              <p className="text-[12px] text-[#235347] m-0">
+                {isExternalEvent
+                  ? 'External events require 2 OTPs (Assembly & Destination check-in).'
+                  : 'Enter the 6-digit gate OTP announced by Management to verify attendance.'}
+              </p>
+
+              {/* Phase 1 / Single OTP Input */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otpInput}
+                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                  disabled={isPhase1Marked}
+                  placeholder={isExternalEvent ? 'Phase 1: Entry OTP (6 digits)' : 'Gate OTP (6 digits)'}
+                  className="flex-1 h-10 px-3 rounded-xl border border-[#8EB69B] bg-[#F6FBF7] text-xs font-bold tracking-widest text-[#051F20] outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleVerifyOtp('entry')}
+                  disabled={isSubmittingOtp || otpInput.trim().length !== 6 || isPhase1Marked}
+                  className="h-10 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold disabled:opacity-40 hover:bg-[#0B2B26] transition-all cursor-pointer"
+                >
+                  {isPhase1Marked ? '✓ In' : 'Verify'}
+                </button>
+              </div>
+
+              {/* Phase 2 OTP Input for External Events */}
+              {isExternalEvent && (
+                <div className="flex items-center gap-2 pt-1 border-t border-[#DAF1DE]">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={exitOtpInput}
+                    onChange={(e) => setExitOtpInput(e.target.value.replace(/\D/g, ''))}
+                    disabled={!isPhase1Marked}
+                    placeholder="Phase 2: Exit OTP (6 digits)"
+                    className="flex-1 h-10 px-3 rounded-xl border border-[#8EB69B] bg-[#F6FBF7] text-xs font-bold tracking-widest text-[#051F20] outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleVerifyOtp('exit')}
+                    disabled={isSubmittingOtp || exitOtpInput.trim().length !== 6 || !isPhase1Marked}
+                    className="h-10 px-4 rounded-xl bg-[#235347] text-white text-xs font-bold disabled:opacity-40 hover:bg-[#163832] transition-all cursor-pointer"
+                  >
+                    Verify Phase 2
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* 4) Event Attendance Roster: Tab Bars for Marked & Not Marked */}
+      <div
+        className="w-full max-w-sm bg-white p-4 sm:p-5 flex flex-col border border-[#DAF1DE] shadow-[0_8px_24px_rgba(5,31,32,0.05)] rounded-3xl"
+      >
+        {/* Roster Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col min-w-0 pr-2">
+            <h3 className="text-base font-bold text-[#051F20] truncate">
+              Event Attendance
+            </h3>
+            <span className="text-xs font-medium text-[#235347] truncate">
+              {chosenEvent.title}
+            </span>
+          </div>
+
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#DAF1DE] text-[#051F20] shrink-0">
+            {registeredScholars.length} Registered
+          </span>
+        </div>
+
+        {/* Segmented Tab Bars */}
+        <div className="w-full grid grid-cols-2 p-1 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] gap-1 mb-3">
+          <button
+            type="button"
+            onClick={() => setAttendanceTab('marked')}
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 ${
+              attendanceTab === 'marked'
+                ? 'bg-[#163832] text-white shadow-xs'
+                : 'text-[#235347] hover:text-[#051F20]'
+            }`}
+            aria-label={`Marked Attendance (${markedList.length})`}
+          >
+            <CheckCircle2
+              size={15}
+              className={attendanceTab === 'marked' ? 'text-[#DAF1DE]' : 'text-[#8EB69B]'}
+            />
+            <span>Marked ({markedList.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAttendanceTab('not_marked')}
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 ${
+              attendanceTab === 'not_marked'
+                ? 'bg-[#163832] text-white shadow-xs'
+                : 'text-[#235347] hover:text-[#051F20]'
+            }`}
+            aria-label={`Not Marked Attendance (${unmarkedList.length})`}
+          >
+            <Clock
+              size={15}
+              className={attendanceTab === 'not_marked' ? 'text-[#DAF1DE]' : 'text-[#8EB69B]'}
+            />
+            <span>Not Marked ({unmarkedList.length})</span>
+          </button>
+        </div>
+
+        {/* Search within tab */}
+        {currentTabList.length > 4 && (
+          <div className="w-full relative mb-3">
+            <input
+              type="text"
+              value={rosterSearch}
+              onChange={(e) => setRosterSearch(e.target.value)}
+              placeholder="Search scholar by name or roll..."
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none focus:border-[#8EB69B]"
+            />
+            <Search size={14} className="absolute left-2.5 top-2.5 text-[#8EB69B]" />
+          </div>
+        )}
+
+        {/* Scholar List */}
+        <div
+          className="flex flex-col gap-2 overflow-y-auto no-scrollbar pr-0.5"
+          style={{ maxHeight: '260px' }}
+        >
+          {filteredRoster.length === 0 ? (
+            <div className="p-6 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-center flex flex-col items-center">
+              <span className="text-xs font-bold text-[#051F20] mb-0.5">
+                {attendanceTab === 'marked'
+                  ? 'No Check-ins Yet'
+                  : 'All Scholars Checked In'}
+              </span>
+              <span className="text-xs font-medium text-[#235347]">
+                {attendanceTab === 'marked'
+                  ? 'Registered scholars who scan will appear here.'
+                  : 'All registered scholars have marked attendance!'}
+              </span>
+            </div>
+          ) : (
+            filteredRoster.map((scholar) => (
+              <div
+                key={scholar.uid}
+                className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-2.5"
+              >
+                <div className="flex flex-col min-w-0 pr-1">
+                  <span className="text-sm font-bold text-[#051F20] truncate">
+                    {scholar.name}
+                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-[#235347] truncate">
+                    <span className="font-semibold text-[#163832]">
+                      {scholar.rollNo}
+                    </span>
+                    <span>•</span>
+                    <span className="truncate">{scholar.department}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end shrink-0 gap-0.5">
+                  {scholar.isMarked ? (
+                    <>
+                      <StatusChip
+                        status="done"
+                        label={scholar.status === 'Entered' ? 'Entered' : 'Marked'}
+                      />
+                      <span className="text-[12px] font-medium text-[#235347]">
+                        {scholar.checkInTime
+                          ? new Date(scholar.checkInTime).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : 'Checked in'}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <StatusChip status="pending" label="Not Marked" />
+                      <span className="text-[12px] font-medium text-[#235347]">
+                        Pending
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
         {/* Scholar Identification Strip */}
-        <div className="w-full pt-3 border-t border-[#DAF1DE] flex items-center justify-between text-[12px]">
+        <div className="w-full pt-3 mt-3 border-t border-[#DAF1DE] flex items-center justify-between text-[12px]">
           <div className="flex flex-col text-left">
             <span className="font-bold text-[#051F20] tracking-wide">
-              {currentUser.rollNo || '21GEO001'}
+              {currentUser.rollNo || 'FAC01'}
             </span>
             <span className="text-[12px] text-[#235347] font-medium">
-              {currentUser.department || 'Geoinformatics'}
+              {currentUser.department || 'Geography & Geomatics'}
             </span>
           </div>
 

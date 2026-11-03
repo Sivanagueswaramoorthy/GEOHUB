@@ -50,6 +50,15 @@ export const TreasurerView: React.FC = () => {
   const [expenseVendor, setExpenseVendor] = useState('');
   const [expenseDescription, setExpenseDescription] = useState('');
   const [expenseEventId, setExpenseEventId] = useState(events[0]?.id || '');
+  const [expenseBillProof, setExpenseBillProof] = useState('');
+
+  // Audit Statement Export State
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [auditScope, setAuditScope] = useState<'overall' | 'event'>('overall');
+  const [auditEventId, setAuditEventId] = useState(events[0]?.id || '');
+
+  // Bill Receipt Preview State
+  const [billPreviewExpense, setBillPreviewExpense] = useState<ExpenseItem | null>(null);
 
   // Add Stock State
   const [isAddStockOpen, setIsAddStockOpen] = useState(false);
@@ -93,12 +102,65 @@ export const TreasurerView: React.FC = () => {
       approvedBy: 'Faculty Governance',
       eventId: expenseEventId || undefined,
       eventTitle: targetEvent ? targetEvent.title : undefined,
-      receiptUrl: 'https://images.unsplash.com/photo-1554415707-9e4466bfe0c2?auto=format&fit=crop&w=600&q=80',
+      receiptUrl: expenseBillProof.trim() || 'https://images.unsplash.com/photo-1554415707-9e4466bfe0c2?auto=format&fit=crop&w=600&q=80',
     });
     setIsAddExpenseOpen(false);
     setExpenseAmount(0);
     setExpenseVendor('');
     setExpenseDescription('');
+    setExpenseBillProof('');
+  };
+
+  const handleExportAudit = () => {
+    const isEventScope = auditScope === 'event';
+    const targetEvent = events.find((ev) => ev.id === auditEventId);
+    const scopeExpenses = isEventScope
+      ? expenses.filter((e) => e.eventId === auditEventId)
+      : expenses;
+
+    const totalAllocated = isEventScope ? (targetEvent?.budget || 50000) : totalBudget;
+    const spentInScope = scopeExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const variance = totalAllocated - spentInScope;
+
+    const headers = ['Voucher ID', 'Event Name', 'Category', 'Vendor Name', 'Description', 'Amount (INR)', 'Date', 'Status', 'Bill Proof'];
+    const rows = scopeExpenses.map((e) => [
+      e.id,
+      `"${e.eventTitle || targetEvent?.title || 'General'}"`,
+      e.category,
+      `"${e.vendorName || 'N/A'}"`,
+      `"${e.title}"`,
+      e.amount,
+      e.buyingDate,
+      e.status,
+      `"${e.receiptUrl || 'Attached'}"`,
+    ]);
+
+    const auditHeaderLines = [
+      'GREEN ECO ORGANIZATION (GEO HUB) - FINANCIAL AUDIT STATEMENT',
+      `Audit Scope: ${isEventScope ? `Event: ${targetEvent?.title || 'Selected Event'}` : 'Overall Club Annual Ledger'}`,
+      `Generated At: ${new Date().toLocaleString()}`,
+      `Certified By: Chapter Treasurer & Faculty Governance`,
+      `Total Budget Allocated: INR ${totalAllocated.toLocaleString()}`,
+      `Total Expended: INR ${spentInScope.toLocaleString()}`,
+      `Net Available Balance / Variance: INR ${variance.toLocaleString()}`,
+      '',
+      headers.join(','),
+    ];
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [auditHeaderLines.join('\n'), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute(
+      'download',
+      `GeoHub_Financial_Audit_${isEventScope ? (targetEvent?.title?.replace(/\s+/g, '_') || 'Event') : 'Overall'}_${Date.now()}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setIsAuditModalOpen(false);
   };
 
   const handleCreateStock = (e: React.FormEvent) => {
@@ -180,6 +242,13 @@ export const TreasurerView: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
+          <PillButton
+            variant="secondary"
+            icon={<Download size={15} />}
+            onClick={() => setIsAuditModalOpen(true)}
+          >
+            Audit Export
+          </PillButton>
           {activeSubTab === 'stock' ? (
             <PillButton
               variant="primary"
@@ -707,6 +776,28 @@ export const TreasurerView: React.FC = () => {
 
           <div>
             <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+              Product Bill / Invoice Reference
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. INV-9021-Receipt.pdf or Image URL"
+              style={{
+                width: '100%',
+                height: '42px',
+                borderRadius: '16px',
+                border: '1px solid #DAF1DE',
+                padding: '0 12px',
+                fontSize: '13px',
+                boxSizing: 'border-box',
+                outline: 'none',
+              }}
+              value={expenseBillProof}
+              onChange={(e) => setExpenseBillProof(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
               Receipt Voucher
             </label>
             <UploadCard
@@ -779,6 +870,191 @@ export const TreasurerView: React.FC = () => {
             Save
           </PillButton>
         </form>
+      </BottomSheet>
+
+      {/* Financial Audit Export BottomSheet */}
+      <BottomSheet
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        title="Financial Audit Statement"
+        subtitle="Certified institutional export for college governance"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832', display: 'block', marginBottom: '6px' }}>
+              Select Audit Scope:
+            </label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setAuditScope('overall')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: auditScope === 'overall' ? '#163832' : '#F6FBF7',
+                  color: auditScope === 'overall' ? '#FFFFFF' : '#235347',
+                  border: auditScope === 'overall' ? '1px solid #163832' : '1px solid #DAF1DE',
+                  cursor: 'pointer',
+                }}
+              >
+                Overall Club Ledger
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuditScope('event')}
+                style={{
+                  flex: 1,
+                  padding: '10px 14px',
+                  borderRadius: '14px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  backgroundColor: auditScope === 'event' ? '#163832' : '#F6FBF7',
+                  color: auditScope === 'event' ? '#FFFFFF' : '#235347',
+                  border: auditScope === 'event' ? '1px solid #163832' : '1px solid #DAF1DE',
+                  cursor: 'pointer',
+                }}
+              >
+                Respective Event
+              </button>
+            </div>
+          </div>
+
+          {auditScope === 'event' && (
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#163832', display: 'block', marginBottom: '4px' }}>
+                Target Event:
+              </label>
+              <select
+                value={auditEventId}
+                onChange={(e) => setAuditEventId(e.target.value)}
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  borderRadius: '12px',
+                  border: '1px solid #8EB69B',
+                  backgroundColor: '#F6FBF7',
+                  padding: '0 10px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: '#051F20',
+                  outline: 'none',
+                }}
+              >
+                {events.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} (Allocated: ₹{(ev.budget || 50000).toLocaleString()})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Scope Financial Summary Card */}
+          {(() => {
+            const isEvent = auditScope === 'event';
+            const target = events.find((e) => e.id === auditEventId);
+            const inScope = isEvent ? expenses.filter((e) => e.eventId === auditEventId) : expenses;
+            const alloc = isEvent ? (target?.budget || 50000) : totalBudget;
+            const spent = inScope.reduce((sum, e) => sum + e.amount, 0);
+            const rem = alloc - spent;
+
+            return (
+              <div
+                style={{
+                  backgroundColor: '#F6FBF7',
+                  border: '1px solid #DAF1DE',
+                  borderRadius: '16px',
+                  padding: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: '#235347', fontWeight: 600 }}>Allocated Corpus:</span>
+                  <span style={{ fontWeight: 800, color: '#051F20' }}>₹{alloc.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: '#235347', fontWeight: 600 }}>Total Spent:</span>
+                  <span style={{ fontWeight: 800, color: '#163832' }}>₹{spent.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', paddingTop: '6px', borderTop: '1px solid #DAF1DE' }}>
+                  <span style={{ color: '#235347', fontWeight: 700 }}>Available Balance / Variance:</span>
+                  <span style={{ fontWeight: 800, color: rem >= 0 ? '#163832' : '#D9534F' }}>₹{rem.toLocaleString()}</span>
+                </div>
+                <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
+                  Includes {inScope.length} line-item vouchers certified for audit.
+                </div>
+              </div>
+            );
+          })()}
+
+          <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
+            <PillButton variant="primary" fullWidth icon={<Download size={15} />} onClick={handleExportAudit}>
+              Export Statement (CSV)
+            </PillButton>
+            <PillButton variant="secondary" fullWidth onClick={() => setIsAuditModalOpen(false)}>
+              Cancel
+            </PillButton>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* Bill Receipt Preview BottomSheet */}
+      <BottomSheet
+        isOpen={Boolean(billPreviewExpense)}
+        onClose={() => setBillPreviewExpense(null)}
+        title="Voucher Receipt Proof"
+        subtitle={billPreviewExpense ? `${billPreviewExpense.title} • ₹${billPreviewExpense.amount.toLocaleString()}` : ''}
+      >
+        {billPreviewExpense && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
+            <div
+              style={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '1px solid #DAF1DE',
+                backgroundColor: '#051F20',
+                maxHeight: '260px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img
+                src={billPreviewExpense.receiptUrl || 'https://images.unsplash.com/photo-1554415707-9e4466bfe0c2?auto=format&fit=crop&w=600&q=80'}
+                alt="Receipt proof"
+                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              />
+            </div>
+
+            <div style={{ backgroundColor: '#F6FBF7', border: '1px solid #DAF1DE', borderRadius: '16px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#235347' }}>Beneficiary / Vendor:</span>
+                <span style={{ fontWeight: 700, color: '#051F20' }}>{billPreviewExpense.vendorName || 'N/A'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#235347' }}>Category:</span>
+                <span style={{ fontWeight: 700, color: '#163832' }}>{billPreviewExpense.category}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#235347' }}>Transaction Date:</span>
+                <span style={{ fontWeight: 700, color: '#051F20' }}>{billPreviewExpense.buyingDate}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#235347' }}>Event Associated:</span>
+                <span style={{ fontWeight: 700, color: '#051F20' }}>{billPreviewExpense.eventTitle || 'General Corpus'}</span>
+              </div>
+            </div>
+
+            <PillButton variant="secondary" fullWidth onClick={() => setBillPreviewExpense(null)}>
+              Close Receipt
+            </PillButton>
+          </div>
+        )}
       </BottomSheet>
     </div>
   );

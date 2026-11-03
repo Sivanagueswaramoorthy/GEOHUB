@@ -15,7 +15,7 @@ async function main() {
           rollNo: 'FAC01',
           name: 'Dr. Sarah Jenkins',
           role: 'faculty',
-          department: 'Geomatics & Earth Sciences',
+          department: 'Geography & Geomatics',
           status: 'active',
         },
         rememberMe: true,
@@ -28,28 +28,28 @@ async function main() {
   await page.goto('http://localhost:5173/#my_qr', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
-  // 1) Capture initial screen (before clicking Generate QR)
-  const initialPath = path.resolve(
+  // 1) Capture "Marked" tab
+  const markedShotPath = path.resolve(
     'C:/Users/SIVANAGU/.gemini/antigravity/brain/3778472a-b8ec-4cc3-9751-dfd44b3dc741',
-    'attendance_qr_initial.png'
+    'attendance_tab_marked.png'
   );
-  await page.screenshot({ path: initialPath, fullPage: true });
-  console.log(`Saved initial screenshot to: ${initialPath}`);
+  await page.screenshot({ path: markedShotPath, fullPage: true });
+  console.log(`Saved marked tab screenshot to: ${markedShotPath}`);
 
-  // 2) Click Generate QR button to open popup
-  const genBtn = await page.$('button[data-testid="btn-generate-qr"]');
-  if (genBtn) {
-    await genBtn.click();
-    await page.waitForTimeout(600);
+  // 2) Click "Not Marked" tab
+  const notMarkedBtn = await page.$('button[aria-label*="Not Marked"]');
+  if (notMarkedBtn) {
+    await notMarkedBtn.click();
+    await page.waitForTimeout(400);
   }
 
-  // 3) Capture popup screen
-  const popupPath = path.resolve(
+  // 3) Capture "Not Marked" tab
+  const notMarkedShotPath = path.resolve(
     'C:/Users/SIVANAGU/.gemini/antigravity/brain/3778472a-b8ec-4cc3-9751-dfd44b3dc741',
-    'attendance_qr_popup.png'
+    'attendance_tab_not_marked.png'
   );
-  await page.screenshot({ path: popupPath, fullPage: true });
-  console.log(`Saved popup screenshot to: ${popupPath}`);
+  await page.screenshot({ path: notMarkedShotPath, fullPage: false });
+  console.log(`Saved not marked tab screenshot to: ${notMarkedShotPath}`);
 
   await context.close();
   await browser.close();

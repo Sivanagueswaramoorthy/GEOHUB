@@ -126,7 +126,7 @@ html, body {
   width: 100%;
   max-width: 100%;
   flex: 1 1 auto;
-  padding: 12px var(--page-padding-x, 20px) var(--page-padding-bottom, 112px) var(--page-padding-x, 20px);
+  padding: 10px var(--page-padding-x, 12px) var(--page-padding-bottom, 112px) var(--page-padding-x, 12px);
   box-sizing: border-box;
   overflow-x: hidden;
 }

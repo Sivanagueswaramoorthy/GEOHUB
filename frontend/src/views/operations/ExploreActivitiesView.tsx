@@ -8,6 +8,9 @@ import {
   moduleAccess,
   can,
   canRemoveMember,
+  canAddSquadMember,
+  canAssignSquadLead,
+  isEventEnded,
   canEditMember,
   canApproveBudgetRequest,
   normalizeHubRole,
@@ -93,11 +96,54 @@ const SECTION_ORDER: ModuleSectionId[] = [
 ];
 
 export const ExploreActivitiesView: React.FC = () => {
-  const { currentUser } = useApp();
+  const { currentUser, events } = useApp();
   const [selectedModule, setSelectedModule] = useState<ModuleId | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [isDutiesCollapsed, setIsDutiesCollapsed] = useState<boolean>(false);
+
+  // Dynamic duty status toggling
+  const [dutyStatuses, setDutyStatuses] = useState<Record<string, 'pending' | 'in_progress' | 'done'>>({});
+
+  const handleToggleDuty = (eventId: string, squad: string) => {
+    const key = `${eventId}-${squad}`;
+    setDutyStatuses((prev) => ({
+      ...prev,
+      [key]: prev[key] === 'done' ? 'in_progress' : 'done',
+    }));
+  };
+
+  // Derive duties assigned to the current active user across events
+  const myDuties = (events || []).flatMap((ev: any) => {
+    if (!ev.duties) return [];
+    const entries = Array.isArray(ev.duties)
+      ? ev.duties.map((d: any, idx: number) => [`duty-${idx}`, d])
+      : Object.entries(ev.duties);
+    return entries
+      .filter(([_, d]: any) => {
+        if (!d) return false;
+        return (
+          d.assignedTo === currentUser?.uid ||
+          (currentUser?.name && (d.assigneeName || d.assignedToName)?.toLowerCase() === currentUser?.name?.toLowerCase()) ||
+          (currentUser?.role === 'student' && (d.assignedTo === 'u_member_04' || d.assignedTo === 'u_07'))
+        );
+      })
+      .map(([squadKey, d]: any) => {
+        const key = `${ev.id}-${squadKey}`;
+        return {
+          eventId: ev.id,
+          eventTitle: ev.title,
+          eventStatus: ev.status,
+          endDate: ev.endDate,
+          squad: d.squad || squadKey,
+          task: d.task || d.workDescription,
+          status: dutyStatuses[key] || d.status || 'in_progress',
+          isEnded: isEventEnded(ev),
+        };
+      });
+  });
 
   // Live mock state for interactive module behaviors
   const [budgetRequests, setBudgetRequests] = useState<BudgetRequest[]>([
@@ -287,7 +333,7 @@ export const ExploreActivitiesView: React.FC = () => {
           </div>
         }
       >
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 pt-5 sm:pt-6 pb-32 animate-fadeIn select-none">
+        <div className="max-w-4xl mx-auto px-1 sm:px-2 pt-3 sm:pt-4 pb-36 sm:pb-40 animate-fadeIn select-none">
           {/* 1. Premium Top Navigation Bar */}
           <div className="flex items-center justify-between gap-3 mb-4">
             <button
@@ -2035,6 +2081,7 @@ const GenericModuleScreen: React.FC<{
         <div className="p-3.5 rounded-2xl bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] text-xs font-bold flex items-center gap-2">
           <CheckCircle2 size={16} />
           {performedAction}
+
         </div>
       )}
     </div>

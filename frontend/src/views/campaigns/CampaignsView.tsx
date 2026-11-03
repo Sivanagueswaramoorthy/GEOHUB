@@ -56,6 +56,32 @@ export const CampaignsView: React.FC = () => {
   const [newsContent, setNewsContent] = useState('');
   const [newsAudience, setNewsAudience] = useState<'all' | 'squad'>('all');
 
+  // Eco & Government Holiday Observance Days
+  const [observanceFilter, setObservanceFilter] = useState<'all' | 'eco' | 'holiday'>('all');
+
+  const OBSERVANCE_DAYS = [
+    { id: 'obs_1', title: 'National Youth Day', date: 'Jan 12', month: 'JAN', day: 12, type: 'holiday', description: 'Swami Vivekananda Jayanti inspiring youth environmental leadership.', hashtags: ['#NationalYouthDay', '#EcoYouth', '#GeoHub'] },
+    { id: 'obs_2', title: 'Republic Day', date: 'Jan 26', month: 'JAN', day: 26, type: 'holiday', description: 'National Gazetted Holiday celebrating sovereign ecological stewardship.', hashtags: ['#RepublicDay', '#GreenIndia'] },
+    { id: 'obs_3', title: 'World Wetlands Day', date: 'Feb 02', month: 'FEB', day: 2, type: 'eco', description: 'Wetlands conservation, lake cleanup and groundwater restoration.', hashtags: ['#WorldWetlandsDay', '#WetlandsAction'] },
+    { id: 'obs_4', title: 'National Science Day', date: 'Feb 28', month: 'FEB', day: 28, type: 'holiday', description: 'Commemorating Raman Effect; indigenous green technology innovations.', hashtags: ['#NationalScienceDay', '#EcoTech'] },
+    { id: 'obs_5', title: 'World Wildlife Day', date: 'Mar 03', month: 'MAR', day: 3, type: 'eco', description: 'Protecting endangered flora and fauna, botanical biodiversity.', hashtags: ['#WorldWildlifeDay', '#ProtectWild'] },
+    { id: 'obs_6', title: 'International Day of Forests', date: 'Mar 21', month: 'MAR', day: 21, type: 'eco', description: 'Campus afforestation, agroforestry and native tree planting.', hashtags: ['#ForestDay', '#PlantTrees'] },
+    { id: 'obs_7', title: 'World Water Day', date: 'Mar 22', month: 'MAR', day: 22, type: 'eco', description: 'Rainwater harvesting, zero water waste, aquifer recharge initiatives.', hashtags: ['#WorldWaterDay', '#SaveWater'] },
+    { id: 'obs_8', title: 'World Earth Day', date: 'Apr 22', month: 'APR', day: 22, type: 'eco', description: 'Global environmental protection, climate action and carbon reduction.', hashtags: ['#EarthDay', '#InvestInOurPlanet'] },
+    { id: 'obs_9', title: 'International Workers Day', date: 'May 01', month: 'MAY', day: 1, type: 'holiday', description: 'Honoring ground environmental workforce and field volunteers.', hashtags: ['#MayDay', '#EcoWarriors'] },
+    { id: 'obs_10', title: 'Biological Diversity Day', date: 'May 22', month: 'MAY', day: 22, type: 'eco', description: 'Ecosystem balance, microbial and botanical preservation.', hashtags: ['#BiodiversityDay', '#EcoHarmony'] },
+    { id: 'obs_11', title: 'World Environment Day', date: 'Jun 05', month: 'JUN', day: 5, type: 'eco', description: 'UN flagship environmental day: beat plastic pollution & restore land.', hashtags: ['#WorldEnvironmentDay', '#BeatPlasticPollution'] },
+    { id: 'obs_12', title: 'World Ocean Day', date: 'Jun 08', month: 'JUN', day: 8, type: 'eco', description: 'Coastal cleanups, marine ecology, river basin waste interception.', hashtags: ['#WorldOceanDay', '#CleanWaterways'] },
+    { id: 'obs_13', title: 'Independence Day', date: 'Aug 15', month: 'AUG', day: 15, type: 'holiday', description: 'National celebration accompanied by campus mega green drives.', hashtags: ['#IndependenceDay', '#CleanCampus'] },
+    { id: 'obs_14', title: 'International Ozone Day', date: 'Sep 16', month: 'SEP', day: 16, type: 'eco', description: 'Preserving the stratospheric ozone layer and energy efficient cooling.', hashtags: ['#OzoneDay', '#SaveOzone'] },
+    { id: 'obs_15', title: 'Mahatma Gandhi Jayanti', date: 'Oct 02', month: 'OCT', day: 2, type: 'holiday', description: 'Swachh Bharat Abhiyan nationwide clean-up and sanitation day.', hashtags: ['#GandhiJayanti', '#SwachhBharat'] },
+    { id: 'obs_16', title: 'National Wildlife Week', date: 'Oct 04', month: 'OCT', day: 4, type: 'eco', description: 'Wildlife symposium, ecological photography and sanctuary treks.', hashtags: ['#WildlifeWeek', '#WildIndia'] },
+    { id: 'obs_17', title: 'Constitution Day', date: 'Nov 26', month: 'NOV', day: 26, type: 'holiday', description: 'Fundamental duty Article 51A(g) to protect forests, lakes and rivers.', hashtags: ['#ConstitutionDay', '#Article51A'] },
+    { id: 'obs_18', title: 'Pollution Prevention Day', date: 'Dec 02', month: 'DEC', day: 2, type: 'eco', description: 'Air, water, hazardous waste mitigation and industrial safety.', hashtags: ['#PollutionControl', '#CleanAirNow'] },
+    { id: 'obs_19', title: 'World Soil Day', date: 'Dec 05', month: 'DEC', day: 5, type: 'eco', description: 'Organic soil composting, micro-nutrients and erosion control.', hashtags: ['#WorldSoilDay', '#SaveSoil'] },
+    { id: 'obs_20', title: 'Energy Conservation Day', date: 'Dec 14', month: 'DEC', day: 14, type: 'eco', description: 'Rooftop solar, smart energy meters and clean renewable power.', hashtags: ['#EnergyConservationDay', '#CleanEnergy'] },
+  ];
+
   const platforms: ('All' | SocialPlatform)[] = ['All', 'Instagram', 'LinkedIn', 'YouTube', 'WhatsApp'];
 
   const showToast = (msg: string) => {
@@ -381,82 +407,167 @@ export const CampaignsView: React.FC = () => {
         </div>
       )}
 
-      {/* SUB-TAB 2: CALENDAR (Month Strip with Colored Dots) */}
+      {/* SUB-TAB 2: CALENDAR (Eco Observance Days & Government Holidays) */}
       {activeSubTab === 'calendar' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Week / Month Strip with Colored Dots */}
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '16px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: '6px',
-            }}
-          >
-            {daysOfWeek.map((day, idx) => {
-              const isSelected = selectedDayIndex === idx;
-              return (
+          {/* Header & Filter Chips */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#051F20', margin: 0 }}>
+                  Chapter Calendar
+                </h3>
+                <p style={{ fontSize: '12px', color: '#235347', margin: '2px 0 0 0' }}>
+                  Government holidays & ecological observance days
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {(['all', 'eco', 'holiday'] as const).map((f) => (
                 <button
+                  key={f}
                   type="button"
-                  key={day}
-                  onClick={() => setSelectedDayIndex(idx)}
+                  onClick={() => setObservanceFilter(f)}
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    padding: '10px 4px',
-                    borderRadius: '16px',
-                    backgroundColor: isSelected ? '#163832' : '#F6FBF7',
-                    color: isSelected ? '#FFFFFF' : '#051F20',
-                    border: isSelected ? '1px solid #163832' : '1px solid #DAF1DE',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    fontSize: '12px',
+                    fontWeight: 700,
                     cursor: 'pointer',
-                    gap: '6px',
+                    transition: 'all 0.15s ease',
+                    backgroundColor: observanceFilter === f ? '#163832' : '#FFFFFF',
+                    color: observanceFilter === f ? '#FFFFFF' : '#235347',
+                    border: observanceFilter === f ? '1px solid #163832' : '1px solid #DAF1DE',
                   }}
                 >
-                  <span style={{ fontSize: '12px', fontWeight: 700 }}>{day}</span>
-                  <div
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '9999px',
-                      backgroundColor: isSelected ? '#DAF1DE' : '#8EB69B',
-                    }}
-                  />
+                  {f === 'all' ? 'All Days' : f === 'eco' ? 'Eco Related Days' : 'Government Holidays'}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {/* Queue for Selected Day */}
-          <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
-            Queue for {daysOfWeek[selectedDayIndex]}
-          </div>
-
+          {/* Observance Cards List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {posts.slice(0, 2).map((post) => (
+            {OBSERVANCE_DAYS.filter((obs) => (observanceFilter === 'all' ? true : obs.type === observanceFilter)).map((obs) => (
               <div
-                key={post.id}
+                key={obs.id}
                 style={{
                   backgroundColor: '#FFFFFF',
-                  borderRadius: '24px',
+                  borderRadius: '20px',
                   border: '1px solid #DAF1DE',
-                  padding: '16px',
-                  boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+                  padding: '14px 16px',
+                  boxShadow: '0 4px 16px rgba(5,31,32,0.04)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '12px',
                 }}
               >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: obs.type === 'eco' ? '#DAF1DE' : '#F6FBF7',
+                      border: '1px solid #8EB69B',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ fontSize: '14px', fontWeight: 900, color: '#051F20', lineHeight: 1 }}>
+                      {obs.day}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#235347', lineHeight: 1, marginTop: '2px' }}>
+                      {obs.month}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
+                        {obs.title}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                          backgroundColor: obs.type === 'eco' ? '#DAF1DE' : '#F6FBF7',
+                          color: '#163832',
+                          border: '1px solid #8EB69B',
+                        }}
+                      >
+                        {obs.type === 'eco' ? 'Eco Day' : 'Govt Holiday'}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#235347', margin: '2px 0 0 0', lineHeight: 1.4 }}>
+                      {obs.description}
+                    </p>
+                    <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
+                      {obs.hashtags.map((tag) => (
+                        <span key={tag} style={{ fontSize: '12px', color: '#8EB69B', fontWeight: 600 }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPostCaption(`Join us in observing ${obs.title}! ${obs.description}\n\n${obs.hashtags.join(' ')}`);
+                    setIsComposerOpen(true);
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    backgroundColor: '#163832',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  Draft Post
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Active Post Queue */}
+          <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', margin: 0 }}>
+              Scheduled Campaign Releases
+            </h4>
+
+            {posts.slice(0, 3).map((post) => (
+              <div
+                key={post.id}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '18px',
+                  border: '1px solid #DAF1DE',
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <div>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                    {post.platform} • {post.scheduledTime}
+                    {post.platform} • {post.scheduledDate} {post.scheduledTime}
                   </span>
-                  <p style={{ fontSize: '13px', color: '#051F20', margin: '4px 0 0 0' }}>
+                  <p style={{ fontSize: '12px', color: '#051F20', margin: '2px 0 0 0' }}>
                     {post.caption}
                   </p>
                 </div>

@@ -1460,8 +1460,8 @@ button,
 }
 
 .gutter-aligned {
-  padding-left: var(--page-padding-x, 20px);
-  padding-right: var(--page-padding-x, 20px);
+  padding-left: var(--page-padding-x, 12px);
+  padding-right: var(--page-padding-x, 12px);
 }
 
 /* Brand Palette Utility Classes */

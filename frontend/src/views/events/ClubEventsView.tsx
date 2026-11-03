@@ -553,6 +553,17 @@ export const ClubEventsView: React.FC = () => {
             >
               {isRegistered ? 'Registered (Click to Leave)' : isFull ? 'Capacity Full' : 'Register for Event'}
             </PillButton>
+            {isRegistered && (
+              <PillButton
+                variant="secondary"
+                onClick={() => {
+                  setSelectedEventId(activeEvent.id);
+                  setActiveTab('my_qr');
+                }}
+              >
+                Pass / OTP
+              </PillButton>
+            )}
           </div>
         )}
 

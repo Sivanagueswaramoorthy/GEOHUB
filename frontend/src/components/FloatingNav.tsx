@@ -223,7 +223,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
                 }}
               >
                 {tab.key === 'operations'
-                  ? 'Opt'
+                  ? 'Ops'
                   : tab.key === 'community'
                   ? 'Chat'
                   : tab.shortLabel || tab.label}

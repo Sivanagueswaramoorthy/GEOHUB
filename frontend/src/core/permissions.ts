@@ -85,8 +85,9 @@ export const normalizeRole = (role?: string | null): FinalRole => {
       return 'faculty';
     case 'admin':
     case 'coordinator':
-    case 'management':
       return 'coordinator';
+    case 'management':
+      return 'management';
     case 'documentation':
       return 'documentation';
     case 'treasurer':
@@ -217,16 +218,37 @@ export interface PermissionContext {
 }
 
 /**
+ * Checks whether an event has concluded.
+ * An event is ended if its status is 'completed', 'cancelled', or 'archived',
+ * or if current time is past its scheduled endDate.
+ */
+export const isEventEnded = (event?: EventModel | null): boolean => {
+  if (!event) return false;
+  if (event.status === 'completed' || event.status === 'cancelled' || event.status === 'archived') {
+    return true;
+  }
+  if (event.endDate) {
+    const end = new Date(event.endDate).getTime();
+    if (!isNaN(end) && Date.now() > end) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
  * Checks if a user is authorized to access a squad's operations.
  * - Faculty and Coordinator: full access to all squads.
- * - Squad Leads: full read/write on their own squad for ALL events. Other squads are hidden.
- * - Non-lead squad members: no squad operations by default.
- *   Can have read or write access if a lead granted it for a specific event (stored in event.squadGrants).
- *   A grant NEVER applies to another event.
+ * - Squad Leads: full read/write on their own squad for ALL events.
+ * - Non-lead squad members:
+ *   - Have READ access to their respective squad's Operations Hub.
+ *   - Gain temporal WRITE access for a specific event if a duty is assigned/enabled.
+ *   - Automatically reverts back to READ-ONLY mode once the event has ended.
  */
 export const canAccessSquadOperations = (
   user: {
     uid?: string;
+    name?: string;
     role?: UserRole | string;
     team?: string;
     teamRole?: string;
@@ -255,23 +277,89 @@ export const canAccessSquadOperations = (
         user.role === 'team_admin' ||
         (role as string) === targetSquad));
 
-  // Team leads have full read/write on their own squad for all events
+  // Team leads have full read/write on their own squad for ALL events
   if (isSquadLead) return true;
 
-  // Non-lead: check per-event grant (never applies to another event)
-  if (event && event.squadGrants && user.uid) {
-    const grant = event.squadGrants.find(
+  // Check if user belongs to this squad
+  const isSquadMember =
+    user.team?.toLowerCase().trim() === targetSquad ||
+    user.squadMemberships?.some((m) => m.squad.toLowerCase().trim() === targetSquad);
+
+  if (!isSquadMember) return false;
+
+  // Non-lead squad members: access strictly tied to duty assignment or per-event grant
+  if (event && user.uid) {
+    const hasDutyAssigned = Boolean(
+      event.duties &&
+      (Array.isArray(event.duties)
+        ? event.duties.some(
+            (d: any) =>
+              (d.assignedTo === user.uid || (user.name && d.assignedToName?.toLowerCase() === user.name.toLowerCase())) &&
+              (!d.squad || d.squad.toLowerCase().trim() === targetSquad)
+          )
+        : Object.entries(event.duties).some(
+            ([sq, d]: any) =>
+              sq.toLowerCase().trim() === targetSquad &&
+              (d.assignedTo === user.uid || (user.name && d.assigneeName?.toLowerCase() === user.name.toLowerCase()))
+          ))
+    );
+
+    const grant = event.squadGrants?.find(
       (g) => g.userId === user.uid && g.squad.toLowerCase().trim() === targetSquad
     );
-    if (grant) {
+
+    const hasEventAccess = hasDutyAssigned || Boolean(grant);
+
+    if (hasEventAccess) {
       if (requiredAccess === 'write') {
-        return grant.access === 'write';
+        // If event ended, write access automatically drops back to read-only mode!
+        if (isEventEnded(event)) {
+          return false;
+        }
+        return hasDutyAssigned || grant?.access === 'write';
       }
+      // Read access is retained for assigned members even post-event
       return true;
     }
   }
 
   return false;
+};
+
+/**
+ * Checks whether an actor can add or enroll members into a specific squad.
+ * Allowed for Faculty, Coordinator, or the respective Squad Lead.
+ */
+export const canAddSquadMember = (
+  actor: UserModel | null | undefined,
+  targetSquad: string
+): boolean => {
+  if (!actor) return false;
+  const role = normalizeRole(actor.role);
+  if (role === 'faculty' || role === 'coordinator') return true;
+
+  const sq = targetSquad.toLowerCase().trim();
+  const isLead =
+    actor.squadMemberships?.some(
+      (m) => m.squad.toLowerCase().trim() === sq && m.isLead
+    ) ||
+    (actor.team?.toLowerCase().trim() === sq &&
+      (actor.teamRole?.toLowerCase().includes('lead') ||
+        actor.post?.toLowerCase().includes('lead') ||
+        actor.role === 'team_admin' ||
+        (role as string) === sq));
+
+  return Boolean(isLead);
+};
+
+/**
+ * Checks whether an actor can assign or change Squad Leads.
+ * Strictly reserved for Faculty Advisor (SuperAdmin) and Club President (Coordinator).
+ */
+export const canAssignSquadLead = (actor: UserModel | null | undefined): boolean => {
+  if (!actor) return false;
+  const role = normalizeRole(actor.role);
+  return role === 'faculty' || role === 'coordinator';
 };
 
 /**
@@ -368,8 +456,8 @@ export const validateEventOtp = (params: {
 }): OtpValidationResult => {
   const { event, otp, phase = 'entry', currentAttendance, scannerUserId } = params;
 
-  // Scanner authority check
-  if (scannerUserId && !canScanForEvent(scannerUserId, event)) {
+  // Scanner authority check (if scanned by another volunteer/proctor)
+  if (scannerUserId && scannerUserId !== params.userId && !canScanForEvent(scannerUserId, event)) {
     return {
       valid: false,
       status: currentAttendance?.status || 'Not marked',
@@ -1150,9 +1238,21 @@ export const moduleAccess = (
         let currentSquadAccess: AccessLevel = 'read';
 
         if (eventId) {
-          const grant = getSquadGrant(user.uid, sq.squad, eventId, event);
-          if (grant && grant.access === 'write') {
-            return 'write';
+          if (!isEventEnded(event)) {
+            const hasDuty = Boolean(
+              event &&
+              event.duties &&
+              Array.isArray(event.duties) &&
+              event.duties.some(
+                (d: any) =>
+                  (d.assignedTo === user.uid || (user.name && d.assignedToName?.toLowerCase() === user.name.toLowerCase())) &&
+                  (!d.squad || d.squad.toLowerCase().trim() === sq.squad)
+              )
+            );
+            const grant = getSquadGrant(user.uid, sq.squad, eventId, event);
+            if (hasDuty || (grant && grant.access === 'write')) {
+              return 'write';
+            }
           }
         }
 
