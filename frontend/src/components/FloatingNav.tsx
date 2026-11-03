@@ -3,11 +3,13 @@ import {
   House,
   Calendar,
   Layers,
+  MessagesSquare,
+  Images,
+  Scan,
+  Wallet,
   UserCheck,
   FolderArchive,
-  Wallet,
   Megaphone,
-  Images,
   User,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -30,29 +32,37 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
     isPhoneFrame,
   } = useApp();
 
-  const tabs = getRoleNavTabs(currentUser.role, currentUser.post);
+  const tabs = getRoleNavTabs(currentUser.role, currentUser.post, currentUser.team);
+  const scannerTab = tabs.find(
+    (tab) => tab.key === 'scan_qr' || tab.key === 'qrscanner' || tab.iconName === 'scan'
+  );
+  const primaryTabs = tabs.filter((tab) => tab !== scannerTab).slice(0, 5);
 
   const getLucideIcon = (iconName: string, size = 20, color = 'currentColor') => {
     switch (iconName) {
       case 'house':
-        return <House size={size} strokeWidth={2} color={color} />;
+        return <House size={size} strokeWidth={1.75} color={color} className="lucide" />;
       case 'calendar':
-        return <Calendar size={size} strokeWidth={2} color={color} />;
+        return <Calendar size={size} strokeWidth={1.75} color={color} className="lucide" />;
       case 'layers':
-        return <Layers size={size} strokeWidth={2} color={color} />;
-      case 'user-check':
-        return <UserCheck size={size} strokeWidth={2} color={color} />;
-      case 'folder-archive':
-        return <FolderArchive size={size} strokeWidth={2} color={color} />;
-      case 'wallet':
-        return <Wallet size={size} strokeWidth={2} color={color} />;
-      case 'megaphone':
-        return <Megaphone size={size} strokeWidth={2} color={color} />;
+        return <Layers size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'messages-square':
+        return <MessagesSquare size={size} strokeWidth={1.75} color={color} className="lucide" />;
       case 'images':
-        return <Images size={size} strokeWidth={2} color={color} />;
+        return <Images size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'scan':
+        return <Scan size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'wallet':
+        return <Wallet size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'user-check':
+        return <UserCheck size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'folder-archive':
+        return <FolderArchive size={size} strokeWidth={1.75} color={color} className="lucide" />;
+      case 'megaphone':
+        return <Megaphone size={size} strokeWidth={1.75} color={color} className="lucide" />;
       case 'user':
       default:
-        return <User size={size} strokeWidth={2} color={color} />;
+        return <User size={size} strokeWidth={1.75} color={color} className="lucide" />;
     }
   };
 
@@ -72,20 +82,33 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       case 'operations':
         setActiveTab('operations');
         break;
+      case 'community':
+        setActiveTab('community');
+        break;
+      case 'gallery':
+        setActiveTab('gallery');
+        break;
+      case 'scan_qr':
+      case 'qrscanner':
+        setActiveTab('scan_qr');
+        break;
+      case 'ledger':
+        setActiveTab('ledger');
+        break;
       case 'members':
-        setActiveTab('members');
+        setActiveTab('operations');
         break;
       case 'archives':
         setActiveTab('gallery');
         break;
       case 'finance':
-        setActiveTab('treasurer');
+        setActiveTab('ledger');
         break;
       case 'campaigns':
-        setActiveTab('campaigns');
+        setActiveTab('operations');
         break;
       case 'memories':
-        setActiveTab('memories');
+        setActiveTab('gallery');
         break;
       case 'profile':
         setActiveTab('profile');
@@ -112,23 +135,23 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
         activeTab === 'reports' ||
         activeTab === 'approvals' ||
         activeTab === 'meetings' ||
-        activeTab === 'doc_studio'
+        activeTab === 'doc_studio' ||
+        activeTab === 'campaigns' ||
+        activeTab === 'members' ||
+        activeTab === 'add_students'
       );
     }
-    if (key === 'members') {
-      return activeTab === 'members' || activeTab === 'add_students';
+    if (key === 'community') {
+      return activeTab === 'community' || activeTab === 'forum';
     }
-    if (key === 'archives') {
-      return activeTab === 'gallery' || activeTab === 'doc_studio';
+    if (key === 'gallery') {
+      return activeTab === 'gallery' || activeTab === 'archives' || activeTab === 'memories';
     }
-    if (key === 'finance') {
-      return activeTab === 'treasurer' || activeTab === 'finance';
+    if (key === 'scan_qr' || key === 'qrscanner') {
+      return activeTab === 'scan_qr' || activeTab === 'my_qr';
     }
-    if (key === 'campaigns') {
-      return activeTab === 'campaigns' || activeTab === 'ai_social';
-    }
-    if (key === 'memories') {
-      return activeTab === 'memories';
+    if (key === 'ledger') {
+      return activeTab === 'ledger' || activeTab === 'treasurer' || activeTab === 'finance';
     }
     if (key === 'profile') {
       return activeTab === 'profile';
@@ -136,90 +159,142 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
     return activeTab === key;
   };
 
+  const isScannerActive = scannerTab ? isTabActive(scannerTab.key) : false;
+
   return (
     <nav
-      className={`fixed transition-all duration-200 select-none ${className}`}
+      className={`fixed select-none ${className}`}
       style={{
-        bottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
+        bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: 'calc(100% - 32px)',
-        maxWidth: isPhoneFrame ? '420px' : '520px',
-        height: '60px',
-        backgroundColor: '#FFFFFF',
-        borderRadius: '9999px',
-        border: '1px solid #DAF1DE',
-        boxShadow: '0 12px 36px rgba(5, 31, 32, 0.12)',
+        width: 'calc(100% - 24px)',
+        maxWidth: isPhoneFrame ? '430px' : '560px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 6px',
+        gap: '10px',
         boxSizing: 'border-box',
         zIndex: 40,
         ...style,
       }}
       aria-label="Floating Navigation"
     >
-      {tabs.slice(0, 5).map((tab) => {
-        const active = isTabActive(tab.key);
+      {/* Primary Floating Nav Bar Pill (White / Mint Container) */}
+      <div
+        className="flex-1 flex items-center justify-around min-w-0"
+        style={{
+          height: '58px',
+          minHeight: '58px',
+          maxHeight: '58px',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '9999px',
+          border: '1px solid #DAF1DE',
+          boxShadow: '0 12px 36px rgba(5, 31, 32, 0.12)',
+          padding: '0 6px',
+          boxSizing: 'border-box',
+        }}
+      >
+        {primaryTabs.map((tab) => {
+          const active = isTabActive(tab.key);
 
-        return (
-          <div
-            key={tab.key}
-            className="flex-1 flex items-center justify-center h-full"
-          >
-            {active ? (
-              <button
-                type="button"
-                onClick={() => handleTabClick(tab.key)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full cursor-pointer transition-all duration-150 pressable"
+          return active ? (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleTabClick(tab.key)}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] transition-all duration-200"
+              style={{
+                backgroundColor: '#163832', // pine-800
+                color: '#FFFFFF',
+                boxShadow: '0 4px 14px rgba(22, 56, 50, 0.28)',
+                height: '42px',
+                boxSizing: 'border-box',
+              }}
+            >
+              <span className="shrink-0">{getLucideIcon(tab.iconName, 18, '#FFFFFF')}</span>
+              <span
                 style={{
-                  backgroundColor: '#163832', // pine-800
+                  fontSize: '12px',
+                  lineHeight: '16px',
+                  fontWeight: 700,
                   color: '#FFFFFF',
-                  boxShadow: '0 4px 14px rgba(22, 56, 50, 0.28)',
-                  height: '42px',
-                  boxSizing: 'border-box',
+                  whiteSpace: 'nowrap',
+                  fontFamily: 'var(--font-family)',
                 }}
               >
-                <span className="shrink-0">{getLucideIcon(tab.iconName, 18, '#FFFFFF')}</span>
+                {tab.key === 'operations'
+                  ? 'Opt'
+                  : tab.key === 'community'
+                  ? 'Chat'
+                  : tab.shortLabel || tab.label}
+              </span>
+            </button>
+          ) : (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleTabClick(tab.key)}
+              className="relative flex items-center justify-center rounded-full transition-colors cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B]"
+              style={{
+                width: '40px',
+                height: '40px',
+                minWidth: '40px',
+                minHeight: '40px',
+                color: '#235347', // pine-700
+                boxSizing: 'border-box',
+              }}
+              title={tab.label}
+              aria-label={tab.label}
+            >
+              {getLucideIcon(tab.iconName, 20, '#235347')}
+              {tab.hasUpdates && (
                 <span
-                  style={{
-                    fontSize: '12px',
-                    lineHeight: '16px',
-                    fontWeight: 700,
-                    color: '#FFFFFF',
-                    whiteSpace: 'nowrap',
-                    fontFamily: 'var(--font-family)',
-                  }}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleTabClick(tab.key)}
-                className="relative flex items-center justify-center p-2 rounded-full transition-colors cursor-pointer pressable"
-                style={{
-                  width: '44px',
-                  height: '44px',
-                  color: '#235347', // pine-700
-                  boxSizing: 'border-box',
-                }}
-                title={tab.label}
-                aria-label={tab.label}
-              >
-                {getLucideIcon(tab.iconName, 22, '#235347')}
-                {tab.hasUpdates && (
-                  <span
-                    className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832]"
-                  />
-                )}
-              </button>
-            )}
-          </div>
-        );
-      })}
+                  className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832]"
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Strictly Fixed Scanner Circle Button (Zero Resizing Across Navigation States) */}
+      {scannerTab && (
+        <button
+          type="button"
+          onClick={() => handleTabClick(scannerTab.key)}
+          className="relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2"
+          style={{
+            width: '56px',
+            height: '56px',
+            minWidth: '56px',
+            minHeight: '56px',
+            maxWidth: '56px',
+            maxHeight: '56px',
+            flexShrink: 0,
+            flexGrow: 0,
+            backgroundColor: isScannerActive ? '#051F20' : '#0B2B26', // Separate distinct background color
+            border: isScannerActive ? '2px solid #8EB69B' : '2px solid #235347',
+            boxShadow: isScannerActive
+              ? '0 8px 24px rgba(5, 31, 32, 0.32)'
+              : '0 6px 20px rgba(5, 31, 32, 0.18)',
+            color: '#FFFFFF',
+            boxSizing: 'border-box',
+          }}
+          title={scannerTab.label}
+          aria-label={scannerTab.label}
+          aria-current={isScannerActive ? 'page' : undefined}
+        >
+          <span className="shrink-0 flex items-center justify-center">
+            {getLucideIcon(scannerTab.iconName, 22, '#FFFFFF')}
+          </span>
+          {scannerTab.hasUpdates && (
+            <span
+              className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: '#D9534F', border: '1.5px solid #FFFFFF' }}
+            />
+          )}
+        </button>
+      )}
     </nav>
   );
 };

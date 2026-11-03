@@ -1,10 +1,31 @@
-import React from 'react';
-import { ArrowLeft, User, Search } from 'lucide-react';
-import { orgConfig, OrgLogoIcon } from '../../config/org';
+import React, { useState, useEffect } from 'react';
+import { Bell, ArrowLeft, ChevronDown } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+import { UserModel } from '../../types';
+import { IconCircleButton } from './IconCircleButton';
+import { ProfileSheet } from './ProfileSheet';
+import astafineWordmarkFull from '../../assets/astafine-wordmark-full.png';
 
 export interface TopBarProps {
+  orgName?: string;
+  orgSubtitle?: string;
+  unreadCount?: number;
+  user?: UserModel | {
+    uid?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    status?: string;
+    isVolunteer?: boolean;
+    avatarUrl?: string;
+  };
+  onProfile?: () => void;
+  onNotifications?: () => void;
+  // Aliases and backwards compatibility props
   title?: string;
   subtitle?: string;
+  onHome?: () => void;
+  showNotificationsInTopBar?: boolean;
   showBack?: boolean;
   onBack?: () => void;
   showProfile?: boolean;
@@ -16,83 +37,291 @@ export interface TopBarProps {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
+  orgName,
+  orgSubtitle,
+  unreadCount: propUnreadCount,
+  user: propUser,
+  onProfile,
+  onNotifications,
   title,
   subtitle,
+  onHome,
+  showNotificationsInTopBar = true,
   showBack = false,
   onBack,
   showProfile = true,
   onProfileClick,
-  showSearch = false,
-  onSearchClick,
   rightAction,
   className = '',
 }) => {
-  return (
-    <header
-      className={`sticky top-0 z-30 flex items-center justify-between px-5 py-3.5 backdrop-blur-md bg-[#F6FBF7]/90 border-b border-[#DAF1DE]/60 select-none transition-all ${className}`}
-      style={{ minHeight: '64px' }}
-    >
-      <div className="flex items-center gap-3 min-w-0">
-        {showBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#163832] shadow-[0_4px_12px_rgba(5,31,32,0.06)] border border-[#DAF1DE] pressable shrink-0 cursor-pointer"
-            aria-label="Go back"
-          >
-            <ArrowLeft size={18} strokeWidth={2.2} />
-          </button>
-        ) : (
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-[0_4px_12px_rgba(5,31,32,0.06)] border border-[#DAF1DE] p-1.5">
-              <OrgLogoIcon size={24} />
-            </div>
-            <span className="font-bold text-sm tracking-tight text-[#051F20]">
-              {(orgConfig as any).shortName || orgConfig.orgName || 'GEO'}
-            </span>
-          </div>
-        )}
+  const appContext = useApp();
+  const currentUser = propUser || appContext?.currentUser;
+  const notifications = appContext?.notifications || [];
+  const setActiveTab = appContext?.setActiveTab;
 
-        {title && (
-          <div className="flex flex-col min-w-0">
-            <h1 className="text-base font-bold text-[#051F20] truncate leading-tight">
-              {title}
-            </h1>
-            {subtitle && (
-              <span className="text-xs font-medium text-[#235347] truncate">
-                {subtitle}
-              </span>
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false);
+  const [prevUnread, setPrevUnread] = useState(0);
+  const [shouldShake, setShouldShake] = useState(false);
+
+  // Compute live unread count
+  const unreadCount =
+    propUnreadCount !== undefined
+      ? propUnreadCount
+      : notifications.filter((n) => !n.isRead).length;
+
+  // Bell shake trigger when a new notification arrives
+  useEffect(() => {
+    if (unreadCount > prevUnread && prevUnread !== 0) {
+      setShouldShake(true);
+      const timer = setTimeout(() => setShouldShake(false), 400);
+      return () => clearTimeout(timer);
+    }
+    setPrevUnread(unreadCount);
+  }, [unreadCount, prevUnread]);
+
+  // Scroll detection: transparent at rest; soft mint elevation when scrolled past 8px
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      setIsScrolled(scrollY > 8);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleHomeClick = () => {
+    if (onHome) {
+      onHome();
+    } else if (setActiveTab) {
+      setActiveTab('home');
+    }
+  };
+
+  const handleNotificationsClick = () => {
+    if (onNotifications) {
+      onNotifications();
+    } else if (setActiveTab) {
+      setActiveTab('notifications');
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (onProfile) {
+      onProfile();
+    } else if (onProfileClick) {
+      onProfileClick();
+    } else if (setActiveTab) {
+      setActiveTab('profile');
+      if (typeof window !== 'undefined') {
+        window.location.hash = 'profile';
+      }
+    } else {
+      setIsProfileSheetOpen(true);
+    }
+  };
+
+  const userInitial = currentUser?.name
+    ? currentUser.name.trim().charAt(0).toUpperCase()
+    : 'D';
+
+  const bellAriaLabel =
+    unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications';
+
+  const displayOrgName = orgName || title || 'Green Eco';
+  const displayOrgSubtitle = orgSubtitle || subtitle || 'Organization';
+  const isDefaultBrand =
+    displayOrgName === 'Green Eco' && displayOrgSubtitle === 'Organization';
+
+  // Astafine – Serif Typeface Family by Rishsketch (Luxury display serif with ligatures)
+  const astafineSerifFamily =
+    "'Astafine', 'Bodoni Moda', 'Playfair Display', 'Cinzel', Didot, 'Bodoni MT', Georgia, serif";
+
+  return (
+    <>
+      {/* Flush edge-to-edge TopBar: NO curved corners, NO top gap, transparent background */}
+      <header
+        className={`sticky top-0 z-30 w-full select-none ${className}`}
+        style={{
+          height: 'calc(64px + env(safe-area-inset-top, 0px))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 0,
+          marginTop: 0,
+          borderRadius: 0,
+          backgroundColor: isScrolled ? '#F6FBF7' : 'transparent',
+          borderBottom: isScrolled ? '1px solid #DAF1DE' : '1px solid transparent',
+          boxShadow: isScrolled ? '0 4px 16px rgba(5, 31, 32, 0.05)' : 'none',
+          transition: 'background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease',
+        }}
+      >
+        <div
+          className="mx-auto h-full flex items-center justify-between"
+          style={{
+            maxWidth: '1280px',
+            paddingLeft: '16px',
+            paddingRight: '16px',
+            borderRadius: 0,
+          }}
+        >
+          {/* LEFT GROUP: Medallion Tile, Divider, Astafine Serif Typography Stack */}
+          <div className="flex items-center min-w-0 pr-2">
+            {showBack ? (
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-full text-[#051F20] active:scale-[0.97] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2 shrink-0 cursor-pointer border-0"
+                style={{ backgroundColor: 'rgba(22, 56, 50, 0.08)' }}
+                aria-label="Go back"
+              >
+                <ArrowLeft size={20} strokeWidth={2} className="lucide text-[#051F20]" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleHomeClick}
+                aria-label="GeoHub home"
+                className="flex items-center min-w-0 bg-transparent border-0 p-0 m-0 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2 rounded-xl transition-all duration-150 active:scale-[0.98]"
+                style={{
+                  height: '44px',
+                  minHeight: '44px',
+                }}
+              >
+                {/* Clean Editorial Wordmark: Authentic Astafine Luxury Serif */}
+                {isDefaultBrand ? (
+                  <div className="flex items-center min-w-0">
+                    <img
+                      src={astafineWordmarkFull}
+                      alt="Green Eco Organization"
+                      className="block object-contain object-left shrink"
+                      style={{
+                        height: '21px',
+                        maxHeight: '23px',
+                        width: 'auto',
+                        maxWidth: '100%',
+                      }}
+                    />
+                    {/* Accessible text for screen readers & testing queries */}
+                    <span className="sr-only">Green Eco</span>
+                    <span className="sr-only">Organization</span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline min-w-0" style={{ gap: '6px' }}>
+                    {/* Line 1: Custom Org Name in Astafine Luxury Serif */}
+                    <span
+                      className="geohub-bar-title font-extrabold text-[#051F20] truncate"
+                      style={{
+                        fontFamily: astafineSerifFamily,
+                        fontSize: '20px',
+                        lineHeight: '24px',
+                        fontWeight: 900,
+                        letterSpacing: '-0.025em',
+                        fontOpticalSizing: 'auto',
+                        fontFeatureSettings: "'dlig' 1, 'liga' 1, 'swsh' 1, 'calt' 1",
+                        textRendering: 'optimizeLegibility',
+                      }}
+                    >
+                      {displayOrgName}
+                    </span>
+
+                    {/* Line 2: Custom Org Subtitle in Astafine Luxury Serif */}
+                    {displayOrgSubtitle && (
+                      <span
+                        className="geohub-bar-subtitle font-bold text-[#235347] truncate"
+                        style={{
+                          fontFamily: astafineSerifFamily,
+                          fontSize: '12px',
+                          lineHeight: '14px',
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          textTransform: 'uppercase',
+                          fontOpticalSizing: 'auto',
+                          fontFeatureSettings: "'dlig' 1, 'liga' 1",
+                          textRendering: 'optimizeLegibility',
+                        }}
+                      >
+                        {displayOrgSubtitle}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </button>
             )}
           </div>
-        )}
-      </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-        {showSearch && (
-          <button
-            type="button"
-            onClick={onSearchClick}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#163832] shadow-[0_4px_12px_rgba(5,31,32,0.06)] border border-[#DAF1DE] pressable cursor-pointer"
-            aria-label="Search"
-          >
-            <Search size={18} strokeWidth={2} />
-          </button>
-        )}
+          {/* RIGHT GROUP: High-Contrast Bell, Avatar with Dropdown Arrow */}
+          <div className="flex items-center shrink-0" style={{ gap: '10px' }}>
+            {rightAction}
 
-        {rightAction}
+            {/* Notification Bell (High-contrast 3D raised white disc button) */}
+            {showNotificationsInTopBar && (
+              <IconCircleButton
+                ariaLabel={bellAriaLabel}
+                unreadCount={unreadCount}
+                shake={shouldShake}
+                onClick={handleNotificationsClick}
+                variant="bell"
+                size="sm"
+              >
+                <Bell
+                  size={18}
+                  strokeWidth={2}
+                  className="lucide text-[#051F20]"
+                />
+              </IconCircleButton>
+            )}
 
-        {showProfile && (
-          <button
-            type="button"
-            onClick={onProfileClick}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#163832] shadow-[0_4px_12px_rgba(5,31,32,0.06)] border border-[#DAF1DE] pressable cursor-pointer"
-            aria-label="Profile"
-          >
-            <User size={18} strokeWidth={2} />
-          </button>
-        )}
-      </div>
-    </header>
+            {/* Avatar Button with Dropdown Chevron (High-Contrast Pine 950 with Sage Ring) */}
+            {showProfile && (
+              <button
+                type="button"
+                onClick={handleProfileClick}
+                aria-label="Open profile menu"
+                className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2"
+                style={{ minHeight: '44px', minWidth: '44px' }}
+              >
+                {/* 38px Avatar Circle in Pine 950 with Sage Ring */}
+                <div
+                  className="flex items-center justify-center rounded-full shrink-0"
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    backgroundColor: '#051F20',
+                    border: '2px solid #8EB69B',
+                    boxShadow: '0 2px 8px rgba(5, 31, 32, 0.15)',
+                  }}
+                >
+                  <span
+                    className="font-extrabold select-none"
+                    style={{
+                      color: '#FFFFFF',
+                      fontSize: '16px',
+                      lineHeight: '18px',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {userInitial}
+                  </span>
+                </div>
+
+                {/* Dropdown Chevron */}
+                <ChevronDown
+                  size={14}
+                  strokeWidth={2.5}
+                  className="lucide text-[#235347] shrink-0"
+                />
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Profile BottomSheet */}
+      <ProfileSheet
+        isOpen={isProfileSheetOpen}
+        onClose={() => setIsProfileSheetOpen(false)}
+      />
+    </>
   );
 };
 

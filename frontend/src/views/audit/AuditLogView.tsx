@@ -11,7 +11,6 @@ import { useApp } from '../../context/AppContext';
 import { getRolePermissions } from '../../core/permissions';
 import { AuditLogItem } from '../../types';
 import {
-  Avatar,
   PillButton,
   StatusChip,
   EmptyState,
@@ -264,7 +263,7 @@ export const AuditLogView: React.FC = () => {
             type="text"
             style={{
               width: '100%',
-              height: '44px',
+              height: '48px',
               boxSizing: 'border-box',
               paddingLeft: '40px',
               paddingRight: '14px',
@@ -284,7 +283,7 @@ export const AuditLogView: React.FC = () => {
             size={18}
             strokeWidth={2}
             color="#8EB69B"
-            style={{ position: 'absolute', left: 14, top: 13 }}
+            style={{ position: 'absolute', left: 14, top: 15 }}
           />
         </div>
       </div>
@@ -317,13 +316,11 @@ export const AuditLogView: React.FC = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                    <Avatar name={log.actorName} size={40} />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#051F20' }}>
-                          {log.actorName}
-                        </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 800, color: '#051F20' }}>
+                        {log.actorName}
+                      </span>
                         <span
                           style={{
                             fontSize: '12px',
@@ -342,7 +339,6 @@ export const AuditLogView: React.FC = () => {
                         Target: {log.targetName || log.targetType}
                       </div>
                     </div>
-                  </div>
 
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ fontSize: '12px', color: '#235347', fontWeight: 600 }}>

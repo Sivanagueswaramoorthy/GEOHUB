@@ -2,6 +2,22 @@
 
 **GeoHub** is a comprehensive, production-grade club orchestration platform built for student organizations, club leads, volunteers, and faculty in-charges.
 
+> **Frontend (v1.3.1 UI Migration)**: React 19 + TypeScript + Vite PWA featuring the Pine & Mint design system, exact 5-tab floating pill bar per role, 12px font floor, 17 clay vector mascots, Lucide-only icons, and shared components.
+
+---
+
+## 🏛️ Frontend Role Navigation Matrix (Exact 5 Tabs per Role)
+
+| Role | Tab 1 | Tab 2 | Tab 3 | Tab 4 | Tab 5 | Cockpit Header |
+|---|---|---|---|---|---|---|
+| **Faculty Advisor** | Home | Events | Operations | Community | Gallery | "Faculty desk" |
+| **Club Coordinator / President** | Home | Events | Operations | Community | Gallery | "Plan something" |
+| **Treasurer** | Home | Events *(read-only)* | Ledger | Community | Gallery | "Finance" *(Reconciled)* |
+| **Promotion Squad Lead** | Home | Events *(read-only)* | Operations | Community | Gallery | "Promotion" |
+| **Documentation Squad Lead** | Home | Events *(read-only)* | Operations | Community | Gallery | Greeting & Quick Links |
+| **Management Squad Lead** | Home | Events | Operations | Community | Gallery | "Management Command" |
+| **Student Member** | Home | Events | Community | Gallery | Operations *(My Duties, Squads)* | "Good morning, {name}" |
+
 ---
 
 ## 🏛️ System Overview & Role Hierarchy

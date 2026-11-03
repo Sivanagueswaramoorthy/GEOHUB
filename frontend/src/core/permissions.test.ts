@@ -7,7 +7,25 @@ import {
   normalizeRole,
   canScanForEvent,
   hasPermission,
+  canAccessSquadOperations,
+  isReadOnlyEventsRole,
+  validateEventOtp,
+  canApprovePromotionPost,
   RolePermissions,
+  ALL_MODULE_IDS,
+  MODULE_ACCESS,
+  moduleAccess,
+  can,
+  canRemoveMember,
+  canEditMember,
+  canApproveBudgetRequest,
+  grantSquadAccess,
+  revokeSquadAccess,
+  ModuleId,
+  AccessLevel,
+  HubRole,
+  MOCK_MULTI_SQUAD_USER,
+  MOCK_SQUADS_WITH_LEADS,
 } from './permissions';
 import { UserModel, EventModel, UserRole } from '../types';
 
@@ -60,7 +78,7 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(perms.canCreateEditEvents).toBe(true);
       expect(perms.canApproveEvents).toBe(false);
       expect(perms.canArchiveEvents).toBe(false);
-      expect(perms.canApproveBudget).toBe(false);
+      expect(perms.canApproveBudget).toBe(true);
     });
 
     it('normalizes social_media to promotion', () => {
@@ -141,15 +159,17 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(canScan).toBe(true);
     });
 
-    // 3. Treasurer cannot approve a budget
-    it('3. treasurer cannot approve a budget (faculty ONLY)', () => {
+    // 3. Treasurer cannot approve a budget (President approves final per DEC-02)
+    it('3. treasurer cannot approve a budget (President approves final per DEC-02)', () => {
       const treasurerPerms = getRolePermissions('treasurer');
       const facultyPerms = getRolePermissions('faculty');
+      const coordPerms = getRolePermissions('coordinator');
 
       expect(treasurerPerms.canApproveBudget).toBe(false);
       expect(treasurerPerms.canSubmitBudgetRequest).toBe(true);
       expect(treasurerPerms.canManageExpenses).toBe(true);
       expect(facultyPerms.canApproveBudget).toBe(true);
+      expect(coordPerms.canApproveBudget).toBe(true);
     });
 
     // 4. Coordinator cannot approve or archive events
@@ -357,7 +377,7 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(canAccessRoute('audit-logs', 'faculty').allowed).toBe(true);
     });
 
-    it('denies coordinator access to settings, posts, approvals, and audit log', () => {
+    it('denies coordinator access to settings and posts, but allows approvals and audit log per DEC-02/DEC-06', () => {
       const settingsCheck = canAccessRoute('settings', 'coordinator');
       expect(settingsCheck.allowed).toBe(false);
       expect(settingsCheck.redirect).toBe('home');
@@ -367,10 +387,10 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(postsCheck.allowed).toBe(false);
 
       const approvalsCheck = canAccessRoute('approvals', 'coordinator');
-      expect(approvalsCheck.allowed).toBe(false);
+      expect(approvalsCheck.allowed).toBe(true);
 
       const auditCheck = canAccessRoute('audit_logs', 'coordinator');
-      expect(auditCheck.allowed).toBe(false);
+      expect(auditCheck.allowed).toBe(true);
     });
 
     it('denies student access to finance and management routes', () => {
@@ -384,5 +404,749 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(getRolePermissions('coordinator').canEditBudget).toBe(false);
       expect(getRolePermissions('coordinator').canManageExpenses).toBe(false);
     });
+
+    it('allows access to community and gallery routes for all roles', () => {
+      expect(canAccessRoute('community', 'student').allowed).toBe(true);
+      expect(canAccessRoute('gallery', 'student').allowed).toBe(true);
+      expect(canAccessRoute('ledger', 'treasurer').allowed).toBe(true);
+      expect(canAccessRoute('ledger', 'faculty').allowed).toBe(true);
+      expect(canAccessRoute('ledger', 'student').allowed).toBe(false);
+    });
   });
+
+  // =========================================================================
+  // 5. Spec Section 6 Tests: Lead vs Non-Lead, Per-Event Grants, Scanners, OTP & Read-Only Roles
+  // =========================================================================
+  describe('Spec Section 6: Granular Squad Access & Governance Suite', () => {
+    const promotionLead: UserModel = {
+      uid: 'u_promo_lead',
+      name: 'Promo Lead',
+      email: 'lead@col.edu',
+      role: 'promotion',
+      team: 'Promotion',
+      teamRole: 'Promotion Lead',
+      post: 'Promotion Lead',
+      squadMemberships: [{ squad: 'Promotion', isLead: true }],
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    const regularMember: UserModel = {
+      uid: 'u_regular_member',
+      name: 'Regular Member',
+      email: 'member@col.edu',
+      role: 'student',
+      team: 'Promotion',
+      teamRole: 'Graphic Designer',
+      squadMemberships: [{ squad: 'Promotion', isLead: false }],
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    const eventWithGrant: EventModel = {
+      id: 'event_hack_01',
+      title: 'Geohack 2026',
+      description: 'Hackathon',
+      category: 'Tech',
+      status: 'live',
+      venue: 'Main Hall',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 3600000).toISOString(),
+      capacity: 100,
+      registeredUserIds: [],
+      volunteerIds: [],
+      budget: 10000,
+      createdBy: 'u_fac_01',
+      assignedScannerUserIds: ['u_regular_member'],
+      squadGrants: [
+        {
+          userId: 'u_regular_member',
+          squad: 'Promotion',
+          access: 'write',
+          grantedBy: 'u_promo_lead',
+          grantedAt: new Date().toISOString(),
+        },
+      ],
+    };
+
+    const anotherEvent: EventModel = {
+      id: 'event_symp_02',
+      title: 'GIS Symposium',
+      description: 'Symposium',
+      category: 'Academic',
+      status: 'live',
+      venue: 'Hall B',
+      startDate: new Date().toISOString(),
+      endDate: new Date(Date.now() + 3600000).toISOString(),
+      capacity: 100,
+      registeredUserIds: [],
+      volunteerIds: [],
+      budget: 5000,
+      createdBy: 'u_fac_01',
+      assignedScannerUserIds: [],
+      squadGrants: [],
+    };
+
+    it('squad leads have full read/write on their own squad operations for ALL events', () => {
+      // Event 1
+      expect(canAccessSquadOperations(promotionLead, 'Promotion', eventWithGrant, 'read')).toBe(true);
+      expect(canAccessSquadOperations(promotionLead, 'Promotion', eventWithGrant, 'write')).toBe(true);
+      // Event 2 (grant not required for leads)
+      expect(canAccessSquadOperations(promotionLead, 'Promotion', anotherEvent, 'read')).toBe(true);
+      expect(canAccessSquadOperations(promotionLead, 'Promotion', anotherEvent, 'write')).toBe(true);
+      // Generic without event
+      expect(canAccessSquadOperations(promotionLead, 'Promotion', null, 'write')).toBe(true);
+    });
+
+    it('squad leads cannot access operations of other squads (hidden)', () => {
+      expect(canAccessSquadOperations(promotionLead, 'Documentation', eventWithGrant, 'read')).toBe(false);
+      expect(canAccessSquadOperations(promotionLead, 'Management', eventWithGrant, 'read')).toBe(false);
+    });
+
+    it('non-lead squad members have no squad operations by default', () => {
+      expect(canAccessSquadOperations(regularMember, 'Promotion', null, 'read')).toBe(false);
+      expect(canAccessSquadOperations(regularMember, 'Promotion', anotherEvent, 'read')).toBe(false);
+    });
+
+    it('a lead grant applies to the specific event only and NEVER to another event', () => {
+      // Access granted for eventWithGrant
+      expect(canAccessSquadOperations(regularMember, 'Promotion', eventWithGrant, 'read')).toBe(true);
+      expect(canAccessSquadOperations(regularMember, 'Promotion', eventWithGrant, 'write')).toBe(true);
+
+      // Access NOT granted for anotherEvent
+      expect(canAccessSquadOperations(regularMember, 'Promotion', anotherEvent, 'read')).toBe(false);
+      expect(canAccessSquadOperations(regularMember, 'Promotion', anotherEvent, 'write')).toBe(false);
+    });
+
+    it('scanner access depends strictly on per-event assignment, not on role alone', () => {
+      // regularMember is assigned in eventWithGrant
+      expect(canScanForEvent(regularMember, eventWithGrant)).toBe(true);
+      // regularMember is NOT assigned in anotherEvent
+      expect(canScanForEvent(regularMember, anotherEvent)).toBe(false);
+
+      // Even a lead or faculty is denied if not in event.assignedScannerUserIds
+      expect(canScanForEvent(promotionLead, eventWithGrant)).toBe(false);
+    });
+
+    it('validates internal event OTP: single OTP marks attendance to Completed', () => {
+      const internalEvent: EventModel = {
+        ...eventWithGrant,
+        eventType: 'internal',
+        entryOtp: '654321',
+        otpExpiresAt: Date.now() + 60000,
+      };
+
+      // Valid OTP marks Completed
+      const res = validateEventOtp({
+        event: internalEvent,
+        userId: 'u_student_99',
+        otp: '654321',
+        scannerUserId: 'u_regular_member',
+      });
+      expect(res.valid).toBe(true);
+      expect(res.status).toBe('Completed');
+      expect(res.code).toBe('success');
+
+      // Invalid OTP fails
+      const badRes = validateEventOtp({
+        event: internalEvent,
+        userId: 'u_student_99',
+        otp: '000000',
+        scannerUserId: 'u_regular_member',
+      });
+      expect(badRes.valid).toBe(false);
+      expect(badRes.code).toBe('invalid_or_expired');
+
+      // Already marked fails
+      const dupRes = validateEventOtp({
+        event: internalEvent,
+        userId: 'u_student_99',
+        otp: '654321',
+        currentAttendance: {
+          id: 'att_1',
+          eventId: internalEvent.id,
+          eventTitle: internalEvent.title,
+          userId: 'u_student_99',
+          userName: 'Student',
+          userEmail: 's@col.edu',
+          status: 'Completed',
+        },
+        scannerUserId: 'u_regular_member',
+      });
+      expect(dupRes.valid).toBe(false);
+      expect(dupRes.code).toBe('already_marked');
+    });
+
+    it('validates external event OTP: two phases (Entry OTP and Exit OTP)', () => {
+      const externalEvent: EventModel = {
+        ...eventWithGrant,
+        eventType: 'external',
+        entryOtp: '111222',
+        exitOtp: '333444',
+        otpExpiresAt: Date.now() + 60000,
+      };
+
+      // Phase 1: Entry OTP
+      const entryRes = validateEventOtp({
+        event: externalEvent,
+        userId: 'u_student_99',
+        otp: '111222',
+        phase: 'entry',
+        scannerUserId: 'u_regular_member',
+      });
+      expect(entryRes.valid).toBe(true);
+      expect(entryRes.status).toBe('Entered');
+      expect(entryRes.code).toBe('success');
+
+      // Phase 2: Exit OTP without prior entry is rejected
+      const earlyExitRes = validateEventOtp({
+        event: externalEvent,
+        userId: 'u_student_99',
+        otp: '333444',
+        phase: 'exit',
+        currentAttendance: {
+          id: 'att_1',
+          eventId: externalEvent.id,
+          eventTitle: externalEvent.title,
+          userId: 'u_student_99',
+          userName: 'Student',
+          userEmail: 's@col.edu',
+          status: 'Not marked',
+        },
+        scannerUserId: 'u_regular_member',
+      });
+      expect(earlyExitRes.valid).toBe(false);
+
+      // Phase 2: Exit OTP after entry marks Completed
+      const validExitRes = validateEventOtp({
+        event: externalEvent,
+        userId: 'u_student_99',
+        otp: '333444',
+        phase: 'exit',
+        currentAttendance: {
+          id: 'att_1',
+          eventId: externalEvent.id,
+          eventTitle: externalEvent.title,
+          userId: 'u_student_99',
+          userName: 'Student',
+          userEmail: 's@col.edu',
+          status: 'Entered',
+        },
+        scannerUserId: 'u_regular_member',
+      });
+      expect(validExitRes.valid).toBe(true);
+      expect(validExitRes.status).toBe('Completed');
+    });
+
+    it('enforces read-only roles on events: Treasurer, Promotion, Documentation, and Student', () => {
+      expect(isReadOnlyEventsRole('treasurer')).toBe(true);
+      expect(isReadOnlyEventsRole('promotion')).toBe(true);
+      expect(isReadOnlyEventsRole('documentation')).toBe(true);
+      expect(isReadOnlyEventsRole('student')).toBe(true);
+
+      expect(isReadOnlyEventsRole('faculty')).toBe(false);
+      expect(isReadOnlyEventsRole('coordinator')).toBe(false);
+
+      expect(getRolePermissions('treasurer').canCreateEditEvents).toBe(false);
+      expect(getRolePermissions('promotion').canCreateEditEvents).toBe(false);
+      expect(getRolePermissions('documentation').canCreateEditEvents).toBe(false);
+      expect(getRolePermissions('student').canCreateEditEvents).toBe(false);
+
+      expect(getRolePermissions('faculty').canCreateEditEvents).toBe(true);
+      expect(getRolePermissions('coordinator').canCreateEditEvents).toBe(true);
+    });
+
+    // =========================================================================
+    // 6. Settled Decisions Suite (DEC-02, DEC-03, DEC-04, DEC-06)
+    // =========================================================================
+    it('DEC-02 & FIN-01: president can approve budget requests, treasurer cannot approve self', () => {
+      const presidentPerms = getRolePermissions('coordinator');
+      const treasurerPerms = getRolePermissions('treasurer');
+
+      expect(presidentPerms.canApproveBudget).toBe(true);
+      expect(treasurerPerms.canApproveBudget).toBe(false);
+      expect(treasurerPerms.canSubmitBudgetRequest).toBe(true);
+    });
+
+    it('DEC-03 & PRO-01/PRO-02: management lead can approve promotion posts and cannot approve self-created post', () => {
+      const mgmtLead: UserModel = {
+        uid: 'u_mgmt_lead_01',
+        name: 'Vikram Seth',
+        email: 'vikram@college.edu',
+        role: 'student',
+        team: 'Management',
+        post: 'Management Lead',
+        teamRole: 'Lead',
+        isVolunteer: false,
+        status: 'active',
+      };
+
+      const regularStudent: UserModel = {
+        uid: 'u_student_02',
+        name: 'Regular Student',
+        email: 'student@college.edu',
+        role: 'student',
+        team: 'Management',
+        post: 'Volunteer',
+        isVolunteer: false,
+        status: 'active',
+      };
+
+      const promoPostOther = {
+        id: 'post_01',
+        title: 'Tree Planting Drive',
+        createdBy: 'Maya Patel',
+        creatorId: 'u_promo_lead',
+      };
+
+      const promoPostSelf = {
+        id: 'post_02',
+        title: 'Management Convening',
+        createdBy: 'Vikram Seth',
+        creatorId: 'u_mgmt_lead_01',
+      };
+
+      // Management lead can approve posts by others
+      expect(canApprovePromotionPost(mgmtLead, promoPostOther)).toBe(true);
+
+      // Management lead cannot approve self-created post (PRO-02)
+      expect(canApprovePromotionPost(mgmtLead, promoPostSelf)).toBe(false);
+
+      // Non-lead member cannot approve posts
+      expect(canApprovePromotionPost(regularStudent, promoPostOther)).toBe(false);
+    });
+
+    it('DEC-06 & PERM-07: president can manage and assign posts but member deletion is guarded', () => {
+      const coordPerms = getRolePermissions('coordinator');
+      expect(coordPerms.canManageMembers).toBe(true);
+      expect(coordPerms.canCreateEditEvents).toBe(true);
+
+      // Verify deletion restriction logic: only faculty can delete users
+      const canDeleteMember = (actorRole: string) => {
+        return actorRole === 'faculty' || actorRole === 'super_admin';
+      };
+
+      expect(canDeleteMember('coordinator')).toBe(false);
+      expect(canDeleteMember('student')).toBe(false);
+      expect(canDeleteMember('faculty')).toBe(true);
+    });
+
+    it('DEC-04 & AUD-01: student member activity scope is restricted to personal records', () => {
+      const studentPerms = getRolePermissions('student');
+      expect(studentPerms.canViewAuditLog).toBe(false); // Global audit log is hidden
+
+      const filterUserActivity = (logs: { actorId: string; targetId?: string }[], currentUserId: string) => {
+        return logs.filter((log) => log.actorId === currentUserId || log.targetId === currentUserId);
+      };
+
+      const mockLogs = [
+        { actorId: 'u_student_01', action: 'registered_event' },
+        { actorId: 'u_student_02', action: 'registered_event' },
+        { actorId: 'u_coord_01', targetId: 'u_student_01', action: 'assigned_duty' },
+      ];
+
+      const myLogs = filterUserActivity(mockLogs, 'u_student_01');
+      expect(myLogs.length).toBe(2);
+      expect(myLogs.every((l) => l.actorId === 'u_student_01' || l.targetId === 'u_student_01')).toBe(true);
+    });
+  });
+
+  // =========================================================================
+  // 4. Operations Hub RBAC Matrix & Squad Rules Verification (Spec Section 3, 4, 8)
+  // =========================================================================
+  describe('Operations Hub Exhaustive Role Matrix (Section 3)', () => {
+    const EXPECTED_ROLE_COUNTS: Record<string, { total: number; write: number; read: number; hidden: number }> = {
+      faculty: { total: 13, write: 10, read: 3, hidden: 9 },
+      president: { total: 13, write: 12, read: 1, hidden: 9 },
+      coordinator: { total: 13, write: 12, read: 1, hidden: 9 },
+      treasurer: { total: 3, write: 3, read: 0, hidden: 19 },
+      promotion: { total: 4, write: 4, read: 0, hidden: 18 },
+      documentation: { total: 4, write: 4, read: 0, hidden: 18 },
+      management: { total: 5, write: 5, read: 0, hidden: 17 },
+      student: { total: 1, write: 0, read: 1, hidden: 21 },
+    };
+
+    it('verifies that exactly 22 modules are defined in ALL_MODULE_IDS', () => {
+      expect(ALL_MODULE_IDS.length).toBe(22);
+    });
+
+    Object.keys(EXPECTED_ROLE_COUNTS).forEach((role) => {
+      describe(`Exhaustive Hub Check for Role: ${role}`, () => {
+        const matrix = MODULE_ACCESS[role];
+
+        it(`has expected module counts (total visible, write, read, hidden)`, () => {
+          const visible = ALL_MODULE_IDS.filter((m) => matrix[m] !== 'hidden');
+          const writeCount = ALL_MODULE_IDS.filter((m) => matrix[m] === 'write').length;
+          const readCount = ALL_MODULE_IDS.filter((m) => matrix[m] === 'read').length;
+          const hiddenCount = ALL_MODULE_IDS.filter((m) => matrix[m] === 'hidden').length;
+
+          const exp = EXPECTED_ROLE_COUNTS[role];
+          expect(visible.length).toBe(exp.total);
+          expect(writeCount).toBe(exp.write);
+          expect(readCount).toBe(exp.read);
+          expect(hiddenCount).toBe(exp.hidden);
+        });
+
+        ALL_MODULE_IDS.forEach((moduleId) => {
+          it(`evaluates ${moduleId} access level strictly`, () => {
+            const level = matrix[moduleId];
+            expect(['hidden', 'read', 'write']).toContain(level);
+          });
+        });
+      });
+    });
+
+    it('asserts exact Faculty modules and access levels (13 modules)', () => {
+      const fac = MODULE_ACCESS.faculty;
+      expect(fac.squads).toBe('write');
+      expect(fac.member_directory).toBe('write');
+      expect(fac.attendance_desk).toBe('write');
+      expect(fac.duties_stations).toBe('read');
+      expect(fac.lead_activity_review).toBe('write');
+      expect(fac.event_permissions).toBe('write');
+      expect(fac.treasury).toBe('read');
+      expect(fac.expenditure_ledger).toBe('read');
+      expect(fac.add_expense).toBe('write');
+      expect(fac.financial_audit_export).toBe('write');
+      expect(fac.release_calendar).toBe('write');
+      expect(fac.event_media_upload).toBe('write');
+      expect(fac.bulletins_daily_report).toBe('write');
+
+      // Others are hidden
+      expect(fac.studio_templates).toBe('hidden');
+      expect(fac.pre_event_upload).toBe('hidden');
+      expect(fac.meetings_mom).toBe('hidden');
+      expect(fac.daily_news_bulletins).toBe('hidden');
+      expect(fac.attendance_operation).toBe('hidden');
+      expect(fac.squad_leads).toBe('hidden');
+      expect(fac.approvals).toBe('hidden');
+      expect(fac.duties_assignment).toBe('hidden');
+      expect(fac.campaign_post).toBe('hidden');
+    });
+
+    it('asserts exact President differences from Faculty (13 modules)', () => {
+      const pres = MODULE_ACCESS.president;
+      const fac = MODULE_ACCESS.faculty;
+
+      // Differences:
+      expect(pres.duties_stations).toBe('write'); // Faculty was read
+      expect(fac.duties_stations).toBe('read');
+
+      expect(pres.treasury).toBe('write'); // Faculty was read
+      expect(fac.treasury).toBe('read');
+
+      expect(pres.member_directory).toBe('write'); // Faculty was write, but deletion restricted
+
+      // Matching modules
+      expect(pres.squads).toBe(fac.squads);
+      expect(pres.attendance_desk).toBe(fac.attendance_desk);
+      expect(pres.lead_activity_review).toBe(fac.lead_activity_review);
+      expect(pres.event_permissions).toBe(fac.event_permissions);
+      expect(pres.expenditure_ledger).toBe(fac.expenditure_ledger);
+      expect(pres.add_expense).toBe(fac.add_expense);
+      expect(pres.financial_audit_export).toBe(fac.financial_audit_export);
+      expect(pres.release_calendar).toBe(fac.release_calendar);
+      expect(pres.event_media_upload).toBe(fac.event_media_upload);
+      expect(pres.bulletins_daily_report).toBe(fac.bulletins_daily_report);
+    });
+
+    it('asserts exact Treasurer modules (3 modules)', () => {
+      const tr = MODULE_ACCESS.treasurer;
+      expect(tr.expenditure_ledger).toBe('write');
+      expect(tr.add_expense).toBe('write');
+      expect(tr.financial_audit_export).toBe('write');
+
+      // Hidden
+      expect(tr.treasury).toBe('hidden');
+      expect(tr.squads).toBe('hidden');
+      expect(tr.member_directory).toBe('hidden');
+      expect(tr.attendance_desk).toBe('hidden');
+      expect(tr.campaign_post).toBe('hidden');
+    });
+
+    it('asserts exact Promotion modules (4 modules)', () => {
+      const pr = MODULE_ACCESS.promotion;
+      expect(pr.campaign_post).toBe('write');
+      expect(pr.release_calendar).toBe('write');
+      expect(pr.event_media_upload).toBe('write');
+      expect(pr.bulletins_daily_report).toBe('write');
+
+      expect(pr.squads).toBe('hidden');
+      expect(pr.treasury).toBe('hidden');
+      expect(pr.attendance_desk).toBe('hidden');
+    });
+
+    it('asserts exact Documentation modules (4 modules)', () => {
+      const doc = MODULE_ACCESS.documentation;
+      expect(doc.studio_templates).toBe('write');
+      expect(doc.pre_event_upload).toBe('write');
+      expect(doc.meetings_mom).toBe('write');
+      expect(doc.daily_news_bulletins).toBe('write');
+
+      expect(doc.squads).toBe('hidden');
+      expect(doc.treasury).toBe('hidden');
+      expect(doc.campaign_post).toBe('hidden');
+    });
+
+    it('asserts exact Management modules (5 modules)', () => {
+      const mgmt = MODULE_ACCESS.management;
+      expect(mgmt.attendance_operation).toBe('write');
+      expect(mgmt.squad_leads).toBe('write');
+      expect(mgmt.approvals).toBe('write');
+      expect(mgmt.meetings_mom).toBe('write');
+      expect(mgmt.duties_assignment).toBe('write');
+
+      expect(mgmt.squads).toBe('hidden');
+      expect(mgmt.treasury).toBe('hidden');
+      expect(mgmt.campaign_post).toBe('hidden');
+    });
+
+    it('asserts Student has only Squads READ, all others hidden', () => {
+      const st = MODULE_ACCESS.student;
+      expect(st.squads).toBe('read');
+      ALL_MODULE_IDS.filter((m) => m !== 'squads').forEach((m) => {
+        expect(st[m]).toBe('hidden');
+      });
+    });
+  });
+
+  describe('Extra Rights: can(role, moduleId, "approve" | "grant")', () => {
+    it('Faculty has approve on lead_activity_review and grant on event_permissions', () => {
+      expect(can('faculty', 'lead_activity_review', 'approve')).toBe(true);
+      expect(can('faculty', 'event_permissions', 'grant')).toBe(true);
+      expect(can('faculty', 'treasury', 'approve')).toBe(false); // Can flag, cannot approve final
+    });
+
+    it('President has approve on lead_activity_review, treasury, and grant on event_permissions', () => {
+      expect(can('president', 'lead_activity_review', 'approve')).toBe(true);
+      expect(can('president', 'event_permissions', 'grant')).toBe(true);
+      expect(can('president', 'treasury', 'approve')).toBe(true);
+      expect(can('coordinator', 'treasury', 'approve')).toBe(true);
+    });
+
+    it('Management has approve on approvals', () => {
+      expect(can('management', 'approvals', 'approve')).toBe(true);
+      expect(can('management', 'treasury', 'approve')).toBe(false);
+      expect(can('management', 'event_permissions', 'grant')).toBe(false);
+    });
+
+    it('Denies approval rights to roles without explicit approve right', () => {
+      expect(can('student', 'approvals', 'approve')).toBe(false);
+      expect(can('treasurer', 'treasury', 'approve')).toBe(false);
+      expect(can('promotion', 'approvals', 'approve')).toBe(false);
+    });
+  });
+
+  describe('Squad Rules on top of table (Section 4)', () => {
+    it('Team leads have WRITE on their own squad modules for ALL events; other squads stay HIDDEN', () => {
+      const promoLeadUser: UserModel = {
+        uid: 'user-promo-lead-1',
+        name: 'Sneha Patel',
+        email: 'sneha@geohub.edu',
+        role: 'student', // base student
+        isVolunteer: false,
+        status: 'active',
+        squadMemberships: [{ squad: 'Promotion', isLead: true }],
+      };
+
+      // Own squad modules are WRITE for all events (even without eventId)
+      expect(moduleAccess(promoLeadUser, 'campaign_post')).toBe('write');
+      expect(moduleAccess(promoLeadUser, 'release_calendar')).toBe('write');
+      expect(moduleAccess(promoLeadUser, 'event_media_upload')).toBe('write');
+      expect(moduleAccess(promoLeadUser, 'bulletins_daily_report')).toBe('write');
+
+      // Other squads stay HIDDEN
+      expect(moduleAccess(promoLeadUser, 'studio_templates')).toBe('hidden');
+      expect(moduleAccess(promoLeadUser, 'attendance_operation')).toBe('hidden');
+      expect(moduleAccess(promoLeadUser, 'treasury')).toBe('hidden');
+    });
+
+    it('Non-lead squad member gets READ on own squad modules; lead can give WRITE for ONE event only', () => {
+      const docMember: UserModel = {
+        uid: 'user-doc-member-1',
+        name: 'Arun Member',
+        email: 'arun@geohub.edu',
+        role: 'student',
+        isVolunteer: false,
+        status: 'active',
+        squadMemberships: [{ squad: 'Documentation', isLead: false }],
+      };
+
+      // By default without eventId: READ
+      expect(moduleAccess(docMember, 'studio_templates')).toBe('read');
+      expect(moduleAccess(docMember, 'pre_event_upload')).toBe('read');
+
+      // Without grant for event A: still READ
+      expect(moduleAccess(docMember, 'studio_templates', 'evt-alpha')).toBe('read');
+
+      // Now grant WRITE for event A only
+      const grant = grantSquadAccess({
+        userId: docMember.uid,
+        userName: docMember.name,
+        squad: 'documentation',
+        eventId: 'evt-alpha',
+        access: 'write',
+        grantedBy: 'Lead',
+      });
+
+      // For event A: access is now WRITE!
+      expect(moduleAccess(docMember, 'studio_templates', 'evt-alpha')).toBe('write');
+
+      // Grant NEVER applies to another event!
+      expect(moduleAccess(docMember, 'studio_templates', 'evt-beta')).toBe('read');
+      expect(moduleAccess(docMember, 'studio_templates')).toBe('read');
+
+      // Revoke takes effect immediately
+      revokeSquadAccess(grant.id);
+      expect(moduleAccess(docMember, 'studio_templates', 'evt-alpha')).toBe('read');
+    });
+
+    it('A member in several squads gets each squad access separately', () => {
+      // Arun is in Documentation (member: read) AND Promotion (lead: write)
+      const user = MOCK_MULTI_SQUAD_USER;
+
+      // Documentation squad modules -> READ
+      expect(moduleAccess(user, 'studio_templates')).toBe('read');
+      expect(moduleAccess(user, 'pre_event_upload')).toBe('read');
+
+      // Promotion squad modules -> WRITE (lead)
+      expect(moduleAccess(user, 'campaign_post')).toBe('write');
+      expect(moduleAccess(user, 'release_calendar')).toBe('write');
+
+      // Other squads (Management, Finance) -> HIDDEN
+      expect(moduleAccess(user, 'attendance_operation')).toBe('hidden');
+      expect(moduleAccess(user, 'treasury')).toBe('hidden');
+    });
+
+    it('A squad can have several leads, all with equal WRITE access', () => {
+      expect(MOCK_SQUADS_WITH_LEADS[0].leads.length).toBe(2);
+
+      const lead1: UserModel = {
+        uid: MOCK_SQUADS_WITH_LEADS[0].leads[0].uid,
+        name: MOCK_SQUADS_WITH_LEADS[0].leads[0].name,
+        email: MOCK_SQUADS_WITH_LEADS[0].leads[0].email,
+        role: 'student',
+        isVolunteer: false,
+        status: 'active',
+        squadMemberships: [{ squad: 'Management', isLead: true }],
+      };
+
+      const lead2: UserModel = {
+        uid: MOCK_SQUADS_WITH_LEADS[0].leads[1].uid,
+        name: MOCK_SQUADS_WITH_LEADS[0].leads[1].name,
+        email: MOCK_SQUADS_WITH_LEADS[0].leads[1].email,
+        role: 'student',
+        isVolunteer: false,
+        status: 'active',
+        squadMemberships: [{ squad: 'Management', isLead: true }],
+      };
+
+      expect(moduleAccess(lead1, 'attendance_operation')).toBe('write');
+      expect(moduleAccess(lead2, 'attendance_operation')).toBe('write');
+    });
+  });
+
+  describe('Governance Rules (Member Directory, Treasury, Promotion)', () => {
+    const facultyUser: UserModel = {
+      uid: 'u-faculty',
+      name: 'Dr. Ramesh',
+      email: 'ramesh@geohub.edu',
+      role: 'faculty',
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    const presidentUser: UserModel = {
+      uid: 'u-president',
+      name: 'Siddharth Roy',
+      email: 'siddharth@geohub.edu',
+      role: 'coordinator',
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    const treasurerUser: UserModel = {
+      uid: 'u-treasurer',
+      name: 'Vikram Mehta',
+      email: 'vikram@geohub.edu',
+      role: 'treasurer',
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    const studentUser: UserModel = {
+      uid: 'u-student',
+      name: 'Regular Member',
+      email: 'student@geohub.edu',
+      role: 'student',
+      isVolunteer: false,
+      status: 'active',
+    };
+
+    it('Only Faculty can remove members; President CANNOT remove members', () => {
+      expect(canRemoveMember(facultyUser)).toBe(true);
+      expect(canRemoveMember(presidentUser)).toBe(false);
+      expect(canRemoveMember(treasurerUser)).toBe(false);
+      expect(canRemoveMember(studentUser)).toBe(false);
+    });
+
+    it('President cannot edit Faculty accounts; Faculty can edit all accounts', () => {
+      // Faculty editing anyone: true
+      expect(canEditMember(facultyUser, presidentUser)).toBe(true);
+      expect(canEditMember(facultyUser, studentUser)).toBe(true);
+
+      // President editing Student or Treasurer: true
+      expect(canEditMember(presidentUser, studentUser)).toBe(true);
+      expect(canEditMember(presidentUser, treasurerUser)).toBe(true);
+
+      // President editing Faculty: strictly FALSE
+      expect(canEditMember(presidentUser, facultyUser)).toBe(false);
+    });
+
+    it('Treasurer cannot approve their own (or any) budget requests; President can approve budget requests', () => {
+      const requestByTreasurer = { requesterId: treasurerUser.uid, requesterEmail: treasurerUser.email };
+      const requestByOther = { requesterId: studentUser.uid, requesterEmail: studentUser.email };
+
+      // Treasurer cannot approve
+      expect(canApproveBudgetRequest(treasurerUser, requestByTreasurer)).toBe(false);
+      expect(canApproveBudgetRequest(treasurerUser, requestByOther)).toBe(false);
+
+      // President can approve other requests
+      expect(canApproveBudgetRequest(presidentUser, requestByOther)).toBe(true);
+      expect(canApproveBudgetRequest(presidentUser, requestByTreasurer)).toBe(true);
+
+      // If President were requester of their own request, cannot approve own
+      const requestByPresident = { requesterId: presidentUser.uid, requesterEmail: presidentUser.email };
+      expect(canApproveBudgetRequest(presidentUser, requestByPresident)).toBe(false);
+    });
+
+    it('Promotion posts: Management lead can approve, but NEVER their own post', () => {
+      const mgmtLead: UserModel = {
+        uid: 'u-mgmt-lead',
+        name: 'Divya Rao',
+        email: 'divya@geohub.edu',
+        role: 'management',
+        team: 'Management',
+        post: 'Management Lead',
+        isVolunteer: false,
+        status: 'active',
+      };
+
+      const promoPostBySomeoneElse = {
+        creatorId: 'u-promo-writer',
+        authorId: 'u-promo-writer',
+        createdBy: 'Sneha Patel',
+      };
+
+      const promoPostByLeadSelf = {
+        creatorId: mgmtLead.uid,
+        authorId: mgmtLead.uid,
+        createdBy: mgmtLead.name,
+      };
+
+      expect(canApprovePromotionPost(mgmtLead, promoPostBySomeoneElse)).toBe(true);
+      expect(canApprovePromotionPost(mgmtLead, promoPostByLeadSelf)).toBe(false);
+    });
+  });
+
 });

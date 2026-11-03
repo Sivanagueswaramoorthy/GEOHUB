@@ -7,12 +7,17 @@ import {
   TreasurerHomeView,
   DocumentationHomeView,
   PromotionHomeView,
+  ManagementHomeView,
 } from '../roles';
 
 export const HomeView: React.FC = () => {
   const { currentUser, showToast, setSelectedEventId, registerForEvent } = useApp();
 
   const isFaculty = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
+  const isCoordinator =
+    currentUser.role === 'admin' ||
+    currentUser.role === 'coordinator' ||
+    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('president'));
   const isDocLead =
     currentUser.role === 'documentation' ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('documentation'));
@@ -20,15 +25,17 @@ export const HomeView: React.FC = () => {
     currentUser.role === 'treasurer' ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('treasurer'));
   const isPromotion =
+    currentUser.role === 'promotion' ||
     currentUser.role === 'social_media' ||
     (currentUser.role === 'team_admin' &&
       (currentUser.team === 'Promotion' ||
         Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
     Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
+  const isManagement =
+    currentUser.role === 'management' ||
+    (currentUser.team === 'Management' && !isFaculty && !isCoordinator);
   const isStudent =
-    currentUser.role === 'student' ||
-    currentUser.role === 'member' ||
-    currentUser.role === 'volunteer';
+    !isFaculty && !isCoordinator && !isDocLead && !isTreasurer && !isPromotion && !isManagement;
 
   if (isPromotion) {
     return <PromotionHomeView showToast={showToast} />;
@@ -45,6 +52,10 @@ export const HomeView: React.FC = () => {
 
   if (isDocLead) {
     return <DocumentationHomeView />;
+  }
+
+  if (isManagement) {
+    return <ManagementHomeView />;
   }
 
   if (isStudent) {

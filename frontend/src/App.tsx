@@ -1,7 +1,6 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
-import { Header } from './components/Header';
+import { TopBar } from './components/shared/TopBar';
 import { FloatingNav } from './components/FloatingNav';
 import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
@@ -36,6 +35,7 @@ import { CampaignsView } from './views/campaigns/CampaignsView';
 import { NotificationsView } from './views/notifications/NotificationsView';
 import { PendingApprovalView } from './views/auth/PendingApprovalView';
 import { NotFoundView } from './views/auth/NotFoundView';
+import { ChangePasswordView } from './features/auth/ChangePasswordView';
 import { AuditDetailPage } from './features/audits/AuditDetailPage';
 import { AuditLogView } from './views/audit/AuditLogView';
 import { DesignSystemView } from './views/design/DesignSystemView';
@@ -109,67 +109,27 @@ const MainAppContent: React.FC = () => {
     return <PendingApprovalView />;
   }
 
+  if (currentUser?.mustChangePassword) {
+    return <ChangePasswordView />;
+  }
+
   const navTabs = getRoleNavTabs(currentUser.role, currentUser.post);
   const primaryTabKeys = [
     'home',
     'dashboard',
     'operations',
+    'events',
+    'community',
+    'gallery',
+    'scan_qr',
+    'qrscanner',
+    'ledger',
     ...navTabs.map((t) => t.key),
     ...(navTabs.some((t) => t.key === 'archives') ? ['archives', 'gallery'] : []),
-    ...(navTabs.some((t) => t.key === 'finance') ? ['finance', 'treasurer'] : []),
+    ...(navTabs.some((t) => t.key === 'finance') ? ['finance', 'treasurer', 'ledger'] : []),
     ...(navTabs.some((t) => t.key === 'campaigns') ? ['campaigns', 'ai_social'] : []),
     ...(navTabs.some((t) => t.key === 'memories') ? ['memories'] : []),
   ];
-
-  // Sub-routes that have a parent back destination (excluding dedicated audit page which has its own sticky breadcrumb header)
-  const isSubRoute = !primaryTabKeys.includes(activeTab) && !activeTab.startsWith('audits');
-
-  const getSubRouteTitle = () => {
-    switch (activeTab) {
-      case 'scan_qr':
-        return 'Gate QR Scanner';
-      case 'my_qr':
-        return 'Dynamic Chapter Pass';
-      case 'attendance':
-        return 'Live Gate Logs';
-      case 'gallery':
-        return 'Media Archives';
-      case 'reports':
-        return 'Executive Dossier';
-      case 'approvals':
-        return 'Faculty Sanctions';
-      case 'tasks':
-        return 'Task Deliverables';
-      case 'teams':
-        return 'Squad Leadership';
-      case 'team_home':
-        return 'Squad Command';
-      case 'add_students':
-        return 'Enroll Scholar';
-      case 'documents':
-        return 'Squad Documents';
-      case 'meetings':
-        return 'Chapter Meetings';
-      case 'memories':
-        return 'Chapter Memories';
-      case 'forum':
-        return 'Communication Forum';
-      case 'treasurer':
-        return 'Treasurer Ledger';
-      case 'doc_studio':
-        return 'Documentation Studio';
-      case 'ai_social':
-        return 'AI Social Studio';
-      case 'notifications':
-        return 'Official Bulletins';
-      case 'audit_logs':
-      case 'audit-logs':
-      case 'audit_log':
-        return 'Institutional Audit Log';
-      default:
-        return 'Operation Module';
-    }
-  };
 
   const renderActiveScreen = () => {
     switch (activeTab) {
@@ -223,7 +183,9 @@ const MainAppContent: React.FC = () => {
       case 'memories':
         return <MemoriesHubView />;
       case 'forum':
+      case 'community':
         return <CommunicationForumView />;
+      case 'ledger':
       case 'finance':
       case 'treasurer':
         return <TreasurerView />;
@@ -275,23 +237,7 @@ const MainAppContent: React.FC = () => {
         }}
       >
         {/* Top Sticky Header */}
-        <Header />
-
-        {/* Sub-view navigation bar if on a nested module */}
-        {isSubRoute && (
-          <div className="subroute-bar">
-            <button
-              type="button"
-              onClick={() => setActiveTab('operations')}
-              className="subroute-back-btn"
-            >
-              <ArrowLeft size={16} />
-              <span>Activities</span>
-            </button>
-            <span className="subroute-title">{getSubRouteTitle()}</span>
-            <div style={{ width: '60px' }} />
-          </div>
-        )}
+        <TopBar />
 
         {/* Main Content Area */}
         <main className={`mobile-app-content ${activeTab.startsWith('audits') ? 'audit-content-override' : ''}`}>
@@ -309,7 +255,13 @@ const MainAppContent: React.FC = () => {
 };
 
 export function App() {
-  const [showSplash, setShowSplash] = React.useState(true);
+  const [showSplash, setShowSplash] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    // Skip splash on automated audits/direct hashes or when already signed in
+    if (window.localStorage.getItem('geohub_auth_session')) return false;
+    if (window.location.hash && window.location.hash !== '#login') return false;
+    return true;
+  });
 
   // Allow re-triggering splash from console/testing if needed
   React.useEffect(() => {

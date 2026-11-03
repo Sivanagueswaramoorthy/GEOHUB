@@ -1,482 +1,332 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   MessageSquare,
   Send,
-  Heart,
-  Pin,
-  Search,
-  Plus,
-  Compass,
+  Image as ImageIcon,
+  Lock,
   Megaphone,
-  Briefcase,
-  CornerDownRight,
+  ShieldAlert,
+  Users,
+  Search,
+  CheckCircle2,
+  X,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ForumMessage } from '../../types';
+import { CommunityMessage } from '../../types';
+import { initialCommunityMessages } from '../../data/mockData';
 import {
   Avatar,
   PillButton,
-  BottomSheet,
-  EmptyState,
   StatusChip,
+  Mascot,
+  SearchField,
 } from '../../components/shared';
 
+interface ChannelDef {
+  id: string;
+  name: string;
+  isSquad: boolean;
+  squadName?: string;
+  description: string;
+}
+
 export const CommunicationForumView: React.FC = () => {
-  const {
-    forumMessages,
-    addForumMessage,
-    addForumReply,
-    likeForumMessage,
-    togglePinForumMessage,
-    currentUser,
-  } = useApp();
+  const { currentUser, showToast } = useApp();
 
-  const [activeChannel, setActiveChannel] = useState<'announcements' | 'coordination' | 'tech_geo' | 'general'>('announcements');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newContent, setNewContent] = useState('');
+  const [messages, setMessages] = useState<CommunityMessage[]>(initialCommunityMessages);
+  const [activeChannelId, setActiveChannelId] = useState<string>('general');
+  const [inputText, setInputText] = useState('');
+  const [attachedPhoto, setAttachedPhoto] = useState<string | null>(null);
 
-  const [replyInputMap, setReplyInputMap] = useState<Record<string, string>>({});
-  const [openReplyBoxId, setOpenReplyBoxId] = useState<string | null>(null);
+  const channels: ChannelDef[] = [
+    { id: 'general', name: '#general', isSquad: false, description: 'Public Chapter Community Lounge' },
+    { id: 'announcements', name: '#announcements', isSquad: false, description: 'Official Chapter Sanctions & Circulars' },
+    { id: 'Promotion', name: '#squad-promotion', isSquad: true, squadName: 'Promotion', description: 'Social Media & Stage Publicity' },
+    { id: 'Management', name: '#squad-management', isSquad: true, squadName: 'Management', description: 'Event Logistics & Operations' },
+    { id: 'Documentation', name: '#squad-documentation', isSquad: true, squadName: 'Documentation', description: 'Session Transcripts & Media Archival' },
+    { id: 'Entertainment', name: '#squad-entertainment', isSquad: true, squadName: 'Entertainment', description: 'Cultural Activities & Icebreakers' },
+  ];
 
-  const channels = [
-    { id: 'announcements', label: '#Announcements', icon: Megaphone },
-    { id: 'coordination', label: '#Coordination', icon: Briefcase },
-    { id: 'tech_geo', label: '#Tech-Geo', icon: Compass },
-    { id: 'general', label: '#General', icon: MessageSquare },
-  ] as const;
+  const activeChannel = channels.find((c) => c.id === activeChannelId) || channels[0];
 
-  const filteredMessages = forumMessages
-    .filter((msg) => {
-      if (msg.channelId !== activeChannel) return false;
-      if (searchQuery) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = (msg.title || '').toLowerCase().includes(q);
-        const matchContent = msg.content.toLowerCase().includes(q);
-        const matchAuthor = msg.authorName.toLowerCase().includes(q);
-        if (!matchTitle && !matchContent && !matchAuthor) return false;
-      }
+  // Check if current user is authorized to access the active channel
+  const isChannelAuthorized = useMemo(() => {
+    if (!activeChannel.isSquad) return true;
+
+    // Faculty and Coordinator have global oversight
+    if (
+      currentUser.role === 'faculty' ||
+      currentUser.role === 'coordinator' ||
+      currentUser.role === 'admin' ||
+      currentUser.role === 'super_admin'
+    ) {
       return true;
-    })
-    .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+    }
 
-  const handleCreatePost = (e: React.FormEvent) => {
+    const targetSquad = activeChannel.squadName?.toLowerCase();
+    const primarySquad = currentUser.team?.toLowerCase();
+    if (primarySquad && primarySquad === targetSquad) return true;
+
+    // Check multi-squad memberships
+    if (currentUser.squadMemberships && currentUser.squadMemberships.length > 0) {
+      return currentUser.squadMemberships.some(
+        (m) => m.squad.toLowerCase() === targetSquad
+      );
+    }
+
+    return false;
+  }, [activeChannel, currentUser]);
+
+  const currentMessages = messages.filter((m) => m.channelId === activeChannel.id);
+
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newContent.trim()) return;
-    addForumMessage({
-      channelId: activeChannel,
-      title: newTitle.trim() || undefined,
-      content: newContent.trim(),
-    });
-    setIsPostModalOpen(false);
-    setNewTitle('');
-    setNewContent('');
+    if (!inputText.trim() && !attachedPhoto) return;
+
+    const newMsg: CommunityMessage = {
+      id: `cmsg_${Date.now()}`,
+      channelId: activeChannel.id,
+      senderId: currentUser.uid,
+      senderName: currentUser.name,
+      senderRole: currentUser.post || currentUser.role,
+      senderAvatar: currentUser.avatarUrl,
+      text: inputText.trim(),
+      imageUrl: attachedPhoto || undefined,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, newMsg]);
+    setInputText('');
+    setAttachedPhoto(null);
+    showToast('✓ Message posted to room.');
   };
 
-  const handleSendReply = (messageId: string) => {
-    const replyText = replyInputMap[messageId];
-    if (!replyText || !replyText.trim()) return;
-    addForumReply(messageId, replyText.trim());
-    setReplyInputMap((prev) => ({ ...prev, [messageId]: '' }));
-    setOpenReplyBoxId(null);
+  const handleAttachSimulatedPhoto = () => {
+    setAttachedPhoto('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80');
+    showToast('Photo attached.');
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
-      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+    <div className="flex flex-col gap-4 select-none animate-fadeIn pb-16">
+      {/* 1) Header */}
+      <div className="flex items-center justify-between">
         <div>
           <h1
-            style={{
-              fontSize: '28px',
-              lineHeight: '32px',
-              fontWeight: 800,
-              color: '#051F20',
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
           >
-            Discussions
+            Community
           </h1>
-          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
-            Channels & community chat
+          <p className="text-xs font-semibold text-[#235347] mt-1">
+            Chapter channels & squad rooms
           </p>
         </div>
 
-        <PillButton
-          variant="primary"
-          icon={<Plus size={16} />}
-          onClick={() => setIsPostModalOpen(true)}
-        >
-          New post
-        </PillButton>
+        <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
+          {activeChannel.name}
+        </span>
       </div>
 
-      {/* 20px channel pills */}
-      <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }} className="no-scrollbar">
+      {/* 2) Channels Bar */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          overflowX: 'auto',
+          padding: '2px 0',
+          WebkitOverflowScrolling: 'touch',
+        }}
+        className="no-scrollbar"
+      >
         {channels.map((ch) => {
-          const isActive = activeChannel === ch.id;
-          const Icon = ch.icon;
+          const isSelected = activeChannelId === ch.id;
           return (
             <button
-              type="button"
               key={ch.id}
-              onClick={() => setActiveChannel(ch.id)}
+              type="button"
+              onClick={() => setActiveChannelId(ch.id)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                height: '36px',
-                padding: '0 14px',
-                borderRadius: '20px',
-                fontSize: '12px',
+                padding: '8px 16px',
+                borderRadius: '9999px',
+                fontSize: '13px',
                 fontWeight: 700,
-                backgroundColor: isActive ? '#163832' : '#FFFFFF',
-                color: isActive ? '#FFFFFF' : '#235347',
-                border: isActive ? '1px solid #163832' : '1px solid #DAF1DE',
-                boxShadow: isActive ? '0 4px 14px rgba(5,31,32,0.12)' : '0 2px 8px rgba(5,31,32,0.04)',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                transition: 'all 200ms ease-out',
-                flexShrink: 0,
+                transition: 'all 0.2s ease-out',
+                backgroundColor: isSelected ? '#163832' : '#FFFFFF',
+                color: isSelected ? '#FFFFFF' : '#235347',
+                border: isSelected ? '1px solid #163832' : '1px solid #DAF1DE',
+                boxShadow: isSelected
+                  ? '0 4px 12px rgba(5, 31, 32, 0.18)'
+                  : '0 2px 6px rgba(5, 31, 32, 0.04)',
+                minHeight: '44px',
+                outline: 'none',
               }}
+              className="touch-target-44"
             >
-              <Icon size={14} strokeWidth={2.2} />
-              <span>{ch.label}</span>
+              {ch.isSquad && <Lock size={12} strokeWidth={1.75} className="shrink-0" />}
+              <span>{ch.name}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Search Input */}
-      <div style={{ position: 'relative' }}>
-        <input
-          type="text"
+      {/* 3) Conversation Body */}
+      {!isChannelAuthorized ? (
+        /* Locked Squad Room Notice */
+        <div
+          className="p-8 bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.06)] flex flex-col items-center text-center gap-3"
+          style={{ borderRadius: '24px' }}
+        >
+          <Mascot name="lock" size="md" />
+          <h2 className="text-base font-bold text-[#051F20]">
+            Squad Room Restricted
+          </h2>
+          <p className="text-xs text-[#235347] max-w-sm">
+            Membership in the <strong>{activeChannel.squadName} Squad</strong> is required to enter this discussion room. Squad leads can assign you from Operations.
+          </p>
+          <PillButton
+            variant="secondary"
+            size="sm"
+            onClick={() => setActiveChannelId('general')}
+          >
+            Return to #general
+          </PillButton>
+        </div>
+      ) : (
+        /* Authorized Chat Stream */
+        <div
+          className="bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.06)] flex flex-col justify-between"
           style={{
-            width: '100%',
-            height: '44px',
-            boxSizing: 'border-box',
-            paddingLeft: '40px',
-            paddingRight: '14px',
-            fontSize: '13px',
-            color: '#051F20',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #DAF1DE',
-            borderRadius: '16px',
-            outline: 'none',
-            boxShadow: '0 4px 14px rgba(5,31,32,0.03)',
+            borderRadius: '24px',
+            minHeight: '420px',
           }}
-          placeholder="Search discussions..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <Search
-          size={18}
-          strokeWidth={2}
-          color="#8EB69B"
-          style={{ position: 'absolute', left: 14, top: 13 }}
-        />
-      </div>
-
-      {/* Chat cards (24px, white, #DAF1DE border) with avatars, role badges, reaction pills */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        {filteredMessages.length === 0 ? (
-          <EmptyState
-            mascot="megaphone"
-            title="No messages"
-            description="Start the discussion in this channel"
-            actionLabel="New post"
-            onAction={() => setIsPostModalOpen(true)}
-          />
-        ) : (
-          filteredMessages.map((msg) => (
-            <div
-              key={msg.id}
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                border: msg.pinned ? '1.5px solid #8EB69B' : '1px solid #DAF1DE',
-                padding: '20px',
-                boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-              }}
-            >
-              {/* Header with Avatar, Name, Role badge, Pinned indicator */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Avatar name={msg.authorName} size={40} />
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#051F20' }}>
-                        {msg.authorName}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          backgroundColor: '#DAF1DE',
-                          color: '#0B2B26',
-                          padding: '2px 8px',
-                          borderRadius: '9999px',
-                          border: '1px solid #8EB69B',
-                          textTransform: 'capitalize',
-                        }}
-                      >
-                        {msg.authorRole.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '12px', color: '#235347', fontWeight: 500 }}>
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-
-                {msg.pinned && (
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      padding: '4px 8px',
-                      borderRadius: '9999px',
-                      backgroundColor: '#DAF1DE',
-                      color: '#163832',
-                      fontSize: '12px',
-                      fontWeight: 700,
-                    }}
-                  >
-                    <Pin size={12} strokeWidth={2.5} />
-                    <span>Pinned</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Title & Content */}
-              {msg.title && (
-                <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  {msg.title}
-                </h3>
-              )}
-              <p style={{ fontSize: '13px', color: '#051F20', lineHeight: 1.5, margin: 0 }}>
-                {msg.content}
-              </p>
-
-              {/* Reaction & Action Pills */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  paddingTop: '8px',
-                  borderTop: '1px solid #DAF1DE',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => likeForumMessage(msg.id)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    height: '32px',
-                    padding: '0 12px',
-                    borderRadius: '9999px',
-                    backgroundColor: msg.likes > 0 ? '#DAF1DE' : '#F6FBF7',
-                    color: '#163832',
-                    border: '1px solid #8EB69B',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Heart
-                    size={14}
-                    fill={msg.likes > 0 ? '#163832' : 'none'}
-                    strokeWidth={2}
-                  />
-                  <span>{msg.likes}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setOpenReplyBoxId(openReplyBoxId === msg.id ? null : msg.id)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    height: '32px',
-                    padding: '0 12px',
-                    borderRadius: '9999px',
-                    backgroundColor: '#F6FBF7',
-                    color: '#235347',
-                    border: '1px solid #DAF1DE',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <MessageSquare size={14} strokeWidth={2} />
-                  <span>{(msg.replies || []).length} Replies</span>
-                </button>
-
-                {(currentUser.role === 'super_admin' || currentUser.role === 'coordinator' || currentUser.role === 'faculty') && (
-                  <button
-                    type="button"
-                    onClick={() => togglePinForumMessage(msg.id)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      height: '32px',
-                      padding: '0 10px',
-                      borderRadius: '9999px',
-                      backgroundColor: '#F6FBF7',
-                      color: '#235347',
-                      border: '1px solid #DAF1DE',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    <Pin size={13} strokeWidth={2} />
-                    <span>{msg.pinned ? 'Unpin' : 'Pin'}</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Replies Thread */}
-              {(msg.replies || []).length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '6px' }}>
-                  {(msg.replies || []).map((rep) => (
-                    <div
-                      key={rep.id}
-                      style={{
-                        padding: '10px 14px',
-                        borderRadius: '16px',
-                        backgroundColor: '#F6FBF7',
-                        border: '1px solid #DAF1DE',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Avatar name={rep.authorName} size={24} />
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#051F20' }}>
-                          {rep.authorName}
-                        </span>
-                        <span style={{ fontSize: '12px', color: '#235347', fontWeight: 500 }}>
-                          {new Date(rep.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      <p style={{ fontSize: '12px', color: '#051F20', margin: 0, paddingLeft: '30px' }}>
-                        {rep.content}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Inline Reply Input */}
-              {openReplyBoxId === msg.id && (
-                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                  <input
-                    type="text"
-                    style={{
-                      flex: 1,
-                      height: '38px',
-                      borderRadius: '16px',
-                      border: '1px solid #DAF1DE',
-                      padding: '0 12px',
-                      fontSize: '12px',
-                      outline: 'none',
-                    }}
-                    placeholder="Write a reply..."
-                    value={replyInputMap[msg.id] || ''}
-                    onChange={(e) =>
-                      setReplyInputMap((prev) => ({ ...prev, [msg.id]: e.target.value }))
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSendReply(msg.id);
-                    }}
-                  />
-                  <PillButton
-                    variant="primary"
-                    size="sm"
-                    icon={<Send size={14} />}
-                    onClick={() => handleSendReply(msg.id)}
-                  >
-                    Reply
-                  </PillButton>
-                </div>
-              )}
+        >
+          {/* Room Header Info */}
+          <div className="p-4 border-b border-[#DAF1DE] flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-[#051F20]">{activeChannel.name}</span>
+              <span className="text-xs text-[#235347]">{activeChannel.description}</span>
             </div>
-          ))
-        )}
-      </div>
+            <StatusChip status="live" label="Live Stream" />
+          </div>
 
-      {/* New Post BottomSheet */}
-      <BottomSheet
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        title="New Post"
-        subtitle={`Post to #${channels.find((c) => c.id === activeChannel)?.label || 'General'}`}
-      >
-        <form onSubmit={handleCreatePost} style={{ display: 'flex', flexDirection: 'column', gap: '14px', paddingTop: '8px' }}>
-          <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
-              Subject
-            </label>
+          {/* Messages Stream */}
+          <div className="p-4 flex flex-col gap-3.5 max-h-[380px] overflow-y-auto">
+            {currentMessages.length === 0 ? (
+              <div className="py-12 text-center text-xs text-[#235347]">
+                No messages in this room yet. Be the first to start the discussion!
+              </div>
+            ) : (
+              currentMessages.map((msg) => {
+                const isMe = msg.senderId === currentUser.uid;
+
+                return (
+                  <div
+                    key={msg.id}
+                    className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1 px-1 text-xs text-[#235347]">
+                      {!isMe && <span className="font-bold text-[#051F20]">{msg.senderName}</span>}
+                      {!isMe && msg.senderRole && (
+                        <span className="text-xs px-1.5 py-0.2 rounded-full bg-[#DAF1DE] text-[#163832]">
+                          {msg.senderRole}
+                        </span>
+                      )}
+                      <span>
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+
+                    {/* Chat Bubble */}
+                    <div
+                      className={`max-w-[85%] p-3.5 rounded-2xl text-xs font-medium ${
+                        isMe
+                          ? 'bg-[#163832] text-white rounded-br-sm'
+                          : 'bg-[#F6FBF7] text-[#051F20] border border-[#DAF1DE] rounded-bl-sm'
+                      }`}
+                    >
+                      {msg.text && <p className="leading-relaxed">{msg.text}</p>}
+
+                      {/* Photo Attachment */}
+                      {msg.imageUrl && (
+                        <div className="mt-2 rounded-xl overflow-hidden border border-[#DAF1DE]">
+                          <img
+                            src={msg.imageUrl}
+                            alt="Attached chapter media"
+                            className="w-full h-40 object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Photo Attachment Preview Bar */}
+          {attachedPhoto && (
+            <div className="p-2.5 mx-4 mb-2 bg-[#DAF1DE] rounded-2xl border border-[#8EB69B] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ImageIcon size={16} strokeWidth={1.75} className="text-[#163832]" />
+                <span className="text-xs font-bold text-[#051F20]">Field Photo Attached</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttachedPhoto(null)}
+                className="p-1 rounded-full text-[#051F20] hover:bg-white/50 touch-target-44 cursor-pointer"
+                aria-label="Remove photo"
+              >
+                <X size={14} strokeWidth={1.75} />
+              </button>
+            </div>
+          )}
+
+          {/* Chat Input Bar */}
+          <form
+            onSubmit={handleSendMessage}
+            className="p-3 border-t border-[#DAF1DE] flex items-center gap-2 bg-[#F6FBF7] rounded-b-3xl"
+          >
+            <button
+              type="button"
+              onClick={handleAttachSimulatedPhoto}
+              className="p-2.5 rounded-full bg-white border border-[#DAF1DE] text-[#163832] hover:bg-[#DAF1DE] transition-colors touch-target-44 cursor-pointer flex items-center justify-center shrink-0"
+              title="Send Photo"
+              aria-label="Attach Photo"
+            >
+              <ImageIcon size={18} strokeWidth={1.75} />
+            </button>
+
             <input
               type="text"
-              placeholder="e.g. Schedule update for Saturday"
-              style={{
-                width: '100%',
-                height: '42px',
-                borderRadius: '16px',
-                border: '1px solid #DAF1DE',
-                padding: '0 12px',
-                fontSize: '13px',
-                boxSizing: 'border-box',
-                outline: 'none',
-              }}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={`Message ${activeChannel.name}...`}
+              className="flex-1 h-11 px-4 text-xs font-medium text-[#051F20] bg-white border border-[#DAF1DE] rounded-full outline-none focus:border-[#163832]"
             />
-          </div>
 
-          <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
-              Message
-            </label>
-            <textarea
-              required
-              rows={4}
-              placeholder="Type your message..."
-              style={{
-                width: '100%',
-                borderRadius: '16px',
-                border: '1px solid #DAF1DE',
-                padding: '10px 12px',
-                fontSize: '13px',
-                boxSizing: 'border-box',
-                outline: 'none',
-                resize: 'none',
-              }}
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-            />
-          </div>
-
-          <PillButton type="submit" variant="primary" fullWidth>
-            Send
-          </PillButton>
-        </form>
-      </BottomSheet>
+            <button
+              type="submit"
+              disabled={!inputText.trim() && !attachedPhoto}
+              className={`p-2.5 rounded-full text-white transition-all touch-target-44 cursor-pointer flex items-center justify-center shrink-0 ${
+                inputText.trim() || attachedPhoto
+                  ? 'bg-[#163832] hover:bg-[#235347]'
+                  : 'bg-[#8EB69B] cursor-not-allowed'
+              }`}
+              title="Send Message"
+              aria-label="Send Message"
+            >
+              <Send size={16} strokeWidth={1.75} />
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

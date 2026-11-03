@@ -5,12 +5,14 @@ import {
   Sparkles,
   Newspaper,
   Share2,
+  Camera,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
   PillButton,
   StatusChip,
   Mascot,
+  OperationCard,
 } from '../../../components/shared';
 
 export const PromotionOperationsView: React.FC = () => {
@@ -20,31 +22,18 @@ export const PromotionOperationsView: React.FC = () => {
     dailyNews,
   } = useApp();
 
-  const shortcuts = [
-    { id: 'campaigns', label: 'Posts', icon: Megaphone, desc: `${posts.length} Posts` },
-    { id: 'campaigns', label: 'Calendar', icon: Calendar, desc: 'Release timeline' },
-    { id: 'campaigns', label: 'AI Studio', icon: Sparkles, desc: 'Captions' },
-    { id: 'campaigns', label: 'News', icon: Newspaper, desc: `${dailyNews.length} Bulletins` },
-  ];
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
-      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+    <div className="flex flex-col gap-5 select-none animate-fadeIn pb-24">
+      {/* 1) Top Header: Title, Subtitle & Mascot */}
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1
-            style={{
-              fontSize: '28px',
-              lineHeight: '32px',
-              fontWeight: 800,
-              color: '#051F20',
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
           >
             Publicity Hub
           </h1>
-          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+          <p className="text-xs font-semibold text-[#235347] mt-1">
             Publicity campaigns & AI studio
           </p>
         </div>
@@ -52,150 +41,47 @@ export const PromotionOperationsView: React.FC = () => {
         <Mascot name="megaphone" size="sm" />
       </div>
 
-      {/* Shortcuts */}
-      <div>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '10px' }}>
-          Shortcuts
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: '12px',
-          }}
-        >
-          {shortcuts.map((sc) => {
-            const Icon = sc.icon;
-            return (
-              <div
-                key={sc.label}
-                onClick={() => setActiveTab(sc.id as any)}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #DAF1DE',
-                  padding: '14px',
-                  boxShadow: '0 4px 14px rgba(5,31,32,0.04)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '9999px',
-                    backgroundColor: '#DAF1DE',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#163832',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={18} strokeWidth={2} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', lineHeight: 1.2 }}>
-                    {sc.label}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
-                    {sc.desc}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 2) Bento Cards Modular Stack (matches user spec exactly) */}
+      <div className="flex flex-col gap-4">
+        {/* 1. Campaigns & Posts */}
+        <OperationCard
+          mascot="megaphone"
+          title="Campaigns & Posts"
+          meta={<StatusChip status="live" label={`${posts.length} Active`} />}
+          description="Social media release schedules, Instagram reels, LinkedIn updates, and WhatsApp blasts"
+          actionLabel="Open Campaigns"
+          onClick={() => setActiveTab('campaigns')}
+        />
 
-      {/* Bento Modules */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
-          Workflows
-        </div>
+        {/* 2. Release Calendar */}
+        <OperationCard
+          mascot="calendar"
+          title="Release Calendar"
+          meta={<span className="text-xs font-bold text-[#235347]">Holidays & Eco Days</span>}
+          description="Track government holidays, world environment days, and scheduled post launches"
+          actionLabel="View Calendar"
+          onClick={() => setActiveTab('campaigns')}
+        />
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '14px',
-          }}
-        >
-          {/* Campaigns */}
-          <div
-            onClick={() => setActiveTab('campaigns')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="megaphone" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Campaigns
-                </h3>
-              </div>
-              <StatusChip status="live" label={`${posts.length} Active`} />
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              Social media schedules, Instagram reels, LinkedIn updates, and WhatsApp blasts
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                Open Campaigns →
-              </span>
-            </div>
-          </div>
+        {/* 3. Per-Event Media Upload */}
+        <OperationCard
+          mascot="camera"
+          title="Event Media Upload"
+          meta={<span className="text-xs font-bold text-[#235347]">Photos & Videos</span>}
+          description="Upload event photos, highlight videos, and promotional graphics directly to albums"
+          actionLabel="Upload Media"
+          onClick={() => setActiveTab('gallery')}
+        />
 
-          {/* Daily News */}
-          <div
-            onClick={() => setActiveTab('campaigns')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="notebook" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Bulletins
-                </h3>
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-                {dailyNews.length} Broadcasts
-              </span>
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              Campus notice board broadcasts, squad bulletins, and urgent club directives
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                View News →
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* 4. Bulletins & Daily News */}
+        <OperationCard
+          mascot="notebook"
+          title="Bulletins & Daily News"
+          meta={<span className="text-xs font-bold text-[#235347]">{dailyNews.length} Broadcasts</span>}
+          description="Campus notice board broadcasts, squad bulletins, and urgent club directives"
+          actionLabel="View News"
+          onClick={() => setActiveTab('campaigns')}
+        />
       </div>
     </div>
   );

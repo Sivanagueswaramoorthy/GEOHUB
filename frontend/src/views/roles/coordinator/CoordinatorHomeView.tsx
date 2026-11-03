@@ -5,6 +5,7 @@ import {
   Users,
   AlertCircle,
   Plus,
+  QrCode,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
@@ -14,6 +15,7 @@ import {
   StatusChip,
   ListRow,
   SectionHeader,
+  EmptyState,
 } from '../../../components/shared';
 
 export interface CoordinatorHomeViewProps {
@@ -33,81 +35,98 @@ export const CoordinatorHomeView: React.FC<CoordinatorHomeViewProps> = ({
 
   return (
     <div className="flex flex-col gap-5 select-none">
-      {/* 1) HeroCard: "Plan something", subtitle "Chapter leadership", small calendar mascot; CTA "New event" */}
+      {/* 1) HeroCard: "Plan something" with "+ New event" and QR Scanner */}
       <HeroCard
         variant="mint"
         title="Plan something"
-        subtitle="Chapter leadership"
+        subtitle="Chapter leadership & event execution"
         mascot="calendar"
         mascotSize="md"
         chip={<StatusChip status="live" label="Coordinator" />}
         action={
-          <PillButton
-            variant="primary"
-            fullWidth
-            icon={<Plus size={16} strokeWidth={2.2} />}
-            onClick={() => setActiveTab('events')}
-          >
-            New event
-          </PillButton>
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex items-center gap-2 w-full">
+              <PillButton
+                variant="primary"
+                fullWidth
+                icon={<Plus size={16} strokeWidth={1.75} className="lucide" />}
+                onClick={() => setActiveTab('events')}
+              >
+                + New event
+              </PillButton>
+              <PillButton
+                variant="secondary"
+                fullWidth
+                icon={<QrCode size={16} strokeWidth={1.75} className="lucide" />}
+                onClick={() => setActiveTab('scan_qr')}
+              >
+                QR Scanner
+              </PillButton>
+            </div>
+            <span className="text-center text-xs font-semibold text-[#235347]">
+              To give attendance for respective event
+            </span>
+          </div>
         }
       />
 
       {/* 2) StatTiles: Events, Pending, Volunteers */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
-          icon={<Calendar size={18} strokeWidth={2} />}
-          value={String(events.length || 6)}
+          icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
+          value={String(events.length || 7)}
           label="Events"
           tint="mint"
           onClick={() => setActiveTab('events')}
         />
         <StatTile
-          icon={<AlertCircle size={18} strokeWidth={2} />}
+          icon={<AlertCircle size={20} strokeWidth={1.75} className="lucide" />}
           value={String(pendingCount || 3)}
           label="Pending"
           tint="amber"
           onClick={() => setActiveTab('operations')}
         />
         <StatTile
-          icon={<Users size={18} strokeWidth={2} />}
-          value={String(users.length || 128)}
+          icon={<Users size={20} strokeWidth={1.75} className="lucide" />}
+          value={String(users.length || 25)}
           label="Volunteers"
           tint="sage"
-          onClick={() => setActiveTab('members')}
+          onClick={() => setActiveTab('operations')}
         />
       </div>
 
-      {/* 3) Action-required list rows */}
+      {/* 3) "Need action" list with View all */}
       <div className="flex flex-col gap-2.5">
         <SectionHeader
-          title="Needs action"
+          title="Need action"
           actionLabel="View all"
           onAction={() => setActiveTab('operations')}
         />
 
         <div className="flex flex-col gap-2">
-          {items.slice(0, 3).map((item) => (
-            <ListRow
-              key={item.id}
-              icon={<Clock size={18} strokeWidth={2} />}
-              title={item.title}
-              subtitle={item.category || item.submittedBy || 'Review required'}
-              meta={<StatusChip status="pending" />}
-              onClick={() => {
-                if (handleReviewAttention) {
-                  handleReviewAttention(item);
-                } else {
-                  setActiveTab('operations');
-                }
-              }}
+          {items && items.length > 0 ? (
+            items.slice(0, 3).map((item) => (
+              <ListRow
+                key={item.id}
+                icon={<Clock size={20} strokeWidth={1.75} className="lucide" />}
+                title={item.title}
+                subtitle={item.category || item.submittedBy || 'Review required'}
+                meta={<StatusChip status="pending" label="Pending" />}
+                onClick={() => {
+                  if (handleReviewAttention) {
+                    handleReviewAttention(item);
+                  } else {
+                    setActiveTab('approvals');
+                  }
+                }}
+              />
+            ))
+          ) : (
+            <EmptyState
+              title="All Caught Up"
+              description="No pending actions requiring immediate coordinator review."
+              mascot="shield"
             />
-          ))}
-
-          {items.length === 0 && (
-            <div className="p-4 rounded-[24px] bg-white border border-[#DAF1DE] text-center text-xs font-semibold text-[#235347]">
-              All items actioned!
-            </div>
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { WifiOff, RefreshCw } from 'lucide-react';
+import { MascotLogo } from './MascotLogo';
 
 export interface OfflineBannerProps {
   className?: string;
@@ -29,6 +30,7 @@ export const OfflineBanner: React.FC<OfflineBannerProps> = ({ className = '' }) 
       role="status"
     >
       <div className="flex items-center gap-2">
+        <MascotLogo size={22} mood="sleep" animated={true} />
         <WifiOff size={16} strokeWidth={2.2} className="text-[#051F20]" />
         <span>You are currently offline. Changes will sync once connected.</span>
       </div>

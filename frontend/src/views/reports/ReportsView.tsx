@@ -47,7 +47,7 @@ export const ReportsView: React.FC = () => {
         `"${a.eventTitle}"`,
         `"${a.userName}"`,
         a.userEmail,
-        a.checkInTime,
+        a.checkInTime || a.entryTime || '',
       ]);
     } else {
       headers = ['ID', 'Category', 'Description', 'Vendor', 'Amount', 'Status'];

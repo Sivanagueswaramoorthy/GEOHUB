@@ -40,6 +40,12 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       } ${className}`}
       style={{
         borderRadius: '32px',
+        boxShadow: isDark
+          ? '0 18px 42px -8px rgba(5, 31, 32, 0.32), 0 8px 20px -4px rgba(5, 31, 32, 0.18)'
+          : '0 16px 36px -6px rgba(5, 31, 32, 0.14), 0 6px 16px -2px rgba(5, 31, 32, 0.08), 0 1px 3px rgba(5, 31, 32, 0.04)',
+        border: isDark
+          ? '1px solid rgba(218, 241, 222, 0.20)'
+          : '1.5px solid #8EB69B',
         ...style,
       }}
     >

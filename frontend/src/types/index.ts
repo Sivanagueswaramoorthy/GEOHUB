@@ -4,7 +4,8 @@ export type FinalRole =
   | 'documentation'
   | 'treasurer'
   | 'promotion'
-  | 'student';
+  | 'student'
+  | 'management';
 
 export type LegacyRole =
   | 'super_admin'
@@ -17,6 +18,12 @@ export type LegacyRole =
 export type UserRole = FinalRole | LegacyRole;
 
 export type UserStatus = 'active' | 'pending' | 'disabled';
+
+export interface SquadMembership {
+  squad: 'Management' | 'Promotion' | 'Documentation' | 'Entertainment' | string;
+  isLead: boolean;
+  permissions?: 'read' | 'write';
+}
 
 export interface UserPostAssignment {
   post: string;
@@ -37,6 +44,8 @@ export interface UserModel {
   postAssignments?: UserPostAssignment[];
   team?: 'Management' | 'Promotion' | 'Documentation' | 'Entertainment' | string;
   teamRole?: string;
+  squadMemberships?: SquadMembership[];
+  mustChangePassword?: boolean;
   isVolunteer: boolean;
   status: UserStatus;
   avatarUrl?: string;
@@ -52,6 +61,8 @@ export interface TeamModel {
   description: string;
   leadId: string;
   leadName: string;
+  leadIds?: string[];
+  leadNames?: string[];
   memberIds: string[];
   totalTasks: number;
   completedTasks: number;
@@ -111,12 +122,44 @@ export interface EventCompletedData {
   documentationSummary?: string;
 }
 
+export interface EventSquadGrant {
+  userId: string;
+  userName?: string;
+  squad: string;
+  access: 'read' | 'write';
+  grantedBy: string;
+  grantedAt: string;
+}
+
+export type EventType = 'internal' | 'external';
+
+export interface EventDutyItem {
+  id?: string;
+  squad?: string;
+  assignedTo?: string;
+  assignedToName?: string;
+  assigneeName?: string;
+  task?: string;
+  workDescription?: string;
+  status: 'pending' | 'in_progress' | 'done' | 'completed';
+}
+
+export interface EventActionLog {
+  id?: string;
+  timestamp: string;
+  squad: 'Promotion' | 'Documentation' | 'Treasurer' | 'Management' | string;
+  actorId?: string;
+  actorName: string;
+  action: string;
+}
+
 export interface EventModel {
   id: string;
   title: string;
   description: string;
   category: string;
-  eventType?: 'internal' | 'external';
+  eventType?: EventType;
+  time?: string;
   posterUrl?: string;
   venue: string;
   geoCoordinates?: { lat: number; lng: number; locationName?: string };
@@ -130,6 +173,12 @@ export interface EventModel {
   registeredUserIds: string[];
   volunteerIds: string[];
   assignedScannerUserIds?: string[];
+  entryOtp?: string;
+  exitOtp?: string;
+  otpExpiresAt?: number;
+  squadGrants?: EventSquadGrant[];
+  duties?: any;
+  actionLogs?: EventActionLog[];
   budget: number;
   createdBy: string;
   qrToken?: string;
@@ -178,6 +227,8 @@ export interface MeetingModel {
   eventId?: string;
   eventTitle?: string;
   dateTime: string; // ISO string
+  date?: string;
+  time?: string;
   venue: string;
   organizerName: string;
   attendeeIds: string[];
@@ -293,6 +344,7 @@ export interface BudgetChangeRequest {
 export interface DocTemplate {
   id: string;
   name: string;
+  title?: string;
   description: string;
   category:
     | 'event_summary'
@@ -358,6 +410,14 @@ export interface ApprovalItem {
   rejectionReason?: string;
 }
 
+export type AttendanceStatus =
+  | 'Not marked'
+  | 'Entered'
+  | 'Completed'
+  | 'Incomplete'
+  | 'verified'
+  | 'flagged';
+
 export interface AttendanceRecord {
   id: string;
   eventId: string;
@@ -366,10 +426,49 @@ export interface AttendanceRecord {
   userName: string;
   userEmail: string;
   team?: string;
-  checkInTime: string; // ISO string
-  scannedByVolunteerId: string;
-  scannedByVolunteerName: string;
-  status: 'verified' | 'flagged';
+  checkInTime?: string; // ISO string
+  entryTime?: string; // ISO string
+  exitTime?: string; // ISO string
+  scannedByVolunteerId?: string;
+  scannedByVolunteerName?: string;
+  status: AttendanceStatus;
+  overrideReason?: string;
+  overriddenBy?: string;
+}
+
+export interface CommunityMessage {
+  id: string;
+  channelId: string; // 'general' | 'Management' | 'Promotion' | 'Documentation' | 'Entertainment'
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  senderRole?: string;
+  text: string;
+  photoUrl?: string;
+  imageUrl?: string;
+  timestamp: string;
+}
+
+export interface GalleryMediaItem {
+  id: string;
+  albumId: string;
+  eventId: string;
+  url: string;
+  type: 'photo' | 'video';
+  caption?: string;
+  uploadedBy: string;
+  uploadedByName: string;
+  uploadedAt: string;
+}
+
+export interface GalleryAlbum {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  date: string;
+  coverUrl: string;
+  mediaCount: number;
+  items: GalleryMediaItem[];
 }
 
 export interface GalleryItem {
@@ -436,7 +535,7 @@ export interface NotificationModel {
 // PROMOTION & SOCIAL MEDIA CAMPAIGNS
 // ------------------------------------------
 export type SocialPlatform = 'Instagram' | 'LinkedIn' | 'WhatsApp' | 'YouTube' | 'Other';
-export type SocialPostStatus = 'Draft' | 'Scheduled' | 'Posted' | 'Published';
+export type SocialPostStatus = 'Draft' | 'Scheduled' | 'Posted' | 'Published' | 'draft' | 'scheduled' | 'posted' | 'published';
 
 export interface SocialPost {
   id: string;
@@ -484,6 +583,8 @@ export interface DailyNewsItem {
   id: string;
   title: string;
   date: string;
+  summary?: string;
+  publishedAt?: string;
   eventId?: string;
   eventTitle?: string;
   author: string;

@@ -6,12 +6,14 @@ import {
   MessageSquare,
   ArrowRight,
   Camera,
+  Upload,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
   PillButton,
   StatusChip,
   Mascot,
+  OperationCard,
 } from '../../../components/shared';
 
 export const DocumentationOperationsView: React.FC = () => {
@@ -19,184 +21,80 @@ export const DocumentationOperationsView: React.FC = () => {
     setActiveTab,
     events,
     docTemplates,
+    meetings,
+    dailyNews,
   } = useApp();
 
-  const shortcuts = [
-    { id: 'doc_studio', label: 'Studio', icon: FileText, desc: 'Template editor' },
-    { id: 'archives', label: 'Archives', icon: Archive, desc: 'Media gallery' },
-    { id: 'meetings', label: 'MoM', icon: Calendar, desc: 'Meeting minutes' },
-    { id: 'memories', label: 'Memories', icon: Camera, desc: 'Field photos' },
-  ];
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
-      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+    <div className="flex flex-col gap-5 select-none animate-fadeIn pb-24">
+      {/* 1) Top Header: Title, Subtitle & Mascot */}
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1
-            style={{
-              fontSize: '28px',
-              lineHeight: '32px',
-              fontWeight: 800,
-              color: '#051F20',
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
           >
             Archival Wing
           </h1>
-          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
-            Official templates & media archives
+          <p className="text-xs font-semibold text-[#235347] mt-1">
+            Official templates, uploads & archival records
           </p>
         </div>
 
         <Mascot name="notebook" size="sm" />
       </div>
 
-      {/* Shortcuts */}
-      <div>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '10px' }}>
-          Shortcuts
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: '12px',
-          }}
-        >
-          {shortcuts.map((sc) => {
-            const Icon = sc.icon;
-            return (
-              <div
-                key={sc.id}
-                onClick={() => setActiveTab(sc.id as any)}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #DAF1DE',
-                  padding: '14px',
-                  boxShadow: '0 4px 14px rgba(5,31,32,0.04)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '9999px',
-                    backgroundColor: '#DAF1DE',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#163832',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={18} strokeWidth={2} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', lineHeight: 1.2 }}>
-                    {sc.label}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
-                    {sc.desc}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 2) Bento Cards Modular Stack (matches user spec exactly) */}
+      <div className="flex flex-col gap-4">
+        {/* 1. Documentation Studio */}
+        <OperationCard
+          mascot="notebook"
+          title="Studio & Templates"
+          meta={<StatusChip status="live" label={`${docTemplates.length} Templates`} />}
+          description="Official templates, PDF/Word/Excel exports, and institutional clearance letters"
+          actionLabel="Open Studio"
+          onClick={() => setActiveTab('doc_studio')}
+        />
 
-      {/* Bento Modules: Documentation Studio, Media Archives */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
-          Workflows
-        </div>
+        {/* 2. Per-Event Upload */}
+        <OperationCard
+          mascot="camera"
+          title="Per-Event Upload"
+          meta={<span className="text-xs font-bold text-[#235347]">{events.length} Events</span>}
+          description="Upload official event reports, photographic records, and participant certificates per event"
+          actionLabel="Upload Files"
+          onClick={() => setActiveTab('doc_studio')}
+        />
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '14px',
-          }}
-        >
-          {/* Documentation Studio */}
-          <div
-            onClick={() => setActiveTab('doc_studio')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="notebook" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Studio
-                </h3>
-              </div>
-              <StatusChip status="live" label={`${docTemplates.length} Templates`} />
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              Official templates, PDF/Word/Excel exports, and clearance letters
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                Open Studio →
-              </span>
-            </div>
-          </div>
+        {/* 3. Meetings & Minutes of Meeting (MoM) */}
+        <OperationCard
+          mascot="calendar"
+          title="Meetings & MoM"
+          meta={<span className="text-xs font-bold text-[#235347]">{meetings.length} Records</span>}
+          description="Draft meeting minutes, attendee resolutions, and action items for faculty sign-off"
+          actionLabel="Record MoM"
+          onClick={() => setActiveTab('meetings')}
+        />
 
-          {/* Media Archives */}
-          <div
-            onClick={() => setActiveTab('archives')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="camera" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Archives
-                </h3>
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-                Gallery Hub
-              </span>
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              High-resolution expedition photos, telemetry records, and video reels
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                View Media →
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* 4. Media Archives & Gallery */}
+        <OperationCard
+          mascot="camera"
+          title="Media Archives"
+          meta={<span className="text-xs font-bold text-[#235347]">Gallery Hub</span>}
+          description="High-resolution expedition photos, telemetry records, and field video reels"
+          actionLabel="View Media"
+          onClick={() => setActiveTab('gallery')}
+        />
+
+        {/* 5. Daily News Bulletins */}
+        <OperationCard
+          mascot="notebook"
+          title="Daily News Bulletins"
+          meta={<span className="text-xs font-bold text-[#235347]">{dailyNews.length} Articles</span>}
+          description="Curated geospatial news, department achievements, and campus journalism"
+          actionLabel="Read Bulletins"
+          onClick={() => setActiveTab('doc_studio')}
+        />
       </div>
     </div>
   );

@@ -3,8 +3,10 @@ import {
   Megaphone,
   Clock,
   Send,
-  Sparkles,
+  Calendar,
   Plus,
+  QrCode,
+  FileCheck2,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
@@ -14,6 +16,7 @@ import {
   StatusChip,
   ListRow,
   SectionHeader,
+  EmptyState,
 } from '../../../components/shared';
 
 export interface PromotionHomeViewProps {
@@ -21,37 +24,48 @@ export interface PromotionHomeViewProps {
 }
 
 export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
-  const { posts, setActiveTab } = useApp();
+  const { posts, events, approvals, setActiveTab } = useApp();
 
   const scheduledCount = posts.filter((p) => p.status === 'Scheduled').length;
   const postedCount = posts.filter((p) => p.status === 'Posted').length;
+  const promoApprovals = approvals.filter((a) => a.requestedTeam === 'Promotion' || a.applicantName?.includes('David') || a.applicantName?.includes('Chloe') || a.type === 'event');
 
   return (
     <div className="flex flex-col gap-5 select-none">
-      {/* 1) HeroCard: "Promotion", subtitle "Publicity & engagement", small megaphone mascot; CTA "New post" */}
+      {/* 1) HeroCard: "Promotion" with "+ New post" and QR Scanner */}
       <HeroCard
         variant="mint"
         title="Promotion"
-        subtitle="Publicity & engagement"
+        subtitle="Publicity, social media & campus campaigns"
         mascot="megaphone"
         mascotSize="md"
-        chip={<StatusChip status="live" label="Media Desk" />}
+        chip={<StatusChip status="live" label="Promotion" />}
         action={
-          <PillButton
-            variant="primary"
-            fullWidth
-            icon={<Plus size={16} strokeWidth={2.2} />}
-            onClick={() => setActiveTab('campaigns')}
-          >
-            New post
-          </PillButton>
+          <div className="flex items-center gap-2 w-full">
+            <PillButton
+              variant="primary"
+              fullWidth
+              icon={<Plus size={16} strokeWidth={1.75} className="lucide" />}
+              onClick={() => setActiveTab('campaigns')}
+            >
+              + New post
+            </PillButton>
+            <PillButton
+              variant="secondary"
+              fullWidth
+              icon={<QrCode size={16} strokeWidth={1.75} className="lucide" />}
+              onClick={() => setActiveTab('scan_qr')}
+            >
+              QR Scanner
+            </PillButton>
+          </div>
         }
       />
 
-      {/* 2) StatTiles: Scheduled, Posted, Reach */}
+      {/* 2) StatTiles: Scheduled, Posted, Events */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
-          icon={<Clock size={18} strokeWidth={2} />}
+          icon={<Clock size={20} strokeWidth={1.75} className="lucide" />}
           value={String(scheduledCount || 2)}
           label="Scheduled"
           footnote="Upcoming"
@@ -59,7 +73,7 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
           onClick={() => setActiveTab('campaigns')}
         />
         <StatTile
-          icon={<Send size={18} strokeWidth={2} />}
+          icon={<Send size={20} strokeWidth={1.75} className="lucide" />}
           value={String(postedCount || 6)}
           label="Posted"
           footnote="Live"
@@ -67,34 +81,47 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
           onClick={() => setActiveTab('campaigns')}
         />
         <StatTile
-          icon={<Sparkles size={18} strokeWidth={2} />}
-          value="4.2k"
-          label="Reach"
-          footnote="+42% growth"
+          icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
+          value={String(events.length || 7)}
+          label="Events"
+          footnote="Active"
           tint="sage"
-          onClick={() => setActiveTab('campaigns')}
+          onClick={() => setActiveTab('events')}
         />
       </div>
 
-      {/* 3) Recent Campaign Posts */}
+      {/* 3) Approval list with Approved/Pending chips */}
       <div className="flex flex-col gap-2.5">
         <SectionHeader
-          title="Campaigns"
-          actionLabel="Studio"
-          onAction={() => setActiveTab('campaigns')}
+          title="Campaign Approvals"
+          actionLabel="View all"
+          onAction={() => setActiveTab('approvals')}
         />
 
         <div className="flex flex-col gap-2">
-          {posts.slice(0, 3).map((post) => (
-            <ListRow
-              key={post.id}
-              icon={<Megaphone size={18} strokeWidth={2} />}
-              title={post.caption || 'Event Announcement'}
-              subtitle={`${post.platform || 'Social'} • ${post.status}`}
-              meta={<StatusChip status={post.status === 'Posted' ? 'done' : 'live'} />}
-              onClick={() => setActiveTab('campaigns')}
+          {promoApprovals && promoApprovals.length > 0 ? (
+            promoApprovals.slice(0, 3).map((item) => (
+              <ListRow
+                key={item.id}
+                icon={<FileCheck2 size={20} strokeWidth={1.75} className="lucide" />}
+                title={item.title}
+                subtitle={`${item.subtitle || 'Social Media Collateral'} • Submitted`}
+                meta={
+                  <StatusChip
+                    status={item.status === 'approved' ? 'approved' : 'pending'}
+                    label={item.status === 'approved' ? 'Approved' : 'Pending'}
+                  />
+                }
+                onClick={() => setActiveTab('approvals')}
+              />
+            ))
+          ) : (
+            <EmptyState
+              title="No Approvals Pending"
+              description="All promotional media campaigns have been reviewed."
+              mascot="megaphone"
             />
-          ))}
+          )}
         </div>
       </div>
     </div>

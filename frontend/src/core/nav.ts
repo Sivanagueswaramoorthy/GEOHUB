@@ -4,6 +4,12 @@ export type NavTabKey =
   | 'home'
   | 'events'
   | 'operations'
+  | 'community'
+  | 'gallery'
+  | 'scan_qr'
+  | 'qrscanner'
+  | 'ledger'
+  // Legacy aliases supported for route compatibility
   | 'members'
   | 'archives'
   | 'finance'
@@ -14,8 +20,21 @@ export type NavTabKey =
 export interface NavItemConfig {
   key: NavTabKey;
   label: string;
-  iconName: 'house' | 'calendar' | 'layers' | 'user-check' | 'folder-archive' | 'wallet' | 'megaphone' | 'images' | 'user';
+  shortLabel?: string;
+  iconName:
+    | 'house'
+    | 'calendar'
+    | 'layers'
+    | 'messages-square'
+    | 'images'
+    | 'scan'
+    | 'wallet'
+    | 'user-check'
+    | 'folder-archive'
+    | 'megaphone'
+    | 'user';
   hasUpdates?: boolean;
+  isReadOnly?: boolean;
 }
 
 /**
@@ -28,6 +47,7 @@ export const ROLE_LABELS: Record<string, string> = {
   treasurer: 'Treasurer',
   promotion: 'Promotion',
   student: 'Student',
+  management: 'Management',
   // Legacy aliases
   super_admin: 'Faculty',
   admin: 'Coordinator',
@@ -37,94 +57,63 @@ export const ROLE_LABELS: Record<string, string> = {
   member: 'Student',
 };
 
-export const getFriendlyRoleName = (role: UserRole | string, post?: string): string => {
+export const getFriendlyRoleName = (role: UserRole | string, post?: string, team?: string): string => {
   if (post && post.trim()) {
-    if (post.toLowerCase().includes('faculty') || post.toLowerCase().includes('advisor')) {
+    const lower = post.toLowerCase();
+    if (lower.includes('faculty') || lower.includes('advisor')) {
       return 'Faculty';
     }
-    if (post.toLowerCase().includes('treasurer')) {
+    if (lower.includes('treasurer')) {
       return 'Treasurer';
     }
-    if (post.toLowerCase().includes('documentation')) {
+    if (lower.includes('documentation')) {
       return 'Documentation';
     }
-    if (post.toLowerCase().includes('promotion') || post.toLowerCase().includes('social')) {
+    if (lower.includes('promotion') || lower.includes('social')) {
       return 'Promotion';
     }
     if (
-      post.toLowerCase().includes('president') ||
-      post.toLowerCase().includes('coordinator') ||
-      post.toLowerCase().includes('lead')
+      lower.includes('president') ||
+      lower.includes('coordinator') ||
+      lower.includes('lead')
     ) {
       return 'Coordinator';
     }
+  }
+
+  if (team && team.toLowerCase() === 'management') {
+    return 'Management';
   }
 
   return ROLE_LABELS[role] || 'Student';
 };
 
 /**
- * Single source of truth for Role to Tabs map (5 tabs per role)
- * Faculty and Coordinator: Home, Events, Operations, Members, Profile
- * Documentation: Home, Events, Operations, Archives, Profile
- * Treasurer: Home, Events, Operations, Finance, Profile
- * Promotion: Home, Events, Operations, Campaigns, Profile
- * Student: Home, Events, Operations, Memories, Profile
+ * Single source of truth for Role to Tabs map (6 universal navigation tabs per role)
+ * Standardized across all roles in accordance with GeoHub Operations Hub architecture:
+ * 1. Home (house)
+ * 2. Events (calendar) - read-only for squad members without event-write grant
+ * 3. Operations (layers) - role-specific operations hub
+ * 4. Community (messages-square) - campus chat and forum
+ * 5. Gallery (images) - chapter memories and event media
+ * 6. QR Scanner (scan) - gate attendance scanner and token check-in
  */
-export const getRoleNavTabs = (role: UserRole, post?: string): NavItemConfig[] => {
-  // Check role or post specialization
+export const getRoleNavTabs = (role: UserRole | string, post?: string, team?: string): NavItemConfig[] => {
   const lowerPost = (post || '').toLowerCase();
+  const lowerRole = (role || '').toLowerCase();
 
-  // Treasurer
-  if (role === 'treasurer' || lowerPost.includes('treasurer')) {
-    return [
-      { key: 'home', label: 'Home', iconName: 'house' },
-      { key: 'events', label: 'Events', iconName: 'calendar' },
-      { key: 'operations', label: 'Operations', iconName: 'layers' },
-      { key: 'finance', label: 'Finance', iconName: 'wallet' },
-      { key: 'profile', label: 'Profile', iconName: 'user' },
-    ];
-  }
+  const isFaculty = lowerRole === 'super_admin' || lowerRole === 'faculty' || lowerPost.includes('faculty') || lowerPost.includes('advisor');
+  const isPresident = lowerRole === 'admin' || lowerRole === 'coordinator' || lowerPost.includes('president') || lowerPost.includes('coordinator');
 
-  // Documentation
-  if (role === 'documentation' || lowerPost.includes('documentation')) {
-    return [
-      { key: 'home', label: 'Home', iconName: 'house' },
-      { key: 'events', label: 'Events', iconName: 'calendar' },
-      { key: 'operations', label: 'Operations', iconName: 'layers' },
-      { key: 'archives', label: 'Archives', iconName: 'folder-archive' },
-      { key: 'profile', label: 'Profile', iconName: 'user' },
-    ];
-  }
+  // Only Faculty Advisor and President have create/edit access to core events without an event grant
+  const isEventsReadOnly = !isFaculty && !isPresident;
 
-  // Promotion
-  if (role === 'social_media' || lowerPost.includes('promotion') || (role === 'team_admin' && lowerPost.includes('media'))) {
-    return [
-      { key: 'home', label: 'Home', iconName: 'house' },
-      { key: 'events', label: 'Events', iconName: 'calendar' },
-      { key: 'operations', label: 'Operations', iconName: 'layers' },
-      { key: 'campaigns', label: 'Campaigns', iconName: 'megaphone' },
-      { key: 'profile', label: 'Profile', iconName: 'user' },
-    ];
-  }
-
-  // Faculty and Coordinator (Super Admin & Admin)
-  if (role === 'super_admin' || role === 'faculty' || role === 'admin' || role === 'coordinator') {
-    return [
-      { key: 'home', label: 'Home', iconName: 'house' },
-      { key: 'events', label: 'Events', iconName: 'calendar' },
-      { key: 'operations', label: 'Operations', iconName: 'layers' },
-      { key: 'members', label: 'Members', iconName: 'user-check' },
-      { key: 'profile', label: 'Profile', iconName: 'user' },
-    ];
-  }
-
-  // Student (Member / Volunteer / Default)
   return [
-    { key: 'home', label: 'Home', iconName: 'house' },
-    { key: 'events', label: 'Events', iconName: 'calendar' },
-    { key: 'operations', label: 'Operations', iconName: 'layers' },
-    { key: 'memories', label: 'Memories', iconName: 'images' },
-    { key: 'profile', label: 'Profile', iconName: 'user' },
+    { key: 'home', label: 'Home', shortLabel: 'Home', iconName: 'house' },
+    { key: 'events', label: 'Events', shortLabel: 'Events', iconName: 'calendar', isReadOnly: isEventsReadOnly },
+    { key: 'operations', label: 'Operations', shortLabel: 'Ops', iconName: 'layers' },
+    { key: 'community', label: 'Community', shortLabel: 'Chat', iconName: 'messages-square' },
+    { key: 'gallery', label: 'Gallery', shortLabel: 'Gallery', iconName: 'images' },
+    { key: 'scan_qr', label: 'QR Scanner', shortLabel: 'Scan', iconName: 'scan' },
   ];
 };

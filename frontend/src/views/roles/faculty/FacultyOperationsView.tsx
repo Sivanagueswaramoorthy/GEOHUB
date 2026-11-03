@@ -8,6 +8,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   Lock,
+  UserPlus,
+  History,
+  Check,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
@@ -15,6 +18,7 @@ import {
   StatusChip,
   Mascot,
   BottomSheet,
+  OperationCard,
 } from '../../../components/shared';
 
 export const FacultyOperationsView: React.FC = () => {
@@ -26,33 +30,51 @@ export const FacultyOperationsView: React.FC = () => {
     teams,
     users,
     meetings,
+    auditLogs,
+    showToast,
   } = useApp();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAuditOpen, setIsAuditOpen] = useState(false);
+  const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
   const [academicYear, setAcademicYear] = useState('2026-2027');
   const [gateSecurityLevel, setGateSecurityLevel] = useState('Standard Gate Pass');
 
-  const pendingApprovals = approvals.filter((a) => a.status === 'pending');
+  const [selectedEventId, setSelectedEventId] = useState<string>(events[0]?.id || 'event_01');
+  const selectedEvent = events.find((e) => e.id === selectedEventId) || events[0];
+
+  const [eventGrants, setEventGrants] = useState<{ squad: string; leadName: string; permission: 'read' | 'write' }[]>([
+    { squad: 'Management', leadName: 'Vikram Seth', permission: 'write' },
+    { squad: 'Promotion', leadName: 'Maya Patel', permission: 'write' },
+    { squad: 'Documentation', leadName: 'Kavita Rao', permission: 'write' },
+    { squad: 'Treasurer', leadName: 'Devon Vance', permission: 'write' },
+  ]);
+
+  const handleTogglePermission = (idx: number) => {
+    setEventGrants((prev) =>
+      prev.map((g, i) => {
+        if (i !== idx) return g;
+        const newPerm = g.permission === 'write' ? 'read' : 'write';
+        showToast(`Updated ${g.squad} squad access for "${selectedEvent.title}" to ${newPerm.toUpperCase()}`);
+        return { ...g, permission: newPerm };
+      })
+    );
+  };
+
   const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
-      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+    <div className="flex flex-col gap-5 select-none animate-fadeIn pb-24">
+      {/* 1) Top Header: Title, Subtitle & Mascot */}
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1
-            style={{
-              fontSize: '28px',
-              lineHeight: '32px',
-              fontWeight: 800,
-              color: '#051F20',
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
           >
             Faculty Command
           </h1>
-          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
+          <p className="text-xs font-semibold text-[#235347] mt-1">
             Institutional governance & oversight
           </p>
         </div>
@@ -60,209 +82,189 @@ export const FacultyOperationsView: React.FC = () => {
         <Mascot name="shield" size="sm" />
       </div>
 
-      {/* Bento Grid of 5 Modules: Lifecycle, Finance, Squads, Archives with MoM sign-off, Settings */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '16px',
-        }}
-      >
-        {/* 1. Event Lifecycle */}
-        <div
+      {/* 2) Bento Cards Modular Stack (matches user spec exactly) */}
+      <div className="flex flex-col gap-4">
+        {/* 1. Lifecycle */}
+        <OperationCard
+          mascot="calendar"
+          title="Lifecycle"
+          meta={<span className="text-xs font-bold text-[#235347]">{events.length} Events</span>}
+          description="Sanction dates, review field proposals, and inspect volunteer duties"
+          actionLabel="Manage"
           onClick={() => setActiveTab('events')}
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid #DAF1DE',
-            padding: '20px',
-            boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Mascot name="calendar" size="sm" />
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                Lifecycle
-              </h3>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-              {events.length} Events
-            </span>
-          </div>
-          <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-            Sanction dates, review field proposals, and inspect volunteer duties
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-              Manage →
-            </span>
-          </div>
-        </div>
+        />
 
-        {/* 2. Finance Oversight */}
-        <div
+        {/* 2. Finance */}
+        <OperationCard
+          mascot="coin"
+          title="Finance"
+          meta={<StatusChip status="live" label="Fiscal Authority" />}
+          description={`Budget sign-offs • ₹${totalSpent.toLocaleString()} disbursed • Treasury ledger oversight`}
+          actionLabel="Inspect"
           onClick={() => setActiveTab('finance')}
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid #DAF1DE',
-            padding: '20px',
-            boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Mascot name="coin" size="sm" />
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                Finance
-              </h3>
-            </div>
-            <StatusChip status="live" label="Fiscal Authority" />
-          </div>
-          <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-            Budget sign-offs • ₹{totalSpent.toLocaleString()} disbursed • Treasury ledger oversight
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-              Inspect →
-            </span>
-          </div>
-        </div>
+        />
 
-        {/* 3. Squads Oversight */}
-        <div
+        {/* 3. Squads */}
+        <OperationCard
+          mascot="clipboard"
+          title="Squads"
+          meta={<span className="text-xs font-bold text-[#235347]">{teams.length} Squads</span>}
+          description="Track committee leadership, appointment sanctions, and deliverable quotas"
+          actionLabel="Review"
           onClick={() => setActiveTab('teams')}
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid #DAF1DE',
-            padding: '20px',
-            boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Mascot name="clipboard" size="sm" />
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                Squads
-              </h3>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-              {teams.length} Squads
-            </span>
-          </div>
-          <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-            Track committee leadership, appointment sanctions, and deliverable quotas
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-              Review →
-            </span>
-          </div>
-        </div>
+        />
 
-        {/* 4. Documentation view-only with MoM sign-off */}
-        <div
-          onClick={() => setActiveTab('meetings')}
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid #DAF1DE',
-            padding: '20px',
-            boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Mascot name="notebook" size="sm" />
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                Archives
-              </h3>
-            </div>
-            <StatusChip status="draft" label="View only" />
-          </div>
-          <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-            Official templates, DGCA permit letters, and Minutes of Meeting sign-off
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-              Sign off →
-            </span>
-          </div>
-        </div>
+        {/* 4. Members Directory & Admissions */}
+        <OperationCard
+          mascot="notebook"
+          title="Members Directory"
+          meta={<span className="text-xs font-bold text-[#235347]">{users.length} Scholars</span>}
+          description="Scholar roster, executive post assignments, and single or bulk roll-number student onboarding"
+          actionLabel="Directory"
+          onClick={() => setActiveTab('members')}
+        />
 
-        {/* 5. Governance Settings */}
-        <div
+        {/* 5. Lead Activity Review */}
+        <OperationCard
+          mascot="shield"
+          title="Lead Activity Review"
+          meta={<StatusChip status="live" label="Audit Trail" />}
+          description="Immutable audit log of leadership actions across Promotion, Documentation, Treasurer, and Management"
+          actionLabel="Review"
+          onClick={() => setIsAuditOpen(true)}
+        />
+
+        {/* 6. Event Permissions */}
+        <OperationCard
+          mascot="lock"
+          title="Event Permissions"
+          meta={<span className="text-xs font-bold text-[#235347]">Per-Event Grants</span>}
+          description="Toggle Management squad write/update permissions and inspect role-based event access"
+          actionLabel="Permissions"
+          onClick={() => setIsPermissionsOpen(true)}
+        />
+
+        {/* 7. Archives */}
+        <OperationCard
+          mascot="notebook"
+          title="Archives"
+          meta={<StatusChip status="draft" label="View only" />}
+          description="Official templates, DGCA permit letters, and Minutes of Meeting sign-off"
+          actionLabel="Sign off"
+          onClick={() => setActiveTab('archives')}
+        />
+
+        {/* 8. Settings */}
+        <OperationCard
+          mascot="shield"
+          title="Settings"
+          meta={<span className="text-xs font-bold text-[#235347]">Academic Tenure {academicYear}</span>}
+          description="Configure chapter academic session, verification levels, and audit parameters"
+          actionLabel="Configure"
           onClick={() => setIsSettingsOpen(true)}
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border: '1px solid #DAF1DE',
-            padding: '20px',
-            boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '14px',
-            gridColumn: '1 / -1',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '9999px',
-                  backgroundColor: '#DAF1DE',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#163832',
-                }}
-              >
-                <Settings size={18} strokeWidth={2} />
-              </div>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                Settings
-              </h3>
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-              Academic Tenure {academicYear}
-            </span>
-          </div>
-          <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-            Configure chapter academic session, verification levels, and audit parameters
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-              Configure →
-            </span>
-          </div>
-        </div>
+        />
       </div>
+
+      {/* Lead Activity Review BottomSheet */}
+      <BottomSheet
+        isOpen={isAuditOpen}
+        onClose={() => setIsAuditOpen(false)}
+        title="Lead Activity Review"
+        subtitle="Immutable leadership audit feed"
+      >
+        <div className="flex flex-col gap-3 pt-2">
+          {auditLogs.slice(0, 8).map((log) => (
+            <div
+              key={log.id}
+              className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-3 select-none"
+            >
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#051F20] truncate">
+                    {log.action}
+                  </span>
+                  <span className="text-[12px] font-semibold text-[#235347] bg-[#DAF1DE] px-2 py-0.5 rounded-full">
+                    {log.actorRole}
+                  </span>
+                </div>
+                <span className="text-xs text-[#235347] mt-0.5">
+                  {log.actorName} • {log.targetName || log.targetId}
+                </span>
+              </div>
+              <span className="text-[12px] text-[#235347] font-mono shrink-0">
+                {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          ))}
+          <PillButton variant="secondary" fullWidth onClick={() => setIsAuditOpen(false)}>
+            Close Review
+          </PillButton>
+        </div>
+      </BottomSheet>
+
+      {/* Event Permissions BottomSheet */}
+      <BottomSheet
+        isOpen={isPermissionsOpen}
+        onClose={() => setIsPermissionsOpen(false)}
+        title="Event Permissions"
+        subtitle="Squad read/write permission grants"
+      >
+        <div className="flex flex-col gap-4 pt-2">
+          <div>
+            <label className="text-xs font-bold text-[#051F20] block mb-1">
+              Select Event
+            </label>
+            <select
+              value={selectedEventId}
+              onChange={(e) => setSelectedEventId(e.target.value)}
+              className="w-full h-11 rounded-2xl border border-[#DAF1DE] px-3 text-xs bg-white text-[#051F20] outline-none"
+            >
+              {events.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title} ({ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming'})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-bold text-[#051F20]">
+              Squad Access Controls
+            </span>
+            {eventGrants.map((grant, idx) => (
+              <div
+                key={grant.squad}
+                className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-xs font-bold text-[#051F20] block">
+                    {grant.squad} Squad
+                  </span>
+                  <span className="text-[12px] text-[#235347]">
+                    Lead: {grant.leadName}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleTogglePermission(idx)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all ${
+                    grant.permission === 'write'
+                      ? 'bg-[#163832] text-white'
+                      : 'bg-[#DAF1DE] text-[#163832]'
+                  }`}
+                >
+                  {grant.permission === 'write' ? 'Write Access' : 'Read Only'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <PillButton variant="primary" fullWidth onClick={() => setIsPermissionsOpen(false)}>
+            Save Permissions
+          </PillButton>
+        </div>
+      </BottomSheet>
 
       {/* Governance Settings BottomSheet */}
       <BottomSheet
@@ -271,46 +273,27 @@ export const FacultyOperationsView: React.FC = () => {
         title="Chapter Settings"
         subtitle="University Club Configuration"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
+        <div className="flex flex-col gap-4 pt-2">
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+            <label className="text-xs font-bold text-[#051F20] block mb-1">
               Academic Session
             </label>
             <input
               type="text"
               value={academicYear}
               onChange={(e) => setAcademicYear(e.target.value)}
-              style={{
-                width: '100%',
-                height: '42px',
-                borderRadius: '16px',
-                border: '1px solid #DAF1DE',
-                padding: '0 12px',
-                fontSize: '13px',
-                boxSizing: 'border-box',
-                outline: 'none',
-              }}
+              className="w-full h-11 rounded-2xl border border-[#DAF1DE] px-3 text-xs outline-none"
             />
           </div>
 
           <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#051F20', display: 'block', marginBottom: '4px' }}>
+            <label className="text-xs font-bold text-[#051F20] block mb-1">
               Turnstile Gate Policy
             </label>
             <select
               value={gateSecurityLevel}
               onChange={(e) => setGateSecurityLevel(e.target.value)}
-              style={{
-                width: '100%',
-                height: '42px',
-                borderRadius: '16px',
-                border: '1px solid #DAF1DE',
-                padding: '0 12px',
-                fontSize: '13px',
-                backgroundColor: '#FFFFFF',
-                boxSizing: 'border-box',
-                outline: 'none',
-              }}
+              className="w-full h-11 rounded-2xl border border-[#DAF1DE] px-3 text-xs bg-white outline-none"
             >
               <option value="Standard Gate Pass">Standard Gate Pass (60s dynamic QR)</option>
               <option value="Strict Verification">Strict Verification (Dual turnstile check)</option>
@@ -320,9 +303,12 @@ export const FacultyOperationsView: React.FC = () => {
           <PillButton
             variant="primary"
             fullWidth
-            onClick={() => setIsSettingsOpen(false)}
+            onClick={() => {
+              showToast('Chapter settings updated');
+              setIsSettingsOpen(false);
+            }}
           >
-            Save
+            Save Settings
           </PillButton>
         </div>
       </BottomSheet>

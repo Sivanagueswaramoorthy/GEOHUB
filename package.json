@@ -1,0 +1,16 @@
+{
+  "name": "geohub-root",
+  "private": true,
+  "version": "1.4.0",
+  "description": "Green Eco Organization - GeoHub Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "start": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend test",
+    "lint:design": "npm --prefix frontend run lint:design",
+    "audit:layout": "npm --prefix frontend run audit:layout",
+    "build:apk": "npm --prefix frontend run build:apk"
+  }
+}
+

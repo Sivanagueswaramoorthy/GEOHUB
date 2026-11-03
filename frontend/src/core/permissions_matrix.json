@@ -34,11 +34,16 @@
     "canSendNotifications",
     "canViewAuditLog",
     "canViewAttendance",
-    "canAssignEventDuties"
+    "canAssignEventDuties",
+    "canAccessLedger",
+    "canAccessCommunity",
+    "canAccessGallery",
+    "canUploadGallery",
+    "canOverrideAttendance"
   ],
   "matrix": {
     "faculty": {
-      "canCreateEditEvents": false,
+      "canCreateEditEvents": true,
       "canApproveEvents": true,
       "canArchiveEvents": true,
       "canCancelEvents": true,
@@ -64,14 +69,19 @@
       "canSendNotifications": true,
       "canViewAuditLog": true,
       "canViewAttendance": true,
-      "canAssignEventDuties": false
+      "canAssignEventDuties": false,
+      "canAccessLedger": true,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": true,
+      "canOverrideAttendance": true
     },
     "coordinator": {
       "canCreateEditEvents": true,
       "canApproveEvents": false,
       "canArchiveEvents": false,
       "canCancelEvents": true,
-      "canApproveBudget": false,
+      "canApproveBudget": true,
       "canSubmitBudgetRequest": false,
       "canManageExpenses": false,
       "canAccessFinance": true,
@@ -84,16 +94,21 @@
       "canManageSquads": true,
       "canAssignPosts": false,
       "canManageSettings": false,
-      "canReviewExecutiveApprovals": false,
+      "canReviewExecutiveApprovals": true,
       "canCreateMemories": true,
       "canPublishMemories": true,
       "canCreateMeetings": true,
       "canSignOffMoM": false,
       "canExportReports": true,
       "canSendNotifications": true,
-      "canViewAuditLog": false,
+      "canViewAuditLog": true,
       "canViewAttendance": true,
-      "canAssignEventDuties": true
+      "canAssignEventDuties": true,
+      "canAccessLedger": true,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": true,
+      "canOverrideAttendance": true
     },
     "documentation": {
       "canCreateEditEvents": false,
@@ -122,7 +137,12 @@
       "canSendNotifications": false,
       "canViewAuditLog": false,
       "canViewAttendance": true,
-      "canAssignEventDuties": false
+      "canAssignEventDuties": false,
+      "canAccessLedger": false,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": true,
+      "canOverrideAttendance": false
     },
     "treasurer": {
       "canCreateEditEvents": false,
@@ -151,7 +171,12 @@
       "canSendNotifications": false,
       "canViewAuditLog": false,
       "canViewAttendance": false,
-      "canAssignEventDuties": false
+      "canAssignEventDuties": false,
+      "canAccessLedger": true,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": false,
+      "canOverrideAttendance": false
     },
     "promotion": {
       "canCreateEditEvents": false,
@@ -180,7 +205,12 @@
       "canSendNotifications": true,
       "canViewAuditLog": false,
       "canViewAttendance": false,
-      "canAssignEventDuties": false
+      "canAssignEventDuties": false,
+      "canAccessLedger": false,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": true,
+      "canOverrideAttendance": false
     },
     "student": {
       "canCreateEditEvents": false,
@@ -209,7 +239,12 @@
       "canSendNotifications": false,
       "canViewAuditLog": false,
       "canViewAttendance": false,
-      "canAssignEventDuties": false
+      "canAssignEventDuties": false,
+      "canAccessLedger": false,
+      "canAccessCommunity": true,
+      "canAccessGallery": true,
+      "canUploadGallery": false,
+      "canOverrideAttendance": false
     }
   },
   "metadata": {

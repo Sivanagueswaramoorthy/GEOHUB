@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, ShieldCheck, Shield, FileText, DollarSign, Megaphone, User } from 'lucide-react';
+import { Check, ShieldCheck, Shield, FileText, DollarSign, Megaphone, User, Users } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
 import { BottomSheet } from '../shared/BottomSheet';
@@ -28,6 +28,13 @@ export const RoleSwitcherModal: React.FC = () => {
       title: 'Coordinator • Club President',
       dept: 'Geoinformatics (4th Year)',
       icon: <Shield size={18} color="#163832" />,
+    },
+    {
+      role: 'management',
+      name: 'Elena Rostova',
+      title: 'Management • Management Squad Lead',
+      dept: 'Geology & Environment (4th Year)',
+      icon: <Users size={18} color="#163832" />,
     },
     {
       role: 'documentation',

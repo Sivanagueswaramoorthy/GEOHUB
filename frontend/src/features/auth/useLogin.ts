@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { UserModel, UserRole } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { canAccessRoute } from '../../core/permissions';
-import { demoUsersList, demoSuperAdmin, demoAdmin, demoDocLead, demoTreasurer, demoTeamAdmin, demoVolunteer, demoMember } from '../../data/mockData';
+import { demoUsersList, demoSuperAdmin, demoAdmin, demoManagement, demoDocLead, demoTreasurer, demoTeamAdmin, demoVolunteer, demoMember } from '../../data/mockData';
 import { LoginFormData } from './auth.schema';
 
 export interface AuthErrorState {
@@ -279,11 +279,19 @@ export const useLogin = (options?: UseLoginOptions) => {
             id.includes('coordinator') ||
             id.includes('president') ||
             id === 'pres' ||
-            id === 'vp' ||
-            trimmedIdentifier.includes('alex') ||
-            trimmedIdentifier.includes('elena')
+            trimmedIdentifier.includes('alex')
           ) {
             found = demoAdmin;
+          } else if (
+            id === '21geo010' ||
+            id === 'mgmt' ||
+            id === 'management' ||
+            id.includes('mgmt') ||
+            id.includes('management') ||
+            trimmedIdentifier.includes('elena') ||
+            trimmedIdentifier.includes('rostova')
+          ) {
+            found = demoManagement;
           } else if (
             id === '22geo018' ||
             id === 'doc' ||
@@ -404,9 +412,9 @@ export const useLogin = (options?: UseLoginOptions) => {
     }, 350);
   };
 
-  const clearError = () => {
+  const clearError = useCallback(() => {
     setErrorState({ code: null, message: null });
-  };
+  }, []);
 
   return {
     authenticate,

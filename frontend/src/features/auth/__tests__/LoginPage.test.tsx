@@ -263,6 +263,10 @@ describe('DemoRolesSheet Component', () => {
 });
 
 describe('LoginPage Integration and E2E Auth Behavior', () => {
+  beforeEach(() => {
+    window.scrollTo = vi.fn();
+  });
+
   it('renders brand elements, mascot, direct Reg No and Password placeholders, without Google sign in, Sign In header, or role button', () => {
     render(
       <AppProvider>
@@ -308,6 +312,85 @@ describe('LoginPage Integration and E2E Auth Behavior', () => {
       },
       { timeout: 2000 }
     );
+  });
+
+  it('renders all role logins and passwords on the login page', () => {
+    render(
+      <AppProvider>
+        <LoginPage />
+      </AppProvider>
+    );
+
+    // Heading for demo credentials card
+    expect(screen.getByText('All Role Logins & Passwords')).toBeInTheDocument();
+
+    // Verify all 8 roles and their Reg Nos are listed
+    expect(screen.getByText('Dr. Sarah Jenkins')).toBeInTheDocument();
+    expect(screen.getAllByText('FAC01').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Alex Rivera')).toBeInTheDocument();
+    expect(screen.getAllByText('21GEO001').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Elena Rostova')).toBeInTheDocument();
+    expect(screen.getAllByText('21GEO010').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Ananya Iyer')).toBeInTheDocument();
+    expect(screen.getAllByText('22GEO019').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('David Chen')).toBeInTheDocument();
+    expect(screen.getAllByText('22GEO014').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Aarav Patel')).toBeInTheDocument();
+    expect(screen.getAllByText('22GEO018').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Maya Patel')).toBeInTheDocument();
+    expect(screen.getAllByText('23GEO088').length).toBeGreaterThan(0);
+
+    expect(screen.getByText('Liam Vance')).toBeInTheDocument();
+    expect(screen.getAllByText('23GEO042').length).toBeGreaterThan(0);
+  });
+
+  it('autofills username and password when clicking Auto-Fill Form', () => {
+    render(
+      <AppProvider>
+        <LoginPage />
+      </AppProvider>
+    );
+
+    const rollNoInput = screen.getByPlaceholderText(/enter your reg no/i) as HTMLInputElement;
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i) as HTMLInputElement;
+
+    // Find all Auto-Fill buttons
+    const autoFillButtons = screen.getAllByRole('button', { name: /auto-fill form/i });
+    expect(autoFillButtons.length).toBe(8);
+
+    // Click the first one (Faculty: FAC01)
+    fireEvent.click(autoFillButtons[0]);
+
+    expect(rollNoInput.value).toBe('FAC01');
+    expect(passwordInput.value).toBe('admin123');
+
+    // Click third one (Management: 21GEO010)
+    fireEvent.click(autoFillButtons[2]);
+    expect(rollNoInput.value).toBe('21GEO010');
+    expect(passwordInput.value).toBe('admin123');
+  });
+
+  it('autofills username and password when clicking quick roll chips', () => {
+    render(
+      <AppProvider>
+        <LoginPage />
+      </AppProvider>
+    );
+
+    const rollNoInput = screen.getByPlaceholderText(/enter your reg no/i) as HTMLInputElement;
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i) as HTMLInputElement;
+
+    const mgmtChip = screen.getByRole('button', { name: /21GEO010\s*\(Management\)/i });
+    fireEvent.click(mgmtChip);
+
+    expect(rollNoInput.value).toBe('21GEO010');
+    expect(passwordInput.value).toBe('admin123');
   });
 });
 

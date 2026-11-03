@@ -1,120 +1,129 @@
-# GeoHub — College Geo Club Management & QR Platform
+# GeoHub — College Geo Club Management & QR Platform (v1.3.1)
 
-> **React 19 + TypeScript + Vite + Vanilla CSS**  
-> Complete role-based college Geo Club web application converted from Flutter with zero external UI framework dependencies (No Tailwind CSS per specification, pure custom design system).
-
----
-
-## 🌟 Key Features
-
-1. **Separate Login Page with Google Sign-In & Role Access**:
-   - Gated authentication: Users land on the separate, dedicated Login page before entering the platform.
-   - **Google Sign-In**: "Continue with Google (@college.edu)" with official Google logo and realistic OAuth account picker dialog.
-   - Institutional accounts across all 5 roles ready to sign in with one tap.
-   - **Role-Based Fast Login**: 1-click role cards to test Super Admin, Admin, Team Admin, Member, or Volunteer.
-   - College email/password login with automatic role detection as the user types.
-   - Complete Membership Induction Request application form and confirmation screen.
-
-2. **Pure White Design System & Deep Teal Branding**:
-   - Strict pure white (`#FFFFFF`) scaffold on every screen (no gray tints).
-   - Deep Teal (`#0F766E`) primary with Mint (`#14B8A6`) accents and Slate typography (`#0F172A`).
-   - Soft `#E8ECF2` card borders and subtle elevation shadows (blur 16–24px, 4–6% opacity).
-   - 12% opacity soft status badges (`success`, `warning`, `danger`, `info`).
-   - Dual viewports: Responsive Desktop Fullscreen Shell or Centered Mobile Simulator (390 × 844) toggle.
-
-3. **5 Distinct Roles with Specialized Cockpits**:
-   - **Super Admin** (`Dr. Sarah Jenkins`): **Executive Command Cockpit** with modern Bento grid layout, live session radial gauge telemetry, incoming turnstile scanner ticker, Dean's institutional grant ledger, in-card faculty sanction desk, and emergency volunteer broadcast directive.
-   - **Admin** (`Alex Rivera`): Club President portal with members management, team administration, event approvals, and gallery uploads.
-   - **Team Admin** (`David Chen`): Team Home, pending applicant induction review, manual member onboarding, team deliverables, and documentation repository.
-   - **Member** (`Maya Patel`): Personalized home feed, live event notices, event registrations, interactive tasks with proof uploads & comment threads, dynamic QR access pass.
-   - **Volunteer** (`Liam Vance`): Everything in Member role + QR Attendance Terminal with simulated camera reticle, rapid test buttons (Valid Student, Duplicate Check-in, Expired Barcode), and instant verified check-in logs.
-
-3. **Dynamic QR Attendance & 30-Second Security Ring**:
-   - Dynamic SVG barcode generated via `qrcode.react`.
-   - Real-time animated circular countdown ring timer (30s auto-refresh) to prevent attendance fraud and screenshot forwarding.
-   - Instant manual token refresh capability.
-
-4. **Live Scanner Emulator**:
-   - Terminal viewfinder with laser beam animation.
-   - Event switcher and interactive test scenarios.
-   - Check-in result bottom sheet and live terminal counter.
-
-5. **Analytics & Data Export**:
-   - SVG rounded bar charts for monthly attendance trends.
-   - Team task completion rate visualizer.
-   - Real CSV export file generation for attendance audits.
+> **React 19 + TypeScript + Vite PWA**  
+> Complete role-based college Geo Club web application converted to the Pine & Mint design system specification with strict 64px floating pill bar navigation (exact 5 tabs per role), 12px font floor, 17 clay vector mascots, Lucide-only icons, and shared components.
 
 ---
 
-## 🚀 Running the Project
+## 🌟 Key Architecture & Nav Matrix
+
+### 1. Exactly 5 Tabs per Role (Floating Pill Bar — 64px Height)
+- **Faculty Advisor**: Home, Events, Operations, Community, Gallery
+- **Club Coordinator / President**: Home, Events, Operations, Community, Gallery
+- **Treasurer**: Home, Events (read-only), Ledger, Community, Gallery
+- **Promotion Squad Lead**: Home, Events (read-only), Operations, Community, Gallery
+- **Documentation Squad Lead**: Home, Events (read-only), Operations, Community, Gallery
+- **Management Squad Lead**: Home, Events, Operations, Community, Gallery
+- **Student Member**: Home, Events, Community, Gallery, Operations (My Duties, Squads)
+
+### 2. Architectural Moves
+- **Profile Navigation**: Profile leaves the tab bar and opens directly from the 40px circular avatar in the sticky top header.
+- **Members Directory**: Relocated into Faculty and Coordinator Operations with search and post assignment.
+- **Archives & Campaigns**: Archives integrated inside Documentation Operations; Campaigns integrated inside Promotion Operations.
+- **Gallery Consolidation**: Memories merged into Gallery as event albums with photo and video grid and full-screen lightbox.
+- **Header QR Shortcut**: Students open rotating Pass QR (30-60s countdown ring); users assigned as event attendance takers open the Gate Scanner.
+
+---
+
+## 🏛️ Role Home Screens (Specialized Cockpits)
+
+1. **Faculty Advisor (`Dr. Sarah Jenkins`)**:
+   - Header: "Faculty desk" with Approvals and QR Generator buttons.
+   - Tiles: Total events, Live, Budget (₹4.5L reconciled).
+   - Audit feed list plus a Ledgers inspection button.
+
+2. **Coordinator / President (`Alex Rivera`)**:
+   - Header: "Plan something" with "+ New event" and "QR Scanner" ("To give attendance for respective event").
+   - Tiles: Events, Pending, Volunteers.
+   - "Need action" list with "View all".
+
+3. **Treasurer (`Devon Vance`)**:
+   - Header: "Finance" with "+ Add expense" and "QR Scanner".
+   - Tiles: Events, Spent (₹1.8L), Available (₹2.7L), Total (₹4.5L) — **numbers reconcile (spent + available = total)**.
+   - Budget Requests list with View button, marked Approved or Pending.
+
+4. **Promotion Squad Lead (`Maya Patel`)**:
+   - Header: "Promotion" with "+ New post" and "QR Scanner".
+   - Tiles: Scheduled, Posted, Events.
+   - Approval list with Approved / Pending status chips.
+
+5. **Documentation Squad Lead (`Aarav Patel`)**:
+   - Greeting, upcoming events, quick links to Templates, Upload, and Daily News.
+
+6. **Management Squad Lead (`Vikram Seth`)**:
+   - Shortcuts for Attendance Desk and Meetings.
+   - Tiles: Squad leads, pending approvals, meetings.
+
+7. **Student Member (`Jordan Hayes`)**:
+   - "Good morning, {name}" with a Join event button.
+   - Quick picks: Events, Pass QR, Squads.
+   - Upcoming events with View all.
+
+---
+
+## 📅 Events & 2-Phase Attendance
+
+1. **Events (`ClubEventsView`)**:
+   - **New event form**: Name, date, time, venue, capacity, and type toggle (`internal` vs `external`).
+   - **Event card**: Title, venue, date and time, members registered. Student view adds a Register button directly on the card and filter chips ("All events" / "Registered events").
+   - **Event detail for Faculty/Coordinator**:
+     - Duties checklist (Promotion, Documentation, Treasurer, MoM) with assigned members and status.
+     - Attendance sheet button navigating to live gate roster.
+     - Squad action log (actions by Promotion, Documentation, Treasurer).
+     - Cancel event button with mandatory cancellation reason bottom sheet (min 10 characters).
+   - **Capacity**: Displays "Full" badge and disables registration at capacity. Read-only roles hide create and edit buttons.
+
+2. **Attendance & Scanner (`VolunteerScanView`, `MyQrView`, `AttendanceView`)**:
+   - **Pass QR (Students)**: Rotating dynamic QR code refreshing every 30-60 seconds, accompanied by a SVG ProgressRing countdown.
+   - **Scanner Screen**: Two tabs: "Scan QR" and "Enter 6-digit OTP". Result states: `success`, `already_marked`, `invalid_or_expired`, `not_authorized`.
+   - **Scanner Access Guard**: The scanner opens ONLY for users assigned to take attendance for that event (`canScanForEvent`). Others see a "Not assigned" empty state.
+   - **Internal Events**: 1 OTP/QR marks attendance to `Completed`.
+   - **External Events**: 2 phases: Entry OTP and Exit OTP with separate countdown timers. Statuses: `Not marked`, `Entered`, `Completed`, `Incomplete`.
+   - **Management Attendance Desk**: Event picker, multi-select student scanner assignments for that event, and live OTP panels with countdown timers.
+   - **Attendance Sheet**: Status chips filter, student search, CSV export, and manual override sheet requiring a reason (Faculty & Coordinator only).
+
+---
+
+## 🔒 Access Rules & Security Invariants
+
+1. **Lead vs Non-Lead Squad Operations**:
+   - Team leads have full read/write on their squad's operations across all events.
+   - Non-lead squad members have no squad operations by default. A lead can grant read or write for a specific event only (`squadGrants`). A grant never applies to another event.
+   - Supports multi-squad membership and squads with multiple leads.
+2. **First Login Password Mandate**:
+   - Forced `ChangePasswordView` triggered upon first login (`mustChangePassword: true`), enforcing minimum 8 characters, confirmation match, and live strength indicator.
+   - All shared default-password text removed.
+
+---
+
+## 🔑 Demo Logins for All 7 Roles
+
+| Role | Name | Email | Roll No |
+|---|---|---|---|
+| Faculty Advisor | Dr. Sarah Jenkins | `sarah.jenkins@college.edu` | `FAC-001` |
+| Coordinator / President | Alex Rivera | `alex@college.edu` | `21GEO001` |
+| Treasurer | Devon Vance | `devon@college.edu` | `21GEO003` |
+| Promotion Squad Lead | Maya Patel | `maya@college.edu` | `21GEO004` |
+| Documentation Squad Lead | Aarav Patel | `aarav@college.edu` | `21GEO008` |
+| Management Squad Lead | Vikram Seth | `vikram@college.edu` | `21GEO010` |
+| Student Member | Jordan Hayes | `jordan@college.edu` | `21GEO002` |
+
+---
+
+## 🚀 Running Verification & Quality Gates
 
 ```bash
 cd frontend
 
-# Install dependencies (React 19, Lucide icons, QRCode.react)
-npm install
+# 1. Run full unit and permissions test suite
+npm run test
 
-# Start development server
+# 2. Run Design System Conformance Linter (Strict 0 violations)
+npm run lint:design
+
+# 3. Start development server
 npm run dev
 
-# Build production bundle
-npm run build
-```
-
-Local URL: `http://localhost:5173/`
-
----
-
-## 📂 Project Architecture
-
-```
-frontend/
-├── index.html
-├── src/
-│   ├── main.tsx
-│   ├── App.tsx                     # Main routing shell & viewport mode toggle
-│   ├── index.css                   # Complete design system & tokens (Vanilla CSS)
-│   ├── types/
-│   │   └── index.ts                # Domain models (User, Event, Task, Team, Approval, etc.)
-│   ├── data/
-│   │   └── mockData.ts             # 25 students, 4 teams, 8 events, 20 tasks, approvals, reports
-│   ├── context/
-│   │   └── AppContext.tsx          # Reactive application state & instant role switcher
-│   ├── components/
-│   │   ├── common/
-│   │   │   ├── StatCard.tsx
-│   │   │   ├── EventCard.tsx
-│   │   │   ├── TaskCard.tsx
-│   │   │   ├── StatusChip.tsx
-│   │   │   ├── RoleBadge.tsx
-│   │   │   ├── AppAvatar.tsx
-│   │   │   ├── SectionHeader.tsx
-│   │   │   ├── EmptyState.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   └── ChartCard.tsx       # SVG rounded bar charts
-│   │   └── navigation/
-│   │       ├── AppTopBar.tsx       # Brand mark, notification badge & quick role pill
-│   │       ├── BottomNavBar.tsx    # Role-specific dynamic 5-tab bar & More drawer
-│   │       └── RoleSwitcherModal.tsx
-│   └── views/
-│       ├── auth/LoginView.tsx
-│       ├── dashboard/DashboardView.tsx
-│       ├── member/MemberHomeView.tsx
-│       ├── events/EventsListView.tsx
-│       ├── tasks/TasksListView.tsx
-│       ├── teams/
-│       │   ├── TeamsListView.tsx
-│       │   ├── TeamHomeView.tsx
-│       │   ├── AddStudentsView.tsx
-│       │   └── TeamDocumentsView.tsx
-│       ├── qr/
-│       │   ├── MyQrView.tsx
-│       │   └── VolunteerScanView.tsx
-│       ├── approvals/ApprovalsView.tsx
-│       ├── members/MembersListView.tsx
-│       ├── gallery/GalleryView.tsx
-│       ├── attendance/AttendanceView.tsx
-│       ├── reports/ReportsView.tsx
-│       ├── notifications/NotificationsView.tsx
-│       └── profile/ProfileView.tsx
+# 4. Run Layout Audit across all 5 viewports (360x740, 390x844, 430x932, 768x1024, 1280x800)
+npm run audit:layout
 ```

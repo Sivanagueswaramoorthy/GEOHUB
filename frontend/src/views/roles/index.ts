@@ -4,3 +4,4 @@ export * from './documentation';
 export * from './student';
 export * from './coordinator';
 export * from './faculty';
+export * from './management';

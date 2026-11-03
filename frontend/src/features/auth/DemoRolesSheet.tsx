@@ -4,10 +4,12 @@ import { UserModel } from '../../types';
 import {
   demoSuperAdmin,
   demoAdmin,
+  demoManagement,
   demoDocLead,
   demoTreasurer,
   demoTeamAdmin,
   demoVolunteer,
+  demoMember,
 } from '../../data/mockData';
 
 export interface DemoPersona {
@@ -46,6 +48,17 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     icon: <Shield size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
+    id: 'management_lead',
+    name: 'Elena Rostova',
+    roleTitle: 'Management Squad Lead',
+    description: 'Event duty allocation, OTP/QR attendance & roster updates',
+    user: demoManagement,
+    initials: 'ER',
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <Users2 size={20} strokeWidth={1.75} className="text-[#163832]" />,
+  },
+  {
     id: 'doc_lead',
     name: 'Aarav Patel',
     roleTitle: 'Documentation Lead',
@@ -77,6 +90,17 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     badgeBg: '#DAF1DE',
     badgeColor: '#163832',
     icon: <Megaphone size={20} strokeWidth={1.75} className="text-[#163832]" />,
+  },
+  {
+    id: 'student_member',
+    name: 'Maya Patel',
+    roleTitle: 'Student Member',
+    description: 'Event passes, digital tickets, QR attendance & community',
+    user: demoMember,
+    initials: 'MP',
+    badgeBg: '#DAF1DE',
+    badgeColor: '#163832',
+    icon: <UserCheck size={20} strokeWidth={1.75} className="text-[#163832]" />,
   },
   {
     id: 'student_volunteer',

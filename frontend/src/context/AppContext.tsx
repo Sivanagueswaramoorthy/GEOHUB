@@ -28,6 +28,7 @@ import {
   DailyNewsItem,
   AuditLogItem,
   EventStatus,
+  AttendanceStatus,
 } from '../types';
 import {
   demoSuperAdmin,
@@ -37,6 +38,7 @@ import {
   demoTreasurer,
   demoMember,
   demoVolunteer,
+  demoManagement,
   demoUsersList,
   initialTeams,
   initialEvents,
@@ -57,7 +59,7 @@ import {
   initialCampaignPlans,
   initialDailyNews,
 } from '../data/mockData';
-import { canAccessRoute, canScanForEvent, normalizeRole } from '../core/permissions';
+import { canAccessRoute, canScanForEvent, normalizeRole, getRolePermissions, validateEventOtp, OtpValidationResult } from '../core/permissions';
 
 interface AppContextType {
   currentUser: UserModel;
@@ -128,6 +130,8 @@ interface AppContextType {
   approveItem: (id: string) => void;
   rejectItem: (id: string, reason: string) => void;
   recordAttendance: (eventId: string, studentId: string) => { success: boolean; message: string; record?: AttendanceRecord };
+  overrideAttendance: (recordId: string, newStatus: AttendanceStatus, reason: string) => { success: boolean; message: string };
+  markAttendanceWithOtp: (params: { eventId: string; studentId: string; otp: string; phase?: 'entry' | 'exit' }) => OtpValidationResult;
   addStudentToTeam: (student: Omit<UserModel, 'uid'>) => void;
   updateUserRoleAndTeam: (uid: string, role: UserRole, team?: string, isVolunteer?: boolean, status?: UserStatus) => void;
   changeStudentPost: (
@@ -384,6 +388,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         break;
       case 'coordinator':
         targetUser = demoAdmin;
+        break;
+      case 'management':
+        targetUser = demoManagement;
         break;
       case 'promotion':
         targetUser = demoTeamAdmin;
@@ -688,6 +695,106 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { success: true, message: `Verified! Check-in confirmed for ${targetUser.name}.`, record: newRecord };
   };
 
+  const overrideAttendance = (
+    recordId: string,
+    newStatus: AttendanceStatus,
+    reason: string
+  ): { success: boolean; message: string } => {
+    const cleanReason = (reason || '').trim();
+    if (!cleanReason) {
+      showToast('A mandatory reason is required for manual override.', 'error');
+      return { success: false, message: 'Mandatory reason required' };
+    }
+    const perms = getRolePermissions(currentUser.role);
+    if (!perms.canOverrideAttendance) {
+      showToast('Permission denied: Faculty or Coordinator role required.', 'error');
+      return { success: false, message: 'Permission denied' };
+    }
+
+    setAttendance((prev) =>
+      prev.map((rec) => {
+        if (rec.id !== recordId) return rec;
+        return {
+          ...rec,
+          status: newStatus,
+          overrideReason: cleanReason,
+          overriddenBy: currentUser.name,
+        };
+      })
+    );
+
+    addAuditLog({
+      actorId: currentUser.uid,
+      actorName: currentUser.name,
+      actorRole: currentUser.role,
+      action: 'attendance_override',
+      targetType: 'attendance',
+      targetId: recordId,
+      targetName: `Attendance Override (${newStatus})`,
+      details: `Status set to ${newStatus}. Reason: ${cleanReason}`,
+    });
+
+    showToast(`✓ Attendance marked as ${newStatus}`);
+    return { success: true, message: 'Updated' };
+  };
+
+  const markAttendanceWithOtp = (params: {
+    eventId: string;
+    studentId: string;
+    otp: string;
+    phase?: 'entry' | 'exit';
+  }): OtpValidationResult => {
+    const targetEvent = events.find((e) => e.id === params.eventId);
+    if (!targetEvent) {
+      return { valid: false, status: 'Not marked', error: 'Event not found', code: 'invalid_or_expired' };
+    }
+    const targetUser = users.find((u) => u.uid === params.studentId || u.rollNo === params.studentId);
+    if (!targetUser) {
+      return { valid: false, status: 'Not marked', error: 'Student not found in club directory', code: 'not_authorized' };
+    }
+    const existingRec = attendance.find((a) => a.eventId === params.eventId && a.userId === targetUser.uid);
+    const result = validateEventOtp({
+      event: targetEvent,
+      userId: targetUser.uid,
+      otp: params.otp,
+      phase: params.phase,
+      currentAttendance: existingRec,
+      scannerUserId: currentUser.uid,
+    });
+
+    if (result.valid) {
+      if (existingRec) {
+        setAttendance((prev) =>
+          prev.map((a) => {
+            if (a.id !== existingRec.id) return a;
+            return {
+              ...a,
+              status: result.status,
+              ...(params.phase === 'exit' ? { exitTime: new Date().toISOString() } : { entryTime: new Date().toISOString() }),
+            };
+          })
+        );
+      } else {
+        const newRec: AttendanceRecord = {
+          id: `att_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+          eventId: targetEvent.id,
+          eventTitle: targetEvent.title,
+          userId: targetUser.uid,
+          userName: targetUser.name,
+          userEmail: targetUser.email,
+          team: targetUser.team,
+          checkInTime: new Date().toISOString(),
+          entryTime: new Date().toISOString(),
+          scannedByVolunteerId: currentUser.uid,
+          scannedByVolunteerName: currentUser.name,
+          status: result.status,
+        };
+        setAttendance((prev) => [newRec, ...prev]);
+      }
+    }
+    return result;
+  };
+
   const updateEventStatus = (eventId: string, newStatus: EventStatus) => {
     const targetEvent = events.find((e) => e.id === eventId);
     if (!targetEvent) return { success: false, message: 'Event not found' };
@@ -798,8 +905,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const assignEventScanners = (eventId: string, scannerUserIds: string[]) => {
     const norm = normalizeRole(currentUser.role);
-    if (norm !== 'faculty' && norm !== 'coordinator') {
-      showToast('Permission denied: Only Coordinator or Faculty can assign scanners.', 'error');
+    if (norm !== 'faculty' && norm !== 'coordinator' && norm !== 'management') {
+      showToast('Permission denied: Management, Coordinator, or Faculty role required.', 'error');
       return { success: false, message: 'Permission denied' };
     }
     const targetEvent = events.find((e) => e.id === eventId);
@@ -1279,6 +1386,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         approveItem,
         rejectItem,
         recordAttendance,
+        overrideAttendance,
+        markAttendanceWithOtp,
         addStudentToTeam,
         updateUserRoleAndTeam,
         changeStudentPost,

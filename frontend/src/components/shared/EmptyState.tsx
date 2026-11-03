@@ -1,9 +1,12 @@
 import React from 'react';
 import { Mascot, MascotName } from './Mascot';
+import { MascotLogo, MascotMood } from './MascotLogo';
 import { PillButton } from './PillButton';
 
 export interface EmptyStateProps {
   mascot?: MascotName;
+  mascotMood?: MascotMood;
+  useMascotLogo?: boolean;
   title: string;
   subtitle?: string;
   description?: string;
@@ -13,7 +16,9 @@ export interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  mascot = 'leaf',
+  mascot,
+  mascotMood = 'sleep',
+  useMascotLogo = true,
   title,
   subtitle,
   description,
@@ -28,7 +33,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       style={{ minHeight: '220px' }}
     >
       <div className="mb-4">
-        <Mascot name={mascot} size="lg" floating />
+        {useMascotLogo && !mascot ? (
+          <MascotLogo size="lg" mood={mascotMood} animated={true} />
+        ) : (
+          <Mascot name={mascot || 'leaf'} size="lg" floating />
+        )}
       </div>
 
       <h3

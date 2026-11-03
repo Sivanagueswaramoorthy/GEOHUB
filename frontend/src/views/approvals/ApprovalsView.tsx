@@ -10,7 +10,7 @@ import {
 } from '../../components/shared';
 
 export const ApprovalsView: React.FC = () => {
-  const { approvals, approveItem, rejectItem } = useApp();
+  const { approvals, approveItem, rejectItem, currentUser, showToast } = useApp();
   const [activeTab, setActiveTab] = useState<string>('all');
   const [rejectItemTarget, setRejectItemTarget] = useState<{ id: string; title: string } | null>(null);
 
@@ -139,19 +139,44 @@ export const ApprovalsView: React.FC = () => {
                     borderTop: '1px solid #DAF1DE',
                   }}
                 >
-                  <PillButton
-                    variant="primary"
-                    fullWidth
-                    onClick={() => approveItem(item.id)}
-                  >
-                    Approve
-                  </PillButton>
-                  <PillButton
-                    variant="destructive"
-                    onClick={() => setRejectItemTarget({ id: item.id, title: item.title })}
-                  >
-                    Reject
-                  </PillButton>
+                  {/* FIN-02 / DEC-02: Self-budget approval denial */}
+                  {item.type === 'budget' && (currentUser.role === 'treasurer' || item.applicantName === currentUser.name) ? (
+                    <span className="text-xs font-semibold text-[#235347] py-1">
+                      Submitted to President for sanction (Treasurer self-approval blocked)
+                    </span>
+                  ) : (
+                    <>
+                      <PillButton
+                        variant="primary"
+                        fullWidth
+                        onClick={() => {
+                          approveItem(item.id);
+                          showToast && showToast(`✓ Sanctioned proposal: ${item.title}`);
+                        }}
+                      >
+                        {item.type === 'budget' && currentUser.role === 'coordinator' ? 'President Approve (Final)' : 'Approve'}
+                      </PillButton>
+
+                      {/* Faculty Flag for Review button (DEC-02) */}
+                      {currentUser.role === 'faculty' && item.type === 'budget' && (
+                        <PillButton
+                          variant="secondary"
+                          onClick={() => {
+                            showToast && showToast(`Flagged "${item.title}" for review hold.`, 'info');
+                          }}
+                        >
+                          Flag
+                        </PillButton>
+                      )}
+
+                      <PillButton
+                        variant="destructive"
+                        onClick={() => setRejectItemTarget({ id: item.id, title: item.title })}
+                      >
+                        Reject
+                      </PillButton>
+                    </>
+                  )}
                 </div>
               )}
             </div>

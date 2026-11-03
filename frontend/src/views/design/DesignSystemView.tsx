@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import {
   Mascot,
+  MascotLogo,
   MascotName,
   TopBar,
   HeroCard,
@@ -42,12 +43,19 @@ import {
   PeoplePicker,
   DatePickerField,
   AmountInput,
+  ProfileSheet,
+  PageHeader,
+  IconCircleButton,
+  AccessChip,
+  HubCard,
+  ModuleSection,
 } from '../../components/shared';
 
 export const DesignSystemView: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<'tokens' | 'mascots' | 'components' | 'states'>('tokens');
+  const [selectedTab, setSelectedTab] = useState<'tokens' | 'mascots' | 'components' | 'states' | 'nav_matrix'>('tokens');
   const [searchValue, setSearchValue] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isProfileSheetDemoOpen, setIsProfileSheetDemoOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [demoFormValue, setDemoFormValue] = useState('Green Eco Hub');
@@ -171,6 +179,7 @@ export const DesignSystemView: React.FC = () => {
             { key: 'mascots', label: '2. Mascots (17)' },
             { key: 'components', label: '3. Components' },
             { key: 'states', label: '4. Dialogs & States' },
+            { key: 'nav_matrix', label: '5. Navigation & Roles' },
           ]}
           activeTab={selectedTab}
           onChange={(key) => setSelectedTab(key as any)}
@@ -365,6 +374,61 @@ export const DesignSystemView: React.FC = () => {
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Official Animated Teardrop MascotLogo (Vector SVG) */}
+          <SectionHeader title="Official GeoHub Teardrop MascotLogo (Animated Vector SVG)" />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              padding: '20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              boxShadow: '0 8px 24px rgba(5,31,32,0.06)',
+            }}
+          >
+            <p style={{ fontSize: '13px', color: '#235347', margin: 0, lineHeight: 1.5 }}>
+              Animated teardrop pin mascot with -12° tilt, soft Sage 400 clay body, Pine 900 outline &amp; face, 60 FPS idle float, blink, squish-on-press, and happy bounce. Tap any mascot to test interaction!
+            </p>
+
+            {/* 4 Standard Sizes */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around', gap: '16px', padding: '16px 0', borderBottom: '1px solid #DAF1DE' }}>
+              {(['sm', 'md', 'lg', 'xl'] as const).map((sz) => (
+                <div key={sz} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <MascotLogo
+                    size={sz}
+                    onClick={() => showDemoToast(`Mascot bounce on size: ${sz}`)}
+                  />
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                    size=&quot;{sz}&quot; ({sz === 'sm' ? '32px' : sz === 'md' ? '44px' : sz === 'lg' ? '72px' : '120px'})
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* 4 Mascot Moods */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#0B2B26' }}>
+                Mood Variations
+              </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around', gap: '16px', padding: '12px 0' }}>
+                {(['idle', 'happy', 'wave', 'sleep'] as const).map((m) => (
+                  <div key={m} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                    <MascotLogo
+                      size="lg"
+                      mood={m}
+                      onClick={() => showDemoToast(`Mood: ${m}`)}
+                    />
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832', textTransform: 'capitalize' }}>
+                      mood=&quot;{m}&quot;
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* All 17 Mascots Grid */}
@@ -589,6 +653,184 @@ export const DesignSystemView: React.FC = () => {
               />
             </div>
           </section>
+
+          {/* Rebuilt GeoHub TopBar & IconCircleButton */}
+          <section style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <SectionHeader title="GeoHub TopBar & IconCircleButton Showroom" />
+            <div
+              style={{
+                padding: '16px',
+                borderRadius: '24px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #DAF1DE',
+                boxShadow: '0 8px 24px rgba(5,31,32,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <p style={{ fontSize: '13px', color: '#235347', margin: 0, lineHeight: 1.5 }}>
+                TopBar (64px + safe area): Soft Pine 800 (8% opacity) leaf logo mark (44x44, 14px radius), two-line text &quot;Green Eco&quot; (17px/20px, 700) and &quot;Organization&quot; (13px/16px, 500, 0.2px letter-spacing). Right group: 12px gap with 44x44 circle Bell button (no white, 8px red dot or 9+ cap) and Avatar button in Pine 800 with 2px Sage 400 ring and Mint 100 initial.
+              </p>
+
+              {/* Live Preview of Rebuilt TopBar */}
+              <div
+                style={{
+                  borderRadius: '16px',
+                  border: '1px solid #DAF1DE',
+                  overflow: 'hidden',
+                  backgroundColor: '#F6FBF7',
+                }}
+              >
+                <TopBar
+                  orgName="Green Eco"
+                  orgSubtitle="Organization"
+                  unreadCount={1}
+                  user={{
+                    uid: 'demo_user',
+                    name: 'David Miller',
+                    email: 'd@col.edu',
+                    role: 'faculty',
+                    status: 'active',
+                    isVolunteer: false,
+                  }}
+                  onHome={() => showDemoToast('Tapped GeoHub home')}
+                  onNotifications={() => showDemoToast('Tapped notifications')}
+                  onProfile={() => showDemoToast('Opened profile menu')}
+                />
+              </div>
+
+              {/* IconCircleButton Variants Gallery */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#0B2B26' }}>
+                  IconCircleButton Variants (44x44, No White at Rest)
+                </span>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IconCircleButton
+                      ariaLabel="Notifications, 0 unread"
+                      variant="bell"
+                      unreadCount={0}
+                      onClick={() => showDemoToast('Bell: 0 unread')}
+                    >
+                      <Bell size={20} strokeWidth={1.75} className="lucide text-[#163832]" />
+                    </IconCircleButton>
+                    <span style={{ fontSize: '12px', color: '#235347' }}>Default Bell (0 unread)</span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IconCircleButton
+                      ariaLabel="Notifications, 1 unread"
+                      variant="bell"
+                      unreadCount={1}
+                      onClick={() => showDemoToast('Bell: 1 unread')}
+                    >
+                      <Bell size={20} strokeWidth={1.75} className="lucide text-[#163832]" />
+                    </IconCircleButton>
+                    <span style={{ fontSize: '12px', color: '#235347' }}>1 Unread (8px Dot)</span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IconCircleButton
+                      ariaLabel="Notifications, 12 unread"
+                      variant="bell"
+                      unreadCount={12}
+                      shake={true}
+                      onClick={() => showDemoToast('Bell: 9+ unread (shaking)')}
+                    >
+                      <Bell size={20} strokeWidth={1.75} className="lucide text-[#163832]" />
+                    </IconCircleButton>
+                    <span style={{ fontSize: '12px', color: '#235347' }}>9+ Unread (Count Badge)</span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <IconCircleButton
+                      ariaLabel="Open profile menu"
+                      variant="avatar"
+                      onClick={() => showDemoToast('Avatar: D initial')}
+                    >
+                      <span
+                        className="font-bold text-[#DAF1DE]"
+                        style={{ fontSize: '16px', lineHeight: '20px', fontWeight: 700 }}
+                      >
+                        D
+                      </span>
+                    </IconCircleButton>
+                    <span style={{ fontSize: '12px', color: '#235347' }}>Avatar (Pine 800 + Sage 400 Ring)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ borderTop: '1px solid #DAF1DE', paddingTop: '12px' }}>
+                <PageHeader
+                  title="Club Events"
+                  subtitle="Campus workshops and geospatial expeditions"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Operations Hub Components: HubCard, AccessChip, ModuleSection */}
+          <section style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <SectionHeader title="Operations Hub Components (Spec Section 5 & 7)" />
+
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #DAF1DE',
+                borderRadius: '16px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+              }}
+            >
+              <div>
+                <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '8px' }}>
+                  AccessChip Variants (Manage, View only, Approve, Grant)
+                </h4>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <AccessChip variant="manage" />
+                  <AccessChip variant="view_only" />
+                  <AccessChip variant="approve" />
+                  <AccessChip variant="grant" />
+                </div>
+              </div>
+
+              <div>
+                <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '8px' }}>
+                  ModuleSection & HubCard Grid (2-column, single column below 340px)
+                </h4>
+                <ModuleSection title="Finance" count={3} description="Treasury, ledger & expense controls">
+                  <HubCard
+                    id="treasury"
+                    title="Treasury"
+                    description="Budget requests, sanction approvals & fund allocations"
+                    iconName="Landmark"
+                    accessType="approve"
+                    pendingCount={1}
+                    onClick={() => showDemoToast('Treasury HubCard clicked (Approve access)')}
+                  />
+                  <HubCard
+                    id="add_expense"
+                    title="Add Expense"
+                    description="Log expenses with bill proof, event tags & categories"
+                    iconName="Receipt"
+                    accessType="manage"
+                    onClick={() => showDemoToast('Add Expense HubCard clicked (Manage access)')}
+                  />
+                  <HubCard
+                    id="expenditure_ledger"
+                    title="Expenditure Ledger"
+                    description="Immutable financial log with timestamps & actors"
+                    iconName="BookOpen"
+                    accessType="view_only"
+                    onClick={() => showDemoToast('Expenditure Ledger HubCard clicked (View only access)')}
+                  />
+                </ModuleSection>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
@@ -606,6 +848,9 @@ export const DesignSystemView: React.FC = () => {
             </PillButton>
             <PillButton variant="secondary" onClick={() => setIsPeoplePickerOpen(true)}>
               Open PeoplePicker
+            </PillButton>
+            <PillButton variant="secondary" onClick={() => setIsProfileSheetDemoOpen(true)}>
+              Open ProfileSheet
             </PillButton>
           </div>
 
@@ -685,6 +930,238 @@ export const DesignSystemView: React.FC = () => {
             selectedUids={selectedPeople}
             onSelectionChange={setSelectedPeople}
           />
+
+          {/* ProfileSheet */}
+          <ProfileSheet
+            isOpen={isProfileSheetDemoOpen}
+            onClose={() => setIsProfileSheetDemoOpen(false)}
+          />
+        </div>
+      )}
+
+      {/* TAB 5: NAVIGATION & ROLES SPECIFICATION */}
+      {selectedTab === 'nav_matrix' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <SectionHeader title="Role Navigation Matrix (Exact 5 Tabs per Role)" />
+
+          <div
+            style={{
+              padding: '20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <p style={{ fontSize: '13px', color: '#051F20', margin: 0, lineHeight: 1.6 }}>
+              The floating pill bar maintains a strict 64px height and contains exactly 5 tabs per role.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                {
+                  role: 'Faculty Advisor',
+                  tabs: ['Home', 'Events', 'Operations', 'Community', 'Gallery'],
+                  cockpit: 'Faculty desk: Approvals, QR Generator, Audit feed, Ledgers',
+                },
+                {
+                  role: 'Club Coordinator / President',
+                  tabs: ['Home', 'Events', 'Operations', 'Community', 'Gallery'],
+                  cockpit: 'Plan something: + New event, QR Scanner, Need action list',
+                },
+                {
+                  role: 'Treasurer',
+                  tabs: ['Home', 'Events (read-only)', 'Ledger', 'Community', 'Gallery'],
+                  cockpit: 'Finance: + Add expense, QR Scanner, Reconciled Tiles (Spent ₹1.8L + Available ₹2.7L = Total ₹4.5L)',
+                },
+                {
+                  role: 'Promotion Squad Lead',
+                  tabs: ['Home', 'Events (read-only)', 'Operations', 'Community', 'Gallery'],
+                  cockpit: 'Promotion: + New post, QR Scanner, Scheduled/Posted/Events tiles',
+                },
+                {
+                  role: 'Documentation Squad Lead',
+                  tabs: ['Home', 'Events (read-only)', 'Operations', 'Community', 'Gallery'],
+                  cockpit: 'Documentation: Templates, Upload, Daily News, Upcoming events',
+                },
+                {
+                  role: 'Management Squad Lead',
+                  tabs: ['Home', 'Events', 'Operations', 'Community', 'Gallery'],
+                  cockpit: 'Management: Attendance, Meetings shortcuts, Squad leads & pending approvals',
+                },
+                {
+                  role: 'Student Member',
+                  tabs: ['Home', 'Events', 'Community', 'Gallery', 'Operations'],
+                  cockpit: 'Good morning, {name}: Join event, Quick picks (Pass QR, Squads), My Duties',
+                },
+              ].map((item) => (
+                <div
+                  key={item.role}
+                  style={{
+                    padding: '14px 16px',
+                    borderRadius: '18px',
+                    backgroundColor: '#F6FBF7',
+                    border: '1px solid #DAF1DE',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: '#051F20' }}>
+                      {item.role}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                      5 Tabs Fixed
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {item.tabs.map((tab) => (
+                      <span
+                        key={tab}
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          padding: '3px 10px',
+                          borderRadius: '9999px',
+                          backgroundColor: '#DAF1DE',
+                          color: '#163832',
+                          border: '1px solid #8EB69B',
+                        }}
+                      >
+                        {tab}
+                      </span>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#235347' }}>
+                    {item.cockpit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <SectionHeader title="Architectural Moves & Governance Rules" />
+
+          <div
+            style={{
+              padding: '20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            {[
+              {
+                title: 'Header Avatar Profile',
+                desc: 'Profile leaves the tab bar and opens directly from the 40px circular avatar in the sticky top header.',
+              },
+              {
+                title: 'Members Directory Relocation',
+                desc: 'Members Directory is nested inside Faculty and Coordinator Operations with search and post assignment.',
+              },
+              {
+                title: 'Archives & Campaigns Integration',
+                desc: 'Archives integrated inside Documentation Operations; Campaigns integrated inside Promotion Operations.',
+              },
+              {
+                title: 'Gallery Consolidation',
+                desc: 'Memories merged into Gallery as event albums with photo and video grid and full-screen lightbox.',
+              },
+              {
+                title: 'Header Dynamic QR Action',
+                desc: 'Students open dynamic Pass QR; users designated as attendance takers open the Gate Scanner.',
+              },
+              {
+                title: 'Lead vs Non-Lead Permissions',
+                desc: 'Team leads have full read/write for their squad across all events. Non-lead squad members require event-specific grants.',
+              },
+              {
+                title: 'Turnstile Attendance Rules',
+                desc: 'Internal events require 1 OTP / QR; External events feature 2 phases (Entry OTP and Exit OTP) with separate countdowns.',
+              },
+            ].map((move) => (
+              <div
+                key={move.title}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '16px',
+                  backgroundColor: '#F6FBF7',
+                  border: '1px solid #DAF1DE',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                }}
+              >
+                <span style={{ fontSize: '13px', fontWeight: 800, color: '#051F20' }}>
+                  {move.title}
+                </span>
+                <span style={{ fontSize: '12px', color: '#235347' }}>
+                  {move.desc}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <SectionHeader title="Demo Logins for All 7 Roles" />
+
+          <div
+            style={{
+              padding: '20px',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '24px',
+              border: '1px solid #DAF1DE',
+              boxShadow: '0 10px 30px rgba(5,31,32,0.06)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '12px',
+            }}
+          >
+            {[
+              { role: 'Faculty Advisor', name: 'Dr. Sarah Jenkins', id: 'sarah.jenkins@college.edu', roll: 'FAC-001' },
+              { role: 'Coordinator / President', name: 'Alex Rivera', id: 'alex@college.edu', roll: '21GEO001' },
+              { role: 'Treasurer', name: 'Devon Vance', id: 'devon@college.edu', roll: '21GEO003' },
+              { role: 'Promotion Lead', name: 'Maya Patel', id: 'maya@college.edu', roll: '21GEO004' },
+              { role: 'Documentation Lead', name: 'Aarav Patel', id: 'aarav@college.edu', roll: '21GEO008' },
+              { role: 'Management Lead', name: 'Vikram Seth', id: 'vikram@college.edu', roll: '21GEO010' },
+              { role: 'Student Member', name: 'Jordan Hayes', id: 'jordan@college.edu', roll: '21GEO002' },
+            ].map((u) => (
+              <div
+                key={u.roll}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '16px',
+                  backgroundColor: '#F6FBF7',
+                  border: '1px solid #DAF1DE',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '2px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: '#051F20' }}>
+                    {u.name}
+                  </span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
+                    {u.roll}
+                  </span>
+                </div>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#235347' }}>
+                  {u.role}
+                </span>
+                <span style={{ fontSize: '12px', color: '#235347' }}>
+                  {u.id}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

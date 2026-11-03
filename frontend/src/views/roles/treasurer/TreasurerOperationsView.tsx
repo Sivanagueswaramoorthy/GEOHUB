@@ -5,12 +5,14 @@ import {
   Package,
   Layers,
   ShieldCheck,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
   PillButton,
   StatusChip,
   Mascot,
+  OperationCard,
 } from '../../../components/shared';
 
 export const TreasurerOperationsView: React.FC = () => {
@@ -22,202 +24,72 @@ export const TreasurerOperationsView: React.FC = () => {
 
   const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-  const shortcuts = [
-    { id: 'treasurer', label: 'Ledger', icon: Receipt, desc: `${expenses.length} Records` },
-    { id: 'treasurer', label: 'Stock', icon: Package, desc: `${stockItems.length} Items` },
-    { id: 'events', label: 'Events', icon: Layers, desc: 'Budgets' },
-  ];
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }} className="select-none">
-      {/* Micro-copy: 1 headline (2-4 words), 1 subtitle (< 6 words) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+    <div className="flex flex-col gap-5 select-none animate-fadeIn pb-24">
+      {/* 1) Top Header: Title, Subtitle & Mascot */}
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1
-            style={{
-              fontSize: '28px',
-              lineHeight: '32px',
-              fontWeight: 800,
-              color: '#051F20',
-              margin: 0,
-              letterSpacing: '-0.02em',
-            }}
+            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            style={{ fontSize: '28px', lineHeight: '32px' }}
           >
             Treasury Hub
           </h1>
-          <p style={{ fontSize: '12px', color: '#235347', margin: '4px 0 0 0', fontWeight: 600 }}>
-            Fiscal ledger & operations
+          <p className="text-xs font-semibold text-[#235347] mt-1">
+            Fiscal ledger & operational disbursements
           </p>
         </div>
 
         <Mascot name="coin" size="sm" />
       </div>
 
-      {/* Clear Notice: Budget Approval Belongs to Faculty Only */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          padding: '12px 16px',
-          borderRadius: '16px',
-          backgroundColor: '#DAF1DE',
-          border: '1px solid #8EB69B',
-          fontSize: '12px',
-          color: '#051F20',
-          fontWeight: 600,
-        }}
-      >
-        <ShieldCheck size={18} color="#163832" />
+      {/* Clear Governance Notice: Budget Approval Belongs to Faculty Only */}
+      <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] font-semibold">
+        <ShieldCheck size={18} className="lucide text-[#163832] shrink-0" />
         <span>Budget approval belongs to faculty only. Operational expense submission enabled.</span>
       </div>
 
-      {/* Shortcuts */}
-      <div>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', marginBottom: '10px' }}>
-          Shortcuts
-        </div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: '12px',
-          }}
-        >
-          {shortcuts.map((sc) => {
-            const Icon = sc.icon;
-            return (
-              <div
-                key={sc.label}
-                onClick={() => setActiveTab(sc.id as any)}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '20px',
-                  border: '1px solid #DAF1DE',
-                  padding: '14px',
-                  boxShadow: '0 4px 14px rgba(5,31,32,0.04)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '9999px',
-                    backgroundColor: '#DAF1DE',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#163832',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={18} strokeWidth={2} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20', lineHeight: 1.2 }}>
-                    {sc.label}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
-                    {sc.desc}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 2) Bento Cards Modular Stack (matches user spec exactly) */}
+      <div className="flex flex-col gap-4">
+        {/* 1. Main Ledger */}
+        <OperationCard
+          mascot="coin"
+          title="Expenditure Ledger"
+          meta={<span className="text-xs font-bold text-[#235347]">₹{totalSpent.toLocaleString()} Disbursed</span>}
+          description="Review expenditures across logistics, printing, refreshments, and honoraria with receipt vouchers"
+          actionLabel="Open Ledger"
+          onClick={() => setActiveTab('treasurer')}
+        />
 
-      {/* Bento Modules */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: '#051F20' }}>
-          Workflows
-        </div>
+        {/* 2. Add Expense */}
+        <OperationCard
+          mascot="wallet"
+          title="Add Expense"
+          meta={<StatusChip status="live" label="+ New Voucher" />}
+          description="Record operational vouchers with event allocation, category, invoice receipt, and description"
+          actionLabel="Create Voucher"
+          onClick={() => setActiveTab('treasurer')}
+        />
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '14px',
-          }}
-        >
-          {/* Main Ledger */}
-          <div
-            onClick={() => setActiveTab('treasurer')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="coin" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Ledger
-                </h3>
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-                ₹{totalSpent.toLocaleString()} Spent
-              </span>
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              Review expenditures across logistics, printing, refreshments, and honoraria
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                Open Ledger →
-              </span>
-            </div>
-          </div>
+        {/* 3. Inventory & Assets */}
+        <OperationCard
+          mascot="tree"
+          title="Equipment Inventory"
+          meta={<span className="text-xs font-bold text-[#235347]">{stockItems.length} Items</span>}
+          description="Physical equipment tracking, asset checkout, telemetry sensors, and low-stock indicators"
+          actionLabel="Inspect Inventory"
+          onClick={() => setActiveTab('treasurer')}
+        />
 
-          {/* Stock Inventory */}
-          <div
-            onClick={() => setActiveTab('treasurer')}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '24px',
-              border: '1px solid #DAF1DE',
-              padding: '20px',
-              boxShadow: '0 10px 30px rgba(5,31,32,0.08)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mascot name="wallet" size="sm" />
-                <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
-                  Inventory
-                </h3>
-              </div>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347' }}>
-                {stockItems.length} Items
-              </span>
-            </div>
-            <p style={{ fontSize: '13px', color: '#235347', margin: 0 }}>
-              Physical equipment tracking, asset checkout, and low-stock indicators
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#163832' }}>
-                Inspect Inventory →
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* 4. Financial Audit Export */}
+        <OperationCard
+          mascot="notebook"
+          title="Financial Audit Export"
+          meta={<span className="text-xs font-bold text-[#235347]">CSV & Statements</span>}
+          description="Export comprehensive financial statements and auditor ledgers by event or academic year"
+          actionLabel="Export Statements"
+          onClick={() => setActiveTab('treasurer')}
+        />
       </div>
     </div>
   );

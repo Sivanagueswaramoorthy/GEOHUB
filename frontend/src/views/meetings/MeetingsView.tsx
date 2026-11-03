@@ -147,7 +147,7 @@ export const MeetingsView: React.FC = () => {
             type="text"
             style={{
               width: '100%',
-              height: '44px',
+              height: '48px',
               boxSizing: 'border-box',
               paddingLeft: '40px',
               paddingRight: '14px',
@@ -167,7 +167,7 @@ export const MeetingsView: React.FC = () => {
             size={18}
             strokeWidth={2}
             color="#8EB69B"
-            style={{ position: 'absolute', left: 14, top: 13 }}
+            style={{ position: 'absolute', left: 14, top: 15 }}
           />
         </div>
       </div>

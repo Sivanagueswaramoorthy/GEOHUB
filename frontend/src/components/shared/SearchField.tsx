@@ -34,7 +34,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
         boxShadow: isFocused
           ? '0 0 0 2px rgba(142, 182, 155, 0.3), 0 4px 14px rgba(5, 31, 32, 0.06)'
           : '0 4px 14px rgba(5, 31, 32, 0.04)',
-        height: '46px',
+        height: '48px',
         padding: '0 14px',
         boxSizing: 'border-box',
         transition: 'all 0.2s ease-out',
@@ -63,6 +63,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
         autoFocus={autoFocus}
         style={{
           width: '100%',
+          height: '48px',
           border: 'none',
           outline: 'none',
           boxShadow: 'none',

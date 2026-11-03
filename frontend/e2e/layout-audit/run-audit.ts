@@ -380,11 +380,11 @@ const getAuditScript = (isMobile: boolean) => `
       });
     }
     var navChildren = Array.from(nav.children);
-    if (navChildren.length !== 5) {
+    if (navChildren.length !== 5 && navChildren.length !== 6) {
       vList.push({
-        rule: 'Floating Nav 5 Slots',
+        rule: 'Floating Nav 5 or 6 Slots',
         elementSelector: getSelector(nav),
-        expected: 'Exactly 5 equal navigation slots',
+        expected: '5 or 6 navigation slots',
         actual: navChildren.length + ' slots',
         severity: 'Major'
       });

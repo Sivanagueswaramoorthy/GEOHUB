@@ -3,11 +3,13 @@ import {
   House,
   Calendar,
   Layers,
+  MessagesSquare,
+  Images,
+  Scan,
   UserCheck,
   FolderArchive,
   Wallet,
   Megaphone,
-  Images,
   User,
   LogOut,
   Smartphone,
@@ -16,6 +18,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { getRoleNavTabs, NavTabKey } from '../../core/nav';
 import { Avatar } from '../shared/Avatar';
+import appLogoClean from '../../assets/app-logo-clean.png';
 
 export const DesktopSidebar: React.FC = () => {
   const {
@@ -27,7 +30,7 @@ export const DesktopSidebar: React.FC = () => {
     logout,
   } = useApp();
 
-  const tabs = getRoleNavTabs(currentUser.role, currentUser.post);
+  const tabs = getRoleNavTabs(currentUser.role, currentUser.post, currentUser.team);
 
   const getLucideIcon = (iconName: string, size = 20, color = 'currentColor') => {
     switch (iconName) {
@@ -37,6 +40,12 @@ export const DesktopSidebar: React.FC = () => {
         return <Calendar size={size} strokeWidth={2} color={color} />;
       case 'layers':
         return <Layers size={size} strokeWidth={2} color={color} />;
+      case 'messages-square':
+        return <MessagesSquare size={size} strokeWidth={2} color={color} />;
+      case 'images':
+        return <Images size={size} strokeWidth={2} color={color} />;
+      case 'scan':
+        return <Scan size={size} strokeWidth={2} color={color} />;
       case 'user-check':
         return <UserCheck size={size} strokeWidth={2} color={color} />;
       case 'folder-archive':
@@ -45,8 +54,6 @@ export const DesktopSidebar: React.FC = () => {
         return <Wallet size={size} strokeWidth={2} color={color} />;
       case 'megaphone':
         return <Megaphone size={size} strokeWidth={2} color={color} />;
-      case 'images':
-        return <Images size={size} strokeWidth={2} color={color} />;
       case 'user':
       default:
         return <User size={size} strokeWidth={2} color={color} />;
@@ -64,6 +71,16 @@ export const DesktopSidebar: React.FC = () => {
       case 'operations':
         setActiveTab('operations');
         break;
+      case 'community':
+        setActiveTab('community');
+        break;
+      case 'gallery':
+        setActiveTab('gallery');
+        break;
+      case 'scan_qr':
+      case 'qrscanner':
+        setActiveTab('scan_qr');
+        break;
       case 'members':
         setActiveTab('members');
         break;
@@ -71,6 +88,7 @@ export const DesktopSidebar: React.FC = () => {
         setActiveTab('gallery');
         break;
       case 'finance':
+      case 'ledger':
         setActiveTab('treasurer');
         break;
       case 'campaigns':
@@ -103,9 +121,12 @@ export const DesktopSidebar: React.FC = () => {
         activeTab === 'doc_studio'
       );
     }
+    if (key === 'community') return activeTab === 'community' || activeTab === 'forum';
+    if (key === 'gallery') return activeTab === 'gallery' || activeTab === 'archives' || activeTab === 'memories';
+    if (key === 'scan_qr' || key === 'qrscanner') return activeTab === 'scan_qr' || activeTab === 'my_qr';
     if (key === 'members') return activeTab === 'members' || activeTab === 'add_students';
     if (key === 'archives') return activeTab === 'gallery' || activeTab === 'doc_studio';
-    if (key === 'finance') return activeTab === 'treasurer' || activeTab === 'finance';
+    if (key === 'finance' || key === 'ledger') return activeTab === 'treasurer' || activeTab === 'finance';
     if (key === 'campaigns') return activeTab === 'campaigns' || activeTab === 'ai_social';
     if (key === 'memories') return activeTab === 'memories';
     if (key === 'profile') return activeTab === 'profile';
@@ -128,42 +149,60 @@ export const DesktopSidebar: React.FC = () => {
       }}
     >
       <div className="flex flex-col gap-6">
-        {/* Wordmark */}
+        {/* Wordmark & Brand Logo with unique badge */}
         <div
-          className="flex items-center gap-2 cursor-pointer pt-2"
+          className="flex items-center gap-2.5 cursor-pointer pt-2"
           onClick={() => setActiveTab('home')}
         >
-          <span
+          <div
+            className="flex items-center justify-center p-1.5 shrink-0"
             style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: '22px',
-              fontWeight: 800,
-              color: '#051F20',
-              letterSpacing: '-0.02em',
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #DAF1DE 100%)',
+              borderRadius: '10px 4px 10px 4px',
+              border: '1.5px solid #8EB69B',
+              boxShadow: '0 2px 6px rgba(5, 31, 32, 0.05)',
             }}
           >
-            GEO
-          </span>
-          <span
-            style={{
-              display: 'inline-block',
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              backgroundColor: '#8EB69B',
-            }}
-          />
-          <span
-            style={{
-              fontFamily: 'var(--font-family)',
-              fontSize: '22px',
-              fontWeight: 800,
-              color: '#235347',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            HUB
-          </span>
+            <img
+              src={appLogoClean}
+              alt="Green Eco Organization"
+              className="h-6 w-auto object-contain shrink-0"
+              style={{ maxHeight: '22px', maxWidth: '48px' }}
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: '20px',
+                fontWeight: 800,
+                color: '#051F20',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              GEO
+            </span>
+            <span
+              style={{
+                display: 'inline-block',
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#8EB69B',
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-family)',
+                fontSize: '20px',
+                fontWeight: 800,
+                color: '#235347',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              HUB
+            </span>
+          </div>
         </div>
 
         {/* Navigation Tabs */}

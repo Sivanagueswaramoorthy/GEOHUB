@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { MascotLogo } from './shared/MascotLogo';
 
 export interface ToastProps {
   message: string;
@@ -15,7 +16,7 @@ export const Toast: React.FC<ToastProps> = ({
   let bg = '#DAF1DE';
   let border = '1px solid #8EB69B';
   let text = '#051F20';
-  let icon = <CheckCircle2 size={18} strokeWidth={2.2} color="#163832" />;
+  let icon = <MascotLogo size={22} mood="happy" animated={true} />;
 
   if (type === 'error') {
     bg = 'rgba(217, 83, 79, 0.12)';
