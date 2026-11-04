@@ -393,7 +393,7 @@ export const AuditLogView: React.FC = () => {
                         <span style={{ color: '#235347' }}>{log.details}</span>
                       </div>
                     )}
-                    {log.beforeState && (
+                    {log.beforeState && !log.beforeState.includes('assignedScanners') && (
                       <div>
                         <span style={{ fontWeight: 700, color: '#D9534F' }}>Before: </span>
                         <code style={{ color: '#051F20', backgroundColor: '#FFFFFF', padding: '2px 6px', borderRadius: '6px' }}>
@@ -401,7 +401,7 @@ export const AuditLogView: React.FC = () => {
                         </code>
                       </div>
                     )}
-                    {log.afterState && (
+                    {log.afterState && !log.afterState.includes('assignedScanners') && (
                       <div>
                         <span style={{ fontWeight: 700, color: '#163832' }}>After: </span>
                         <code style={{ color: '#051F20', backgroundColor: '#FFFFFF', padding: '2px 6px', borderRadius: '6px' }}>

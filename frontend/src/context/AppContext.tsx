@@ -239,20 +239,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       details: 'Sanctioned annual GeoFest 2026 allocation: ₹4,500',
       timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
     },
-    {
-      id: 'audit_03',
-      actorId: 'u_admin_02',
-      actorName: 'Alex Rivera',
-      actorRole: 'coordinator',
-      action: 'scanner_assignment_change',
-      targetType: 'event',
-      targetId: 'event_01',
-      targetName: 'GEO FEST 2026',
-      beforeState: 'assignedScanners=[]',
-      afterState: 'assignedScanners=[u_volunteer_05, u_11, u_13, u_16, u_19]',
-      details: 'Designated 5 scanners for event turnstile check-in',
-      timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
   ]);
 
   const addAuditLog = (entry: Omit<AuditLogItem, 'id' | 'timestamp'>) => {

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
 import {
   ALL_MODULE_IDS,
@@ -52,6 +53,23 @@ import {
   AlertCircle,
   QrCode,
   Scan,
+  Crown,
+  ChevronRight,
+  ChevronDown,
+  Check,
+  Sparkles,
+  Search,
+  X,
+  MapPin,
+  Filter,
+  Megaphone,
+  Coins,
+  Users,
+  RefreshCw,
+  Maximize2,
+  Calendar,
+  UserX,
+  UserCheck,
 } from 'lucide-react';
 
 interface AuditLogEntry {
@@ -489,6 +507,30 @@ export const ExploreActivitiesView: React.FC = () => {
             />
           )}
 
+          {selectedModule === 'squads' && (
+            <SquadsScreen
+              readOnly={readOnly}
+              onLogAudit={(event, action) => logAudit('squads', event, action)}
+              currentUser={currentUser}
+            />
+          )}
+
+          {selectedModule === 'squad_leads' && (
+            <SquadLeadsScreen
+              readOnly={readOnly}
+              onLogAudit={(event, action) => logAudit('squad_leads', event, action)}
+              currentUser={currentUser}
+            />
+          )}
+
+          {(selectedModule === 'duties_assignment' || selectedModule === 'duties_stations') && (
+            <DutiesAssignmentScreen
+              readOnly={readOnly}
+              onLogAudit={(event, action) => logAudit(selectedModule, event, action)}
+              currentUser={currentUser}
+            />
+          )}
+
           {/* Standard generic screen for other modules */}
           {![
             'treasury',
@@ -501,6 +543,10 @@ export const ExploreActivitiesView: React.FC = () => {
             'event_permissions',
             'member_directory',
             'lead_activity_review',
+            'squads',
+            'squad_leads',
+            'duties_assignment',
+            'duties_stations',
           ].includes(selectedModule) && (
             <GenericModuleScreen
               moduleId={selectedModule}
@@ -521,7 +567,7 @@ export const ExploreActivitiesView: React.FC = () => {
       {/* Page Header */}
       <PageHeader
         title="Operations"
-        subtitle="Operational modules, role assignments & squad governance"
+        showRoleChip={false}
       />
 
       {/* Role Chip Banner */}
@@ -600,7 +646,6 @@ export const ExploreActivitiesView: React.FC = () => {
               <ModuleSection
                 key={sectionName}
                 title={sectionName}
-                count={sectionModules.length}
               >
                 {sectionModules.map((id) => {
                   const cfg = MODULE_CONFIGS[id];
@@ -618,6 +663,8 @@ export const ExploreActivitiesView: React.FC = () => {
                       access={access}
                       accessType={accessType}
                       pendingCount={pendingCount}
+                      hideDescription={true}
+                      hideAccessChip={true}
                       onClick={() => setSelectedModule(id)}
                     />
                   );
@@ -1461,128 +1508,543 @@ const CampaignPostScreen: React.FC<{
 
 /**
  * 6. Attendance Desk Screen:
- * - Internal events: 1 OTP/QR code.
- * - External events: Entry OTP and Exit OTP with separate countdowns.
- * - Manual override with mandatory reason.
+ * - Dynamic Event QR Generator with live session OTP, rotation countdown, and fullscreen projector display.
+ * - Comprehensive Manual Attendance Roster for the respective event with one-tap status toggling (Present / Late / Absent).
+ * - Live event attendance metrics summary.
+ * - Manual attendance override with mandatory audit reason logging.
  */
+interface AttendeeRecord {
+  uid: string;
+  name: string;
+  rollNo: string;
+  squad: string;
+  status: 'present' | 'late' | 'absent';
+  checkInTime?: string;
+}
+
+const CHAPTER_EVENTS_FOR_ATTENDANCE = [
+  { id: 'ev-geofest', title: 'GEO FEST 2026: Campus Odyssey', venue: 'Main Auditorium', date: 'Tomorrow • 09:30 AM' },
+  { id: 'ev-gis', title: 'GIS & Satellite Telemetry Workshop', venue: 'Geomatics Lab 3', date: 'Nov 08 • 10:00 AM' },
+  { id: 'ev-drone', title: 'Campus Biodiversity Drone Survey', venue: 'North Quad Base Station', date: 'Nov 12 • 02:00 PM' },
+  { id: 'ev-colloquium', title: 'National Remote Sensing Colloquium 2026', venue: 'Conference Hall A', date: 'Concluded' },
+];
+
+const INITIAL_ATTENDEES_ROSTER: Record<string, AttendeeRecord[]> = {
+  'ev-geofest': [
+    { uid: 'u-1', name: 'Dr. Ramesh Kumar', rollNo: 'FAC-GEO-01', squad: 'Management', status: 'present', checkInTime: '09:15 AM' },
+    { uid: 'u-2', name: 'Siddharth Roy', rollNo: '22GEO001', squad: 'Management', status: 'present', checkInTime: '09:20 AM' },
+    { uid: 'u-3', name: 'Divya Rao', rollNo: '22GEO005', squad: 'Management', status: 'present', checkInTime: '09:22 AM' },
+    { uid: 'u-4', name: 'Sneha Patel', rollNo: '22GEO012', squad: 'Promotion', status: 'present', checkInTime: '09:25 AM' },
+    { uid: 'u-5', name: 'Ananya Iyer', rollNo: '22GEO023', squad: 'Treasury', status: 'present', checkInTime: '09:28 AM' },
+    { uid: 'u-6', name: 'Aarav Patel', rollNo: '22GEO034', squad: 'Documentation', status: 'late', checkInTime: '09:42 AM' },
+    { uid: 'u-7', name: 'Kunal Sen', rollNo: '23GEO045', squad: 'Promotion', status: 'present', checkInTime: '09:30 AM' },
+    { uid: 'u-8', name: 'David Chen', rollNo: '23GEO052', squad: 'Documentation', status: 'absent' },
+    { uid: 'u-9', name: 'Priya Sharma', rollNo: '23GEO061', squad: 'Treasury', status: 'present', checkInTime: '09:33 AM' },
+    { uid: 'u-10', name: 'Maya Patel', rollNo: '23GEO070', squad: 'Management', status: 'absent' },
+  ],
+  'ev-gis': [
+    { uid: 'u-1', name: 'Dr. Ramesh Kumar', rollNo: 'FAC-GEO-01', squad: 'Management', status: 'present', checkInTime: '09:50 AM' },
+    { uid: 'u-7', name: 'Kunal Sen', rollNo: '23GEO045', squad: 'Promotion', status: 'present', checkInTime: '09:55 AM' },
+    { uid: 'u-9', name: 'Priya Sharma', rollNo: '23GEO061', squad: 'Treasury', status: 'present', checkInTime: '09:58 AM' },
+    { uid: 'u-8', name: 'David Chen', rollNo: '23GEO052', squad: 'Documentation', status: 'late', checkInTime: '10:12 AM' },
+    { uid: 'u-10', name: 'Maya Patel', rollNo: '23GEO070', squad: 'Management', status: 'absent' },
+  ],
+  'ev-drone': [
+    { uid: 'u-8', name: 'David Chen', rollNo: '23GEO052', squad: 'Documentation', status: 'present', checkInTime: '01:50 PM' },
+    { uid: 'u-2', name: 'Siddharth Roy', rollNo: '22GEO001', squad: 'Management', status: 'present', checkInTime: '01:55 PM' },
+    { uid: 'u-4', name: 'Sneha Patel', rollNo: '22GEO012', squad: 'Promotion', status: 'absent' },
+  ],
+  'ev-colloquium': [
+    { uid: 'u-3', name: 'Divya Rao', rollNo: '22GEO005', squad: 'Management', status: 'present', checkInTime: '09:00 AM' },
+    { uid: 'u-5', name: 'Ananya Iyer', rollNo: '22GEO023', squad: 'Treasury', status: 'present', checkInTime: '09:05 AM' },
+  ],
+};
+
 const AttendanceDeskScreen: React.FC<{
   readOnly: boolean;
   onLogAudit: (event: string, action: string) => void;
   currentUser: any;
 }> = ({ readOnly, onLogAudit, currentUser }) => {
-  const [eventType, setEventType] = useState<'internal' | 'external'>('internal');
+  const [selectedEventId, setSelectedEventId] = useState('ev-geofest');
+  const [activeTab, setActiveTab] = useState<'roster' | 'qr'>('roster');
+  const [attendeesByEvent, setAttendeesByEvent] = useState(INITIAL_ATTENDEES_ROSTER);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+
+  // QR Generator States
+  const [otp, setOtp] = useState('829 401');
+  const [secondsLeft, setSecondsLeft] = useState(28);
+  const [qrToken, setQrToken] = useState('GEO-TOKEN-8F92A');
+  const [showProjectorModal, setShowProjectorModal] = useState(false);
+
+  // Manual Override States
   const [showOverrideDialog, setShowOverrideDialog] = useState(false);
-  const [overrideStudent, setOverrideStudent] = useState('GEO-2026-042');
+  const [overrideStudent, setOverrideStudent] = useState('Kunal Sen (23GEO045)');
   const [overrideReason, setOverrideReason] = useState('');
-  const [overrideStatus, setOverrideStatus] = useState<string | null>(null);
+  const [overrideStatusMsg, setOverrideStatusMsg] = useState<string | null>(null);
+
+  // Live timer for OTP rotation
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          const nextOtp = Math.floor(100000 + Math.random() * 900000).toString().replace(/(\d{3})(\d{3})/, '$1 $2');
+          setOtp(nextOtp);
+          setQrToken(`GEO-TOKEN-${Math.random().toString(36).substring(2, 7).toUpperCase()}`);
+          return 30;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const selectedEvent =
+    CHAPTER_EVENTS_FOR_ATTENDANCE.find((e) => e.id === selectedEventId) || CHAPTER_EVENTS_FOR_ATTENDANCE[0];
+  const currentRoster = attendeesByEvent[selectedEventId] || [];
+
+  const handleUpdateStatus = (uid: string, newStatus: 'present' | 'late' | 'absent') => {
+    if (readOnly) return;
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setAttendeesByEvent((prev) => ({
+      ...prev,
+      [selectedEventId]: (prev[selectedEventId] || []).map((att) =>
+        att.uid === uid
+          ? { ...att, status: newStatus, checkInTime: newStatus === 'absent' ? undefined : att.checkInTime || nowTime }
+          : att
+      ),
+    }));
+
+    const student = currentRoster.find((a) => a.uid === uid);
+    if (student) {
+      onLogAudit(selectedEvent.title, `Updated attendance for ${student.name} (${student.rollNo}) to ${newStatus.toUpperCase()}`);
+    }
+  };
 
   const handleOverrideSubmit = (reason?: string) => {
     const finalReason = reason || overrideReason;
     if (!finalReason.trim()) return;
 
     onLogAudit(
-      eventType === 'internal' ? 'Internal GIS Orientation' : 'Inter-College Geo-Marathon',
+      selectedEvent.title,
       `Manual attendance override for student ${overrideStudent}. Mandatory Reason: "${finalReason}"`
     );
 
-    setOverrideStatus(`Attendance overridden for ${overrideStudent}.`);
+    setOverrideStatusMsg(`Attendance override recorded for ${overrideStudent}.`);
     setShowOverrideDialog(false);
     setOverrideReason('');
-    setTimeout(() => setOverrideStatus(null), 4000);
+    setTimeout(() => setOverrideStatusMsg(null), 4000);
   };
 
+  const filteredAttendees = currentRoster.filter((att) => {
+    if (statusFilter !== 'All' && att.status !== statusFilter.toLowerCase()) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      att.name.toLowerCase().includes(q) ||
+      att.rollNo.toLowerCase().includes(q) ||
+      att.squad.toLowerCase().includes(q)
+    );
+  });
+
+  const totalCount = currentRoster.length;
+  const presentCount = currentRoster.filter((a) => a.status === 'present').length;
+  const lateCount = currentRoster.filter((a) => a.status === 'late').length;
+  const absentCount = currentRoster.filter((a) => a.status === 'absent').length;
+  const attendanceRate = totalCount > 0 ? Math.round(((presentCount + lateCount) / totalCount) * 100) : 0;
+
+  const qrPayload = `GEO-CHECKIN:${selectedEvent.id}:${qrToken}:${otp.replace(/\s/g, '')}`;
+
   return (
-    <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <h2 className="font-heading font-bold text-[#051F20] text-base">
-          Live Attendance Desk
-        </h2>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setEventType('internal')}
-            className={`px-3 py-1 rounded-xl text-[12px] font-semibold transition-all ${
-              eventType === 'internal'
-                ? 'bg-[#163832] text-white'
-                : 'bg-[#DAF1DE] text-[#051F20]'
-            }`}
-          >
-            Internal Event (1-Phase)
-          </button>
-          <button
-            onClick={() => setEventType('external')}
-            className={`px-3 py-1 rounded-xl text-[12px] font-semibold transition-all ${
-              eventType === 'external'
-                ? 'bg-[#163832] text-white'
-                : 'bg-[#DAF1DE] text-[#051F20]'
-            }`}
-          >
-            External Event (Entry/Exit)
-          </button>
+    <div className="space-y-4 select-none pb-12 animate-fadeIn">
+      {/* 1. Header with Event Selector & Tab Switcher */}
+      <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="font-heading font-bold text-base sm:text-lg text-[#051F20]">
+              Event Attendance Console
+            </h2>
+            <p className="text-xs text-[#235347]">
+              Live QR code check-in & manual attendance roster for chapter events
+            </p>
+          </div>
+
+          {/* Mode Switcher Tabs */}
+          <div className="flex items-center gap-1 bg-[#F6FBF7] p-1 rounded-xl border border-[#DAF1DE] shrink-0">
+            <button
+              type="button"
+              onClick={() => setActiveTab('roster')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'roster'
+                  ? 'bg-[#163832] text-white shadow-xs'
+                  : 'text-[#235347] hover:text-[#051F20]'
+              }`}
+            >
+              <UserCheck size={14} />
+              <span>Manual Attendance</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('qr')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'qr'
+                  ? 'bg-[#163832] text-white shadow-xs'
+                  : 'text-[#235347] hover:text-[#051F20]'
+              }`}
+            >
+              <QrCode size={14} />
+              <span>Event QR Generator</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Event Selector Dropdown */}
+        <div className="pt-2 border-t border-[#DAF1DE]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Calendar size={16} className="text-[#8EB69B] shrink-0" />
+            <span className="text-xs font-bold text-[#163832] shrink-0">Select Event:</span>
+            <select
+              value={selectedEventId}
+              onChange={(e) => setSelectedEventId(e.target.value)}
+              className="flex-1 max-w-md p-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-semibold text-[#051F20] outline-none cursor-pointer focus:bg-white focus:border-[#235347]"
+            >
+              {CHAPTER_EVENTS_FOR_ATTENDANCE.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.title} ({ev.date})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs text-[#235347] shrink-0">
+            <MapPin size={13} className="text-[#8EB69B]" />
+            <span className="font-medium">{selectedEvent.venue}</span>
+          </div>
         </div>
       </div>
 
-      {/* OTP Display Card */}
-      {eventType === 'internal' ? (
-        <div className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <span className="text-[12px] font-semibold text-[#235347] uppercase tracking-wider">
-              Single-Phase Check-In OTP / QR
-            </span>
-            <div className="text-3xl font-mono font-bold text-[#051F20] tracking-widest mt-1">
-              829 401
+      {/* 2. TAB A: EVENT QR GENERATOR */}
+      {activeTab === 'qr' && (
+        <div className="p-4 sm:p-6 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-5 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#DAF1DE]">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#235347] block">
+                Dynamic Event Pass
+              </span>
+              <h3 className="font-heading font-bold text-lg text-[#051F20]">
+                {selectedEvent.title}
+              </h3>
             </div>
-            <p className="text-[12px] text-[#235347] mt-1">
-              Rotates every 30 seconds for fraud prevention.
-            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowProjectorModal(true)}
+              className="h-9 px-3.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-95 shrink-0"
+            >
+              <Maximize2 size={14} />
+              <span>Projector / Fullscreen</span>
+            </button>
           </div>
-          <div className="w-16 h-16 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
-            <QrCode size={32} />
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
-            <span className="text-[12px] font-semibold text-[#235347] uppercase tracking-wider">
-              Phase 1: Entry OTP
-            </span>
-            <div className="text-2xl font-mono font-bold text-[#051F20] tracking-widest mt-1">
-              419 203
+
+          {/* QR Display Card */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 p-4 sm:p-6 bg-gradient-to-br from-[#F6FBF7] via-white to-[#F6FBF7] rounded-3xl border border-[#8EB69B]/50">
+            {/* High-res QRCodeSVG */}
+            <div className="p-3 bg-white rounded-2xl border-2 border-[#163832]/20 shadow-md flex items-center justify-center">
+              <QRCodeSVG
+                value={qrPayload}
+                size={180}
+                bgColor="#FFFFFF"
+                fgColor="#051F20"
+                level="Q"
+              />
             </div>
-            <p className="text-[12px] text-[#235347] mt-1">Valid until 11:30 AM</p>
-          </div>
-          <div className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
-            <span className="text-[12px] font-semibold text-[#235347] uppercase tracking-wider">
-              Phase 2: Exit OTP
-            </span>
-            <div className="text-2xl font-mono font-bold text-[#051F20] tracking-widest mt-1">
-              736 194
+
+            {/* OTP & Session Details */}
+            <div className="text-center sm:text-left space-y-2">
+              <span className="text-xs font-bold text-[#235347] uppercase tracking-wider block">
+                Session Check-In OTP
+              </span>
+              <div className="font-mono font-extrabold text-3xl sm:text-4xl text-[#051F20] tracking-widest">
+                {otp}
+              </div>
+              <p className="text-xs text-[#235347] flex items-center justify-center sm:justify-start gap-1.5">
+                <Clock size={13} className="text-[#8EB69B]" />
+                <span>Rotates in <strong>{secondsLeft}s</strong> for anti-proxy fraud prevention</span>
+              </p>
+
+              {/* Progress bar */}
+              <div className="w-full sm:w-56 h-1.5 rounded-full bg-[#DAF1DE] overflow-hidden mt-2">
+                <div
+                  className="h-full bg-[#163832] transition-all duration-1000 ease-linear rounded-full"
+                  style={{ width: `${(secondsLeft / 30) * 100}%` }}
+                />
+              </div>
+
+              <div className="pt-2 flex items-center justify-center sm:justify-start gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextOtp = Math.floor(100000 + Math.random() * 900000).toString().replace(/(\d{3})(\d{3})/, '$1 $2');
+                    setOtp(nextOtp);
+                    setSecondsLeft(30);
+                    onLogAudit(selectedEvent.title, 'Regenerated event check-in QR & OTP pass');
+                  }}
+                  className="h-8 px-3 rounded-xl bg-white border border-[#8EB69B] text-[#163832] text-xs font-bold hover:bg-[#DAF1DE] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                >
+                  <RefreshCw size={12} />
+                  <span>Refresh Code</span>
+                </button>
+              </div>
             </div>
-            <p className="text-[12px] text-[#235347] mt-1">Countdown active post 04:00 PM</p>
           </div>
         </div>
       )}
 
-      {/* Manual Override Action (Hidden if readOnly) */}
-      {!readOnly && (
-        <div className="pt-2">
-          <button
-            onClick={() => setShowOverrideDialog(true)}
-            className="px-4 py-2 rounded-xl bg-[#163832] text-white text-[12px] font-semibold hover:bg-[#0B2B26] active:scale-95 transition-all"
-            data-testid="btn-manual-override"
-          >
-            Manual Attendance Override
-          </button>
+      {/* 3. TAB B: MANUAL ATTENDANCE FOR RESPECTIVE EVENT */}
+      {activeTab === 'roster' && (
+        <div className="space-y-4 animate-fadeIn">
+          {/* Summary KPI Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            <div className="p-3 bg-white rounded-2xl border border-[#DAF1DE] shadow-2xs">
+              <span className="text-xs text-[#8EB69B] block font-semibold">Total Scholars</span>
+              <span className="font-heading font-extrabold text-lg text-[#051F20]">{totalCount}</span>
+            </div>
+            <div className="p-3 bg-[#DAF1DE]/40 rounded-2xl border border-[#8EB69B]/50 shadow-2xs">
+              <span className="text-xs text-[#163832] block font-semibold">Present</span>
+              <span className="font-heading font-extrabold text-lg text-[#163832]">{presentCount}</span>
+            </div>
+            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 shadow-2xs">
+              <span className="text-xs text-amber-800 block font-semibold">Late</span>
+              <span className="font-heading font-extrabold text-lg text-amber-900">{lateCount}</span>
+            </div>
+            <div className="p-3 bg-red-50 rounded-2xl border border-red-200 shadow-2xs">
+              <span className="text-xs text-red-800 block font-semibold">Absent</span>
+              <span className="font-heading font-extrabold text-lg text-red-900">{absentCount}</span>
+            </div>
+            <div className="p-3 bg-[#F6FBF7] rounded-2xl border border-[#DAF1DE] shadow-2xs col-span-2 sm:col-span-1">
+              <span className="text-xs text-[#235347] block font-semibold">Turnout Rate</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading font-extrabold text-lg text-[#051F20]">{attendanceRate}%</span>
+                <span className="text-xs text-[#8EB69B]">turnout</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Search, Status Filters & Manual Override Action */}
+          <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-3.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="relative flex-1 min-w-0">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search scholars by name, roll no, or squad..."
+                  className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#051F20] placeholder:text-[#8EB69B] focus:border-[#235347] focus:bg-white transition-all outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => setShowOverrideDialog(true)}
+                  data-testid="btn-manual-override"
+                  className="h-9 px-3.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95 shrink-0"
+                >
+                  <Shield size={14} />
+                  <span>Manual Override</span>
+                </button>
+              )}
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+              {['All', 'Present', 'Late', 'Absent'].map((st) => {
+                const isSelected = statusFilter === st;
+                return (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setStatusFilter(st)}
+                    className={`h-8 px-3 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                      isSelected
+                        ? 'bg-[#163832] text-white shadow-xs'
+                        : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:bg-[#DAF1DE]'
+                    }`}
+                  >
+                    <span>{st}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Notification message */}
+            {overrideStatusMsg && (
+              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs font-bold text-[#051F20] flex items-center gap-2">
+                <CheckCircle2 size={15} className="text-[#163832]" />
+                <span>{overrideStatusMsg}</span>
+              </div>
+            )}
+
+            {/* Attendee Roster List */}
+            <div className="space-y-2 pt-1">
+              {filteredAttendees.length === 0 ? (
+                <div className="py-8 text-center text-xs text-[#235347] bg-[#F6FBF7] rounded-2xl border border-[#DAF1DE]">
+                  No attendees matching your search.
+                </div>
+              ) : (
+                filteredAttendees.map((att) => {
+                  const isPresent = att.status === 'present';
+                  const isLate = att.status === 'late';
+                  const isAbsent = att.status === 'absent';
+
+                  return (
+                    <div
+                      key={att.uid}
+                      className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7]/60 hover:bg-[#F6FBF7] border border-[#DAF1DE] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center font-heading font-extrabold text-xs shrink-0 shadow-2xs ${
+                            isPresent
+                              ? 'bg-[#163832] text-[#DAF1DE]'
+                              : isLate
+                              ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                              : 'bg-red-100 text-red-900 border border-red-200'
+                          }`}
+                        >
+                          {att.name.charAt(0)}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-heading font-bold text-sm text-[#051F20] truncate">
+                              {att.name}
+                            </span>
+                            <span className="text-xs text-[#8EB69B] font-mono shrink-0">
+                              ({att.rollNo})
+                            </span>
+                          </div>
+                          <div className="text-xs text-[#235347] flex items-center gap-1.5 mt-0.5 truncate">
+                            <span className="font-semibold text-[#163832]">{att.squad} Squad</span>
+                            {att.checkInTime && (
+                              <>
+                                <span className="text-[#8EB69B]">•</span>
+                                <span className="text-[#8EB69B]">Checked-in at {att.checkInTime}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* One-Tap Status Toggles */}
+                      {!readOnly && (
+                        <div className="flex items-center gap-1 shrink-0 self-end sm:self-center">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(att.uid, 'present')}
+                            className={`h-8 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                              isPresent
+                                ? 'bg-[#163832] text-white shadow-xs'
+                                : 'bg-white border border-[#8EB69B] text-[#163832] hover:bg-[#DAF1DE]'
+                            }`}
+                          >
+                            Present
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(att.uid, 'late')}
+                            className={`h-8 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                              isLate
+                                ? 'bg-amber-500 text-white shadow-xs'
+                                : 'bg-white border border-amber-300 text-amber-800 hover:bg-amber-50'
+                            }`}
+                          >
+                            Late
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(att.uid, 'absent')}
+                            className={`h-8 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                              isAbsent
+                                ? 'bg-[#D9534F] text-white shadow-xs'
+                                : 'bg-white border border-red-300 text-red-800 hover:bg-red-50'
+                            }`}
+                          >
+                            Absent
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
         </div>
       )}
 
-      {overrideStatus && (
-        <div className="p-3 rounded-xl bg-[#DAF1DE] text-[#051F20] text-[12px] font-semibold flex items-center gap-2">
-          <CheckCircle2 size={16} />
-          {overrideStatus}
+      {/* Fullscreen / Projector Modal */}
+      {showProjectorModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-lg border border-[#DAF1DE] shadow-2xl text-center space-y-5">
+            <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
+              <div className="text-left">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#235347]">
+                  Venue Check-In Projector
+                </span>
+                <h3 className="font-heading font-extrabold text-xl text-[#051F20]">
+                  {selectedEvent.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowProjectorModal(false)}
+                className="text-[#8EB69B] hover:text-[#051F20] cursor-pointer"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="p-6 bg-white rounded-3xl border-4 border-[#163832] inline-block shadow-lg mx-auto">
+              <QRCodeSVG
+                value={qrPayload}
+                size={260}
+                bgColor="#FFFFFF"
+                fgColor="#051F20"
+                level="H"
+              />
+            </div>
+
+            <div>
+              <span className="text-xs font-bold text-[#235347] uppercase tracking-wider block">
+                Session OTP
+              </span>
+              <div className="font-mono font-extrabold text-4xl text-[#051F20] tracking-widest mt-1">
+                {otp}
+              </div>
+              <p className="text-xs text-[#235347] mt-1">
+                Scan with GeoHub app to mark attendance instantly
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Override Dialog with Mandatory Reason */}
+      {/* Manual Override Dialog with Mandatory Reason */}
       <ConfirmDialog
         isOpen={showOverrideDialog}
         onClose={() => setShowOverrideDialog(false)}
@@ -1868,92 +2330,2007 @@ const EventPermissionsScreen: React.FC<{
   );
 };
 
+// =========================================================================
+// Roster Data Model & Initial Mock Records
+// =========================================================================
+interface ScholarRecord {
+  uid: string;
+  name: string;
+  role: string;
+  squad: string;
+  isLead: boolean;
+  post: string;
+  email?: string;
+  rollNo?: string;
+}
+
+const INITIAL_CHAPTER_ROSTER: ScholarRecord[] = [
+  { uid: 'u-fac', name: 'Dr. Ramesh Kumar', role: 'faculty', squad: 'Management', isLead: true, post: 'Faculty Advisor', email: 'ramesh.kumar@geohub.edu', rollNo: 'FAC-GEO-01' },
+  { uid: 'u-pres', name: 'Siddharth Roy', role: 'coordinator', squad: 'Management', isLead: true, post: 'Club President', email: 'siddharth.roy@geohub.edu', rollNo: '22GEO001' },
+  { uid: 'u-mgmt', name: 'Divya Rao', role: 'management', squad: 'Management', isLead: true, post: 'Management Lead', email: 'divya.rao@geohub.edu', rollNo: '22GEO005' },
+  { uid: 'u-promo-lead', name: 'Sneha Patel', role: 'management', squad: 'Promotion', isLead: true, post: 'Promotion Lead', email: 'sneha.patel@geohub.edu', rollNo: '22GEO012' },
+  { uid: 'u-treas-lead', name: 'Ananya Iyer', role: 'management', squad: 'Treasury', isLead: true, post: 'Treasury Lead', email: 'ananya.iyer@geohub.edu', rollNo: '22GEO023' },
+  { uid: 'u-doc-lead', name: 'Aarav Patel', role: 'management', squad: 'Documentation', isLead: true, post: 'Documentation Lead', email: 'aarav.patel@geohub.edu', rollNo: '22GEO034' },
+  { uid: 'u-mem-1', name: 'Kunal Sen', role: 'student', squad: 'Promotion', isLead: false, post: 'Social Media Associate', email: 'kunal.sen@geohub.edu', rollNo: '23GEO045' },
+  { uid: 'u-mem-2', name: 'David Chen', role: 'student', squad: 'Documentation', isLead: false, post: 'Field Archivist', email: 'david.chen@geohub.edu', rollNo: '23GEO052' },
+  { uid: 'u-mem-3', name: 'Priya Sharma', role: 'student', squad: 'Treasury', isLead: false, post: 'Voucher Auditor', email: 'priya.sharma@geohub.edu', rollNo: '23GEO061' },
+  { uid: 'u-mem-4', name: 'Maya Patel', role: 'student', squad: 'Management', isLead: false, post: 'Logistics Coordinator', email: 'maya.patel@geohub.edu', rollNo: '23GEO070' },
+];
+
 /**
  * 9. Member Directory Screen:
- * - Only Faculty can remove members.
- * - President has WRITE, but NO remove-member action and no editing of Faculty accounts.
+ * - Clean roster list (names, squads, roles). No cramped edit/trash buttons on row.
+ * - When clicking a member card, opens a dedicated FULL PAGE with complete member details!
+ * - In that detail screen: update student information and delete operation with Faculty authority.
  */
 const MemberDirectoryScreen: React.FC<{
   readOnly: boolean;
   onLogAudit: (event: string, action: string) => void;
   currentUser: any;
 }> = ({ readOnly, onLogAudit, currentUser }) => {
-  const [members, setMembers] = useState([
-    { uid: 'u-fac', name: 'Dr. Ramesh Kumar', role: 'faculty', squad: 'Faculty Governance' },
-    { uid: 'u-pres', name: 'Siddharth Roy', role: 'coordinator', squad: 'Management' },
-    { uid: 'u-lead', name: 'Divya Rao', role: 'management', squad: 'Management Lead' },
-    { uid: 'u-mem', name: 'Kunal Sen', role: 'student', squad: 'General Member' },
-  ]);
+  const [selectedSquad, setSelectedSquad] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMember, setSelectedMember] = useState<ScholarRecord | null>(null);
+
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberSquad, setNewMemberSquad] = useState('Promotion');
+
+  // Update student states on detail page
+  const [editName, setEditName] = useState('');
+  const [editPost, setEditPost] = useState('');
+  const [editSquad, setEditSquad] = useState('Promotion');
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
+
+  const [members, setMembers] = useState<ScholarRecord[]>(INITIAL_CHAPTER_ROSTER);
 
   const canRemove = canRemoveMember(currentUser);
+  const effectiveSquad = selectedSquad === 'All' ? 'Promotion' : selectedSquad;
+  const canAddMember = canAddSquadMember(currentUser, effectiveSquad);
 
-  const handleRemove = (member: any) => {
-    if (!canRemove) return;
-    setMembers((prev) => prev.filter((m) => m.uid !== member.uid));
-    onLogAudit('Member Directory', `Removed member ${member.name} (${member.role})`);
+  const handleSelectMember = (m: ScholarRecord) => {
+    setSelectedMember(m);
+    setEditName(m.name);
+    setEditPost(m.post || m.role);
+    setEditSquad(m.squad);
+    setSaveSuccessMsg(null);
   };
 
-  return (
-    <div className="p-5 sm:p-6 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading font-bold text-[#051F20] text-base">
-          Member Roster
-        </h2>
-        <span className="text-[12px] text-[#235347]">
-          {members.length} Registered Scholars
-        </span>
-      </div>
+  const handleSaveMemberUpdates = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedMember) return;
+    const updated: ScholarRecord = {
+      ...selectedMember,
+      name: editName.trim() || selectedMember.name,
+      post: editPost.trim() || selectedMember.post,
+      squad: editSquad,
+    };
+    setMembers((prev) => prev.map((m) => (m.uid === selectedMember.uid ? updated : m)));
+    setSelectedMember(updated);
+    onLogAudit('Member Directory', `Updated profile details for ${updated.name} (${editSquad} Squad)`);
+    setSaveSuccessMsg('Student record updated successfully!');
+    setTimeout(() => setSaveSuccessMsg(null), 3000);
+  };
 
-      <div className="divide-y divide-[#8EB69B]/20">
-        {members.map((m) => {
-          const canEditThisMember = !readOnly && canEditMember(currentUser, m as any);
+  const handleRemoveFromPage = (member: ScholarRecord) => {
+    if (!canRemove) return;
+    if (member.role === 'faculty' || member.role === 'coordinator' || member.uid === currentUser?.uid) return;
+    setMembers((prev) => prev.filter((m) => m.uid !== member.uid));
+    onLogAudit('Member Directory', `Removed member ${member.name} (${member.role})`);
+    setSelectedMember(null);
+  };
 
-          return (
-            <div key={m.uid} className="py-3 flex items-center justify-between gap-2">
+  const handleConfirmAddMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberName.trim()) return;
+    const squad = selectedSquad === 'All' ? newMemberSquad : selectedSquad;
+    const newEntry: ScholarRecord = {
+      uid: `u-${Date.now()}`,
+      name: newMemberName.trim(),
+      role: 'student',
+      squad,
+      isLead: false,
+      post: `${squad} Member`,
+      rollNo: `24GEO${Math.floor(100 + Math.random() * 900)}`,
+      email: `${newMemberName.toLowerCase().replace(/\s+/g, '.') || 'scholar'}@geohub.edu`,
+    };
+    setMembers((prev) => [...prev, newEntry]);
+    onLogAudit('Member Directory', `Squad Lead enrolled ${newMemberName} into ${squad} squad`);
+    setShowAddMemberModal(false);
+    setNewMemberName('');
+  };
+
+  const squads = ['All', 'Management', 'Promotion', 'Treasury', 'Documentation'];
+
+  const filteredMembers = members.filter((m) => {
+    const matchesSquad =
+      selectedSquad === 'All' || m.squad.toLowerCase() === selectedSquad.toLowerCase();
+    if (!matchesSquad) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      m.name.toLowerCase().includes(q) ||
+      m.squad.toLowerCase().includes(q) ||
+      (m.post && m.post.toLowerCase().includes(q)) ||
+      m.role.toLowerCase().includes(q)
+    );
+  });
+
+  // FULL PAGE VIEW FOR SELECTED STUDENT
+  if (selectedMember) {
+    const isProtected = selectedMember.role === 'faculty' || selectedMember.role === 'coordinator';
+
+    return (
+      <div className="space-y-4 animate-fadeIn select-none pb-16">
+        {/* Top Header & Back to Roster */}
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setSelectedMember(null)}
+            data-testid="btn-back-to-roster"
+            className="h-9 px-3.5 rounded-full bg-white border border-[#DAF1DE] text-[#163832] text-xs font-bold hover:bg-[#F6FBF7] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Roster</span>
+          </button>
+
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#163832]" />
+            <span>{selectedMember.isLead ? '👑 Squad Lead' : 'General Member'}</span>
+          </span>
+        </div>
+
+        {/* Profile Dossier Card */}
+        <div className="p-4 sm:p-5 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4">
+          <div className="flex items-center gap-3.5">
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center font-heading font-extrabold text-xl shrink-0 shadow-xs ${
+                selectedMember.isLead
+                  ? 'bg-[#163832] text-[#DAF1DE] border border-[#235347]'
+                  : 'bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40'
+              }`}
+            >
+              {selectedMember.name.charAt(0)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-heading font-bold text-lg text-[#051F20] truncate">
+                {selectedMember.name}
+              </h2>
+              <p className="text-xs text-[#235347] font-semibold truncate">
+                {selectedMember.post || selectedMember.role} • {selectedMember.squad} Squad
+              </p>
+              <div className="flex items-center gap-2 text-xs text-[#8EB69B] mt-0.5 truncate">
+                <span>Scholar ID: {selectedMember.uid}</span>
+                {selectedMember.rollNo && (
+                  <>
+                    <span>•</span>
+                    <span>Roll: {selectedMember.rollNo}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Success Notification */}
+          {saveSuccessMsg && (
+            <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs font-bold text-[#051F20] flex items-center gap-2">
+              <CheckCircle2 size={15} className="text-[#163832]" />
+              <span>{saveSuccessMsg}</span>
+            </div>
+          )}
+
+          {/* Update Student Form */}
+          <div className="pt-3 border-t border-[#DAF1DE]">
+            <h3 className="font-heading font-bold text-sm text-[#051F20] mb-3">
+              Update Student Record
+            </h3>
+            <form onSubmit={handleSaveMemberUpdates} className="space-y-3">
               <div>
-                <div className="font-heading font-bold text-[#051F20] text-sm">
-                  {m.name}
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Full Scholar Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  disabled={readOnly}
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none bg-white focus:ring-2 focus:ring-[#8EB69B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1">
+                    Designation / Club Post
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    disabled={readOnly}
+                    value={editPost}
+                    onChange={(e) => setEditPost(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none bg-white focus:ring-2 focus:ring-[#8EB69B]"
+                  />
                 </div>
-                <div className="text-[12px] text-[#235347]">
-                  Role: <strong>{m.role}</strong> | {m.squad}
+
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1">
+                    Assigned Squad
+                  </label>
+                  <select
+                    disabled={readOnly}
+                    value={editSquad}
+                    onChange={(e) => setEditSquad(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none bg-white focus:ring-2 focus:ring-[#8EB69B]"
+                  >
+                    <option value="Management">Management</option>
+                    <option value="Promotion">Promotion</option>
+                    <option value="Treasury">Treasury</option>
+                    <option value="Documentation">Documentation</option>
+                  </select>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                {canEditThisMember && (
+              {!readOnly && (
+                <div className="flex items-center justify-end pt-2">
                   <button
-                    className="p-1.5 rounded-lg border border-[#8EB69B] text-[#163832] hover:bg-[#DAF1DE]"
-                    title="Edit Member"
+                    type="submit"
+                    className="h-10 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-95"
                   >
-                    <Edit2 size={14} />
+                    <Check size={14} />
+                    <span>Save Changes</span>
                   </button>
-                )}
+                </div>
+              )}
+            </form>
+          </div>
 
-                {/* Remove member button: ONLY rendered if canRemoveMember(currentUser) is true (Faculty only) */}
-                {canRemove && (
-                  <button
-                    onClick={() => handleRemove(m)}
-                    className="p-1.5 rounded-lg border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10"
-                    title="Remove Member"
-                    data-testid={`btn-remove-member-${m.uid}`}
+          {/* Delete Student Action */}
+          <div className="pt-3 border-t border-[#DAF1DE]">
+            <h3 className="font-heading font-bold text-sm text-[#051F20] mb-1.5">
+              Roster Removal & Governance
+            </h3>
+            {isProtected ? (
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#235347]">
+                🔒 <strong>Institutional Steering Account:</strong> Faculty Advisor and Club President accounts cannot be removed.
+              </div>
+            ) : canRemove ? (
+              <div className="p-3.5 rounded-2xl bg-red-50/60 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-red-900">
+                    Remove Scholar from Club Roster
+                  </p>
+                  <p className="text-xs text-red-700">
+                    Revokes all squad access, event operational permissions, and QR check-in status.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFromPage(selectedMember)}
+                  data-testid={`btn-remove-member-${selectedMember.uid}`}
+                  className="h-9 px-3.5 rounded-xl bg-[#D9534F] text-white text-xs font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer active:scale-95"
+                >
+                  <Trash2 size={13} />
+                  <span>Delete Student</span>
+                </button>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#235347]">
+                Roster removal requires Faculty Advisor executive authorization.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ROSTER LIST VIEW
+  return (
+    <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4 select-none pb-12">
+      {/* 1. Search Bar & Action Controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="relative flex-1 min-w-0">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search members by name, role or squad..."
+            className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#051F20] placeholder:text-[#8EB69B] focus:border-[#235347] focus:bg-white transition-all outline-none"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer"
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {canAddMember && !readOnly && (
+          <button
+            type="button"
+            onClick={() => setShowAddMemberModal(true)}
+            className="h-9 px-3.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95 shrink-0"
+            data-testid="btn-add-squad-member"
+          >
+            <Plus size={14} className="shrink-0" />
+            <span>Enroll Member</span>
+          </button>
+        )}
+      </div>
+
+      {/* 2. Squad Filter Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+        {squads.map((sq) => {
+          const isSelected = selectedSquad === sq;
+          const count =
+            sq === 'All'
+              ? members.length
+              : members.filter((m) => m.squad.toLowerCase() === sq.toLowerCase()).length;
+          return (
+            <button
+              key={sq}
+              type="button"
+              onClick={() => setSelectedSquad(sq)}
+              className={`h-8 px-3 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                isSelected
+                  ? 'bg-[#163832] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <span>{sq}</span>
+              <span
+                className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                  isSelected ? 'bg-white/20 text-white' : 'bg-[#DAF1DE] text-[#163832]'
+                }`}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3. Members List: Clickable cards that open student full page! */}
+      <div className="space-y-2">
+        {filteredMembers.length === 0 ? (
+          <div className="py-8 text-center text-xs text-[#235347] bg-[#F6FBF7] rounded-2xl border border-[#DAF1DE]">
+            No roster members found matching your filters.
+          </div>
+        ) : (
+          filteredMembers.map((m) => {
+            return (
+              <div
+                key={m.uid}
+                onClick={() => handleSelectMember(m)}
+                className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7]/60 hover:bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-2.5 sm:gap-3 cursor-pointer active:scale-[0.99] group shadow-2xs"
+                title="Click to view full student details, update or delete"
+              >
+                {/* Left: Avatar + Details */}
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center font-heading font-extrabold text-sm shrink-0 shadow-2xs group-hover:scale-105 transition-transform ${
+                      m.isLead
+                        ? 'bg-[#163832] text-[#DAF1DE] border border-[#235347]'
+                        : 'bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40'
+                    }`}
                   >
-                    <Trash2 size={14} />
-                  </button>
+                    {m.name.charAt(0)}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="font-heading font-bold text-sm text-[#051F20] truncate">
+                        {m.name}
+                      </span>
+                      {m.isLead && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0 whitespace-nowrap">
+                          <span>👑</span>
+                          <span>Squad Lead</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[#235347] truncate mt-0.5 flex items-center gap-1.5">
+                      <span className="font-medium">{m.post || m.role}</span>
+                      <span className="text-[#8EB69B]">•</span>
+                      <span className="font-semibold text-[#163832]">{m.squad} Squad</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Tap indicator chevron */}
+                <div className="flex items-center gap-1 text-[#8EB69B] group-hover:text-[#163832] group-hover:translate-x-0.5 transition-all shrink-0">
+                  <span className="text-xs font-semibold hidden min-[400px]:inline text-[#235347]/70">View</span>
+                  <ChevronRight size={16} />
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Add Member Modal */}
+      {showAddMemberModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md border border-[#DAF1DE] shadow-2xl space-y-4">
+            <h3 className="font-heading font-bold text-[#051F20] text-base">
+              Enroll Member into {selectedSquad === 'All' ? newMemberSquad : selectedSquad} Squad
+            </h3>
+            <p className="text-xs text-[#235347]">
+              Enrolled members gain READ access to their squad Operations Hub and duty assignments.
+            </p>
+            <form onSubmit={handleConfirmAddMember} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Candidate Scholar Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rahul Verma"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              {selectedSquad === 'All' && (
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1">
+                    Target Squad
+                  </label>
+                  <select
+                    value={newMemberSquad}
+                    onChange={(e) => setNewMemberSquad(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                  >
+                    <option value="Promotion">Promotion</option>
+                    <option value="Treasury">Treasury</option>
+                    <option value="Documentation">Documentation</option>
+                    <option value="Management">Management</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddMemberModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#8EB69B] text-xs font-semibold text-[#051F20] hover:bg-[#DAF1DE] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[#163832] text-white text-xs font-semibold hover:bg-[#0B2B26] cursor-pointer"
+                >
+                  Enroll Member
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * 10. Squads Screen:
+ * - Shows all squads with the Squad Leads and the Members for that respective squad.
+ * - Allows searching, filtering, and clicking to view member dossiers.
+ * - Allows adding members to each respective squad.
+ */
+const SquadsScreen: React.FC<{
+  readOnly: boolean;
+  onLogAudit: (event: string, action: string) => void;
+  currentUser: any;
+}> = ({ readOnly, onLogAudit, currentUser }) => {
+  const [selectedSquadFilter, setSelectedSquadFilter] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMember, setSelectedMember] = useState<ScholarRecord | null>(null);
+
+  const [members, setMembers] = useState<ScholarRecord[]>(INITIAL_CHAPTER_ROSTER);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [targetSquadForAdd, setTargetSquadForAdd] = useState('Promotion');
+  const [newMemberName, setNewMemberName] = useState('');
+
+  const canRemove = canRemoveMember(currentUser);
+  const canEditLeads = canAssignSquadLead(currentUser);
+
+  const squadDefinitions = [
+    {
+      id: 'Management',
+      name: 'Management Squad',
+      description: 'Institutional governance, steering, duty protocols & event administration',
+      icon: Shield,
+      accent: 'bg-[#163832] text-[#DAF1DE]',
+    },
+    {
+      id: 'Promotion',
+      name: 'Promotion Squad',
+      description: 'Campus outreach, social releases, campaign banners & sponsor pitches',
+      icon: Megaphone,
+      accent: 'bg-[#235347] text-[#DAF1DE]',
+    },
+    {
+      id: 'Treasury',
+      name: 'Treasury Squad',
+      description: 'Budget allocations, expense ledgers, vouchers & financial audit exports',
+      icon: Coins,
+      accent: 'bg-[#0B2B26] text-[#F2B84B]',
+    },
+    {
+      id: 'Documentation',
+      name: 'Documentation Squad',
+      description: 'Session transcripts, circular archives, photography & press bulletins',
+      icon: FileText,
+      accent: 'bg-[#163832] text-[#DAF1DE]',
+    },
+  ];
+
+  const handleConfirmAddMember = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberName.trim()) return;
+    const newEntry: ScholarRecord = {
+      uid: `u-${Date.now()}`,
+      name: newMemberName.trim(),
+      role: 'student',
+      squad: targetSquadForAdd,
+      isLead: false,
+      post: `${targetSquadForAdd} Associate`,
+      rollNo: `24GEO${Math.floor(100 + Math.random() * 900)}`,
+      email: `${newMemberName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`,
+    };
+    setMembers((prev) => [...prev, newEntry]);
+    onLogAudit('Squads', `Enrolled ${newMemberName} into ${targetSquadForAdd} squad`);
+    setShowAddModal(false);
+    setNewMemberName('');
+  };
+
+  // If member clicked, show detail view
+  if (selectedMember) {
+    const isProtected = selectedMember.role === 'faculty' || selectedMember.role === 'coordinator';
+
+    return (
+      <div className="space-y-4 animate-fadeIn select-none pb-16">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setSelectedMember(null)}
+            className="h-9 px-3.5 rounded-full bg-white border border-[#DAF1DE] text-[#163832] text-xs font-bold hover:bg-[#F6FBF7] transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+          >
+            <ArrowLeft size={14} />
+            <span>Back to Squads</span>
+          </button>
+
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+            <span>{selectedMember.isLead ? '👑 Squad Lead' : 'General Member'}</span>
+          </span>
+        </div>
+
+        <div className="p-4 sm:p-5 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4">
+          <div className="flex items-center gap-3.5">
+            <div
+              className={`w-14 h-14 rounded-2xl flex items-center justify-center font-heading font-extrabold text-xl shrink-0 shadow-xs ${
+                selectedMember.isLead
+                  ? 'bg-[#163832] text-[#DAF1DE] border border-[#235347]'
+                  : 'bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40'
+              }`}
+            >
+              {selectedMember.name.charAt(0)}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-heading font-bold text-lg text-[#051F20] truncate">
+                {selectedMember.name}
+              </h2>
+              <p className="text-xs text-[#235347] font-semibold truncate">
+                {selectedMember.post || selectedMember.role} • {selectedMember.squad} Squad
+              </p>
+              <p className="text-xs text-[#8EB69B] mt-0.5 truncate">
+                Scholar ID: {selectedMember.uid}
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-[#DAF1DE]">
+            <h3 className="font-heading font-bold text-sm text-[#051F20] mb-2">
+              Squad Membership Information
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-[#235347]">
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
+                <span className="text-[#8EB69B] block font-semibold">Current Squad</span>
+                <span className="font-bold text-[#051F20] text-sm">{selectedMember.squad} Squad</span>
+              </div>
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
+                <span className="text-[#8EB69B] block font-semibold">Designation / Role</span>
+                <span className="font-bold text-[#051F20] text-sm">{selectedMember.post}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Delete Action if Faculty */}
+          <div className="pt-3 border-t border-[#DAF1DE]">
+            <h3 className="font-heading font-bold text-sm text-[#051F20] mb-1.5">
+              Roster Removal
+            </h3>
+            {isProtected ? (
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#235347]">
+                🔒 <strong>Institutional Steering Account:</strong> Faculty Advisor and Club President accounts cannot be removed.
+              </div>
+            ) : canRemove ? (
+              <div className="p-3.5 rounded-2xl bg-red-50/60 border border-red-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold text-red-900">
+                    Remove Scholar from Squad Roster
+                  </p>
+                  <p className="text-xs text-red-700">
+                    Revokes squad access and operational permissions.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMembers((prev) => prev.filter((m) => m.uid !== selectedMember.uid));
+                    onLogAudit('Squads', `Removed member ${selectedMember.name} from ${selectedMember.squad}`);
+                    setSelectedMember(null);
+                  }}
+                  className="h-9 px-3.5 rounded-xl bg-[#D9534F] text-white text-xs font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer active:scale-95"
+                >
+                  <Trash2 size={13} />
+                  <span>Delete Member</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredSquads = squadDefinitions.filter(
+    (s) => selectedSquadFilter === 'All' || s.id.toLowerCase() === selectedSquadFilter.toLowerCase()
+  );
+
+  return (
+    <div className="space-y-4 select-none pb-12 animate-fadeIn">
+      {/* 1. Header & Filter */}
+      <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div>
+            <h2 className="font-heading font-bold text-base text-[#051F20]">
+              Chapter Squads & Teams
+            </h2>
+            <p className="text-xs text-[#235347]">
+              Squad leads, team rosters, and collaborative operational stations
+            </p>
+          </div>
+
+          <div className="relative min-w-0 sm:w-64">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search leads or members..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#051F20] placeholder:text-[#8EB69B] focus:border-[#235347] focus:bg-white transition-all outline-none"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Squad Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+          {['All', 'Management', 'Promotion', 'Treasury', 'Documentation'].map((sq) => {
+            const isSelected = selectedSquadFilter === sq;
+            return (
+              <button
+                key={sq}
+                type="button"
+                onClick={() => setSelectedSquadFilter(sq)}
+                className={`h-8 px-3 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                  isSelected
+                    ? 'bg-[#163832] text-white shadow-xs'
+                    : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:bg-[#DAF1DE]'
+                }`}
+              >
+                <span>{sq}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Squad Cards List */}
+      <div className="space-y-4">
+        {filteredSquads.map((sq) => {
+          const Icon = sq.icon;
+          const squadLeads = members.filter(
+            (m) =>
+              m.squad.toLowerCase() === sq.id.toLowerCase() &&
+              m.isLead &&
+              (!searchQuery.trim() ||
+                m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                m.post.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+
+          const squadMembers = members.filter(
+            (m) =>
+              m.squad.toLowerCase() === sq.id.toLowerCase() &&
+              !m.isLead &&
+              (!searchQuery.trim() ||
+                m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                m.post.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+
+          const totalCount = members.filter((m) => m.squad.toLowerCase() === sq.id.toLowerCase()).length;
+
+          return (
+            <div
+              key={sq.id}
+              className="p-4 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4 select-none"
+            >
+              {/* Squad Header */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#DAF1DE]">
+                <div className="flex items-center gap-3">
+                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs ${sq.accent}`}>
+                    <Icon size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-bold text-base text-[#051F20]">
+                      {sq.name}
+                    </h3>
+                    <p className="text-xs text-[#235347] line-clamp-1">
+                      {sq.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+                    {totalCount} Total Scholars
+                  </span>
+                  {!readOnly && canAddSquadMember(currentUser, sq.id) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTargetSquadForAdd(sq.id);
+                        setShowAddModal(true);
+                      }}
+                      className="h-8 px-2.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs"
+                      title="Enroll member into this squad"
+                    >
+                      <Plus size={13} />
+                      <span className="hidden sm:inline">Add Member</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* SECTION A: Respective Squad Leads */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#163832]">
+                  <Crown size={14} className="text-[#F2B84B]" />
+                  <span>Squad Leads ({squadLeads.length})</span>
+                </div>
+
+                {squadLeads.length === 0 ? (
+                  <div className="p-3 rounded-xl bg-[#F6FBF7] text-xs text-[#8EB69B] border border-[#DAF1DE] text-center">
+                    No lead appointed yet for this squad.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {squadLeads.map((lead) => (
+                      <div
+                        key={lead.uid}
+                        onClick={() => setSelectedMember(lead)}
+                        className="p-3 rounded-2xl bg-gradient-to-r from-[#F6FBF7] to-white border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-2.5 cursor-pointer active:scale-[0.99] group shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-xl bg-[#163832] text-[#DAF1DE] flex items-center justify-center font-heading font-extrabold text-xs shrink-0 shadow-2xs">
+                            {lead.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span className="font-heading font-bold text-xs text-[#051F20] truncate">
+                                {lead.name}
+                              </span>
+                              <span className="text-xs">👑</span>
+                            </div>
+                            <p className="text-xs text-[#235347] truncate">
+                              {lead.post}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[#8EB69B] group-hover:text-[#163832] transition-colors shrink-0">
+                          <span className="text-xs font-semibold hidden min-[400px]:inline">View</span>
+                          <ChevronRight size={15} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION B: Respective Squad Members */}
+              <div className="space-y-2 pt-2 border-t border-[#DAF1DE]/60">
+                <div className="flex items-center justify-between gap-2 text-xs font-bold text-[#235347]">
+                  <div className="flex items-center gap-1.5">
+                    <Users size={14} className="text-[#8EB69B]" />
+                    <span>Squad Members ({squadMembers.length})</span>
+                  </div>
+                </div>
+
+                {squadMembers.length === 0 ? (
+                  <div className="p-3 rounded-xl bg-[#F6FBF7] text-xs text-[#8EB69B] border border-[#DAF1DE] text-center">
+                    No general members enrolled in this squad yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {squadMembers.map((m) => (
+                      <div
+                        key={m.uid}
+                        onClick={() => setSelectedMember(m)}
+                        className="p-2.5 rounded-xl bg-[#F6FBF7]/60 hover:bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-2 cursor-pointer active:scale-[0.99] group"
+                      >
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                            {m.name.charAt(0)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="font-heading font-bold text-xs text-[#051F20] truncate block">
+                              {m.name}
+                            </span>
+                            <span className="text-xs text-[#235347] truncate block">
+                              {m.post}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-[#8EB69B] group-hover:text-[#163832] transition-colors shrink-0">
+                          <ChevronRight size={14} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
           );
         })}
       </div>
+
+      {/* Add Member Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md border border-[#DAF1DE] shadow-2xl space-y-4">
+            <h3 className="font-heading font-bold text-[#051F20] text-base">
+              Enroll Member into {targetSquadForAdd} Squad
+            </h3>
+            <p className="text-xs text-[#235347]">
+              Enrolled members gain access to operational tools and duty assignments for this squad.
+            </p>
+            <form onSubmit={handleConfirmAddMember} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Candidate Scholar Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rahul Verma"
+                  value={newMemberName}
+                  onChange={(e) => setNewMemberName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#8EB69B] text-xs font-semibold text-[#051F20] hover:bg-[#DAF1DE] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[#163832] text-white text-xs font-semibold hover:bg-[#0B2B26] cursor-pointer"
+                >
+                  Confirm Enrollment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 /**
- * 10. Lead Activity Review Screen:
- * - Review squad lead milestones.
- * - Sign off / approve if has APPROVE right.
+ * 11. Squad Leads Screen (Write Operations Enabled for Faculty Advisor & President):
+ * - View all appointed squad leads.
+ * - Perform write operations: Edit squad leads (change name, designation, squad transfer) and Appoint new leads!
  */
+const SquadLeadsScreen: React.FC<{
+  readOnly: boolean;
+  onLogAudit: (event: string, action: string) => void;
+  currentUser: any;
+}> = ({ readOnly, onLogAudit, currentUser }) => {
+  const [leads, setLeads] = useState<ScholarRecord[]>([
+    { uid: 'u-mgmt', name: 'Divya Rao', role: 'management', squad: 'Management', isLead: true, post: 'Management Lead', email: 'divya.rao@geohub.edu', rollNo: '22GEO005' },
+    { uid: 'u-promo-lead', name: 'Sneha Patel', role: 'management', squad: 'Promotion', isLead: true, post: 'Promotion Lead', email: 'sneha.patel@geohub.edu', rollNo: '22GEO012' },
+    { uid: 'u-treas-lead', name: 'Ananya Iyer', role: 'management', squad: 'Treasury', isLead: true, post: 'Treasury Lead', email: 'ananya.iyer@geohub.edu', rollNo: '22GEO023' },
+    { uid: 'u-doc-lead', name: 'Aarav Patel', role: 'management', squad: 'Documentation', isLead: true, post: 'Documentation Lead', email: 'aarav.patel@geohub.edu', rollNo: '22GEO034' },
+  ]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAppointModal, setShowAppointModal] = useState(false);
+  const [editingLead, setEditingLead] = useState<ScholarRecord | null>(null);
+
+  // Form states for editing
+  const [editName, setEditName] = useState('');
+  const [editPost, setEditPost] = useState('');
+  const [editSquad, setEditSquad] = useState('Promotion');
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // Form states for appointing
+  const [appointName, setAppointName] = useState('');
+  const [appointSquad, setAppointSquad] = useState('Promotion');
+  const [appointPost, setAppointPost] = useState('Promotion Co-Lead');
+
+  const canEdit = !readOnly && canAssignSquadLead(currentUser);
+
+  const handleOpenEdit = (lead: ScholarRecord) => {
+    setEditingLead(lead);
+    setEditName(lead.name);
+    setEditPost(lead.post);
+    setEditSquad(lead.squad);
+    setShowEditModal(true);
+  };
+
+  const handleSaveLeadEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingLead) return;
+
+    const updated: ScholarRecord = {
+      ...editingLead,
+      name: editName.trim() || editingLead.name,
+      post: editPost.trim() || editingLead.post,
+      squad: editSquad,
+    };
+
+    setLeads((prev) => prev.map((l) => (l.uid === editingLead.uid ? updated : l)));
+    onLogAudit('Squad Leads', `Updated squad lead: ${updated.name} for ${updated.squad} Squad (${updated.post})`);
+    setShowEditModal(false);
+    setEditingLead(null);
+    setNotification(`Successfully updated Squad Lead: ${updated.name}`);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  const handleStepDownLead = () => {
+    if (!editingLead) return;
+    setLeads((prev) => prev.filter((l) => l.uid !== editingLead.uid));
+    onLogAudit('Squad Leads', `Stepped down squad lead ${editingLead.name} from ${editingLead.squad} Squad`);
+    setShowEditModal(false);
+    setEditingLead(null);
+    setNotification(`Stepped down lead ${editingLead.name} back to squad member.`);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  const handleConfirmAppoint = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!appointName.trim()) return;
+
+    const newLead: ScholarRecord = {
+      uid: `u-lead-${Date.now()}`,
+      name: appointName.trim(),
+      role: 'management',
+      squad: appointSquad,
+      isLead: true,
+      post: appointPost.trim() || `${appointSquad} Lead`,
+      email: `${appointName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`,
+    };
+
+    setLeads((prev) => [...prev, newLead]);
+    onLogAudit('Squad Leads', `Appointed ${appointName} as ${newLead.post}`);
+    setShowAppointModal(false);
+    setAppointName('');
+    setNotification(`Successfully appointed ${newLead.name} as ${newLead.post}`);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  const filteredLeads = leads.filter(
+    (l) =>
+      !searchQuery.trim() ||
+      l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      l.squad.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      l.post.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4 select-none pb-12 animate-fadeIn">
+      {/* 1. Header & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div>
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#163832] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#235347]">
+              Executive Governance
+            </span>
+          </div>
+          <h2 className="font-heading font-bold text-lg text-[#051F20]">
+            Squad Leads Directory
+          </h2>
+          <p className="text-xs text-[#235347]">
+            Squad lead appointments, operational coordination & executive leadership
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setShowAppointModal(true)}
+              data-testid="btn-appoint-squad-lead"
+              className="h-9 px-3.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
+            >
+              <Plus size={14} />
+              <span>Appoint Lead</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Notification banner */}
+      {notification && (
+        <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs font-bold text-[#051F20] flex items-center gap-2 animate-fadeIn">
+          <CheckCircle2 size={15} className="text-[#163832]" />
+          <span>{notification}</span>
+        </div>
+      )}
+
+      {/* 2. Search */}
+      <div className="relative">
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search squad leads by name, squad, or designation..."
+          className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#051F20] placeholder:text-[#8EB69B] focus:border-[#235347] focus:bg-white transition-all outline-none"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer"
+          >
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* 3. Squad Leads List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {filteredLeads.map((lead) => (
+          <div
+            key={lead.uid}
+            className="p-4 rounded-2xl bg-[#F6FBF7]/70 border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col justify-between gap-3 shadow-2xs"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-11 h-11 rounded-2xl bg-[#163832] text-[#DAF1DE] flex items-center justify-center font-heading font-extrabold text-sm shrink-0 shadow-2xs">
+                  {lead.name.charAt(0)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="font-heading font-bold text-sm text-[#051F20] truncate">
+                      {lead.name}
+                    </h3>
+                    <span className="text-xs">👑</span>
+                  </div>
+                  <p className="text-xs text-[#235347] font-semibold truncate mt-0.5">
+                    {lead.post}
+                  </p>
+                  <p className="text-xs text-[#8EB69B] truncate mt-0.5">
+                    {lead.squad} Squad • {lead.email}
+                  </p>
+                </div>
+              </div>
+
+              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B] shrink-0">
+                Write Access
+              </span>
+            </div>
+
+            {/* Write Operation Button: Edit Squad Lead */}
+            {canEdit && (
+              <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleOpenEdit(lead)}
+                  data-testid={`btn-edit-squad-lead-${lead.uid}`}
+                  className="h-8 px-3 rounded-xl bg-white border border-[#8EB69B] text-[#163832] text-xs font-bold hover:bg-[#DAF1DE] transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-2xs"
+                >
+                  <Edit2 size={13} />
+                  <span>Edit Squad Lead</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Edit Squad Lead Modal */}
+      {showEditModal && editingLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md border border-[#DAF1DE] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-heading font-bold text-[#051F20] text-base">
+                Edit Squad Lead
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowEditModal(false)}
+                className="text-[#8EB69B] hover:text-[#051F20] cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveLeadEdit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Lead Scholar Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Designation / Post
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editPost}
+                  onChange={(e) => setEditPost(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Assigned Squad
+                </label>
+                <select
+                  value={editSquad}
+                  onChange={(e) => setEditSquad(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                >
+                  <option value="Management">Management Squad</option>
+                  <option value="Promotion">Promotion Squad</option>
+                  <option value="Treasury">Treasury Squad</option>
+                  <option value="Documentation">Documentation Squad</option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between border-t border-[#DAF1DE]">
+                <button
+                  type="button"
+                  onClick={handleStepDownLead}
+                  className="px-3 py-2 rounded-xl text-xs font-bold text-[#D9534F] hover:bg-red-50 cursor-pointer"
+                >
+                  Step Down Lead
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(false)}
+                    className="px-3 py-2 rounded-xl border border-[#8EB69B] text-xs font-semibold text-[#051F20] hover:bg-[#DAF1DE] cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-[#163832] text-white text-xs font-semibold hover:bg-[#0B2B26] cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Appoint New Squad Lead Modal */}
+      {showAppointModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md border border-[#DAF1DE] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-heading font-bold text-[#051F20] text-base">
+                Appoint New Squad Lead
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAppointModal(false)}
+                className="text-[#8EB69B] hover:text-[#051F20] cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmAppoint} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Target Squad
+                </label>
+                <select
+                  value={appointSquad}
+                  onChange={(e) => setAppointSquad(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                >
+                  <option value="Promotion">Promotion Squad</option>
+                  <option value="Treasury">Treasury Squad</option>
+                  <option value="Documentation">Documentation Squad</option>
+                  <option value="Management">Management Squad</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Candidate Scholar Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Kunal Sen"
+                  value={appointName}
+                  onChange={(e) => setAppointName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Designation / Post
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={appointPost}
+                  onChange={(e) => setAppointPost(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#DAF1DE]">
+                <button
+                  type="button"
+                  onClick={() => setShowAppointModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#8EB69B] text-xs font-semibold text-[#051F20] hover:bg-[#DAF1DE] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[#163832] text-white text-xs font-semibold hover:bg-[#0B2B26] cursor-pointer"
+                >
+                  Appoint Lead
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * 12. Duties Assignment Screen:
+ * - Steering Committee & Squad Leads assign event-specific duties to members.
+ * - Temporal Write Access Engine: Active events grant write permissions across Operational Hubs;
+ *   automatically locks to Read-Only once event concludes.
+ */
+interface DutyRecord {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  eventStatus: 'upcoming' | 'ongoing' | 'concluded';
+  assigneeName: string;
+  assigneeRole: string;
+  squad: string;
+  task: string;
+  station: string;
+  status: 'in_progress' | 'completed';
+}
+
+const DutiesAssignmentScreen: React.FC<{
+  readOnly: boolean;
+  onLogAudit: (event: string, action: string) => void;
+  currentUser: any;
+}> = ({ readOnly, onLogAudit, currentUser }) => {
+  const [viewMode, setViewMode] = useState<'by_member' | 'by_event'>('by_member');
+
+  const [duties, setDuties] = useState<DutyRecord[]>([
+    {
+      id: 'duty-1',
+      eventId: 'ev-geofest',
+      eventTitle: 'GEO FEST 2026: Campus Odyssey',
+      eventStatus: 'ongoing',
+      assigneeName: 'Ananya Iyer',
+      assigneeRole: 'Treasury Lead',
+      squad: 'Treasury',
+      task: 'Honorarium and audio rigging voucher clearance',
+      station: 'Main Auditorium Finance Station',
+      status: 'completed',
+    },
+    {
+      id: 'duty-2',
+      eventId: 'ev-geofest',
+      eventTitle: 'GEO FEST 2026: Campus Odyssey',
+      eventStatus: 'ongoing',
+      assigneeName: 'Sneha Patel',
+      assigneeRole: 'Promotion Lead',
+      squad: 'Promotion',
+      task: 'Stage banners, guest photo wall & live social feed dispatch',
+      station: 'Stage Media Deck & North Entrance',
+      status: 'in_progress',
+    },
+    {
+      id: 'duty-3',
+      eventId: 'ev-geofest',
+      eventTitle: 'GEO FEST 2026: Campus Odyssey',
+      eventStatus: 'ongoing',
+      assigneeName: 'Aarav Patel',
+      assigneeRole: 'Documentation Lead',
+      squad: 'Documentation',
+      task: 'High-res keynote session recording & circular documentation',
+      station: 'Press Gallery Tech Station',
+      status: 'in_progress',
+    },
+    {
+      id: 'duty-4',
+      eventId: 'ev-geofest',
+      eventTitle: 'GEO FEST 2026: Campus Odyssey',
+      eventStatus: 'ongoing',
+      assigneeName: 'Maya Patel',
+      assigneeRole: 'Logistics Associate',
+      squad: 'Management',
+      task: 'Participant kit distribution, QR scanner check-in desk',
+      station: 'Gate 2 Registration Desk',
+      status: 'completed',
+    },
+    {
+      id: 'duty-5',
+      eventId: 'ev-gis',
+      eventTitle: 'GIS & Satellite Telemetry Workshop',
+      eventStatus: 'ongoing',
+      assigneeName: 'Priya Sharma',
+      assigneeRole: 'Treasurer Associate',
+      squad: 'Treasury',
+      task: 'GIS software workstation license budget allocation vouchers',
+      station: 'Geomatics Lab 3 Desk',
+      status: 'in_progress',
+    },
+    {
+      id: 'duty-6',
+      eventId: 'ev-gis',
+      eventTitle: 'GIS & Satellite Telemetry Workshop',
+      eventStatus: 'ongoing',
+      assigneeName: 'Kunal Sen',
+      assigneeRole: 'Promotion Associate',
+      squad: 'Promotion',
+      task: 'Workshop directional signage and attendee onboarding guidance',
+      station: 'Seminar Hall 1 Foyer',
+      status: 'in_progress',
+    },
+    {
+      id: 'duty-7',
+      eventId: 'ev-drone',
+      eventTitle: 'Campus Biodiversity Drone Survey',
+      eventStatus: 'upcoming',
+      assigneeName: 'David Chen',
+      assigneeRole: 'Field Archivist',
+      squad: 'Documentation',
+      task: 'Drone telemetry micro-SD card indexing & field flight logbook',
+      station: 'North Quad Drone Base Station',
+      status: 'in_progress',
+    },
+    {
+      id: 'duty-8',
+      eventId: 'ev-remotesensing',
+      eventTitle: 'National Remote Sensing Colloquium 2026',
+      eventStatus: 'concluded',
+      assigneeName: 'Divya Rao',
+      assigneeRole: 'Management Lead',
+      squad: 'Management',
+      task: 'Proceedings booklet collation and committee MoM formal sign-off',
+      station: 'Conference Center Hall A',
+      status: 'completed',
+    },
+  ]);
+
+  const [selectedSquad, setSelectedSquad] = useState<string>('All');
+  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAssignModal, setShowAssignModal] = useState(false);
+
+  const [newEventTitle, setNewEventTitle] = useState('GEO FEST 2026: Campus Odyssey');
+  const [newSquad, setNewSquad] = useState('Promotion');
+  const [newAssigneeName, setNewAssigneeName] = useState('');
+  const [newTask, setNewTask] = useState('');
+  const [newStation, setNewStation] = useState('');
+
+  const canManageDuties = !readOnly;
+
+  const handleToggleStatus = (id: string) => {
+    if (readOnly) return;
+    setDuties((prev) =>
+      prev.map((d) => {
+        if (d.id === id) {
+          const nextStatus = d.status === 'completed' ? 'in_progress' : 'completed';
+          onLogAudit('Duties Assignment', `Updated duty for ${d.assigneeName} to ${nextStatus}`);
+          return { ...d, status: nextStatus };
+        }
+        return d;
+      })
+    );
+  };
+
+  const handleRemoveDuty = (id: string, name: string) => {
+    if (readOnly) return;
+    setDuties((prev) => prev.filter((d) => d.id !== id));
+    onLogAudit('Duties Assignment', `Unassigned duty from ${name}`);
+  };
+
+  const handleConfirmAssignDuty = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAssigneeName.trim() || !newTask.trim()) return;
+
+    const isOngoing = newEventTitle.includes('GEO FEST') || newEventTitle.includes('GIS');
+    const isConcluded = newEventTitle.includes('Colloquium');
+
+    const newDuty: DutyRecord = {
+      id: `duty-${Date.now()}`,
+      eventId: `ev-${Date.now()}`,
+      eventTitle: newEventTitle,
+      eventStatus: isConcluded ? 'concluded' : isOngoing ? 'ongoing' : 'upcoming',
+      assigneeName: newAssigneeName.trim(),
+      assigneeRole: `${newSquad} Associate`,
+      squad: newSquad,
+      task: newTask.trim(),
+      station: newStation.trim() || 'Assigned Venue Post',
+      status: 'in_progress',
+    };
+
+    setDuties((prev) => [newDuty, ...prev]);
+    onLogAudit('Duties Assignment', `Assigned ${newSquad} duty to ${newAssigneeName} for ${newEventTitle}`);
+    setShowAssignModal(false);
+    setNewAssigneeName('');
+    setNewTask('');
+    setNewStation('');
+  };
+
+  const squads = ['All', 'Management', 'Promotion', 'Treasury', 'Documentation'];
+
+  // Filtered duties
+  const filteredDuties = duties.filter((d) => {
+    const matchesSquad = selectedSquad === 'All' || d.squad.toLowerCase() === selectedSquad.toLowerCase();
+    const matchesStatus =
+      selectedStatus === 'All' ||
+      (selectedStatus === 'Active' && d.status === 'in_progress') ||
+      (selectedStatus === 'Completed' && d.status === 'completed');
+    if (!matchesSquad || !matchesStatus) return false;
+
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      d.assigneeName.toLowerCase().includes(q) ||
+      d.task.toLowerCase().includes(q) ||
+      d.eventTitle.toLowerCase().includes(q) ||
+      d.station.toLowerCase().includes(q) ||
+      d.squad.toLowerCase().includes(q)
+    );
+  });
+
+  // Group duties by member
+  const membersWithDuties = Array.from(new Set(duties.map((d) => d.assigneeName))).map((memberName) => {
+    const memberDuties = filteredDuties.filter((d) => d.assigneeName === memberName);
+    const sampleDuty = duties.find((d) => d.assigneeName === memberName);
+    return {
+      name: memberName,
+      role: sampleDuty?.assigneeRole || 'Scholar',
+      squad: sampleDuty?.squad || 'General',
+      duties: memberDuties,
+    };
+  }).filter((m) => m.duties.length > 0 || !searchQuery.trim());
+
+  return (
+    <div className="p-3.5 sm:p-5 bg-white rounded-2xl sm:rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-4 select-none pb-12 animate-fadeIn">
+      {/* 1. Header, View Mode Switcher & Assign Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="font-heading font-bold text-base sm:text-lg text-[#051F20]">
+            Duties & Task Assignments
+          </h2>
+          <p className="text-xs text-[#235347]">
+            Operational duty allocations, venue station deployments & crew tracking
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* View Mode Toggle: By Member vs By Event */}
+          <div className="flex items-center gap-1 bg-[#F6FBF7] p-1 rounded-xl border border-[#DAF1DE]">
+            <button
+              type="button"
+              onClick={() => setViewMode('by_member')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'by_member'
+                  ? 'bg-[#163832] text-white shadow-xs'
+                  : 'text-[#235347] hover:text-[#051F20]'
+              }`}
+            >
+              By Member
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('by_event')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'by_event'
+                  ? 'bg-[#163832] text-white shadow-xs'
+                  : 'text-[#235347] hover:text-[#051F20]'
+              }`}
+            >
+              By Event
+            </button>
+          </div>
+
+          {canManageDuties && (
+            <button
+              type="button"
+              onClick={() => setShowAssignModal(true)}
+              data-testid="btn-assign-duty"
+              className="h-9 px-3.5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] transition-all flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap cursor-pointer active:scale-95"
+            >
+              <Plus size={14} />
+              <span>Assign Duty</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* 2. Search & Filter Bar */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search duties by member, task, or venue station..."
+            className="w-full pl-9 pr-8 py-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs text-[#051F20] placeholder:text-[#8EB69B] focus:border-[#235347] focus:bg-white transition-all outline-none"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Squad & Status Filter Pills */}
+        <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+            {squads.map((sq) => {
+              const isSelected = selectedSquad === sq;
+              const count =
+                sq === 'All'
+                  ? duties.length
+                  : duties.filter((d) => d.squad.toLowerCase() === sq.toLowerCase()).length;
+              return (
+                <button
+                  key={sq}
+                  type="button"
+                  onClick={() => setSelectedSquad(sq)}
+                  className={`h-8 px-3 rounded-full text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                    isSelected
+                      ? 'bg-[#163832] text-white shadow-xs'
+                      : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:bg-[#DAF1DE]'
+                  }`}
+                >
+                  <span>{sq}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                      isSelected ? 'bg-white/20 text-white' : 'bg-[#DAF1DE] text-[#163832]'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-1 bg-[#F6FBF7] p-1 rounded-xl border border-[#DAF1DE] shrink-0">
+            {(['All', 'Active', 'Completed'] as const).map((st) => (
+              <button
+                key={st}
+                type="button"
+                onClick={() => setSelectedStatus(st)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  selectedStatus === st
+                    ? 'bg-white text-[#163832] shadow-xs border border-[#DAF1DE]'
+                    : 'text-[#235347] hover:text-[#051F20]'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. VIEW MODE A: BY MEMBER (SHOWS DUTIES ASSIGNED FOR EACH MEMBER) */}
+      {viewMode === 'by_member' && (
+        <div className="space-y-3.5 pt-1">
+          {membersWithDuties.length === 0 ? (
+            <div className="py-8 text-center text-xs text-[#235347] bg-[#F6FBF7] rounded-2xl border border-[#DAF1DE]">
+              No members found with assigned duties matching your filters.
+            </div>
+          ) : (
+            membersWithDuties.map((member) => (
+              <div
+                key={member.name}
+                className="p-4 rounded-2xl bg-[#F6FBF7]/50 border border-[#DAF1DE] shadow-2xs space-y-3"
+              >
+                {/* Member Dossier Header */}
+                <div className="flex items-center justify-between gap-3 pb-2.5 border-b border-[#DAF1DE]">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-xl bg-[#163832] text-[#DAF1DE] flex items-center justify-center font-heading font-extrabold text-xs shrink-0 shadow-2xs">
+                      {member.name.charAt(0)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-heading font-bold text-sm text-[#051F20] truncate">
+                          {member.name}
+                        </h3>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-white text-[#163832] border border-[#DAF1DE]">
+                          {member.squad} Squad
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#235347] truncate">
+                        {member.role}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+                      {member.duties.length} Assigned {member.duties.length === 1 ? 'Duty' : 'Duties'}
+                    </span>
+                    {canManageDuties && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewAssigneeName(member.name);
+                          setNewSquad(member.squad);
+                          setShowAssignModal(true);
+                        }}
+                        className="h-8 px-2.5 rounded-xl bg-white border border-[#8EB69B] text-[#163832] text-xs font-bold hover:bg-[#DAF1DE] transition-all flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs"
+                        title="Assign new duty to this member"
+                      >
+                        <Plus size={13} />
+                        <span className="hidden min-[450px]:inline">Add Duty</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Assigned Duties for this Member */}
+                <div className="space-y-2">
+                  {member.duties.map((d) => {
+                    const isDone = d.status === 'completed';
+                    const isOngoing = d.eventStatus === 'ongoing';
+
+                    return (
+                      <div
+                        key={d.id}
+                        className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                          isDone
+                            ? 'bg-white/60 border-[#DAF1DE] opacity-80'
+                            : 'bg-white border-[#8EB69B]/50 shadow-2xs'
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-heading font-bold text-xs text-[#051F20]">
+                              {d.eventTitle}
+                            </span>
+                            {isOngoing ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
+                                Active Event • Write Access ✍️
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-xs font-bold bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE]">
+                                {d.eventStatus}
+                              </span>
+                            )}
+                            <span className="text-xs text-[#235347] flex items-center gap-1">
+                              <MapPin size={11} className="text-[#8EB69B]" />
+                              <span>{d.station}</span>
+                            </span>
+                          </div>
+
+                          <p className={`text-xs leading-relaxed ${isDone ? 'line-through text-[#8EB69B]' : 'text-[#235347]'}`}>
+                            {d.task}
+                          </p>
+                        </div>
+
+                        {canManageDuties && (
+                          <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleStatus(d.id)}
+                              className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                                isDone
+                                  ? 'bg-[#163832] text-white shadow-xs'
+                                  : 'bg-[#F6FBF7] border border-[#8EB69B] text-[#163832] hover:bg-[#DAF1DE]'
+                              }`}
+                            >
+                              <Check size={13} />
+                              <span>{isDone ? 'Completed' : 'Mark Done'}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDuty(d.id, d.assigneeName)}
+                              className="w-8 h-8 rounded-xl bg-white border border-[#D9534F]/30 text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                              title="Unassign Duty"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* 4. VIEW MODE B: BY EVENT */}
+      {viewMode === 'by_event' && (
+        <div className="space-y-3 pt-1">
+          {filteredDuties.length === 0 ? (
+            <div className="py-8 text-center text-xs text-[#235347] bg-[#F6FBF7] rounded-2xl border border-[#DAF1DE]">
+              No duties found matching your filters.
+            </div>
+          ) : (
+            filteredDuties.map((d) => {
+              const isDone = d.status === 'completed';
+              const isOngoing = d.eventStatus === 'ongoing';
+
+              return (
+                <div
+                  key={d.id}
+                  className={`p-3.5 sm:p-4 rounded-2xl border transition-all select-none space-y-2.5 ${
+                    isDone
+                      ? 'bg-[#F6FBF7]/50 border-[#DAF1DE] opacity-80'
+                      : 'bg-white border-[#8EB69B]/50 shadow-[0_2px_12px_rgba(5,31,32,0.04)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="font-heading font-bold text-xs text-[#051F20] truncate">
+                      {d.eventTitle}
+                    </span>
+                    {isOngoing ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0">
+                        <span>Event Active • Temporal Write Access ✍️</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] shrink-0">
+                        <span>{d.eventStatus}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1 border-t border-[#DAF1DE]/60">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-heading font-bold text-sm text-[#051F20]">
+                          {d.assigneeName}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F6FBF7] text-[#163832] border border-[#DAF1DE]">
+                          {d.squad} Squad
+                        </span>
+                        <span className="text-xs text-[#235347] flex items-center gap-1">
+                          <MapPin size={12} className="text-[#8EB69B]" />
+                          <span>{d.station}</span>
+                        </span>
+                      </div>
+
+                      <p className={`text-xs leading-relaxed ${isDone ? 'line-through text-[#8EB69B]' : 'text-[#235347]'}`}>
+                        {d.task}
+                      </p>
+                    </div>
+
+                    {canManageDuties && (
+                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(d.id)}
+                          className={`h-8 px-3 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 ${
+                            isDone
+                              ? 'bg-[#163832] text-white shadow-xs'
+                              : 'bg-white border border-[#8EB69B] text-[#163832] hover:bg-[#DAF1DE]'
+                          }`}
+                        >
+                          <Check size={13} />
+                          <span>{isDone ? 'Completed' : 'Mark Done'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDuty(d.id, d.assigneeName)}
+                          className="w-8 h-8 rounded-xl bg-white border border-[#D9534F]/30 text-[#D9534F] hover:bg-[#D9534F]/10 hover:border-[#D9534F] flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                          title="Unassign Duty"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Assign New Duty Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md border border-[#DAF1DE] shadow-2xl space-y-4">
+            <h3 className="font-heading font-bold text-[#051F20] text-base">
+              Assign New Event Duty
+            </h3>
+            <p className="text-xs text-[#235347]">
+              Enables temporal operational write access for the assignee while the event is active.
+            </p>
+            <form onSubmit={handleConfirmAssignDuty} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Target Chapter Event
+                </label>
+                <select
+                  value={newEventTitle}
+                  onChange={(e) => setNewEventTitle(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                >
+                  <option value="GEO FEST 2026: Campus Odyssey">GEO FEST 2026: Campus Odyssey (Ongoing)</option>
+                  <option value="GIS & Satellite Telemetry Workshop">GIS & Satellite Telemetry Workshop (Ongoing)</option>
+                  <option value="Campus Biodiversity Drone Survey">Campus Biodiversity Drone Survey (Upcoming)</option>
+                  <option value="National Remote Sensing Colloquium 2026">National Remote Sensing Colloquium 2026 (Concluded)</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1">
+                    Operational Squad
+                  </label>
+                  <select
+                    value={newSquad}
+                    onChange={(e) => setNewSquad(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                  >
+                    <option value="Promotion">Promotion</option>
+                    <option value="Treasury">Treasury</option>
+                    <option value="Documentation">Documentation</option>
+                    <option value="Management">Management</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1">
+                    Assignee Scholar Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Kunal Sen"
+                    value={newAssigneeName}
+                    onChange={(e) => setNewAssigneeName(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Venue Station / Post
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Main Auditorium Audio Deck"
+                  value={newStation}
+                  onChange={(e) => setNewStation(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#051F20] mb-1">
+                  Operational Duty Task Description
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="Describe the exact duty responsibility..."
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-xs text-[#051F20] outline-none resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAssignModal(false)}
+                  className="px-4 py-2 rounded-xl border border-[#8EB69B] text-xs font-semibold text-[#051F20] hover:bg-[#DAF1DE] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[#163832] text-white text-xs font-semibold hover:bg-[#0B2B26] cursor-pointer"
+                >
+                  Assign Duty
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LeadActivityReviewScreen: React.FC<{
   readOnly: boolean;
   canApprove: boolean;
