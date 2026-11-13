@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, ArrowLeft, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, ChevronLeft, ArrowLeft, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TaskCard } from '../../components/common/TaskCard';
 import { TaskPriority, TaskStatus } from '../../types';
@@ -83,14 +83,14 @@ export const TasksListView: React.FC = () => {
   if (selectedTask) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }} className="select-none">
-        <PillButton
-          variant="secondary"
-          size="sm"
-          icon={<ArrowLeft size={14} strokeWidth={2} />}
+        <button
+          type="button"
           onClick={() => setSelectedTaskId(null)}
+          className="inline-flex items-center gap-1.5 bg-transparent border-0 p-0 text-sm font-bold text-[#051F20] hover:text-[#163832] cursor-pointer touch-target-44"
         >
-          Back
-        </PillButton>
+          <ChevronLeft size={20} strokeWidth={2.5} />
+          <span>Back</span>
+        </button>
 
         <div
           style={{

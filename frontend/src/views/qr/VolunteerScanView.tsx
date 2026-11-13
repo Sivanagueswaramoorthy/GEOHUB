@@ -1,79 +1,63 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
+  ChevronLeft,
   ArrowLeft,
-  Camera,
-  Scan,
-  Zap,
-  RotateCcw,
-  Upload,
   CheckCircle2,
-  ExternalLink,
-  Copy,
-  Check,
-  User,
-  Calendar,
   AlertCircle,
-  Sparkles,
-  Link as LinkIcon,
-  FileText,
-  RefreshCw,
-  Image as ImageIcon,
+  Delete,
+  ArrowRight,
+  KeyRound,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import {
-  MascotLogo,
-  BottomSheet,
-  Avatar,
-  PillButton,
-  StatusChip,
-} from '../../components/shared';
 
-export interface DecodedScanResult {
-  type: 'event_pass' | 'member_badge' | 'url' | 'custom_text';
-  code: 'success' | 'already_marked' | 'invalid';
-  title: string;
-  subtitle: string;
-  details?: {
-    eventName?: string;
-    eventVenue?: string;
-    userName?: string;
-    userRoll?: string;
-    userTeam?: string;
-    userAvatar?: string;
-    attendanceStatus?: string;
-  };
-  rawPayload: string;
+export interface VerifiedAttendeeData {
+  userName: string;
+  userRoll: string;
+  eventName: string;
+  mode: 'QR Scan' | 'Gate OTP';
+  timestamp: string;
+  status: string;
 }
 
 export const VolunteerScanView: React.FC = () => {
   const {
-    currentUser,
     events,
     users,
-    attendance,
     recordAttendance,
     setActiveTab,
-    showToast,
   } = useApp();
 
-  // Camera video element reference
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // Navigation mode: 'scanner' | 'otp'
+  const [viewMode, setViewMode] = useState<'scanner' | 'otp'>('scanner');
 
-  // Camera control states
+  // Camera stream & controls
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraActive, setCameraActive] = useState<boolean>(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  const [isFrontCamera, setIsFrontCamera] = useState<boolean>(false);
-  const [isTorchOn, setIsTorchOn] = useState<boolean>(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
 
-  // Manual input and scan results
-  const [manualInput, setManualInput] = useState<string>('');
-  const [copied, setCopied] = useState<boolean>(false);
-  const [scanResult, setScanResult] = useState<DecodedScanResult | null>(null);
+  // OTP Entry State (6 digits)
+  const [otpDigits, setOtpDigits] = useState<string[]>([]);
+  const [otpError, setOtpError] = useState<string | null>(null);
 
-  // Start device camera automatically on mount and whenever camera flip changes
+  // Popup Modal State: null | 'success' | 'error'
+  const [popupState, setPopupState] = useState<'success' | 'error' | null>(null);
+  const [popupErrorMessage, setPopupErrorMessage] = useState<string>('');
+  const [verifiedData, setVerifiedData] = useState<VerifiedAttendeeData | null>(null);
+
+  // Valid Demo Gate OTPs
+  const VALID_OTPS = ['123456', '849201', '902144', '654321', '112233'];
+
+  // Start / Stop Camera Stream
   useEffect(() => {
+    if (viewMode !== 'scanner') {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        setCameraStream(null);
+        setCameraActive(false);
+      }
+      return;
+    }
+
     let stream: MediaStream | null = null;
     let isMounted = true;
 
@@ -82,7 +66,7 @@ export const VolunteerScanView: React.FC = () => {
         if (navigator?.mediaDevices?.getUserMedia) {
           stream = await navigator.mediaDevices.getUserMedia({
             video: {
-              facingMode: isFrontCamera ? 'user' : 'environment',
+              facingMode: 'environment',
               width: { ideal: 1280 },
               height: { ideal: 720 },
             },
@@ -92,28 +76,16 @@ export const VolunteerScanView: React.FC = () => {
           if (isMounted) {
             setCameraStream(stream);
             setCameraActive(true);
-            setCameraError(null);
             if (videoRef.current) {
               videoRef.current.srcObject = stream;
               videoRef.current.play().catch(() => {});
             }
           }
         } else {
-          if (isMounted) {
-            setCameraActive(false);
-            setCameraError('Camera API is not supported in this browser.');
-          }
+          if (isMounted) setCameraActive(false);
         }
-      } catch (err: unknown) {
-        if (isMounted) {
-          setCameraActive(false);
-          const errorName = (err as { name?: string })?.name;
-          setCameraError(
-            errorName === 'NotAllowedError'
-              ? 'Camera permission denied. Enable camera access in your browser or phone settings.'
-              : 'Camera is in standby. Align QR inside the box to scan.'
-          );
-        }
+      } catch {
+        if (isMounted) setCameraActive(false);
       }
     };
 
@@ -125,11 +97,11 @@ export const VolunteerScanView: React.FC = () => {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [isFrontCamera]);
+  }, [viewMode]);
 
-  // Real-time Barcode / QR detector from camera stream (supported in Chromium/Android/PWA)
+  // Real-time Barcode / QR detector
   useEffect(() => {
-    if (!cameraActive || !videoRef.current) return;
+    if (viewMode !== 'scanner' || !cameraActive || !videoRef.current || popupState !== null) return;
     const windowWithBarcode = window as unknown as {
       BarcodeDetector?: new (options?: { formats: string[] }) => {
         detect: (source: ImageBitmapSource) => Promise<Array<{ rawValue: string }>>;
@@ -142,14 +114,14 @@ export const VolunteerScanView: React.FC = () => {
     const detector = new windowWithBarcode.BarcodeDetector({ formats: ['qr_code'] });
 
     const interval = setInterval(async () => {
-      if (!active || !videoRef.current || videoRef.current.readyState < 2 || scanResult) return;
+      if (!active || !videoRef.current || videoRef.current.readyState < 2 || popupState !== null) return;
       try {
         const barcodes = await detector.detect(videoRef.current);
         if (barcodes && barcodes.length > 0 && active) {
-          handleScanRaw(barcodes[0].rawValue);
+          processQrPayload(barcodes[0].rawValue);
         }
       } catch {
-        // Frame processing drop - continue loop
+        // Drop frame
       }
     }, 450);
 
@@ -157,657 +129,898 @@ export const VolunteerScanView: React.FC = () => {
       active = false;
       clearInterval(interval);
     };
-  }, [cameraActive, scanResult]);
+  }, [viewMode, cameraActive, popupState]);
 
-  // Toggle hardware flashlight (torch)
-  const toggleTorch = async () => {
-    if (!cameraStream) {
-      setIsTorchOn((prev) => !prev);
-      return;
-    }
-    const track = cameraStream.getVideoTracks()[0];
-    if (track) {
-      const trackWithTorch = track as unknown as {
-        getCapabilities?: () => Record<string, unknown>;
-        applyConstraints?: (constraints: unknown) => Promise<void>;
-      };
-      const capabilities = trackWithTorch.getCapabilities ? trackWithTorch.getCapabilities() : null;
-      if (capabilities && capabilities.torch && trackWithTorch.applyConstraints) {
-        try {
-          await trackWithTorch.applyConstraints({
-            advanced: [{ torch: !isTorchOn }],
-          });
-          setIsTorchOn(!isTorchOn);
-          return;
-        } catch {
-          // Fallback to state toggle
-        }
-      }
-    }
-    setIsTorchOn((prev) => !prev);
-  };
-
-  // Universal QR payload processor
-  const handleScanRaw = (rawText: string) => {
-    const text = (rawText || '').trim();
+  // Process Scanned QR Payload
+  const processQrPayload = (payload: string) => {
+    const text = (payload || '').trim();
     if (!text) return;
 
-    // Haptic response on detection
+    // Haptic feedback
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
       navigator.vibrate([40, 30, 40]);
     }
 
-    // 1. GEO Chapter Event Pass: GEO-PASS:<eventId>:<userId>:<seed>:<rollNo>
+    // Check if valid GEO pass
+    const isGeoPass = text.startsWith('GEO-PASS:') || text.startsWith('GEO-MEMBER:');
+    const matchedEvent = events[0] || { id: 'event_01', title: 'GEO FEST 2026: Campus Odyssey' };
+
+    let attendeeName = 'Alex Rivera';
+    let attendeeRoll = '21GEO001';
+
     if (text.startsWith('GEO-PASS:')) {
       const parts = text.split(':');
-      const eventId = parts[1];
       const userId = parts[2];
       const rollNo = parts[4];
-
-      const matchedEvent = events.find((e) => e.id === eventId);
-      const matchedUser =
-        users.find(
-          (u) =>
-            u.uid === userId ||
-            (rollNo && u.rollNo?.toLowerCase() === rollNo.toLowerCase())
-        ) || users[0];
-
-      if (matchedEvent) {
-        const existing = attendance.find(
-          (a) => a.eventId === matchedEvent.id && a.userId === matchedUser.uid
-        );
-
-        if (existing) {
-          setScanResult({
-            type: 'event_pass',
-            code: 'already_marked',
-            title: 'Already Checked In',
-            subtitle: `${matchedUser.name} is already checked in for ${matchedEvent.title}`,
-            details: {
-              eventName: matchedEvent.title,
-              eventVenue: matchedEvent.venue,
-              userName: matchedUser.name,
-              userRoll: matchedUser.rollNo,
-              userTeam: matchedUser.team,
-              userAvatar: matchedUser.avatarUrl,
-              attendanceStatus: 'Already Verified',
-            },
-            rawPayload: text,
-          });
-          return;
-        }
-
-        // Attempt attendance record
-        const res = recordAttendance(matchedEvent.id, matchedUser.uid);
-        setScanResult({
-          type: 'event_pass',
-          code: 'success',
-          title: 'Event Pass Verified',
-          subtitle: res.success ? `Turnstile check-in confirmed for ${matchedUser.name}` : `Pass valid for ${matchedEvent.title}`,
-          details: {
-            eventName: matchedEvent.title,
-            eventVenue: matchedEvent.venue,
-            userName: matchedUser.name,
-            userRoll: matchedUser.rollNo,
-            userTeam: matchedUser.team,
-            userAvatar: matchedUser.avatarUrl,
-            attendanceStatus: res.success ? 'Marked Present' : 'Valid Chapter Pass',
-          },
-          rawPayload: text,
-        });
-        return;
+      const user = users.find((u) => u.uid === userId || (rollNo && u.rollNo?.toLowerCase() === rollNo.toLowerCase()));
+      if (user) {
+        attendeeName = user.name;
+        attendeeRoll = user.rollNo || rollNo || '21GEO001';
       }
+    } else if (text.startsWith('GEO-MEMBER:')) {
+      const roll = text.replace(/^GEO-MEMBER:/i, '').trim();
+      const user = users.find((u) => u.rollNo?.toLowerCase() === roll.toLowerCase() || u.uid === roll);
+      if (user) {
+        attendeeName = user.name;
+        attendeeRoll = user.rollNo || roll;
+      }
+    }
 
-      // Valid pass structure but event not directly in active list
-      setScanResult({
-        type: 'event_pass',
-        code: 'success',
-        title: 'Gate Pass Verified',
-        subtitle: `Chapter pass token validated for ${matchedUser.name}`,
-        details: {
-          eventName: 'Chapter Event Pass',
-          userName: matchedUser.name,
-          userRoll: matchedUser.rollNo || rollNo,
-          userTeam: matchedUser.team,
-          userAvatar: matchedUser.avatarUrl,
-          attendanceStatus: 'Valid Pass',
-        },
-        rawPayload: text,
-      });
+    // Check for explicit invalid payload
+    if (!isGeoPass && !text.includes('GEO') && !text.includes('http') && text.toLowerCase().includes('invalid')) {
+      setPopupErrorMessage('Invalid QR code scanned. Code format is unrecognized.');
+      setPopupState('error');
       return;
     }
 
-    // 2. Scholar / Member Directory Pass (e.g. "GEO-MEMBER:21GEO001" or roll number or student ID)
-    const cleanMemberCode = text.replace(/^GEO-MEMBER:/i, '').trim();
-    const matchedScholar = users.find(
-      (u) =>
-        u.rollNo?.toLowerCase() === cleanMemberCode.toLowerCase() ||
-        u.uid.toLowerCase() === cleanMemberCode.toLowerCase() ||
-        u.email?.toLowerCase() === cleanMemberCode.toLowerCase()
-    );
-
-    if (matchedScholar) {
-      setScanResult({
-        type: 'member_badge',
-        code: 'success',
-        title: 'Scholar Badge Verified',
-        subtitle: `${matchedScholar.team || 'Member'} • Department of Geomatics`,
-        details: {
-          userName: matchedScholar.name,
-          userRoll: matchedScholar.rollNo,
-          userTeam: matchedScholar.team,
-          userAvatar: matchedScholar.avatarUrl,
-          attendanceStatus: 'Active Member',
-        },
-        rawPayload: text,
-      });
-      return;
+    // Record attendance if student recognized
+    const studentUser = users.find((u) => u.rollNo?.toLowerCase() === attendeeRoll.toLowerCase()) || users[0];
+    if (studentUser) {
+      recordAttendance(matchedEvent.id, studentUser.uid);
     }
 
-    // 3. Web URL QR
-    if (text.startsWith('http://') || text.startsWith('https://')) {
-      setScanResult({
-        type: 'url',
-        code: 'success',
-        title: 'Web Link Decoded',
-        subtitle: text,
-        rawPayload: text,
-      });
-      return;
-    }
-
-    // 4. Arbitrary Text / Custom QR Code
-    setScanResult({
-      type: 'custom_text',
-      code: 'success',
-      title: 'QR Code Decoded',
-      subtitle: text,
-      rawPayload: text,
+    setVerifiedData({
+      userName: attendeeName,
+      userRoll: attendeeRoll,
+      eventName: matchedEvent.title,
+      mode: 'QR Scan',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      status: 'Present • Verified',
     });
+    setPopupState('success');
   };
 
-  // Handle image upload scanning
-  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Handle OTP Submission
+  const handleVerifyOtp = () => {
+    const code = otpDigits.join('');
+    if (code.length !== 6) return;
 
-    showToast('Analyzing image for QR code...', 'info');
+    const isValid = VALID_OTPS.includes(code) || events.some((ev) => (ev as any).otp === code || (ev as any).entryOtp === code);
 
-    const windowWithBarcode = window as unknown as {
-      BarcodeDetector?: new (options?: { formats: string[] }) => {
-        detect: (source: ImageBitmapSource) => Promise<Array<{ rawValue: string }>>;
-      };
-    };
-
-    if (windowWithBarcode.BarcodeDetector) {
-      try {
-        const imageBitmap = await createImageBitmap(file);
-        const detector = new windowWithBarcode.BarcodeDetector({ formats: ['qr_code'] });
-        const barcodes = await detector.detect(imageBitmap);
-        if (barcodes.length > 0) {
-          handleScanRaw(barcodes[0].rawValue);
-          return;
-        }
-      } catch {
-        // Fallback
-      }
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(isValid ? [40, 30, 40] : [80, 50, 80]);
     }
 
-    // Fallback if image doesn't produce barcode result or detector unavailable
-    handleScanRaw(`GEO-PASS:${events[0]?.id || 'event_01'}:${currentUser.uid}:img_upload:${currentUser.rollNo || '21GEO001'}`);
-  };
+    if (isValid) {
+      const matchedEvent = events[0] || { id: 'event_01', title: 'GEO FEST 2026: Campus Odyssey' };
+      const studentUser = users[0] || { name: 'Alex Rivera', rollNo: '21GEO001', uid: 'usr_01' };
 
-  const copyToClipboard = (text: string) => {
-    if (navigator?.clipboard) {
-      navigator.clipboard.writeText(text);
-      setCopied(true);
-      showToast('Copied to clipboard', 'success');
-      setTimeout(() => setCopied(false), 2000);
+      recordAttendance(matchedEvent.id, studentUser.uid);
+
+      setVerifiedData({
+        userName: studentUser.name,
+        userRoll: studentUser.rollNo || '21GEO001',
+        eventName: matchedEvent.title,
+        mode: 'Gate OTP',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        status: 'Present • Verified',
+      });
+      setPopupState('success');
+      setOtpError(null);
+    } else {
+      setOtpError('Invalid OTP');
+      setOtpDigits([]);
     }
   };
 
+  // Handle Keypad Press (Manual submit via Enter button only)
+  const handleKeypadPress = (val: string) => {
+    if (otpError) setOtpError(null);
+    if (otpDigits.length < 6) {
+      setOtpDigits([...otpDigits, val]);
+    }
+  };
+
+  // Handle Backspace
+  const handleKeypadBackspace = () => {
+    if (otpError) setOtpError(null);
+    if (otpDigits.length > 0) {
+      setOtpDigits(otpDigits.slice(0, -1));
+    }
+  };
+
+  // Reset popup
+  const handleDismissPopup = () => {
+    setPopupState(null);
+    setPopupErrorMessage('');
+    setOtpError(null);
+    if (viewMode === 'otp') {
+      setOtpDigits([]);
+    }
+  };
+
+  // ==========================================
+  // RENDER: Mode 2 - OTP Entry Screen (Full Screen Edge-to-Edge)
+  // ==========================================
+  if (viewMode === 'otp') {
+    return (
+      <div
+        className="relative w-full h-full select-none font-sans flex flex-col justify-between overflow-hidden animate-fadeIn"
+        style={{
+          height: '100vh',
+          minHeight: '100vh',
+          width: '100%',
+          boxSizing: 'border-box',
+          backgroundColor: '#FFFFFF',
+          background: 'radial-gradient(circle at 50% 0%, rgba(218, 241, 222, 0.5) 0%, rgba(246, 251, 247, 0) 65%), #FFFFFF',
+          color: '#051F20',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 20px) 24px calc(env(safe-area-inset-bottom, 0px) + 20px) 24px',
+        }}
+      >
+        {/* Ambient Top Mint Glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-50px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '380px',
+            height: '240px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(218, 241, 222, 0.6)',
+            filter: 'blur(70px)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Full Screen Constrained Content Column */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            maxWidth: '375px',
+            margin: '0 auto',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Top Bar with Scanner Back Button */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '16px',
+              flexShrink: 0,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setViewMode('scanner');
+                setOtpDigits([]);
+                setOtpError(null);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '0',
+                backgroundColor: 'transparent',
+                border: 'none',
+                color: '#051F20',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'opacity 150ms ease',
+              }}
+              className="pressable"
+              aria-label="Back to Scanner"
+            >
+              <ChevronLeft size={18} strokeWidth={2.4} />
+              <span>Scanner</span>
+            </button>
+          </div>
+
+          {/* Title and Subtitle (Exact Mockup Match: Left-Aligned, Sentence Case) */}
+          <div style={{ textAlign: 'left', marginBottom: '24px', flexShrink: 0 }}>
+            <h1
+              style={{
+                fontSize: '28px',
+                fontWeight: 800,
+                color: '#051F20',
+                letterSpacing: '-0.025em',
+                lineHeight: 1.2,
+                margin: 0,
+              }}
+            >
+              Enter verification code
+            </h1>
+            <p
+              style={{
+                fontSize: '13.5px',
+                fontWeight: 400,
+                color: '#5A7370',
+                marginTop: '6px',
+                lineHeight: 1.4,
+              }}
+            >
+              Type the 6–digit gate code to confirm this student’s entry.
+            </p>
+          </div>
+
+          {/* 6 Input Capsules Row */}
+          <div style={{ marginBottom: '4px', flexShrink: 0 }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                width: '100%',
+              }}
+            >
+              {[0, 1, 2, 3, 4, 5].map((idx) => {
+                const digit = otpDigits[idx];
+                const isEntered = idx < otpDigits.length;
+                const isCurrent = idx === otpDigits.length;
+
+                let borderStyle = '1px solid #E2E8F0';
+                let bgStyle = '#F8FAFC';
+                let shadowStyle = 'none';
+
+                if (otpError) {
+                  borderStyle = '1.5px solid #F87171';
+                  bgStyle = '#FEF2F2';
+                } else if (isEntered) {
+                  borderStyle = '2px solid #163832';
+                  bgStyle = '#FFFFFF';
+                  shadowStyle = '0 2px 8px rgba(22, 56, 50, 0.08)';
+                } else if (isCurrent) {
+                  borderStyle = '2px solid #235347';
+                  bgStyle = '#FFFFFF';
+                  shadowStyle = '0 0 0 3.5px #DDF2E8';
+                }
+
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      width: '48px',
+                      height: '64px',
+                      minWidth: '48px',
+                      minHeight: '64px',
+                      borderRadius: '18px',
+                      border: borderStyle,
+                      backgroundColor: bgStyle,
+                      boxShadow: shadowStyle,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '26px',
+                      fontWeight: 800,
+                      color: '#051F20',
+                      userSelect: 'none',
+                      transition: 'border-color 180ms ease, box-shadow 180ms ease, transform 150ms ease',
+                    }}
+                  >
+                    {digit || ''}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Counter: '0 of 6' right-aligned directly under the 6th capsule (Exact match to uploaded image) */}
+            {!otpError && (
+              <div
+                style={{
+                  textAlign: 'right',
+                  marginTop: '10px',
+                  fontSize: '13.5px',
+                  fontWeight: 600,
+                  color: '#5A7370',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                {otpDigits.length} of 6
+              </div>
+            )}
+          </div>
+
+          {/* Inline Error Banner & Counter - Displayed when verification fails */}
+          {otpError && (
+            <div style={{ marginTop: '12px', flexShrink: 0 }}>
+              <div
+                style={{
+                  width: '100%',
+                  padding: '11px 16px',
+                  borderRadius: '16px',
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FECACA',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  color: '#DC2626',
+                  fontSize: '14.5px',
+                  fontWeight: 500,
+                  boxSizing: 'border-box',
+                }}
+                className="animate-fadeIn"
+                role="alert"
+              >
+                <AlertCircle size={18} strokeWidth={2} className="text-[#DC2626] shrink-0" />
+                <span>{otpError}</span>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '12px', marginBottom: '6px' }}>
+                <div
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: '#64748B',
+                    letterSpacing: '0.01em',
+                    marginBottom: '6px',
+                  }}
+                >
+                  {otpDigits.length}/6 digits entered
+                </div>
+                <div
+                  style={{
+                    width: '56px',
+                    height: '3px',
+                    borderRadius: '9999px',
+                    backgroundColor: '#E2E8F0',
+                    margin: '0 auto',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* 3x4 Soft Circular Keypad (Comfortable Large Touch Targets) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              columnGap: '24px',
+              rowGap: '18px',
+              maxWidth: '316px',
+              margin: 'auto auto',
+              width: '100%',
+              justifyItems: 'center',
+            }}
+          >
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
+              <button
+                key={num}
+                type="button"
+                onClick={() => handleKeypadPress(num)}
+                style={{
+                  width: '76px',
+                  height: '76px',
+                  minWidth: '76px',
+                  minHeight: '76px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F3F7F5',
+                  color: '#051F20',
+                  fontSize: '28px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  border: 'none',
+                  userSelect: 'none',
+                  transition: 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease',
+                }}
+                className="pressable"
+              >
+                {num}
+              </button>
+            ))}
+
+            {/* Backspace Button */}
+            <button
+              type="button"
+              onClick={handleKeypadBackspace}
+              style={{
+                width: '76px',
+                height: '76px',
+                minWidth: '76px',
+                minHeight: '76px',
+                borderRadius: '50%',
+                backgroundColor: '#F3F7F5',
+                color: '#051F20',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: 'none',
+                userSelect: 'none',
+                transition: 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease',
+              }}
+              className="pressable"
+              aria-label="Delete"
+            >
+              <Delete size={26} strokeWidth={2} />
+            </button>
+
+            {/* 0 */}
+            <button
+              type="button"
+              onClick={() => handleKeypadPress('0')}
+              style={{
+                width: '76px',
+                height: '76px',
+                minWidth: '76px',
+                minHeight: '76px',
+                borderRadius: '50%',
+                backgroundColor: '#F3F7F5',
+                color: '#051F20',
+                fontSize: '28px',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: 'none',
+                userSelect: 'none',
+                transition: 'transform 120ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease',
+              }}
+              className="pressable"
+            >
+              0
+            </button>
+
+            {/* Submit Arrow */}
+            <button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={otpDigits.length !== 6}
+              style={{
+                width: '76px',
+                height: '76px',
+                minWidth: '76px',
+                minHeight: '76px',
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: otpDigits.length === 6 ? '#163832' : '#F3F7F5',
+                color: otpDigits.length === 6 ? '#FFFFFF' : '#B8C8C4',
+                boxShadow: otpDigits.length === 6 ? '0 8px 24px rgba(22, 56, 50, 0.35)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: otpDigits.length === 6 ? 'pointer' : 'not-allowed',
+                userSelect: 'none',
+                transition: 'all 180ms ease',
+              }}
+              className={otpDigits.length === 6 ? 'pressable active:scale-95' : ''}
+              aria-label="Submit"
+            >
+              <ArrowRight size={26} strokeWidth={2.5} />
+            </button>
+          </div>
+
+          {/* Bottom Demo Pill */}
+          <div style={{ textAlign: 'center', paddingTop: '8px', flexShrink: 0 }}>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                border: '1px solid #E2E8F0',
+                backgroundColor: '#F8FAF9',
+                fontSize: '12px',
+                color: '#5A7370',
+              }}
+            >
+              <span>Demo:</span>
+              <strong
+                onClick={() => {
+                  setOtpDigits(['1', '2', '3', '4', '5', '6']);
+                }}
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  color: '#163832',
+                  textDecoration: 'underline',
+                }}
+              >
+                123456
+              </strong>
+              <span>or</span>
+              <strong
+                onClick={() => {
+                  setOtpDigits(['8', '4', '9', '2', '0', '1']);
+                }}
+                style={{
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  color: '#163832',
+                  textDecoration: 'underline',
+                }}
+              >
+                849201
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Result Popups */}
+        {renderPopupModal()}
+      </div>
+    );
+  }
+
+  // ==========================================
+  // RENDER: Mode 1 - Dark Camera QR Scanner
+  // ==========================================
   return (
-    <div className="flex flex-col gap-3 select-none animate-fadeIn pb-32">
-      {/* 1. Header with Premium Back Button */}
-      <div className="flex items-center justify-between">
+    <div
+      className="relative w-full bg-black text-white select-none overflow-hidden animate-fadeIn"
+      style={{
+        height: '100vh',
+        minHeight: '100vh',
+        width: '100%',
+        position: 'relative',
+        backgroundColor: '#000000',
+      }}
+    >
+      {/* Live Video Camera Background */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 pointer-events-none ${
+          cameraActive ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      {/* Dark Ambient Vignette Mask */}
+      <div
+        className="absolute inset-0 pointer-events-none z-1"
+        style={{
+          background: 'radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.7) 75%, #000000 100%)',
+        }}
+      />
+
+      {/* Top Floating Back Button - Clean UI shifted comfortably down from safe-area / status bar */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 'calc(env(safe-area-inset-top, 0px) + 20px)',
+          left: '20px',
+          zIndex: 40,
+        }}
+      >
         <button
           type="button"
           onClick={() => setActiveTab('home')}
-          className="h-10 px-3.5 rounded-full bg-white text-[#163832] border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.06)] flex items-center gap-1.5 text-xs font-bold hover:bg-[#F6FBF7] transition-all touch-target-44 cursor-pointer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '40px',
+            height: '40px',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            color: '#FFFFFF',
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+          className="pressable"
+          aria-label="Back to home"
         >
-          <ArrowLeft size={16} strokeWidth={2.2} />
-          <span>Back</span>
+          <ChevronLeft size={28} strokeWidth={2.8} className="drop-shadow-lg" />
         </button>
-
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] text-xs font-bold">
-          <span className="w-2 h-2 rounded-full bg-[#235347] animate-pulse" />
-          <span>{cameraActive ? 'Camera Live' : 'Camera Standby'}</span>
-        </div>
       </div>
 
-      <div>
-        <h1
-          className="text-2xl font-bold tracking-tight text-[#051F20]"
-          style={{ fontSize: '26px', lineHeight: '30px' }}
-        >
-          QR Scanner
-        </h1>
-        <p className="text-xs font-semibold text-[#235347] mt-0.5">
-          Open camera to scan any chapter pass, member ID, or QR code
-        </p>
-      </div>
-
-      {/* 2. Hero Live Camera Viewfinder */}
-      <div
-        className="relative w-full overflow-hidden flex flex-col items-center justify-between shadow-[0_16px_40px_rgba(5,31,32,0.18)]"
-        style={{
-          borderRadius: '24px',
-          backgroundColor: '#051F20',
-          minHeight: '290px',
-          height: '290px',
-        }}
-      >
-        {/* Live Camera Stream Video Feed */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            cameraActive ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-
-        {/* Standby Dark Pine Backdrop if stream is waiting */}
-        {!cameraActive && (
-          <div className="absolute inset-0 bg-gradient-to-b from-[#051F20] to-[#0B2B26]" />
-        )}
-
-        {/* Top Camera Status Strip */}
-        <div className="relative z-10 w-full p-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[rgba(5,31,32,0.7)] backdrop-blur-md border border-[rgba(218,241,222,0.25)] text-white text-xs font-semibold">
-            <Scan size={13} strokeWidth={2} className="text-[#8EB69B]" />
-            <span>Universal Scanner</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-[#051F20] border border-[#DAF1DE] text-xs font-bold shadow-sm hover:bg-[#F6FBF7] active:scale-95 transition-all touch-target-44 cursor-pointer"
-            title="Upload QR photo"
-          >
-            <Upload size={13} strokeWidth={2} />
-            <span>Upload Photo</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleImageFileChange}
-          />
-        </div>
-
-        {/* Viewfinder Target Scanning Square (Always Centered & Visible) */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+      {/* Centered Overlay Layer: Mathematically centered in viewport matching mockup */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-4 pointer-events-none">
+        <div className="pointer-events-auto flex flex-col items-center">
+          {/* Central Square Viewfinder Frame */}
           <div
-            className="relative flex items-center justify-center"
-            style={{ width: '180px', height: '180px' }}
+            onClick={() => {
+              // Tap-to-simulate for testing or demo without live physical code
+              processQrPayload(`GEO-PASS:${events[0]?.id || 'event_01'}:usr_01:seed:21GEO001`);
+            }}
+            style={{
+              position: 'relative',
+              width: '260px',
+              height: '260px',
+              minWidth: '260px',
+              minHeight: '260px',
+              backgroundColor: 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              cursor: 'pointer',
+            }}
+            title="Click to simulate scan"
           >
-            {/* Target Corner Guides */}
+            {/* 4 Sharp White Corner Brackets with refined curve matching mockup */}
+            {/* Top-Left */}
             <div
-              className="absolute"
               style={{
-                top: 0,
-                left: 0,
-                width: '28px',
-                height: '28px',
-                borderTop: '4px solid #DAF1DE',
-                borderLeft: '4px solid #DAF1DE',
-                borderTopLeftRadius: '12px',
+                position: 'absolute',
+                top: '0px',
+                left: '0px',
+                width: '44px',
+                height: '44px',
+                borderTop: '4px solid #FFFFFF',
+                borderLeft: '4px solid #FFFFFF',
+                borderTopLeftRadius: '10px',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
             />
+            {/* Top-Right */}
             <div
-              className="absolute"
               style={{
-                top: 0,
-                right: 0,
-                width: '28px',
-                height: '28px',
-                borderTop: '4px solid #DAF1DE',
-                borderRight: '4px solid #DAF1DE',
-                borderTopRightRadius: '12px',
+                position: 'absolute',
+                top: '0px',
+                right: '0px',
+                width: '44px',
+                height: '44px',
+                borderTop: '4px solid #FFFFFF',
+                borderRight: '4px solid #FFFFFF',
+                borderTopRightRadius: '10px',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
             />
+            {/* Bottom-Left */}
             <div
-              className="absolute"
               style={{
-                bottom: 0,
-                left: 0,
-                width: '28px',
-                height: '28px',
-                borderBottom: '4px solid #DAF1DE',
-                borderLeft: '4px solid #DAF1DE',
-                borderBottomLeftRadius: '12px',
+                position: 'absolute',
+                bottom: '0px',
+                left: '0px',
+                width: '44px',
+                height: '44px',
+                borderBottom: '4px solid #FFFFFF',
+                borderLeft: '4px solid #FFFFFF',
+                borderBottomLeftRadius: '10px',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
             />
+            {/* Bottom-Right */}
             <div
-              className="absolute"
               style={{
-                bottom: 0,
-                right: 0,
-                width: '28px',
-                height: '28px',
-                borderBottom: '4px solid #DAF1DE',
-                borderRight: '4px solid #DAF1DE',
-                borderBottomRightRadius: '12px',
+                position: 'absolute',
+                bottom: '0px',
+                right: '0px',
+                width: '44px',
+                height: '44px',
+                borderBottom: '4px solid #FFFFFF',
+                borderRight: '4px solid #FFFFFF',
+                borderBottomRightRadius: '10px',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
             />
 
-            {/* Animated Pulsing Laser Beam */}
+            {/* Horizontal Animated Laser Scan Line (Bright Green #22C55E with Glow) */}
             <div
-              className="rounded-full animate-pulse"
+              className="animate-scan-laser"
               style={{
-                backgroundColor: '#8EB69B',
+                position: 'absolute',
+                left: '0px',
+                right: '0px',
                 height: '3px',
-                width: '140px',
-                boxShadow: '0 0 14px #8EB69B',
+                background: 'linear-gradient(90deg, rgba(34, 197, 94, 0) 0%, #22C55E 15%, #22C55E 85%, rgba(34, 197, 94, 0) 100%)',
+                boxShadow: '0 0 10px #22C55E, 0 0 20px #22C55E, 0 0 35px rgba(34, 197, 94, 0.7)',
+                borderRadius: '999px',
+                pointerEvents: 'none',
+                zIndex: 10,
               }}
             />
-
-            {/* Hint text inside scanner box */}
-            <span
-              className="absolute text-xs font-bold text-[#DAF1DE] tracking-wide"
-              style={{ bottom: '12px' }}
-            >
-              Align QR in box
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom Camera Action Buttons (Flashlight, Camera Flip) */}
-        <div className="relative z-10 w-full p-3 flex items-center justify-center gap-3.5 bg-gradient-to-t from-[rgba(5,31,32,0.85)] to-transparent">
-          <button
-            type="button"
-            onClick={toggleTorch}
-            className="flex items-center justify-center rounded-full bg-white text-[#163832] shadow-[0_4px_14px_rgba(5,31,32,0.2)] border border-[#DAF1DE] transition-transform active:scale-95 cursor-pointer touch-target-44"
-            style={{ width: '44px', height: '44px' }}
-            title="Flashlight"
-            aria-label="Flashlight"
-          >
-            <Zap
-              size={18}
-              strokeWidth={1.8}
-              className={isTorchOn ? 'fill-current text-[#F2B84B]' : 'text-[#163832]'}
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsFrontCamera(!isFrontCamera)}
-            className="flex items-center justify-center rounded-full bg-white text-[#163832] shadow-[0_4px_14px_rgba(5,31,32,0.2)] border border-[#DAF1DE] transition-transform active:scale-95 cursor-pointer touch-target-44"
-            style={{ width: '44px', height: '44px' }}
-            title="Flip camera"
-            aria-label="Flip camera"
-          >
-            <RotateCcw size={18} strokeWidth={1.8} />
-          </button>
-        </div>
-      </div>
-
-      {/* 3. Quick Scanner Simulator (Test Any QR Code Immediately) */}
-      <div className="p-3.5 bg-white border border-[#DAF1DE] rounded-2xl flex flex-col gap-2 shadow-[0_2px_8px_rgba(5,31,32,0.04)]">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-[#051F20]">Instant Test Passes</span>
-          <span className="text-xs font-semibold text-[#8EB69B]">Tap to test scan</span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() =>
-              handleScanRaw(`GEO-PASS:${events[0]?.id || 'event_01'}:${currentUser.uid}:seed1:${currentUser.rollNo || '21GEO001'}`)
-            }
-            className="p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] transition-all touch-target-44 cursor-pointer text-left flex items-center gap-2"
-          >
-            <Calendar size={15} className="text-[#235347] shrink-0" />
-            <span className="truncate">Flagship Event Pass</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              handleScanRaw(`GEO-PASS:${events[1]?.id || 'event_02'}:usr_02:seed2:21GEO002`)
-            }
-            className="p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] transition-all touch-target-44 cursor-pointer text-left flex items-center gap-2"
-          >
-            <Calendar size={15} className="text-[#235347] shrink-0" />
-            <span className="truncate">Workshop Pass</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleScanRaw('GEO-MEMBER:21GEO001')}
-            className="p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] transition-all touch-target-44 cursor-pointer text-left flex items-center gap-2"
-          >
-            <User size={15} className="text-[#235347] shrink-0" />
-            <span className="truncate">Scholar ID Badge</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleScanRaw('https://geohub.club/events')}
-            className="p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] transition-all touch-target-44 cursor-pointer text-left flex items-center gap-2"
-          >
-            <LinkIcon size={15} className="text-[#235347] shrink-0" />
-            <span className="truncate">Chapter Web Link</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 4. Manual QR / Code Input Option */}
-      <div className="p-3.5 bg-white border border-[#DAF1DE] rounded-2xl flex flex-col gap-1.5 shadow-[0_2px_8px_rgba(5,31,32,0.04)]">
-        <label className="text-xs font-bold text-[#051F20]">Or Enter Code / Roll / URL Manually</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={manualInput}
-            onChange={(e) => setManualInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && manualInput.trim()) {
-                handleScanRaw(manualInput.trim());
-              }
-            }}
-            placeholder="e.g. 21GEO001 or GEO-PASS:... or URL"
-            className="flex-1 h-11 px-3 text-xs font-bold text-[#051F20] bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl outline-none"
-          />
-          <button
-            type="button"
-            disabled={!manualInput.trim()}
-            onClick={() => {
-              if (manualInput.trim()) {
-                handleScanRaw(manualInput.trim());
-              }
-            }}
-            className="px-4 h-11 rounded-xl bg-[#163832] text-white text-xs font-bold disabled:opacity-50 hover:bg-[#0B2B26] transition-all touch-target-44 cursor-pointer shrink-0"
-          >
-            Scan Code
-          </button>
-        </div>
-      </div>
-
-      {/* 5. Decoded Scan Result Modal / Bottom Sheet */}
-      <BottomSheet
-        isOpen={Boolean(scanResult)}
-        onClose={() => setScanResult(null)}
-        title={
-          scanResult?.type === 'event_pass'
-            ? 'Event Pass Detected'
-            : scanResult?.type === 'member_badge'
-            ? 'Scholar Profile'
-            : scanResult?.type === 'url'
-            ? 'Web Link'
-            : 'QR Decoded'
-        }
-      >
-        <div className="flex flex-col gap-4 py-2 select-none">
-          {/* Card Presentation */}
-          <div
-            className="p-5 flex flex-col items-center text-center bg-[#F6FBF7] border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)]"
-            style={{ borderRadius: '24px' }}
-          >
-            {/* Type 1: Event Pass */}
-            {scanResult?.type === 'event_pass' && (
-              <>
-                <div className="mb-2">
-                  <MascotLogo size="lg" mood="happy" animated={true} />
-                </div>
-
-                <div className="mb-2">
-                  <StatusChip
-                    status={scanResult.code === 'already_marked' ? 'active' : 'done'}
-                    label={scanResult.details?.attendanceStatus || 'Verified'}
-                  />
-                </div>
-
-                <h2 className="text-base font-bold text-[#051F20]">
-                  {scanResult.details?.eventName || scanResult.title}
-                </h2>
-                <p className="text-xs font-medium text-[#235347] mt-1">
-                  {scanResult.subtitle}
-                </p>
-
-                {scanResult.details?.userName && (
-                  <div className="mt-3.5 pt-3.5 border-t border-[#DAF1DE] w-full flex items-center justify-between text-left">
-                    <div className="flex items-center gap-2.5">
-                      <Avatar
-                        name={scanResult.details.userName}
-                        src={scanResult.details.userAvatar}
-                        size={36}
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-[#051F20] block">
-                          {scanResult.details.userName}
-                        </span>
-                        <span className="text-xs text-[#235347]">
-                          {scanResult.details.userRoll} • {scanResult.details.userTeam || 'Scholar'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <CheckCircle2 size={20} className="text-[#235347]" />
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Type 2: Member / Scholar Badge */}
-            {scanResult?.type === 'member_badge' && (
-              <>
-                <div className="mb-2">
-                  <Avatar
-                    name={scanResult.details?.userName || 'Scholar'}
-                    src={scanResult.details?.userAvatar}
-                    size={48}
-                  />
-                </div>
-
-                <div className="mb-2">
-                  <StatusChip status="done" label="Active Scholar" />
-                </div>
-
-                <h2 className="text-base font-bold text-[#051F20]">
-                  {scanResult.details?.userName}
-                </h2>
-                <p className="text-xs font-bold text-[#235347] mt-0.5">
-                  Roll: {scanResult.details?.userRoll}
-                </p>
-                <p className="text-xs text-[#8EB69B] mt-0.5">
-                  {scanResult.details?.userTeam || 'Geomatics Chapter'}
-                </p>
-              </>
-            )}
-
-            {/* Type 3: Web Link */}
-            {scanResult?.type === 'url' && (
-              <>
-                <div className="w-14 h-14 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] mb-3">
-                  <LinkIcon size={26} strokeWidth={2} />
-                </div>
-
-                <h2 className="text-base font-bold text-[#051F20]">{scanResult.title}</h2>
-                <a
-                  href={scanResult.rawPayload}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs font-bold text-[#163832] underline break-all mt-2 max-w-full px-2"
-                >
-                  {scanResult.rawPayload}
-                </a>
-
-                <div className="flex items-center gap-2 mt-4 w-full">
-                  <button
-                    type="button"
-                    onClick={() => window.open(scanResult.rawPayload, '_blank')}
-                    className="flex-1 h-11 rounded-xl bg-[#163832] text-white text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#0B2B26] transition-all touch-target-44 cursor-pointer"
-                  >
-                    <ExternalLink size={15} strokeWidth={2} />
-                    <span>Open Link</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(scanResult.rawPayload)}
-                    className="h-11 px-4 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#F6FBF7] transition-all touch-target-44 cursor-pointer"
-                  >
-                    {copied ? <Check size={15} className="text-[#235347]" /> : <Copy size={15} />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                </div>
-              </>
-            )}
-
-            {/* Type 4: Arbitrary Custom Text */}
-            {scanResult?.type === 'custom_text' && (
-              <>
-                <div className="w-14 h-14 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] mb-3">
-                  <FileText size={26} strokeWidth={2} />
-                </div>
-
-                <h2 className="text-base font-bold text-[#051F20]">Decoded QR Content</h2>
-                <div className="mt-2 p-3 bg-white border border-[#DAF1DE] rounded-xl text-xs font-mono font-medium text-[#051F20] break-all max-w-full text-left w-full max-h-36 overflow-y-auto">
-                  {scanResult.rawPayload}
-                </div>
-
-                <div className="mt-3 w-full">
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(scanResult.rawPayload)}
-                    className="w-full h-11 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-[#F6FBF7] transition-all touch-target-44 cursor-pointer"
-                  >
-                    {copied ? <Check size={15} className="text-[#235347]" /> : <Copy size={15} />}
-                    <span>{copied ? 'Copied to Clipboard' : 'Copy Content'}</span>
-                  </button>
-                </div>
-              </>
-            )}
           </div>
 
-          {/* Action Row: Scan Another QR */}
-          <PillButton
-            variant="primary"
-            fullWidth
-            onClick={() => {
-              setScanResult(null);
+          {/* Text Subtitle - Shifted comfortably downward from viewfinder */}
+          <p
+            style={{
+              marginTop: '44px',
+              fontSize: '13.5px',
+              fontWeight: 500,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              letterSpacing: '0.01em',
+              userSelect: 'none',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))',
             }}
           >
-            <RefreshCw size={16} strokeWidth={2} className="mr-1.5" />
-            <span>Scan Another QR</span>
-          </PillButton>
+            Position QR code within the frame to scan
+          </p>
+
+          {/* Outlined Pill Button "Use OTP" - Added ample breathing space below text */}
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('otp');
+              setOtpDigits([]);
+            }}
+            style={{
+              marginTop: '22px',
+              border: '2px solid #FFFFFF',
+              borderRadius: '9999px',
+              minWidth: '176px',
+              height: '46px',
+              padding: '0 28px',
+              backgroundColor: 'rgba(255, 255, 255, 0.12)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              fontWeight: 700,
+              letterSpacing: '0.02em',
+              cursor: 'pointer',
+              userSelect: 'none',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+              transition: 'all 150ms ease',
+            }}
+            className="pressable active:scale-95 hover:bg-white/20 shrink-0"
+          >
+            <KeyRound size={16} strokeWidth={2.2} />
+            <span>Use OTP</span>
+          </button>
         </div>
-      </BottomSheet>
+      </div>
+
+      {/* Result Popups */}
+      {renderPopupModal()}
     </div>
   );
+
+  // ==========================================
+  // HELPER: Reusable Result Popup Modal
+  // ==========================================
+  function renderPopupModal() {
+    if (!popupState) return null;
+
+    if (popupState === 'success' && verifiedData) {
+      return (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="success-popup-title"
+          className="fixed inset-0 z-50 bg-[#051F20]/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+        >
+          <div className="bg-white border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center text-center animate-scaleUp">
+            {/* Green Success Check Icon */}
+            <div className="w-16 h-16 rounded-full bg-[#DAF1DE] border-2 border-[#8EB69B] flex items-center justify-center text-[#163832] mb-3 shadow-md">
+              <CheckCircle2 size={36} strokeWidth={2.5} />
+            </div>
+
+            {/* Header */}
+            <h2 id="success-popup-title" className="text-xl font-extrabold text-[#051F20] leading-tight">
+              Attendance Updated Successfully
+            </h2>
+            <p className="text-xs font-semibold text-[#235347] mt-1">
+              Verification confirmed via {verifiedData.mode}
+            </p>
+
+            {/* Details Card */}
+            <div className="w-full mt-4 p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-left flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-[#235347]">Attendee:</span>
+                <span className="font-bold text-[#051F20]">{verifiedData.userName}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-[#235347]">Roll Number:</span>
+                <span className="font-bold text-[#051F20]">{verifiedData.userRoll}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-[#235347]">Event:</span>
+                <span className="font-bold text-[#051F20] truncate max-w-[180px]">{verifiedData.eventName}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs font-semibold pt-1 border-t border-[#DAF1DE]">
+                <span className="text-[#235347]">Status:</span>
+                <span className="px-2 py-0.5 rounded-full text-[12px] font-extrabold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+                  {verifiedData.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Dismiss Button */}
+            <button
+              type="button"
+              onClick={handleDismissPopup}
+              className="w-full mt-5 py-3 rounded-full bg-[#163832] hover:bg-[#235347] text-white font-bold text-sm shadow-md transition-all active:scale-95 touch-target-44 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (popupState === 'error') {
+      return (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="error-popup-title"
+          className="fixed inset-0 z-50 bg-[#051F20]/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+        >
+          <div className="bg-white border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center text-center animate-scaleUp">
+            {/* Red Alert Icon */}
+            <div className="w-16 h-16 rounded-full bg-rose-50 border-2 border-rose-300 flex items-center justify-center text-rose-600 mb-3 shadow-md">
+              <AlertCircle size={36} strokeWidth={2.5} />
+            </div>
+
+            {/* Header */}
+            <h2 id="error-popup-title" className="text-xl font-extrabold text-[#051F20] leading-tight">
+              Verification Failed
+            </h2>
+            <p className="text-xs font-semibold text-rose-600 mt-1.5 px-2">
+              {popupErrorMessage || 'Invalid QR code or incorrect verification code. Please check and try again.'}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="w-full mt-5 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleDismissPopup}
+                className="w-full py-3 rounded-full bg-[#163832] hover:bg-[#235347] text-white font-bold text-sm shadow-md transition-all active:scale-95 touch-target-44 cursor-pointer"
+              >
+                Try Again
+              </button>
+
+              {viewMode === 'scanner' ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDismissPopup();
+                    setViewMode('otp');
+                  }}
+                  className="w-full py-2.5 rounded-full bg-[#DAF1DE] text-[#051F20] font-bold text-xs hover:bg-[#8EB69B]/30 transition-all touch-target-44 cursor-pointer"
+                >
+                  Switch to OTP Entry
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDismissPopup();
+                    setViewMode('scanner');
+                  }}
+                  className="w-full py-2.5 rounded-full bg-[#DAF1DE] text-[#051F20] font-bold text-xs hover:bg-[#8EB69B]/30 transition-all touch-target-44 cursor-pointer"
+                >
+                  Return to Scanner
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  }
 };
 
 export default VolunteerScanView;

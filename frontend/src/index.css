@@ -1,5 +1,6 @@
 @import './styles/tokens.css';
 @import './styles/utilities.css';
+@import './styles/page-transitions.css';
 
 /* ==========================================================================
    Typeface: Astafine – Serif Typeface Family (Designer: Rishsketch)
@@ -131,11 +132,66 @@ html, body {
   overflow-x: hidden;
 }
 
+.scan-content-override {
+  padding: 0 !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.scan-content-override .page-transition-enter {
+  height: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 100% !important;
+  background: transparent !important;
+}
+
+.mobile-shell-column:has(.scan-content-override) {
+  background: transparent !important;
+}
+
 @media (min-width: 768px) {
   .mobile-app-content {
     padding-left: 24px;
     padding-right: 24px;
   }
+}
+
+/* Dedicated Chat View Content Override: Full-height viewport lock so text bar stays fixed and only messages stream scrolls */
+.chat-content-override {
+  padding-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: calc(100dvh - 56px - 84px) !important;
+  max-height: calc(100dvh - 56px - 84px) !important;
+  overflow: hidden !important;
+}
+
+@supports not (height: 100dvh) {
+  .chat-content-override {
+    height: calc(100vh - 56px - 84px) !important;
+    max-height: calc(100vh - 56px - 84px) !important;
+  }
+}
+
+.phone-frame-mode .chat-content-override {
+  height: calc(100vh - 32px - 56px - 84px) !important;
+  max-height: calc(100vh - 32px - 56px - 84px) !important;
+}
+
+.chat-content-override > [data-testid="page-transition-container"],
+.chat-content-override > .page-transition-enter {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
 }
 
 /* StatTiles 2x2 Square Boxes Grid */
@@ -155,12 +211,16 @@ html, body {
 
 
 /* Utility hiding scrollbars */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 button, input, select, textarea {
@@ -188,20 +248,35 @@ a {
   text-decoration: none;
 }
 
-/* Custom Scrollbars */
+@keyframes scanLaser {
+  0% {
+    top: 4%;
+    opacity: 0.7;
+  }
+  50% {
+    top: 94%;
+    opacity: 1;
+  }
+  100% {
+    top: 4%;
+    opacity: 0.7;
+  }
+}
+
+.animate-scan-laser {
+  animation: scanLaser 2.2s ease-in-out infinite;
+}
+
+/* Hide all scrollbars globally for a clean, seamless mobile app feel */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Screen reader utility */
@@ -1036,6 +1111,27 @@ a {
   margin-bottom: 20px;
 }
 
+.scan-content-override {
+  padding: 0 !important;
+  min-height: 100vh !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.scan-content-override .page-transition-enter {
+  height: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 100% !important;
+  background: transparent !important;
+}
+
+.mobile-shell-column:has(.scan-content-override) {
+  background: transparent !important;
+}
+
 @media (min-width: 768px) {
   .bento-grid {
     grid-template-columns: repeat(12, 1fr);
@@ -1279,6 +1375,62 @@ a {
   font-size: 13px;
   font-weight: 600;
   animation: slideUp 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   Ultra-Premium Glassmorphic Floating Toast Notification
+   ========================================================================== */
+@keyframes toastDropIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.geohub-toast-container {
+  position: absolute;
+  top: calc(64px + env(safe-area-inset-top, 0px) + 12px);
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  max-width: calc(100% - 32px);
+  width: max-content;
+  box-sizing: border-box;
+  animation: toastDropIn 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  user-select: none;
+  pointer-events: auto;
+}
+
+.geohub-toast-success {
+  background: rgba(5, 31, 32, 0.94);
+  border: 1px solid rgba(142, 182, 155, 0.45);
+  box-shadow: 0 12px 32px rgba(5, 31, 32, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.geohub-toast-error {
+  background: rgba(45, 14, 20, 0.94);
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  box-shadow: 0 12px 32px rgba(225, 29, 72, 0.28), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.geohub-toast-info {
+  background: rgba(5, 31, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
 }
 
 .action-seal-btn {

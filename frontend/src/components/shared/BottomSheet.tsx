@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { AppContext } from '../../context/AppContext';
 
@@ -10,6 +11,7 @@ export interface BottomSheetProps {
   children: React.ReactNode;
   maxHeight?: string;
   showCloseButton?: boolean;
+  fullScreen?: boolean;
 }
 
 export const BottomSheet: React.FC<BottomSheetProps> = ({
@@ -20,6 +22,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   children,
   maxHeight = '90vh',
   showCloseButton = true,
+  fullScreen = false,
 }) => {
   const appContext = useContext(AppContext);
   const isPhoneFrame = appContext?.isPhoneFrame ?? false;
@@ -37,50 +40,65 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  const content = (
     <div
-      className="fixed inset-0 flex flex-col justify-end select-none"
+      className={`fixed inset-0 select-none ${fullScreen ? 'flex flex-col' : 'flex flex-col justify-end'}`}
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 1000,
+        zIndex: 9999,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(5, 31, 32, 0.45)',
-        backdropFilter: 'blur(6px)',
+        justifyContent: fullScreen ? 'stretch' : 'flex-end',
+        alignItems: 'center',
+        backgroundColor: fullScreen && !isPhoneFrame ? '#FFFFFF' : 'rgba(5, 31, 32, 0.45)',
+        backdropFilter: fullScreen && !isPhoneFrame ? 'none' : 'blur(6px)',
       }}
-      onClick={onClose}
+      onClick={fullScreen ? undefined : onClose}
     >
       <div
         className="w-full mx-auto relative flex flex-col transition-transform duration-250 ease-out"
         style={{
-          maxWidth: isPhoneFrame ? '480px' : '640px',
+          maxWidth: isPhoneFrame ? '480px' : fullScreen ? '100%' : '640px',
+          width: '100%',
+          height: fullScreen ? (isPhoneFrame ? 'calc(100vh - 32px)' : '100%') : undefined,
+          maxHeight: fullScreen ? (isPhoneFrame ? 'calc(100vh - 32px)' : '100dvh') : maxHeight,
+          margin: fullScreen && isPhoneFrame ? '16px auto' : '0',
           backgroundColor: '#FFFFFF',
-          borderTopLeftRadius: '24px',
-          borderTopRightRadius: '24px',
-          borderTop: '1px solid #DAF1DE',
-          boxShadow: '0 -12px 40px rgba(5, 31, 32, 0.12)',
-          maxHeight,
+          borderRadius: fullScreen ? (isPhoneFrame ? '36px' : '0px') : undefined,
+          borderTopLeftRadius: fullScreen ? (isPhoneFrame ? '36px' : '0px') : '24px',
+          borderTopRightRadius: fullScreen ? (isPhoneFrame ? '36px' : '0px') : '24px',
+          border: fullScreen && isPhoneFrame ? '1px solid #DAF1DE' : 'none',
+          borderTop: fullScreen ? (isPhoneFrame ? '1px solid #DAF1DE' : 'none') : '1px solid #DAF1DE',
+          boxShadow: fullScreen
+            ? isPhoneFrame
+              ? '0 16px 40px rgba(5, 31, 32, 0.2)'
+              : 'none'
+            : '0 -12px 40px rgba(5, 31, 32, 0.12)',
           boxSizing: 'border-box',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: fullScreen ? '1 1 auto' : undefined,
         }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >
-        {/* Drag Pill Handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div
-            style={{
-              width: '40px',
-              height: '4px',
-              borderRadius: '9999px',
-              backgroundColor: '#8EB69B',
-              opacity: 0.8,
-            }}
-          />
-        </div>
+        {/* Drag Pill Handle (Only when NOT fullScreen) */}
+        {!fullScreen && (
+          <div className="flex justify-center pt-3 pb-1">
+            <div
+              style={{
+                width: '40px',
+                height: '4px',
+                borderRadius: '9999px',
+                backgroundColor: '#8EB69B',
+                opacity: 0.8,
+              }}
+            />
+          </div>
+        )}
 
         {/* Header with Title and 40px Close Button */}
         {(title || showCloseButton) && (
@@ -89,18 +107,19 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             style={{
               paddingLeft: '20px',
               paddingRight: '20px',
-              paddingTop: '8px',
-              paddingBottom: '12px',
+              paddingTop: fullScreen ? '16px' : '8px',
+              paddingBottom: fullScreen ? '16px' : '12px',
               boxSizing: 'border-box',
+              flexShrink: 0,
             }}
           >
             <div className="flex-1 pr-2">
               {title && (
                 <h3
                   style={{
-                    fontSize: '18px',
-                    lineHeight: '24px',
-                    fontWeight: 600,
+                    fontSize: fullScreen ? '20px' : '18px',
+                    lineHeight: fullScreen ? '26px' : '24px',
+                    fontWeight: 700,
                     color: '#051F20',
                     margin: 0,
                   }}
@@ -149,9 +168,13 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         <div
           className="overflow-y-auto"
           style={{
-            padding: '16px 20px 24px 20px',
-            maxHeight: 'calc(90vh - 80px)',
+            padding: fullScreen ? '20px 20px calc(32px + env(safe-area-inset-bottom, 0px)) 20px' : '16px 20px 24px 20px',
+            maxHeight: fullScreen ? 'none' : 'calc(90vh - 80px)',
             boxSizing: 'border-box',
+            flex: fullScreen ? '1 1 auto' : undefined,
+            display: fullScreen ? 'flex' : undefined,
+            flexDirection: fullScreen ? 'column' : undefined,
+            minHeight: 0,
           }}
         >
           {children}
@@ -159,6 +182,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 };
 
 export default BottomSheet;

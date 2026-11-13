@@ -80,7 +80,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
             <span
               role="status"
               aria-hidden="true"
-              className="absolute rounded-full"
+              className="absolute rounded-full animate-badge-pop"
               style={{
                 top: isCompact ? '1px' : '4px',
                 right: isCompact ? '1px' : '4px',
@@ -96,7 +96,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
             <span
               role="status"
               aria-hidden="true"
-              className="absolute flex items-center justify-center text-xs font-bold text-white rounded-full"
+              className="absolute flex items-center justify-center text-xs font-bold text-white rounded-full animate-badge-pop"
               style={{
                 top: isCompact ? '-3px' : '1px',
                 right: isCompact ? '-3px' : '1px',

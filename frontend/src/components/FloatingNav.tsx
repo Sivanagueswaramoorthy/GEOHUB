@@ -196,61 +196,69 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
       >
         {primaryTabs.map((tab) => {
           const active = isTabActive(tab.key);
+          const labelText =
+            tab.key === 'operations'
+              ? 'Hub'
+              : tab.key === 'community'
+              ? 'Chat'
+              : tab.shortLabel || tab.label;
 
-          return active ? (
+          return (
             <button
               key={tab.key}
               type="button"
               onClick={() => handleTabClick(tab.key)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] transition-all duration-200"
-              style={{
-                backgroundColor: '#163832', // pine-800
-                color: '#FFFFFF',
-                boxShadow: '0 4px 14px rgba(22, 56, 50, 0.28)',
-                height: '42px',
-                boxSizing: 'border-box',
-              }}
-            >
-              <span className="shrink-0">{getLucideIcon(tab.iconName, 18, '#FFFFFF')}</span>
-              <span
-                style={{
-                  fontSize: '12px',
-                  lineHeight: '16px',
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  whiteSpace: 'nowrap',
-                  fontFamily: 'var(--font-family)',
-                }}
-              >
-                {tab.key === 'operations'
-                  ? 'Ops'
-                  : tab.key === 'community'
-                  ? 'Chat'
-                  : tab.shortLabel || tab.label}
-              </span>
-            </button>
-          ) : (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => handleTabClick(tab.key)}
-              className="relative flex items-center justify-center rounded-full transition-colors cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B]"
-              style={{
-                width: '40px',
-                height: '40px',
-                minWidth: '40px',
-                minHeight: '40px',
-                color: '#235347', // pine-700
-                boxSizing: 'border-box',
-              }}
               title={tab.label}
               aria-label={tab.label}
+              aria-current={active ? 'page' : undefined}
+              className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] transition-all duration-260 ${
+                active ? 'px-3.5 py-1.5' : 'w-10 h-10'
+              }`}
+              style={{
+                height: '42px',
+                minHeight: '42px',
+                backgroundColor: active ? '#163832' : 'transparent',
+                color: active ? '#FFFFFF' : '#235347',
+                boxShadow: active ? '0 4px 14px rgba(22, 56, 50, 0.28)' : 'none',
+                boxSizing: 'border-box',
+                transition: 'all 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
             >
-              {getLucideIcon(tab.iconName, 20, '#235347')}
-              {tab.hasUpdates && (
+              <span
+                className={`shrink-0 flex items-center justify-center transition-transform duration-200 ${
+                  active ? 'animate-nav-pop' : ''
+                }`}
+              >
+                {getLucideIcon(tab.iconName, active ? 18 : 20, active ? '#FFFFFF' : '#235347')}
+              </span>
+
+              {/* Smooth expanding label text */}
+              <div
+                style={{
+                  maxWidth: active ? '70px' : '0px',
+                  opacity: active ? 1 : 0,
+                  marginLeft: active ? '6px' : '0px',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
                 <span
-                  className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832]"
-                />
+                  style={{
+                    fontSize: '12px',
+                    lineHeight: '16px',
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    fontFamily: 'var(--font-family)',
+                  }}
+                >
+                  {labelText}
+                </span>
+              </div>
+
+              {/* Notification update dot when inactive */}
+              {!active && tab.hasUpdates && (
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832] animate-badge-pop" />
               )}
             </button>
           );
@@ -262,7 +270,9 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
         <button
           type="button"
           onClick={() => handleTabClick(scannerTab.key)}
-          className="relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2"
+          className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2 active:scale-95 transition-all duration-200 ${
+            isScannerActive ? 'animate-scanner-ring' : ''
+          }`}
           style={{
             width: '56px',
             height: '56px',
@@ -289,7 +299,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           </span>
           {scannerTab.hasUpdates && (
             <span
-              className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full"
+              className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full animate-badge-pop"
               style={{ backgroundColor: '#D9534F', border: '1.5px solid #FFFFFF' }}
             />
           )}

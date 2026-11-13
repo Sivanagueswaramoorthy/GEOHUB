@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SectionCard } from './SectionCard';
 import { Overline } from './Overline';
+import { AnimatedNumber } from './shared/AnimatedNumber';
 
 export interface DonutSegment {
   label: string;
@@ -258,7 +259,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                 transition: 'all 0.2s ease',
               }}
             >
-              {displayTotal}
+              <AnimatedNumber value={displayTotal} />
             </span>
 
             <span

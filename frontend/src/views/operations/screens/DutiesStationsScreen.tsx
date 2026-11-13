@@ -1,0 +1,394 @@
+import React, { useState } from 'react';
+import {
+  MapPin,
+  Users,
+  Plus,
+  Shield,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Trash2,
+  Calendar,
+} from 'lucide-react';
+import { AnimatedNumber } from '../../../components/shared';
+
+export interface StationVolunteer {
+  id: string;
+  name: string;
+  rollNo: string;
+  shift: string;
+  isLead?: boolean;
+}
+
+export interface DutyStation {
+  id: string;
+  name: string;
+  location: string;
+  event: string;
+  requiredVolunteers: number;
+  assignedVolunteers: StationVolunteer[];
+  stationLead: string;
+}
+
+export interface DutiesStationsScreenProps {
+  readOnly: boolean;
+  onLogAudit: (event: string, action: string) => void;
+  currentUser: any;
+}
+
+export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
+  readOnly,
+  onLogAudit,
+  currentUser,
+}) => {
+  const [selectedEvent, setSelectedEvent] = useState('GEO FEST 2026');
+  const [selectedStation, setSelectedStation] = useState<DutyStation | null>(null);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [newVolName, setNewVolName] = useState('Rohan Dave');
+  const [newVolRoll, setNewVolRoll] = useState('23GEO014');
+  const [newVolShift, setNewVolShift] = useState('08:30 AM - 01:00 PM');
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const [stations, setStations] = useState<DutyStation[]>([
+    {
+      id: 'st-1',
+      name: 'Gate 1 Turnstile & Check-In Station',
+      location: 'North Quad Turnstile Gate',
+      event: 'GEO FEST 2026',
+      requiredVolunteers: 4,
+      stationLead: 'Priya Sharma (Treasury)',
+      assignedVolunteers: [
+        { id: 'sv-1', name: 'Priya Sharma', rollNo: '22GEO088', shift: '08:30 AM - 01:00 PM', isLead: true },
+        { id: 'sv-2', name: 'Kunal Sen', rollNo: '23GEO045', shift: '08:30 AM - 01:00 PM' },
+        { id: 'sv-3', name: 'Maya Patel', rollNo: '24GEO102', shift: '01:00 PM - 05:30 PM' },
+      ],
+    },
+    {
+      id: 'st-2',
+      name: 'Registration & Delegate Kit Desk',
+      location: 'Main Auditorium Foyer',
+      event: 'GEO FEST 2026',
+      requiredVolunteers: 3,
+      stationLead: 'Divya Rao (Management)',
+      assignedVolunteers: [
+        { id: 'sv-4', name: 'Divya Rao', rollNo: '22GEO005', shift: '08:00 AM - 02:00 PM', isLead: true },
+        { id: 'sv-5', name: 'David Chen', rollNo: '24GEO055', shift: '08:00 AM - 02:00 PM' },
+        { id: 'sv-6', name: 'Elena Rostova', rollNo: '22GEO019', shift: '12:00 PM - 06:00 PM' },
+      ],
+    },
+    {
+      id: 'st-3',
+      name: 'Stage Audio/Visual & Keynote Rigging',
+      location: 'Auditorium Stage Deck',
+      event: 'GEO FEST 2026',
+      requiredVolunteers: 2,
+      stationLead: 'Aarav Patel (Documentation)',
+      assignedVolunteers: [
+        { id: 'sv-7', name: 'Aarav Patel', rollNo: '22GEO034', shift: '08:30 AM - 05:30 PM', isLead: true },
+      ],
+    },
+    {
+      id: 'st-4',
+      name: 'VIP Protocol & Guest Speaker Escort',
+      location: 'Administrative Portico & Green Room',
+      event: 'GEO FEST 2026',
+      requiredVolunteers: 2,
+      stationLead: 'Sneha Patel (Promotion)',
+      assignedVolunteers: [
+        { id: 'sv-8', name: 'Sneha Patel', rollNo: '22GEO012', shift: '09:00 AM - 03:00 PM', isLead: true },
+        { id: 'sv-9', name: 'Ananya Iyer', rollNo: '22GEO023', shift: '09:00 AM - 03:00 PM' },
+      ],
+    },
+  ]);
+
+  const totalAssigned = stations.reduce((sum, s) => sum + s.assignedVolunteers.length, 0);
+  const totalRequired = stations.reduce((sum, s) => sum + s.requiredVolunteers, 0);
+
+  const handleAssignVolunteer = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStation || !newVolName.trim()) return;
+
+    const newVolunteer: StationVolunteer = {
+      id: `sv-${Date.now()}`,
+      name: newVolName.trim(),
+      rollNo: newVolRoll.trim(),
+      shift: newVolShift,
+      isLead: false,
+    };
+
+    setStations((prev) =>
+      prev.map((st) =>
+        st.id === selectedStation.id
+          ? { ...st, assignedVolunteers: [...st.assignedVolunteers, newVolunteer] }
+          : st
+      )
+    );
+
+    onLogAudit(selectedEvent, `Assigned volunteer ${newVolunteer.name} to ${selectedStation.name} (${newVolunteer.shift})`);
+
+    setShowAssignModal(false);
+    setSelectedStation(null);
+    setNotice(`Assigned ${newVolunteer.name} to station.`);
+    setTimeout(() => setNotice(null), 3500);
+  };
+
+  const handleRemoveVolunteer = (stationId: string, volId: string, volName: string) => {
+    if (readOnly) return;
+    setStations((prev) =>
+      prev.map((st) =>
+        st.id === stationId
+          ? { ...st, assignedVolunteers: st.assignedVolunteers.filter((v) => v.id !== volId) }
+          : st
+      )
+    );
+    onLogAudit(selectedEvent, `Removed volunteer ${volName} from station`);
+    setNotice(`Unassigned ${volName} from station.`);
+    setTimeout(() => setNotice(null), 3500);
+  };
+
+  return (
+    <div className="space-y-4 sm:space-y-5 select-none w-full max-w-full overflow-hidden">
+      {/* 1. Sleek Compact Metric Header Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_6px_rgba(5,31,32,0.03)] flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#235347] uppercase tracking-wide">Stations</span>
+            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+              <MapPin size={14} />
+            </div>
+          </div>
+          <div className="font-extrabold text-[#051F20] text-base sm:text-lg mt-1">
+            <AnimatedNumber value={stations.length} /> Active
+          </div>
+        </div>
+
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_6px_rgba(5,31,32,0.03)] flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#235347] uppercase tracking-wide">Strength</span>
+            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+              <Users size={14} />
+            </div>
+          </div>
+          <div className="font-extrabold text-[#163832] text-base sm:text-lg mt-1">
+            <AnimatedNumber value={totalAssigned} /> / {totalRequired}
+          </div>
+        </div>
+
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_6px_rgba(5,31,32,0.03)] flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#235347] uppercase tracking-wide">Coverage</span>
+            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+              <CheckCircle2 size={14} />
+            </div>
+          </div>
+          <div className="font-extrabold text-[#051F20] text-base sm:text-lg mt-1">
+            {Math.round((totalAssigned / totalRequired) * 100)}%
+          </div>
+        </div>
+
+        <div className="p-2.5 sm:p-3 rounded-2xl bg-[#DAF1DE]/40 border border-[#8EB69B] flex flex-col justify-between">
+          <span className="text-xs font-bold text-[#163832] uppercase tracking-wide">Scope Event</span>
+          <div className="font-extrabold text-[#051F20] text-xs sm:text-sm mt-1 truncate">
+            {selectedEvent}
+          </div>
+        </div>
+      </div>
+
+      {notice && (
+        <div className="p-3 rounded-2xl bg-[#DAF1DE] border border-[#8EB69B] text-[#051F20] text-xs font-semibold flex items-center gap-2">
+          <CheckCircle2 size={16} className="text-[#163832]" />
+          <span>{notice}</span>
+        </div>
+      )}
+
+      {/* 2. Stations Grid */}
+      <div className="p-4 sm:p-5 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#DAF1DE]/70">
+          <h2 className="font-bold text-[#051F20] text-sm sm:text-base">
+            Duties and Operational Station Board
+          </h2>
+          <span className="text-xs font-semibold text-[#235347]">
+            {stations.length} Checkpoints
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          {stations.map((st) => {
+            const isFull = st.assignedVolunteers.length >= st.requiredVolunteers;
+
+            return (
+              <div
+                key={st.id}
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all space-y-2.5"
+              >
+                <div className="flex items-start justify-between gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0 shadow-2xs">
+                      <MapPin size={16} strokeWidth={2.2} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
+                        {st.name}
+                      </h3>
+                      <p className="text-xs text-[#235347] truncate">{st.location}</p>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-bold shrink-0 ${
+                      isFull
+                        ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
+                        : 'bg-[rgba(242,184,75,0.18)] text-[#051F20] border border-[rgba(242,184,75,0.4)]'
+                    }`}
+                  >
+                    {st.assignedVolunteers.length}/{st.requiredVolunteers}
+                  </span>
+                </div>
+
+                <div className="text-xs text-[#235347] truncate">
+                  Lead: <strong className="text-[#051F20]">{st.stationLead}</strong>
+                </div>
+
+                {/* Assigned Volunteers Roster */}
+                <div className="space-y-1.5 pt-1 border-t border-[#DAF1DE]">
+                  <span className="text-xs font-semibold text-[#235347] uppercase tracking-wide block">
+                    Deployed Volunteers
+                  </span>
+                  {st.assignedVolunteers.map((vol) => (
+                    <div
+                      key={vol.id}
+                      className="p-2 rounded-xl bg-white border border-[#DAF1DE] flex items-center justify-between gap-2 text-xs"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="font-bold text-[#051F20] truncate">{vol.name}</span>
+                        <span className="text-[#235347]">({vol.rollNo})</span>
+                        {vol.isLead && (
+                          <span className="px-1.5 py-0.2 rounded text-[12px] font-bold bg-[#DAF1DE] text-[#051F20]">
+                            Officer
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[#235347] font-semibold">{vol.shift}</span>
+                        {!readOnly && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVolunteer(st.id, vol.id, vol.name)}
+                            className="text-[#D9534F] hover:bg-[#D9534F]/10 p-1 rounded-md cursor-pointer"
+                            title="Unassign Volunteer"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Quick Add Button */}
+                {!readOnly && !isFull && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedStation(st);
+                      setShowAssignModal(true);
+                    }}
+                    className="w-full h-8 rounded-xl bg-white border border-[#163832] text-[#163832] hover:bg-[#DAF1DE] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <Plus size={13} />
+                    <span>Assign Volunteer to Station</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Assign Modal */}
+      {showAssignModal && selectedStation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/50 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-[#051F20] text-base">
+                Assign Volunteer: {selectedStation.name}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAssignModal(false)}
+                className="w-8 h-8 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAssignVolunteer} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                  Volunteer Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newVolName}
+                  onChange={(e) => setNewVolName(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                    Roll Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newVolRoll}
+                    onChange={(e) => setNewVolRoll(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                    Assigned Shift
+                  </label>
+                  <select
+                    value={newVolShift}
+                    onChange={(e) => setNewVolShift(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                  >
+                    <option value="08:30 AM - 01:00 PM">Morning Shift (08:30 - 13:00)</option>
+                    <option value="01:00 PM - 05:30 PM">Afternoon Shift (13:00 - 17:30)</option>
+                    <option value="Full Day (08:30 - 17:30)">Full Day (08:30 - 17:30)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAssignModal(false)}
+                  className="h-10 px-4 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="h-10 px-5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 cursor-pointer"
+                >
+                  Deploy Volunteer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DutiesStationsScreen;
+

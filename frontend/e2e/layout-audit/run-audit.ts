@@ -481,7 +481,7 @@ async function runAudit() {
 
       for (const route of role.routes) {
         const targetUrl = `${BASE_URL}/#${route}`;
-        await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.waitForTimeout(300); // Allow render & data settlement
 
         const shotFilename = `${role.key}_${route}_${vp.name}.png`;

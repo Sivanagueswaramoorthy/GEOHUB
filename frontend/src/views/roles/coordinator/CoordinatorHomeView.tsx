@@ -6,6 +6,7 @@ import {
   AlertCircle,
   Plus,
   QrCode,
+  Layers,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
@@ -35,7 +36,7 @@ export const CoordinatorHomeView: React.FC<CoordinatorHomeViewProps> = ({
 
   return (
     <div className="flex flex-col gap-5 select-none">
-      {/* 1) HeroCard: "Plan something" with "+ New event" and QR Scanner */}
+      {/* 1) HeroCard: "Plan something" with Operations and QR Generator */}
       <HeroCard
         variant="mint"
         title="Plan something"
@@ -44,28 +45,28 @@ export const CoordinatorHomeView: React.FC<CoordinatorHomeViewProps> = ({
         mascotSize="md"
         chip={<StatusChip status="live" label="Coordinator" />}
         action={
-          <div className="flex flex-col gap-2 w-full">
-            <div className="flex items-center gap-2 w-full">
-              <PillButton
-                variant="primary"
-                fullWidth
-                icon={<Plus size={16} strokeWidth={1.75} className="lucide" />}
-                onClick={() => setActiveTab('events')}
-              >
-                + New event
-              </PillButton>
-              <PillButton
-                variant="secondary"
-                fullWidth
-                icon={<QrCode size={16} strokeWidth={1.75} className="lucide" />}
-                onClick={() => setActiveTab('scan_qr')}
-              >
-                QR Scanner
-              </PillButton>
-            </div>
-            <span className="text-center text-xs font-semibold text-[#235347]">
-              To give attendance for respective event
-            </span>
+          <div className="flex items-center gap-2 w-full">
+            <PillButton
+              variant="primary"
+              fullWidth
+              icon={<Layers size={16} strokeWidth={1.75} className="lucide" />}
+              onClick={() => setActiveTab('operations')}
+            >
+              <span>Operations</span>
+              {pendingCount > 0 && (
+                <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#DAF1DE] text-[#051F20]">
+                  {pendingCount}
+                </span>
+              )}
+            </PillButton>
+            <PillButton
+              variant="secondary"
+              fullWidth
+              icon={<QrCode size={16} strokeWidth={1.75} className="lucide" />}
+              onClick={() => setActiveTab('my_qr')}
+            >
+              QR Generator
+            </PillButton>
           </div>
         }
       />

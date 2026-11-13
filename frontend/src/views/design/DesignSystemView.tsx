@@ -409,13 +409,13 @@ export const DesignSystemView: React.FC = () => {
               ))}
             </div>
 
-            {/* 4 Mascot Moods */}
+            {/* Official Mascot Moods */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <span style={{ fontSize: '12px', fontWeight: 700, color: '#0B2B26' }}>
-                Mood Variations
+                Interactive Mascot Mood Variations
               </span>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around', gap: '16px', padding: '12px 0' }}>
-                {(['idle', 'happy', 'wave', 'sleep'] as const).map((m) => (
+                {(['idle', 'look-down', 'eyes-closed', 'peek', 'happy', 'worried', 'wave', 'sleep'] as const).map((m) => (
                   <div key={m} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                     <MascotLogo
                       size="lg"
@@ -970,7 +970,7 @@ export const DesignSystemView: React.FC = () => {
                 {
                   role: 'Club Coordinator / President',
                   tabs: ['Home', 'Events', 'Operations', 'Community', 'Gallery'],
-                  cockpit: 'Plan something: + New event, QR Scanner, Need action list',
+                  cockpit: 'Plan something: Operations, QR Generator, Need action list',
                 },
                 {
                   role: 'Treasurer',

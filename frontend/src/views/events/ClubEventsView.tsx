@@ -6,6 +6,7 @@ import {
   Clock,
   Users,
   Compass,
+  ChevronLeft,
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
@@ -314,9 +315,9 @@ export const ClubEventsView: React.FC = () => {
           <button
             type="button"
             onClick={handleCloseDetail}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DAF1DE] text-xs font-bold text-[#163832] shadow-[0_2px_8px_rgba(5,31,32,0.04)] hover:border-[#8EB69B] cursor-pointer touch-target-44"
+            className="inline-flex items-center gap-1.5 bg-transparent border-0 p-0 text-sm font-bold text-[#051F20] hover:text-[#163832] cursor-pointer touch-target-44"
           >
-            <ArrowLeft size={16} strokeWidth={1.75} />
+            <ChevronLeft size={20} strokeWidth={2.5} />
             <span>All events</span>
           </button>
 
@@ -841,6 +842,7 @@ export const ClubEventsView: React.FC = () => {
         subtitle={`Step ${createStep} of 3: ${
           createStep === 1 ? 'Event Details' : createStep === 2 ? 'Duties Roster' : 'Review & Sanction'
         }`}
+        fullScreen
       >
         <div className="flex flex-col gap-4 select-none">
           {/* Step 1: Basics */}

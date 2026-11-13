@@ -111,7 +111,7 @@ export const getRoleNavTabs = (role: UserRole | string, post?: string, team?: st
   return [
     { key: 'home', label: 'Home', shortLabel: 'Home', iconName: 'house' },
     { key: 'events', label: 'Events', shortLabel: 'Events', iconName: 'calendar', isReadOnly: isEventsReadOnly },
-    { key: 'operations', label: 'Operations', shortLabel: 'Ops', iconName: 'layers' },
+    { key: 'operations', label: 'Operations', shortLabel: 'Hub', iconName: 'layers' },
     { key: 'community', label: 'Community', shortLabel: 'Chat', iconName: 'messages-square' },
     { key: 'gallery', label: 'Gallery', shortLabel: 'Gallery', iconName: 'images' },
     { key: 'scan_qr', label: 'QR Scanner', shortLabel: 'Scan', iconName: 'scan' },

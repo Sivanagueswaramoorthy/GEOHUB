@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ChevronLeft,
   ArrowLeft,
   ChevronRight,
   ExternalLink,
@@ -80,10 +81,10 @@ export const AuditHeader: React.FC<AuditHeaderProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="audit-back-btn"
+          className="audit-back-btn inline-flex items-center gap-1 text-sm font-bold text-[#051F20] bg-transparent border-0 p-0 cursor-pointer"
           aria-label="Back to Audits"
         >
-          <ArrowLeft size={16} strokeWidth={2.2} />
+          <ChevronLeft size={18} strokeWidth={2.5} />
           <span>Back to Audits</span>
         </button>
 

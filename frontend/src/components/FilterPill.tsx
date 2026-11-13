@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { SEARCH_AND_FILTER } from '../styles/tokens';
+import { AnimatedNumber } from './shared/AnimatedNumber';
 
 export interface FilterPillProps {
   label: string;
@@ -68,7 +69,7 @@ export const FilterPill: React.FC<FilterPillProps> = ({
             borderRadius: '999px',
           }}
         >
-          {count}
+          <AnimatedNumber value={count} duration={400} />
         </span>
       )}
 

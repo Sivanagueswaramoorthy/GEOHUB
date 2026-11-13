@@ -1,5 +1,6 @@
 import React from 'react';
 import { TYPOGRAPHY, COLORS } from '../styles/tokens';
+import { AnimatedNumber } from './shared/AnimatedNumber';
 
 export type StatTileTint = 'mint' | 'lavender' | 'amber' | 'teal';
 
@@ -98,7 +99,7 @@ export const StatTile: React.FC<StatTileProps> = ({
           marginBottom: '8px',
         }}
       >
-        {value}
+        <AnimatedNumber value={value} />
       </div>
 
       {/* Bottom Row: Footnote chip bottom-left */}

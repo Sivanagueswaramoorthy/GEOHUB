@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AlertTriangle } from 'lucide-react';
 import { PillButton } from './PillButton';
 
@@ -41,17 +42,18 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       return;
     }
     setError(null);
-    onConfirm(reason);
     onClose();
+    onConfirm(reason);
   };
 
-  return (
+  const dialogContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/45 backdrop-blur-xs select-none"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+      style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-[24px] bg-white p-6 shadow-[0_16px_40px_rgba(5,31,32,0.16)] border border-[#DAF1DE]"
+        className="w-full max-w-sm rounded-[24px] bg-white p-6 shadow-[0_20px_50px_rgba(5,31,32,0.22)] border border-[#DAF1DE]"
         style={{ borderRadius: '24px' }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -61,9 +63,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <div
             className="flex items-center justify-center w-10 h-10 rounded-full shrink-0"
             style={{
-              backgroundColor: isDanger ? 'rgba(217, 83, 79, 0.12)' : '#DAF1DE',
-              color: isDanger ? '#D9534F' : '#163832',
-              border: isDanger ? '1px solid rgba(217, 83, 79, 0.3)' : '1px solid #8EB69B',
+              backgroundColor: isDangerActive ? 'rgba(217, 83, 79, 0.12)' : '#DAF1DE',
+              color: isDangerActive ? '#D9534F' : '#163832',
+              border: isDangerActive ? '1px solid rgba(217, 83, 79, 0.3)' : '1px solid #8EB69B',
             }}
           >
             <AlertTriangle size={18} strokeWidth={2.2} />
@@ -115,6 +117,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(dialogContent, document.body);
+  }
+  return dialogContent;
 };
 
 export default ConfirmDialog;

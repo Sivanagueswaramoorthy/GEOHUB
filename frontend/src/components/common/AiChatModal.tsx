@@ -133,15 +133,18 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           style={{
             width: '36px',
             height: '36px',
-            borderRadius: '50%',
-            backgroundColor: '#F8FAFC',
+            backgroundColor: 'transparent',
+            border: 'none',
+            padding: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#0F172A',
+            color: '#051F20',
+            cursor: 'pointer',
           }}
+          aria-label="Back"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={24} strokeWidth={2.5} />
         </button>
 
         <div style={{ textAlign: 'center' }}>

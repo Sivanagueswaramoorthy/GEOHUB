@@ -253,7 +253,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     try {
       if (typeof window !== 'undefined') {
-        const hash = window.location.hash.replace(/^#\/?/, '').trim();
+        const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
         const path = window.location.pathname.replace(/^\//, '').trim();
         if (hash === 'login' || path === 'login') return false;
         const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
@@ -271,8 +271,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTab, setActiveTabState] = useState<string>('home');
   const [toast, setToast] = useState<{ message: string; type?: 'success' | 'error' | 'info' } | null>(null);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'error') => {
-    setToast({ message, type });
+  const showToast = (message: string, type?: 'success' | 'error' | 'info') => {
+    const resolvedType =
+      type ||
+      (message.startsWith('✓') ||
+      message.toLowerCase().includes('success') ||
+      message.toLowerCase().includes('selected event') ||
+      message.toLowerCase().includes('copied') ||
+      message.toLowerCase().includes('updated') ||
+      message.toLowerCase().includes('assigned') ||
+      message.toLowerCase().includes('confirmed')
+        ? 'success'
+        : message.toLowerCase().includes('error') ||
+          message.toLowerCase().includes('denied') ||
+          message.toLowerCase().includes('invalid') ||
+          message.toLowerCase().includes('expired') ||
+          message.toLowerCase().includes('failed') ||
+          message.toLowerCase().includes('protection rule')
+        ? 'error'
+        : 'info');
+
+    setToast({ message, type: resolvedType });
     setTimeout(() => {
       setToast((prev) => (prev?.message === message ? null : prev));
     }, 3500);
@@ -297,7 +316,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     const handleUrlRoute = () => {
-      const hash = window.location.hash.replace(/^#\/?/, '').trim();
+      const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
       const path = window.location.pathname.replace(/^\//, '').trim();
       const targetRoute = hash || (path && path !== 'index.html' ? path : '');
 
@@ -401,19 +420,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setActiveTab('login');
-    setSelectedEventId(null);
-    setSelectedTaskId(null);
-    setSelectedTeamId(null);
-    setSelectedUserId(null);
-    setIsRoleSwitcherOpen(false);
     try {
       localStorage.removeItem('geohub_auth_session');
       sessionStorage.removeItem('geohub_auth_session');
     } catch {
       // ignore
     }
+    setIsAuthenticated(false);
+    setCurrentUser(demoSuperAdmin);
+    setActiveTabState('login');
+    setSelectedEventId(null);
+    setSelectedTaskId(null);
+    setSelectedTeamId(null);
+    setSelectedUserId(null);
+    setIsRoleSwitcherOpen(false);
     if (typeof window !== 'undefined') {
       window.location.hash = 'login';
     }

@@ -29,27 +29,27 @@ export const SearchField: React.FC<SearchFieldProps> = ({
         alignItems: 'center',
         width: '100%',
         backgroundColor: '#FFFFFF',
-        border: `1px solid ${isFocused ? '#8EB69B' : '#DAF1DE'}`,
-        borderRadius: '16px',
+        border: `1.5px solid ${isFocused ? '#163832' : '#DAF1DE'}`,
+        borderRadius: '14px',
         boxShadow: isFocused
-          ? '0 0 0 2px rgba(142, 182, 155, 0.3), 0 4px 14px rgba(5, 31, 32, 0.06)'
-          : '0 4px 14px rgba(5, 31, 32, 0.04)',
-        height: '48px',
-        padding: '0 14px',
+          ? '0 0 0 3px rgba(35, 83, 71, 0.12), 0 2px 8px rgba(5, 31, 32, 0.04)'
+          : '0 2px 6px rgba(5, 31, 32, 0.02)',
+        height: style?.height || '44px',
+        padding: '0 12px',
         boxSizing: 'border-box',
-        transition: 'all 0.2s ease-out',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         ...style,
       }}
     >
       <Search
-        size={18}
-        strokeWidth={2}
-        color="#235347"
+        size={16}
+        strokeWidth={2.2}
+        color={isFocused ? '#163832' : '#235347'}
         style={{
           flexShrink: 0,
-          marginRight: '10px',
-          opacity: isFocused ? 1 : 0.85,
-          transition: 'opacity 0.2s ease-out',
+          marginRight: '8px',
+          opacity: isFocused ? 1 : 0.75,
+          transition: 'all 0.2s ease-out',
         }}
       />
 
@@ -63,18 +63,17 @@ export const SearchField: React.FC<SearchFieldProps> = ({
         autoFocus={autoFocus}
         style={{
           width: '100%',
-          height: '48px',
+          height: '100%',
           border: 'none',
           outline: 'none',
           boxShadow: 'none',
           backgroundColor: 'transparent',
-          fontSize: '14px',
+          fontSize: '13px',
           fontWeight: 500,
           color: '#051F20',
           fontFamily: "'Plus Jakarta Sans', Inter, -apple-system, sans-serif",
           padding: 0,
           margin: 0,
-          lineHeight: '20px',
         }}
       />
 
@@ -86,8 +85,8 @@ export const SearchField: React.FC<SearchFieldProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '28px',
-            height: '28px',
+            width: '24px',
+            height: '24px',
             borderRadius: '9999px',
             backgroundColor: '#DAF1DE',
             color: '#163832',
@@ -101,7 +100,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
           }}
           aria-label="Clear search"
         >
-          <X size={14} strokeWidth={2.4} />
+          <X size={13} strokeWidth={2.4} />
         </button>
       )}
     </div>

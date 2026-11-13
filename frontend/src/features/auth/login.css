@@ -1,28 +1,213 @@
 /* ==========================================================================
-   GeoHub - Auth / Login Design System (Strict Brand Tokens)
+   GeoHub - Auth / Login Design System (Executive Luxury Campus Aesthetic)
+   Tokens: #051F20, #0B2B26, #163832, #235347, #8EB69B, #DAF1DE, #F6FBF7, #FFFFFF, #D9534F
    ========================================================================== */
 
-.login-field-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 16px;
-  width: 100%;
-  box-sizing: border-box;
+/* 1. Ambient Background Atmosphere */
+@keyframes ambientGlowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
 }
 
-.login-label {
+@keyframes mascotCloudFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes mascotShadowPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(0.9);
+    opacity: 0.16;
+  }
+}
+
+.ambient-orb-top {
+  animation: ambientGlowPulse 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.ambient-orb-bottom {
+  animation: ambientGlowPulse 10s ease-in-out infinite reverse;
+  will-change: transform, opacity;
+}
+
+.mascot-cloud-bob {
+  animation: mascotCloudFloat 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.mascot-cloud-shadow {
+  animation: mascotShadowPulse 4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* 2. WebKit Autofill Reset (Prevents harsh blue/yellow autofill backgrounds) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #F6FBF7 inset !important;
+  -webkit-text-fill-color: #051F20 !important;
+  caret-color: #051F20 !important;
+  transition: background-color 5000s ease-in-out 0s;
+  font-family: inherit !important;
+  font-size: 14.5px !important;
+  font-weight: 600 !important;
+}
+
+/* 3. Luxury Frosted Glass Auth Card */
+.luxury-auth-card {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid #DAF1DE;
+  border-radius: 32px;
+  box-shadow:
+    0 24px 60px rgba(5, 31, 32, 0.08),
+    0 4px 16px rgba(5, 31, 32, 0.02),
+    inset 0 1px 0 #FFFFFF;
+}
+
+/* 4. Luxury Elevated Input Wrappers (Zero Label Collisions) */
+.luxury-field-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.luxury-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #051F20;
+  letter-spacing: 0.015em;
+  padding-left: 2px;
+  margin-bottom: 6px;
+}
+
+.luxury-input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  border-radius: 16px;
+  border: 1.5px solid #DAF1DE;
+  background-color: #F6FBF7;
+  padding: 4px 6px;
+  box-sizing: border-box;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(5, 31, 32, 0.02);
+}
+
+.luxury-input-wrapper:hover {
+  border-color: #8EB69B;
+  background-color: #FFFFFF;
+}
+
+.luxury-input-wrapper.is-focused,
+.luxury-input-wrapper:focus-within {
+  border-color: #163832;
+  background-color: #FFFFFF;
+  box-shadow:
+    0 0 0 3.5px rgba(22, 56, 50, 0.12),
+    0 4px 14px rgba(5, 31, 32, 0.04);
+}
+
+.luxury-input-wrapper.has-danger {
+  border-color: #D9534F !important;
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.16) !important;
+}
+
+/* Left Icon Pill */
+.luxury-icon-capsule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background-color: #FFFFFF;
+  border: 1px solid #DAF1DE;
+  color: #163832;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(5, 31, 32, 0.03);
+}
+
+.luxury-input-wrapper:focus-within .luxury-icon-capsule {
+  background-color: #DAF1DE;
+  border-color: #8EB69B;
   color: #051F20;
 }
 
-.caps-lock-chip {
+/* Native Input Element */
+.luxury-native-input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  padding: 0 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #051F20;
+  outline: none;
+}
+
+.luxury-native-input::placeholder {
+  color: #8EB69B;
+  font-weight: 400;
+  font-size: 13.5px;
+}
+
+/* Eye Toggle Button */
+.luxury-password-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #8EB69B;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+  margin-right: 2px;
+}
+
+.luxury-password-toggle:hover {
+  color: #051F20;
+  background-color: rgba(218, 241, 222, 0.5);
+}
+
+.luxury-password-toggle:focus-visible {
+  outline: 2px solid #163832;
+  outline-offset: 1px;
+}
+
+/* Caps Lock Warning Badge */
+.caps-lock-pill {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   padding: 2px 8px;
   border-radius: 9999px;
   font-size: 12px;
@@ -32,90 +217,160 @@
   border: 1px solid #8EB69B;
 }
 
-.login-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 48px;
-  min-height: 48px;
-  border-radius: 16px;
-  border: 1px solid #DAF1DE;
-  background-color: #FFFFFF;
-  box-sizing: border-box;
-  transition: all 0.2s ease-out;
-}
-
-.login-input-wrapper:focus-within {
-  border-color: #8EB69B;
-  box-shadow: 0 0 0 2px rgba(142, 182, 155, 0.25);
-}
-
-.login-input-icon {
-  display: flex;
+/* 5. Luxury High-Contrast CTA Button (Pine 800) */
+.btn-luxury-submit {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding-left: 14px;
-  color: #235347;
-  pointer-events: none;
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #163832 0%, #0B2B26 100%);
+  color: #FFFFFF;
+  border: 1px solid #235347;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow:
+    0 10px 24px rgba(11, 43, 38, 0.22),
+    inset 0 1px 0 rgba(218, 241, 222, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.login-input-wrapper input {
+.btn-luxury-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #235347 0%, #163832 100%);
+  box-shadow:
+    0 14px 28px rgba(11, 43, 38, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-luxury-submit:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(11, 43, 38, 0.16);
+}
+
+.btn-luxury-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Inline Spinner */
+.luxury-spinner-circle {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spinnerSpin 0.8s linear infinite;
+}
+
+@keyframes spinnerSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 6. Card Shake Animation on Error */
+@keyframes luxuryCardShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+
+.card-shake-active {
+  animation: luxuryCardShake 360ms ease-in-out;
+}
+
+/* 7. Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb-top,
+  .ambient-orb-bottom,
+  .mascot-cloud-bob,
+  .mascot-cloud-shadow,
+  .card-shake-active {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Clean Reference Auth Styling */
+.auth-panel {
+  width: 100%;
+  max-width: 420px;
+  background-color: #FFFFFF;
+  border-radius: 32px;
+  border: 1.5px solid #DAF1DE;
+  box-shadow: 0 16px 48px rgba(5, 31, 32, 0.06);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.auth-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.auth-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #051F20;
+  padding-left: 2px;
+}
+
+.auth-input-box {
+  width: 100%;
+  height: 50px;
+  min-height: 50px;
+  border-radius: 18px;
+  border: 1.5px solid #DAF1DE;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.auth-input-box:hover {
+  border-color: #8EB69B;
+}
+
+.auth-input-box:focus-within {
+  border-color: #163832;
+  box-shadow: 0 0 0 3px rgba(22, 56, 50, 0.1);
+}
+
+.auth-input-box.has-error {
+  border-color: #D9534F;
+  box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.12);
+}
+
+.auth-input-box input {
   flex: 1;
   width: 100%;
   height: 100%;
   border: none;
   background: transparent;
-  padding: 0 14px;
+  padding-left: 10px;
+  padding-right: 6px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #051F20;
   outline: none;
-  border-radius: 16px;
 }
 
-.login-input-wrapper input::placeholder {
+.auth-input-box input::placeholder {
   color: #8EB69B;
   font-weight: 400;
-}
-
-.field-error-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #D9534F;
-}
-
-.btn-login-submit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 46px;
-  border-radius: 9999px;
-  background-color: #163832;
-  color: #FFFFFF;
-  border: none;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(5, 31, 32, 0.12);
-  transition: all 0.2s ease-out;
-}
-
-.btn-login-submit:hover:not(:disabled) {
-  background-color: #0B2B26;
-  transform: translateY(-1px);
-}
-
-.btn-login-submit:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-.btn-login-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  font-size: 13px;
 }

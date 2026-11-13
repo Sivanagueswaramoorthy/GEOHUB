@@ -1,4 +1,5 @@
 import React from 'react';
+import { AnimatedNumber } from './AnimatedNumber';
 
 export interface StatTileProps {
   icon: React.ReactNode;
@@ -94,7 +95,7 @@ export const StatTile: React.FC<StatTileProps> = ({
           className="font-bold tracking-tight text-[#051F20]"
           style={{ fontSize: '24px', lineHeight: '28px' }}
         >
-          {value}
+          <AnimatedNumber value={value} />
         </div>
         <div
           className="text-xs font-semibold text-[#235347] mt-0.5 truncate"

@@ -34,7 +34,7 @@ describe('MascotLogo Component', () => {
     expect(svg).toHaveAttribute('height', '120');
   });
 
-  it('renders face and elements across all moods (idle, happy, wave, sleep)', () => {
+  it('renders face and elements across all moods (idle, happy, wave, sleep, look-down, eyes-closed, peek, worried)', () => {
     const { rerender } = render(<MascotLogo mood="idle" />);
     expect(screen.getByRole('img', { name: 'GeoHub logo' })).toBeInTheDocument();
 
@@ -46,6 +46,18 @@ describe('MascotLogo Component', () => {
 
     rerender(<MascotLogo mood="sleep" />);
     expect(screen.getByText('z')).toBeInTheDocument();
+
+    rerender(<MascotLogo mood="look-down" />);
+    expect(screen.getByRole('img', { name: 'GeoHub logo' })).toBeInTheDocument();
+
+    rerender(<MascotLogo mood="eyes-closed" />);
+    expect(screen.getByRole('img', { name: 'GeoHub logo' })).toBeInTheDocument();
+
+    rerender(<MascotLogo mood="peek" />);
+    expect(screen.getByRole('img', { name: 'GeoHub logo' })).toBeInTheDocument();
+
+    rerender(<MascotLogo mood="worried" />);
+    expect(screen.getByRole('img', { name: 'GeoHub logo' })).toBeInTheDocument();
   });
 
   it('respects animated=false by omitting float and blink animation classes', () => {

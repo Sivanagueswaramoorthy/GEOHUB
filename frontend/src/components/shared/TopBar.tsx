@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, ArrowLeft, ChevronDown } from 'lucide-react';
+import { Bell, ChevronLeft, ChevronDown } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserModel } from '../../types';
 import { IconCircleButton } from './IconCircleButton';
@@ -170,11 +170,10 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 type="button"
                 onClick={onBack}
-                className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] rounded-full text-[#051F20] active:scale-[0.97] transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2 shrink-0 cursor-pointer border-0"
-                style={{ backgroundColor: 'rgba(22, 56, 50, 0.08)' }}
+                className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] text-[#051F20] bg-transparent active:scale-[0.95] transition-all duration-150 focus:outline-none shrink-0 cursor-pointer border-0 p-0"
                 aria-label="Go back"
               >
-                <ArrowLeft size={20} strokeWidth={2} className="lucide text-[#051F20]" />
+                <ChevronLeft size={26} strokeWidth={2.5} className="lucide text-[#051F20]" />
               </button>
             ) : (
               <button

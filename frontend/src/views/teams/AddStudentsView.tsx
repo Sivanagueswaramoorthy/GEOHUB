@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { UserPlus, ArrowLeft, Mail, Building, Users, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { UserPlus, ChevronLeft, ArrowLeft, Mail, Building, Users, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import {
   PillButton,
@@ -122,14 +122,14 @@ export const AddStudentsView: React.FC = () => {
     <div className="flex flex-col gap-5 select-none animate-fadeIn pb-16">
       {/* Back button */}
       <div>
-        <PillButton
-          variant="secondary"
-          size="sm"
-          icon={<ArrowLeft size={16} strokeWidth={1.75} />}
+        <button
+          type="button"
           onClick={() => setActiveTab('operations')}
+          className="inline-flex items-center gap-1.5 bg-transparent border-0 p-0 text-sm font-bold text-[#051F20] hover:text-[#163832] cursor-pointer touch-target-44"
         >
-          Back to Operations
-        </PillButton>
+          <ChevronLeft size={20} strokeWidth={2.5} />
+          <span>Back to Operations</span>
+        </button>
       </div>
 
       {/* Header */}

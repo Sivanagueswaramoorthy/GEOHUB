@@ -44,7 +44,7 @@ describe('GeoHub Unified 6-Tab Navigation (Nav Bar Architecture)', () => {
     const scanTab = tabs.find((t) => t.key === 'scan_qr');
     const chatTab = tabs.find((t) => t.key === 'community');
 
-    expect(opsTab?.shortLabel).toBe('Ops');
+    expect(opsTab?.shortLabel).toBe('Hub');
     expect(scanTab?.shortLabel).toBe('Scan');
     expect(chatTab?.shortLabel).toBe('Chat');
   });

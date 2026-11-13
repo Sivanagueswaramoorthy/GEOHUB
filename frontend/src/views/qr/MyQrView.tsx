@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import {
+  ChevronLeft,
   ArrowLeft,
   RefreshCw,
   Calendar,
@@ -9,7 +10,6 @@ import {
   CheckCircle2,
   Clock,
   Search,
-  KeyRound,
   ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -27,7 +27,6 @@ export const MyQrView: React.FC = () => {
     attendance,
     selectedEventId,
     setSelectedEventId,
-    markAttendanceWithOtp,
     setActiveTab,
     showToast,
   } = useApp();
@@ -38,10 +37,6 @@ export const MyQrView: React.FC = () => {
     if (live) return live.id;
     return events[0]?.id || 'event_01';
   });
-
-  const [otpInput, setOtpInput] = useState('');
-  const [exitOtpInput, setExitOtpInput] = useState('');
-  const [isSubmittingOtp, setIsSubmittingOtp] = useState(false);
 
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(20);
@@ -191,12 +186,11 @@ export const MyQrView: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('home')}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.06)] hover:border-[#8EB69B] active:scale-95 text-[13px] font-bold text-[#163832] transition-all cursor-pointer touch-target-44"
+          className="w-10 h-10 bg-transparent border-0 active:scale-95 text-[#051F20] flex items-center justify-center transition-all cursor-pointer touch-target-44 p-0"
           aria-label="Back to Home"
           data-testid="btn-back-qr"
         >
-          <ArrowLeft size={16} strokeWidth={2.2} />
-          <span>Back</span>
+          <ChevronLeft size={26} strokeWidth={2.5} />
         </button>
 
         <StatusChip status="live" label="Live Token" />
@@ -250,123 +244,6 @@ export const MyQrView: React.FC = () => {
           <QrCode size={18} strokeWidth={2} />
           <span>Generate QR</span>
         </button>
-      </div>
-
-      {/* 3.5) 6-Digit OTP Self-Validation Card (Internal: 1 OTP, External: 2 OTPs) */}
-      <div className="w-full max-w-sm bg-white p-4 rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <KeyRound size={16} strokeWidth={2} className="text-[#163832]" />
-            <span className="text-[13px] font-bold text-[#051F20]">Self-Verify via OTP</span>
-          </div>
-          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#DAF1DE] text-[#051F20]">
-            {chosenEvent.eventType === 'external' ? 'Dual OTP (External)' : '1 OTP (Internal)'}
-          </span>
-        </div>
-
-        {(() => {
-          const myAttendance = attendance.find(
-            (a) => a.eventId === chosenEvent.id && (a.userId === currentUser.uid || a.userEmail === currentUser.email)
-          );
-          const isFullyMarked = myAttendance?.status === 'Completed' || myAttendance?.status === 'verified';
-          const isPhase1Marked = myAttendance?.status === 'Entered';
-          const isExternalEvent = chosenEvent.eventType === 'external';
-
-          const handleVerifyOtp = (phase: 'entry' | 'exit' = 'entry') => {
-            const code = (phase === 'entry' ? otpInput : exitOtpInput).trim();
-            if (code.length < 6) {
-              showToast('Please enter a valid 6-digit OTP.', 'error');
-              return;
-            }
-            setIsSubmittingOtp(true);
-            const res = markAttendanceWithOtp({
-              eventId: chosenEvent.id,
-              studentId: currentUser.uid,
-              otp: code,
-              phase,
-            });
-            setIsSubmittingOtp(false);
-            if (res.valid) {
-              if (phase === 'entry') setOtpInput('');
-              if (phase === 'exit') setExitOtpInput('');
-              showToast(
-                phase === 'exit'
-                  ? '✓ External event verified! Attendance complete.'
-                  : isExternalEvent
-                  ? '✓ Phase 1 check-in verified! Enter Phase 2 at departure.'
-                  : '✓ Attendance confirmed! Check-in verified.'
-              );
-            } else {
-              showToast(res.error || 'Invalid or expired OTP', 'error');
-            }
-          };
-
-          if (isFullyMarked) {
-            return (
-              <div className="p-3 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B] flex items-center gap-2.5 text-[#051F20]">
-                <CheckCircle2 size={18} className="text-[#163832] shrink-0" />
-                <div className="flex flex-col text-xs">
-                  <span className="font-bold">Attendance Verified</span>
-                  <span className="text-[#235347]">You are marked present for this event.</span>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div className="flex flex-col gap-2.5">
-              <p className="text-[12px] text-[#235347] m-0">
-                {isExternalEvent
-                  ? 'External events require 2 OTPs (Assembly & Destination check-in).'
-                  : 'Enter the 6-digit gate OTP announced by Management to verify attendance.'}
-              </p>
-
-              {/* Phase 1 / Single OTP Input */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  maxLength={6}
-                  value={otpInput}
-                  onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                  disabled={isPhase1Marked}
-                  placeholder={isExternalEvent ? 'Phase 1: Entry OTP (6 digits)' : 'Gate OTP (6 digits)'}
-                  className="flex-1 h-10 px-3 rounded-xl border border-[#8EB69B] bg-[#F6FBF7] text-xs font-bold tracking-widest text-[#051F20] outline-none disabled:bg-gray-100 disabled:text-gray-400"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleVerifyOtp('entry')}
-                  disabled={isSubmittingOtp || otpInput.trim().length !== 6 || isPhase1Marked}
-                  className="h-10 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold disabled:opacity-40 hover:bg-[#0B2B26] transition-all cursor-pointer"
-                >
-                  {isPhase1Marked ? '✓ In' : 'Verify'}
-                </button>
-              </div>
-
-              {/* Phase 2 OTP Input for External Events */}
-              {isExternalEvent && (
-                <div className="flex items-center gap-2 pt-1 border-t border-[#DAF1DE]">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={exitOtpInput}
-                    onChange={(e) => setExitOtpInput(e.target.value.replace(/\D/g, ''))}
-                    disabled={!isPhase1Marked}
-                    placeholder="Phase 2: Exit OTP (6 digits)"
-                    className="flex-1 h-10 px-3 rounded-xl border border-[#8EB69B] bg-[#F6FBF7] text-xs font-bold tracking-widest text-[#051F20] outline-none disabled:bg-gray-100 disabled:text-gray-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleVerifyOtp('exit')}
-                    disabled={isSubmittingOtp || exitOtpInput.trim().length !== 6 || !isPhase1Marked}
-                    className="h-10 px-4 rounded-xl bg-[#235347] text-white text-xs font-bold disabled:opacity-40 hover:bg-[#163832] transition-all cursor-pointer"
-                  >
-                    Verify Phase 2
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })()}
       </div>
 
       {/* 4) Event Attendance Roster: Tab Bars for Marked & Not Marked */}
@@ -472,8 +349,6 @@ export const MyQrView: React.FC = () => {
                     <span className="font-semibold text-[#163832]">
                       {scholar.rollNo}
                     </span>
-                    <span>•</span>
-                    <span className="truncate">{scholar.department}</span>
                   </div>
                 </div>
 

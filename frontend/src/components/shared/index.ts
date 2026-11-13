@@ -32,6 +32,8 @@ export * from './AccessChip';
 export * from './HubCard';
 export * from './ModuleSection';
 export * from './ModuleGuard';
+export * from './AnimatedNumber';
+export * from './PageTransition';
 export { Toast, type ToastProps } from '../Toast';
 export { FloatingNav, type FloatingNavProps } from '../FloatingNav';
 export { Header, type HeaderProps } from '../Header';

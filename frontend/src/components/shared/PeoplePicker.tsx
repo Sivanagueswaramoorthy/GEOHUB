@@ -25,6 +25,7 @@ export interface PeoplePickerProps {
   onConfirm?: (selectedIds: string[]) => void;
   onSelectionChange?: (selectedIds: string[]) => void;
   multiSelect?: boolean;
+  fullScreen?: boolean;
 }
 
 export const PeoplePicker: React.FC<PeoplePickerProps> = ({
@@ -38,6 +39,7 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
   onConfirm,
   onSelectionChange,
   multiSelect = true,
+  fullScreen = true,
 }) => {
   const initialSelected = selectedIds || selectedUids || [];
   const [currentSelected, setCurrentSelected] = useState<string[]>(initialSelected);
@@ -80,16 +82,17 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
       onClose={onClose}
       title={title}
       subtitle={subtitle}
+      fullScreen={fullScreen}
       maxHeight="80vh"
     >
-      <div className="flex flex-col gap-4 p-5 select-none">
+      <div className="flex flex-col gap-4 select-none flex-1 min-h-0">
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search by name or role..."
         />
 
-        <div className="flex flex-col gap-2 max-h-72 overflow-y-auto no-scrollbar">
+        <div className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar min-h-0">
           {filteredPeople.map((person) => {
             const personId = person.id || person.uid || '';
             const isSelected = currentSelected.includes(personId);
@@ -133,7 +136,7 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-[#DAF1DE]">
+        <div className="flex items-center justify-between pt-3 pb-1 border-t border-[#DAF1DE] mt-auto shrink-0">
           <span className="text-xs font-bold text-[#235347]">
             {currentSelected.length} selected
           </span>

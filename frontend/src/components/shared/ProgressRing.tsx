@@ -1,4 +1,5 @@
 import React from 'react';
+import { AnimatedNumber } from './AnimatedNumber';
 
 export interface ProgressRingProps {
   progress: number; // 0 to 100
@@ -57,7 +58,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
           className="font-bold text-[#051F20] leading-none"
           style={{ fontSize: size >= 90 ? '20px' : '15px' }}
         >
-          {label || `${Math.round(clamped)}%`}
+          <AnimatedNumber value={label || `${Math.round(clamped)}%`} />
         </span>
         {sublabel && (
           <span

@@ -2,6 +2,7 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { TopBar } from './components/shared/TopBar';
 import { FloatingNav } from './components/FloatingNav';
+import { PageTransition } from './components/shared/PageTransition';
 import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
@@ -49,15 +50,22 @@ const MainAppContent: React.FC = () => {
     activeTab,
     setActiveTab,
     toast,
+    showToast,
     hideToast,
     isPhoneFrame,
   } = useApp();
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__showToast = showToast;
+    }
+  }, [showToast]);
 
   // Route guarding for /login and protected routes
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
     const path = window.location.pathname.replace(/^\//, '').trim();
     const isDesignSystem = hash === 'design-system' || path === 'design-system' || hash === 'design_system' || path === 'design_system';
     if (isDesignSystem) {
@@ -69,13 +77,34 @@ const MainAppContent: React.FC = () => {
 
     if (isAuthenticated) {
       if (isLogin) {
-        // Authenticated users visiting /login are redirected to their role home
+        // Authenticated users visiting /login are redirected to their role home,
+        // BUT ONLY IF a valid stored session actually exists!
+        let hasStoredSession = false;
+        try {
+          hasStoredSession = Boolean(
+            localStorage.getItem('geohub_auth_session') ||
+            sessionStorage.getItem('geohub_auth_session')
+          );
+        } catch {
+          // ignore
+        }
+
+        if (!hasStoredSession) {
+          // User just executed a logout! Respect logout state.
+          setActiveTab('login');
+          return;
+        }
+
         setActiveTab('home');
         if (window.location.hash.includes('login')) {
           window.location.hash = '';
         }
         if (path === 'login') {
-          window.history.replaceState(null, '', '/');
+          try {
+            window.history.replaceState(null, '', '/');
+          } catch {
+            // ignore in file:// or webview
+          }
         }
       }
     } else {
@@ -84,12 +113,45 @@ const MainAppContent: React.FC = () => {
         const attemptedRoute = hash || (path && path !== 'index.html' ? path : '');
         if (attemptedRoute && attemptedRoute !== 'login') {
           const nextUrl = `/login?next=${encodeURIComponent(attemptedRoute)}`;
-          window.history.replaceState(null, '', nextUrl);
+          try {
+            window.history.replaceState(null, '', nextUrl);
+          } catch {
+            // ignore
+          }
           setActiveTab('login');
         }
       }
     }
   }, [isAuthenticated, activeTab, setActiveTab]);
+
+  // Scroll to the very top whenever the active screen or route changes
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [activeTab]);
+
+  React.useEffect(() => {
+    const handleHashScrollTop = () => {
+      if (typeof window !== 'undefined') {
+        try {
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        } catch {
+          window.scrollTo(0, 0);
+        }
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+    };
+    window.addEventListener('hashchange', handleHashScrollTop);
+    return () => window.removeEventListener('hashchange', handleHashScrollTop);
+  }, []);
 
   if (activeTab === 'design-system') {
     return (
@@ -218,15 +280,6 @@ const MainAppContent: React.FC = () => {
 
   return (
     <div className="mobile-scaffold-root">
-      {/* Global Security / Route Guard Toast */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type || 'error'}
-          onClose={hideToast}
-        />
-      )}
-
       {/* Shell column: responsive fullscreen or mobile frame */}
       <div
         className={`mobile-shell-column ${isPhoneFrame && !activeTab.startsWith('audits') ? 'phone-frame-mode' : 'fullscreen-mode'}`}
@@ -236,16 +289,35 @@ const MainAppContent: React.FC = () => {
           transition: 'max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        {/* Top Sticky Header */}
-        <TopBar />
+        {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
+        {activeTab !== 'scan_qr' && activeTab !== 'profile' && <TopBar />}
+
+        {/* Global Security / Notification Toast (Floating gracefully below TopBar) */}
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type || 'info'}
+            onClose={hideToast}
+          />
+        )}
 
         {/* Main Content Area */}
-        <main className={`mobile-app-content ${activeTab.startsWith('audits') ? 'audit-content-override' : ''}`}>
-          {renderActiveScreen()}
+        <main
+          className={`mobile-app-content ${
+            activeTab.startsWith('audits') ? 'audit-content-override' : ''
+          } ${
+            activeTab === 'community' || activeTab === 'forum'
+              ? 'chat-content-override'
+              : ''
+          } ${activeTab === 'scan_qr' ? 'scan-content-override' : ''}`}
+        >
+          <PageTransition tabKey={activeTab}>
+            {renderActiveScreen()}
+          </PageTransition>
         </main>
 
-        {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views) */}
-        {!activeTab.startsWith('audits') && <FloatingNav />}
+        {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
+        {!activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />}
 
         {/* Role Switcher Modal */}
         <RoleSwitcherModal />

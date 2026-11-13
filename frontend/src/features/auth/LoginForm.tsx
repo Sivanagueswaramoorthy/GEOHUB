@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ArrowRight, CheckCircle2, AlertCircle, RefreshCw, KeyRound, Sparkles } from 'lucide-react';
+import { User, ArrowRight, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { PasswordField } from './PasswordField';
 import { createLoginSchema, LoginFormData } from './auth.schema';
 import { AuthErrorState } from './useLogin';
@@ -42,9 +42,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const rollNoRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const loginSchema = createLoginSchema();
-
-  // Populate credentials if passed externally (e.g. from Demo Credentials card)
+  // Populate credentials if passed externally
   useEffect(() => {
     if (fillCredentials) {
       if (fillCredentials.rollNo) setRollNo(fillCredentials.rollNo);
@@ -137,63 +135,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       onSubmit={handleSubmit}
       noValidate
       className={`login-form ${shouldShake ? 'shake-animation' : ''}`}
-      style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}
+      style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}
     >
-      {/* Quick Roll No Fill Chips */}
-      <div className="login-quick-roles" style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
-        <span style={{ fontSize: '12px', fontWeight: 700, color: '#235347', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
-          Roll Nos:
-        </span>
-        {[
-          { roll: 'FAC01', label: 'Faculty', pass: 'admin123' },
-          { roll: '21GEO001', label: 'President', pass: 'admin123' },
-          { roll: '21GEO010', label: 'Management', pass: 'admin123' },
-          { roll: '22GEO019', label: 'Treasurer', pass: 'admin123' },
-          { roll: '22GEO014', label: 'Promotion', pass: 'admin123' },
-          { roll: '22GEO018', label: 'Documentation', pass: 'admin123' },
-          { roll: '23GEO088', label: 'Member', pass: 'admin123' },
-          { roll: '23GEO042', label: 'Volunteer', pass: 'admin123' },
-        ].map((item) => (
-          <button
-            key={item.roll}
-            type="button"
-            disabled={isLoading || isSuccess}
-            onClick={() => {
-              setRollNo(item.roll);
-              setPassword(item.pass);
-              setRollNoError(null);
-              setPasswordError(null);
-              onClearError?.();
-            }}
-            style={{
-              flexShrink: 0,
-              padding: '6px 12px',
-              minHeight: '44px',
-              borderRadius: '9999px',
-              fontSize: '12px',
-              fontWeight: 600,
-              backgroundColor: '#DAF1DE',
-              color: '#163832',
-              border: '1px solid #8EB69B',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <strong style={{ fontWeight: 800 }}>{item.roll}</strong>
-            <span style={{ opacity: 0.85, fontSize: '12px' }}>({item.label})</span>
-          </button>
-        ))}
-      </div>
-
       {/* Register Number (Reg No) Input */}
       <div className="login-field-group">
         <label htmlFor="login-roll-no" className="login-label">
           <span>Register Number (Reg No)</span>
         </label>
-        <div className="login-input-wrapper">
+        <div className={`login-input-wrapper ${rollNoError ? 'has-error' : ''}`}>
           <span className="login-input-icon" aria-hidden="true">
             <User size={18} strokeWidth={2} />
           </span>
@@ -235,37 +184,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         disabled={isLoading || isSuccess}
         placeholder="Enter your password"
       />
-
-      {/* Default Password Callout */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 12px',
-          borderRadius: '12px',
-          backgroundColor: '#F6FBF7',
-          border: '1px solid #DAF1DE',
-          fontSize: '12px',
-          color: '#235347',
-        }}
-      >
-        <KeyRound size={16} strokeWidth={2} className="shrink-0 text-[#163832]" />
-        <span>
-          Default password for all demo accounts:{' '}
-          <strong
-            style={{
-              fontWeight: 700,
-              color: '#051F20',
-              backgroundColor: '#DAF1DE',
-              padding: '2px 6px',
-              borderRadius: '6px',
-            }}
-          >
-            admin123
-          </strong>
-        </span>
-      </div>
 
       {/* Options Row: Keep me signed in & Forgot password link */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
@@ -350,3 +268,5 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     </form>
   );
 };
+
+export default LoginForm;
