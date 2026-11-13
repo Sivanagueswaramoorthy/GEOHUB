@@ -6,7 +6,7 @@
 
 const API_BASE_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
-  'http://localhost:8000/api';
+  '/api';
 
 class ApiClient {
   private token: string | null = null;
@@ -99,6 +99,17 @@ class ApiClient {
     return await this.request<any>('/auth/me');
   }
 
+  public async getUsers() {
+    return await this.request<any[]>('/auth/users');
+  }
+
+  public async enrollUser(userData: any) {
+    return await this.request<any>('/auth/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
   public async setUserRole(userId: string, role: string, post?: string) {
     return await this.request<any>('/auth/set-role', {
       method: 'POST',
@@ -122,9 +133,8 @@ class ApiClient {
   }
 
   public async updateEventStatus(eventId: string, newStatus: string) {
-    return await this.request<any>(`/events/${eventId}/status`, {
-      method: 'PUT',
-      body: JSON.stringify({ status: newStatus }),
+    return await this.request<any>(`/events/${eventId}/status?status_in=${encodeURIComponent(newStatus)}`, {
+      method: 'PATCH',
     });
   }
 
@@ -176,8 +186,8 @@ class ApiClient {
   }
 
   public async updateTaskStatus(taskId: string, status: string) {
-    return await this.request<any>(`/tasks/${taskId}/status?status=${status}`, {
-      method: 'PUT',
+    return await this.request<any>(`/tasks/${taskId}/status?status=${encodeURIComponent(status)}`, {
+      method: 'PATCH',
     });
   }
 
@@ -231,6 +241,17 @@ class ApiClient {
   public async approveBudgetRequest(requestId: string) {
     return await this.request<any>(`/finance/budget-requests/${requestId}/approve`, {
       method: 'POST',
+    });
+  }
+
+  public async getExpenses() {
+    return await this.request<any[]>('/finance/expenses');
+  }
+
+  public async createExpense(expenseData: any) {
+    return await this.request<any>('/finance/expenses', {
+      method: 'POST',
+      body: JSON.stringify(expenseData),
     });
   }
 

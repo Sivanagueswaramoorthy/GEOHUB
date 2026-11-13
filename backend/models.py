@@ -171,3 +171,18 @@ class Notification(Base):
     type = Column(String(32), default="info") # info, success, warning, alert
     is_read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class Expense(Base):
+    __tablename__ = "expenses"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(128), nullable=False)
+    category = Column(String(64), nullable=False)
+    amount = Column(Float, nullable=False)
+    event_id = Column(String(64), nullable=True)
+    event_title = Column(String(128), nullable=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    receipt_url = Column(String(256), nullable=True)
+    logged_by = Column(String(64), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+

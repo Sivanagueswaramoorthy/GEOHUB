@@ -263,3 +263,44 @@ class DashboardStatsResponse(BaseModel):
     total_check_ins: int
     team_member_counts: dict
     task_status_counts: dict
+
+# Expense Schemas
+class ExpenseCreate(BaseModel):
+    title: str
+    category: str
+    amount: float
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    date: Optional[datetime] = None
+    receipt_url: Optional[str] = None
+
+class ExpenseResponse(BaseModel):
+    id: str
+    title: str
+    category: str
+    amount: float
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    date: datetime
+    receipt_url: Optional[str] = None
+    logged_by: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# User Enrollment Schema
+class UserEnrollRequest(BaseModel):
+    name: str
+    roll_no: str
+    email: str
+    role: str = "student"
+    post: Optional[str] = None
+    department: Optional[str] = None
+    year_of_study: Optional[str] = None
+    phone: Optional[str] = None
+    team: Optional[str] = None
+    team_role: Optional[str] = None
+    is_volunteer: Optional[bool] = False
+    password: Optional[str] = "GeoHub2026!"
+

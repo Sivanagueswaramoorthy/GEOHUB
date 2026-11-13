@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -121,3 +122,44 @@ def reject_budget_request(
     )
 
     return budget_req
+
+@router.get("/expenses", response_model=List[schemas.ExpenseResponse])
+def get_expenses(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    """Retrieve all approved official chapter expenses from the financial ledger."""
+    return db.query(models.Expense).order_by(models.Expense.date.desc()).all()
+
+@router.post("/expenses", response_model=schemas.ExpenseResponse)
+def create_expense(
+    exp_in: schemas.ExpenseCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    """Log an expense transaction in the chapter ledger with audit logging."""
+    new_exp = models.Expense(
+        title=exp_in.title,
+        category=exp_in.category,
+        amount=exp_in.amount,
+        event_id=exp_in.event_id,
+        event_title=exp_in.event_title,
+        date=exp_in.date or datetime.utcnow(),
+        receipt_url=exp_in.receipt_url,
+        logged_by=current_user.id
+    )
+    db.add(new_exp)
+    db.commit()
+    db.refresh(new_exp)
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="expense_logged",
+        target_type="expense",
+        target_id=new_exp.id,
+        target_name=new_exp.title,
+        details=f"Logged expense of ₹{new_exp.amount:.2f} under {new_exp.category} for {new_exp.event_title or 'General Operations'}"
+    )
+
+    return new_exp

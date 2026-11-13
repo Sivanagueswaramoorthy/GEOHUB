@@ -1,3 +1,5 @@
+import uuid
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -216,3 +218,62 @@ def assign_team_admin(
     )
 
     return {"success": True, "message": f"Assigned {target_user.name} as {target_user.post} for {req.team}"}
+
+@router.get("/users", response_model=List[schemas.UserResponse])
+def get_all_users(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    """Retrieve full official roster of chapter scholars and leads from database."""
+    users = db.query(models.User).order_by(models.User.name.asc()).all()
+    return [schemas.UserResponse.from_orm(u) for u in users]
+
+@router.post("/users", response_model=schemas.UserResponse)
+def enroll_user(
+    req: schemas.UserEnrollRequest,
+    db: Session = Depends(get_db),
+    actor: models.User = Depends(auth.get_current_active_user)
+):
+    """Enroll a new scholar into the chapter directory."""
+    # Check if roll number or email already exists
+    clean_roll = req.roll_no.strip().upper()
+    clean_email = req.email.strip().lower()
+
+    existing = db.query(models.User).filter(
+        (models.User.roll_no == clean_roll) | (models.User.email == clean_email)
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Scholar with this roll number or email already exists.")
+
+    new_user = models.User(
+        id=f"u_{uuid.uuid4().hex[:12]}",
+        roll_no=clean_roll,
+        name=req.name.strip(),
+        email=clean_email,
+        hashed_password=auth.get_password_hash(req.password or "GeoHub2026!"),
+        role=req.role or "student",
+        post=req.post,
+        department=req.department or "Geoinformatics Engineering",
+        year_of_study=req.year_of_study or "1st Year",
+        phone=req.phone,
+        team=req.team,
+        team_role=req.team_role,
+        is_volunteer=req.is_volunteer or False,
+        status="active"
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    auth.log_audit(
+        db=db,
+        actor=actor,
+        action="member_enrolled",
+        target_type="user",
+        target_id=new_user.id,
+        target_name=new_user.name,
+        details=f"Enrolled new scholar {new_user.name} ({clean_roll}) with role {new_user.role}"
+    )
+
+    return schemas.UserResponse.from_orm(new_user)
+

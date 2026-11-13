@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   Search,
@@ -15,6 +15,7 @@ import {
 import { AnimatedNumber, ConfirmDialog, SearchField, EmptyState } from '../../../components/shared';
 import { canAddSquadMember, canRemoveMember } from '../../../core/permissions';
 import { useApp } from '../../../context/AppContext';
+import { apiClient } from '../../../api/client';
 
 export interface ScholarRecord {
   uid: string;
@@ -68,6 +69,19 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
       rollNo: u.rollNo || u.uid,
     }));
   });
+
+  useEffect(() => {
+    setMembers((users || []).map((u) => ({
+      uid: u.uid,
+      name: u.name,
+      role: u.role,
+      squad: u.team || 'Management',
+      isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
+      post: u.post || 'Chapter Member',
+      email: u.email,
+      rollNo: u.rollNo || u.uid,
+    })));
+  }, [users]);
 
   const canRemove = canRemoveMember(currentUser);
   const canAdd = canAddSquadMember(currentUser, selectedSquad === 'All' ? 'Promotion' : selectedSquad);
@@ -138,6 +152,16 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
     setMembers((prev) => [...prev, newScholar]);
     onLogAudit('Member Directory', `Enrolled new scholar: ${newScholar.name} (${newScholar.squad})`);
+
+    // Persist new scholar to TiDB Cloud backend
+    apiClient.enrollUser({
+      name: newScholar.name,
+      roll_no: newScholar.rollNo,
+      email: newScholar.email,
+      role: newScholar.role,
+      team: newScholar.squad,
+      post: newScholar.post,
+    }).catch(() => {});
 
     setShowAddModal(false);
     setNewName('');

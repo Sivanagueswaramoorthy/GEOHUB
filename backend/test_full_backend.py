@@ -1,5 +1,6 @@
 import unittest
 import json
+from datetime import datetime
 from fastapi.testclient import TestClient
 from main import app
 from database import SessionLocal
@@ -196,5 +197,44 @@ class TestFullBackendSuite(unittest.TestCase):
         logs = resp.json()
         self.assertIsInstance(logs, list)
 
+    def test_09_expenses_lifecycle(self):
+        treas_token = self.get_token(self.treas_roll)
+        # Log expense
+        payload = {
+            "title": "Field Equipment Calibration",
+            "category": "Equipment",
+            "amount": 4200.0,
+            "event_title": "Fullstack Drone Camp"
+        }
+        resp = self.client.post("/api/finance/expenses", headers={"Authorization": f"Bearer {treas_token}"}, json=payload)
+        self.assertEqual(resp.status_code, 200, resp.text)
+        exp = resp.json()
+        self.assertEqual(exp["amount"], 4200.0)
+
+        # Get expenses list
+        list_resp = self.client.get("/api/finance/expenses", headers={"Authorization": f"Bearer {treas_token}"})
+        self.assertEqual(list_resp.status_code, 200)
+        self.assertTrue(any(e["title"] == "Field Equipment Calibration" for e in list_resp.json()))
+
+    def test_10_users_roster_and_enrollment(self):
+        coord_token = self.get_token(self.coord_roll)
+        # Get users
+        get_res = self.client.get("/api/auth/users", headers={"Authorization": f"Bearer {coord_token}"})
+        self.assertEqual(get_res.status_code, 200)
+        self.assertIsInstance(get_res.json(), list)
+
+        # Enroll scholar
+        enroll_payload = {
+            "name": "Live Test Scholar",
+            "roll_no": f"21TEST{datetime.now().strftime('%M%S')}",
+            "email": f"test{datetime.now().strftime('%M%S')}@college.edu",
+            "role": "student",
+            "department": "Geoinformatics"
+        }
+        enroll_res = self.client.post("/api/auth/users", headers={"Authorization": f"Bearer {coord_token}"}, json=enroll_payload)
+        self.assertEqual(enroll_res.status_code, 200, enroll_res.text)
+        self.assertEqual(enroll_res.json()["name"], "Live Test Scholar")
+
 if __name__ == "__main__":
     unittest.main()
+

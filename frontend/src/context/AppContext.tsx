@@ -317,7 +317,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let isMounted = true;
     const syncWithBackend = async () => {
       try {
-        const liveEvents = await apiClient.getEvents();
+        // 1. Sync Events
+        const liveEvents = await apiClient.getEvents().catch(() => null);
         if (isMounted && Array.isArray(liveEvents) && liveEvents.length > 0) {
           setEvents(liveEvents.map((e: any): EventModel => ({
             id: e.id,
@@ -338,6 +339,114 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             cancellationReason: e.cancellation_reason || undefined,
             budget: Number(e.budget || 0),
             createdBy: e.created_by || 'u_admin_02',
+          })));
+        }
+
+        // 2. Sync Users & Official Chapter Roster
+        const liveUsers = await apiClient.getUsers().catch(() => null);
+        if (isMounted && Array.isArray(liveUsers) && liveUsers.length > 0) {
+          setUsers(liveUsers.map((u: any): UserModel => ({
+            uid: u.id,
+            rollNo: u.roll_no,
+            name: u.name,
+            email: u.email,
+            role: u.role || 'student',
+            post: u.post || undefined,
+            department: u.department || 'Geoinformatics Engineering',
+            yearOfStudy: u.year_of_study || '3rd Year',
+            phone: u.phone || undefined,
+            team: u.team || undefined,
+            teamRole: u.team_role || undefined,
+            isVolunteer: Boolean(u.is_volunteer),
+            status: u.status || 'active',
+            squadMemberships: u.squad_memberships
+              ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
+              : [],
+          })));
+        }
+
+        // 3. Sync Squads & Teams
+        const liveTeams = await apiClient.getTeams().catch(() => null);
+        if (isMounted && Array.isArray(liveTeams) && liveTeams.length > 0) {
+          setTeams((prev) => prev.map((t) => {
+            const matched = liveTeams.find((lt: any) => lt.name.toLowerCase() === t.name.toLowerCase() || lt.id === t.id);
+            if (!matched) return t;
+            return {
+              ...t,
+              description: matched.description || t.description,
+              memberIds: matched.member_user_ids || t.memberIds,
+              leadIds: matched.admin_user_ids || t.leadIds,
+            };
+          }));
+        }
+
+        // 4. Sync Duty Tasks
+        const liveTasks = await apiClient.getTasks('all').catch(() => null);
+        if (isMounted && Array.isArray(liveTasks) && liveTasks.length > 0) {
+          setTasks(liveTasks.map((t: any): TaskModel => ({
+            id: t.id,
+            title: t.title,
+            description: t.description || '',
+            priority: 'medium',
+            status: t.status || 'todo',
+            team: t.team_id || 'Management',
+            assigneeId: t.assigned_user_ids?.[0] || 'u_admin_02',
+            assigneeName: 'Assigned Scholar',
+            createdById: t.created_by || 'u_admin_02',
+            createdByName: 'Coordinator',
+            dueDate: t.deadline || new Date().toISOString(),
+            comments: [],
+            createdAt: t.created_at || new Date().toISOString(),
+            proofUrl: t.proof_urls?.[0],
+          })));
+        }
+
+        // 5. Sync Treasury Budget Requests
+        const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
+        if (isMounted && Array.isArray(liveBudget) && liveBudget.length > 0) {
+          setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
+            id: b.id,
+            teamName: b.team_name,
+            requestedAmount: Number(b.requested_amount || 0),
+            currentAllocation: Number(b.current_allocation || 0),
+            reason: b.reason,
+            requestedBy: b.requested_by,
+            requestedAt: b.created_at || new Date().toISOString(),
+            status: b.status || 'pending',
+          })));
+        }
+
+        // 6. Sync Official Financial Ledger Expenses
+        const liveExpenses = await apiClient.getExpenses().catch(() => null);
+        if (isMounted && Array.isArray(liveExpenses) && liveExpenses.length > 0) {
+          setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
+            id: exp.id,
+            title: exp.title,
+            amount: Number(exp.amount || 0),
+            category: exp.category,
+            buyingDate: exp.date || exp.created_at || new Date().toISOString(),
+            eventTitle: exp.event_title || 'General Operations',
+            vendorName: 'Official Vendor',
+            paidBy: exp.logged_by || 'Treasurer Lead',
+            approvedBy: 'Faculty Advisor',
+            receiptUrl: exp.receipt_url,
+            status: 'approved',
+          })));
+        }
+
+        // 7. Sync Governance Audit Logs
+        const liveAudits = await apiClient.getAuditLogs().catch(() => null);
+        if (isMounted && Array.isArray(liveAudits) && liveAudits.length > 0) {
+          setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
+            id: a.id,
+            actorId: a.actor_id,
+            actorName: a.actor_name,
+            action: a.action,
+            targetType: a.target_type,
+            targetId: a.target_id,
+            targetName: a.target_name,
+            details: a.details,
+            timestamp: a.timestamp || new Date().toISOString(),
           })));
         }
       } catch {
@@ -511,6 +620,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return { ...ev, registeredUserIds: [...ev.registeredUserIds, newUid] };
       })
     );
+
+    // Sync student enrollment with TiDB Cloud
+    apiClient.enrollUser({
+      name: studentData.name,
+      roll_no: studentData.rollNo || `21GEO${Date.now().toString().slice(-4)}`,
+      email: studentData.email || `scholar_${Date.now()}@college.edu`,
+      role: studentData.role || 'student',
+      department: studentData.department,
+      team: studentData.team,
+      team_role: studentData.teamRole,
+    }).catch(() => {});
+
     return newStudent;
   };
 
@@ -523,6 +644,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       volunteerIds: [],
     };
     setEvents((prev) => [newEvent, ...prev]);
+
+    // Persist event to TiDB Cloud backend
+    apiClient.createEvent({
+      title: newEventData.title,
+      type: newEventData.category,
+      date_time: newEventData.startDate,
+      venue: newEventData.venue,
+      description: newEventData.description,
+      budget: newEventData.budget || 0,
+      academic_year: '2026-2027',
+      volunteer_user_ids: [],
+      status: newEventData.status || 'draft',
+    }).catch(() => {});
   };
 
   const updateEvent = (eventId: string, updatedFields: Partial<EventModel>) => {
@@ -544,6 +678,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       })
     );
+
+    // Sync task status update to TiDB Cloud
+    apiClient.updateTaskStatus(taskId, status).catch(() => {});
   };
 
   const addTaskComment = (taskId: string, text: string) => {
@@ -570,6 +707,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString(),
     };
     setTasks((prev) => [newTask, ...prev]);
+
+    // Persist task to TiDB Cloud backend
+    apiClient.createTask({
+      title: newTaskData.title,
+      description: newTaskData.description,
+      team_id: newTaskData.team,
+      assigned_user_ids: newTaskData.assigneeId ? [newTaskData.assigneeId] : [],
+      deadline: newTaskData.dueDate,
+      status: newTaskData.status || 'todo',
+    }).catch(() => {});
   };
 
   const approveItem = (id: string) => {
@@ -587,6 +734,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         showToast('Protection Rule: You cannot approve your own budget request.', 'error');
         return;
       }
+
+      // Persist budget approval in TiDB Cloud
+      apiClient.approveBudgetRequest(item.id).catch(() => {});
     }
 
     setApprovals((prev) =>
@@ -859,6 +1009,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEvents((prev) =>
       prev.map((ev) => (ev.id === eventId ? { ...ev, status: newStatus } : ev))
     );
+
+    // Sync event lifecycle status with TiDB Cloud
+    apiClient.updateEventStatus(eventId, newStatus).catch(() => {});
 
     addAuditLog({
       actorId: currentUser.uid,
@@ -1227,6 +1380,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'pending',
     };
     setBudgetRequests((prev) => [newReq, ...prev]);
+
+    // Persist budget request to TiDB Cloud backend
+    apiClient.submitBudgetRequest(teamName, requestedAmount, reason).catch(() => {});
   };
 
   const updateUserRoleAndTeam = (uid: string, role: UserRole, team?: string, isVolunteer?: boolean, status?: UserStatus) => {

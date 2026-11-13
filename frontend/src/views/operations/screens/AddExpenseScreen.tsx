@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AnimatedNumber, PillButton } from '../../../components/shared';
 import { useApp } from '../../../context/AppContext';
+import { apiClient } from '../../../api/client';
 
 export interface ExpenseItem {
   id: string;
@@ -71,6 +72,15 @@ export const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
 
     setExpenses((prev) => [newExpense, ...prev]);
     onLogAudit(event, `Recorded expense ₹${parsedAmount.toLocaleString()} for ${description}`);
+
+    // Persist expense directly to TiDB Cloud
+    apiClient.createExpense({
+      title: description.trim(),
+      category,
+      amount: parsedAmount,
+      event_title: event,
+      receipt_url: billProof,
+    }).catch(() => {});
 
     setAmount('');
     setDescription('');
