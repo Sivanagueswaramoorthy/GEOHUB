@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { User, Bell, Repeat, Smartphone, Monitor, LogOut } from 'lucide-react';
+import { User, Bell, Repeat, Smartphone, Monitor, LogOut, Settings } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserModel } from '../../types';
 import { BottomSheet } from './BottomSheet';
 import { ListRow } from './ListRow';
 import { ConfirmDialog } from './ConfirmDialog';
+import { APP_VERSION } from '../../config/version';
 
 export interface ProfileSheetProps {
   isOpen: boolean;
@@ -48,6 +49,7 @@ export const ProfileSheet: React.FC<ProfileSheetProps> = ({
     setIsPhoneFrame,
     setIsRoleSwitcherOpen,
     logout,
+    updateInfo,
   } = useApp();
 
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -132,7 +134,28 @@ export const ProfileSheet: React.FC<ProfileSheetProps> = ({
               }}
             />
 
-            {/* 3. Switch role (faculty and dev mode only) */}
+            {/* 3. Settings & App Updates */}
+            <ListRow
+              icon={<Settings size={20} strokeWidth={1.75} className="lucide text-[#163832]" />}
+              title="Settings & Updates"
+              subtitle={`GeoHub v${APP_VERSION} • Software updates`}
+              meta={
+                updateInfo ? (
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B] animate-pulse">
+                    UPDATE
+                  </span>
+                ) : undefined
+              }
+              onClick={() => {
+                onClose();
+                setActiveTab('profile');
+                if (typeof window !== 'undefined') {
+                  window.location.hash = '#profile?tab=settings';
+                }
+              }}
+            />
+
+            {/* 4. Switch role (faculty and dev mode only) */}
             {canSwitchRole && (
               <ListRow
                 icon={<Repeat size={20} strokeWidth={1.75} className="lucide text-[#163832]" />}

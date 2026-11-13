@@ -23,6 +23,15 @@ import {
   EyeOff,
   AlertCircle,
   CheckCircle2,
+  Cloud,
+  Globe,
+  RefreshCw,
+  Smartphone,
+  Radio,
+  DownloadCloud,
+  Send,
+  ArrowRight,
+  Settings,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '../../context/AppContext';
@@ -31,6 +40,8 @@ import {
   getRoleBadgeLabel,
 } from '../../components/shared';
 import { apiClient } from '../../api/client';
+import { APP_VERSION, APP_VERSION_CODE } from '../../config/version';
+import { triggerApkInstallation, onApkDownloadProgress } from '../../core/versionChecker';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -39,9 +50,59 @@ export const ProfileView: React.FC = () => {
     attendance = [],
     tasks = [],
     showToast,
+    refreshCloudData,
+    isSyncing,
+    updateInfo,
+    checkForUpdates,
   } = useApp();
 
-  const [activeProfileTab, setActiveProfileTab] = useState<'overview' | 'security'>('overview');
+  const [activeProfileTab, setActiveProfileTab] = useState<'overview' | 'security' | 'settings'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      if (hash.includes('tab=settings') || hash.includes('tab=updates') || hash === '#settings') {
+        return 'settings';
+      }
+      if (hash.includes('tab=security')) {
+        return 'security';
+      }
+    }
+    return 'overview';
+  });
+
+  // Direct in-settings update download state
+  const [isDownloadingUpdate, setIsDownloadingUpdate] = useState(false);
+  const [updateDownloadProgress, setUpdateDownloadProgress] = useState(0);
+  const [updateStatusMessage, setUpdateStatusMessage] = useState('');
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash || '';
+      if (hash.includes('tab=settings') || hash.includes('tab=updates') || hash === '#settings') {
+        setActiveProfileTab('settings');
+      } else if (hash.includes('tab=security')) {
+        setActiveProfileTab('security');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  const handleDirectUpdateFromSettings = () => {
+    if (!updateInfo) return;
+    setIsDownloadingUpdate(true);
+    setUpdateDownloadProgress(10);
+    setUpdateStatusMessage('Initiating download...');
+
+    const unsubscribe = onApkDownloadProgress((progress, message) => {
+      setUpdateDownloadProgress(progress);
+      setUpdateStatusMessage(message);
+      if (progress === 100 || progress < 0) {
+        setIsDownloadingUpdate(false);
+      }
+    });
+
+    triggerApkInstallation(updateInfo.download_url);
+  };
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
@@ -49,6 +110,86 @@ export const ProfileView: React.FC = () => {
     () => `GEO-AUTH-${currentUser.uid}-${Date.now().toString(36).toUpperCase()}`
   );
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Cloud Server & Cross-Device Sync State
+  const [serverUrl, setServerUrl] = useState(() => apiClient.getBaseUrl());
+  const [isEditingServer, setIsEditingServer] = useState(false);
+  const [isTestingServer, setIsTestingServer] = useState(false);
+  const [serverHealth, setServerHealth] = useState<{ ok?: boolean; message?: string; latencyMs?: number } | null>(null);
+
+  const handleTestServer = async () => {
+    setIsTestingServer(true);
+    const res = await apiClient.testServerHealth();
+    setServerHealth(res);
+    setIsTestingServer(false);
+    if (res.ok) {
+      showToast(`✓ Server connected (${res.latencyMs}ms)`, 'success');
+    } else {
+      showToast(`Server unreachable: ${res.message}`, 'error');
+    }
+  };
+
+  const handleSaveServerUrl = () => {
+    apiClient.setBaseUrl(serverUrl);
+    setIsEditingServer(false);
+    showToast('Server URL updated', 'success');
+    refreshCloudData();
+  };
+
+  // OTA Updates & Device Telemetry State
+  const [deviceAudit, setDeviceAudit] = useState<{
+    total_devices: number;
+    updated_devices: number;
+    outdated_devices: number;
+    adoption_percentage: number;
+    latest_version: string;
+  } | null>(null);
+  const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+
+  const fetchDeviceAudit = async () => {
+    setIsLoadingAudit(true);
+    try {
+      const res = await fetch(`${apiClient.getBaseUrl()}/app/devices`);
+      if (res.ok) {
+        const data = await res.json();
+        setDeviceAudit(data);
+      }
+    } catch {
+      // silent
+    } finally {
+      setIsLoadingAudit(false);
+    }
+  };
+
+  const handleBroadcastUpdate = async () => {
+    setIsBroadcasting(true);
+    try {
+      const res = await fetch(`${apiClient.getBaseUrl()}/app/broadcast-update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'A new GeoHub update is available. Tap to upgrade!',
+        }),
+      });
+      if (res.ok) {
+        showToast('✓ Update broadcast sent to devices & in-app alerts created', 'success');
+        fetchDeviceAudit();
+      } else {
+        showToast('Could not dispatch broadcast update', 'error');
+      }
+    } catch {
+      showToast('Network error while dispatching broadcast', 'error');
+    } finally {
+      setIsBroadcasting(false);
+    }
+  };
+
+  const handleManualUpdateCheck = () => {
+    if (typeof window !== 'undefined' && (window as any).checkAppUpdate) {
+      (window as any).checkAppUpdate(true);
+    }
+  };
 
   // Change Password State & Modal Visibility
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
@@ -408,6 +549,20 @@ export const ProfileView: React.FC = () => {
         >
           Security
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveProfileTab('settings')}
+          className={`flex-1 py-2 rounded-xl text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+            activeProfileTab === 'settings'
+              ? 'bg-[#184E50] text-white shadow-xs'
+              : 'hover:text-[#0F3638] text-[#52705E]'
+          }`}
+        >
+          <span>Settings</span>
+          {updateInfo && (
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          )}
+        </button>
       </nav>
 
       {/* -------------------------------------------------------------
@@ -622,6 +777,537 @@ export const ProfileView: React.FC = () => {
             >
               Change
             </button>
+          </section>
+
+          {/* Cloud Server & Cross-Device Sync Section */}
+          <section
+            aria-labelledby="cloud-sync-heading"
+            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] shrink-0">
+                  <Cloud size={20} strokeWidth={2.2} />
+                </div>
+                <div className="text-left">
+                  <h3
+                    id="cloud-sync-heading"
+                    className="text-sm font-extrabold text-[#051F20]"
+                  >
+                    Cloud Server & Cross-Device Sync
+                  </h3>
+                  <p className="text-xs font-medium text-[#235347]">
+                    Sync events and club records across all member phones
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleTestServer}
+                  disabled={isTestingServer}
+                  className="px-3 py-1.5 rounded-full bg-[#DAF1DE] text-[#163832] text-xs font-bold hover:bg-[#8EB69B]/40 transition active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                >
+                  <RefreshCw size={12} className={isTestingServer ? 'animate-spin' : ''} />
+                  <span>Test</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => refreshCloudData()}
+                  disabled={isSyncing}
+                  className="px-3 py-1.5 rounded-full bg-[#163832] text-white text-xs font-bold hover:bg-[#235347] transition active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                >
+                  <RefreshCw size={12} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>Sync</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Current Endpoint */}
+            <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#051F20]">Server Endpoint</span>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingServer(!isEditingServer)}
+                  className="text-xs font-bold text-[#235347] hover:underline cursor-pointer bg-transparent border-0 p-0"
+                >
+                  {isEditingServer ? 'Cancel' : 'Change URL'}
+                </button>
+              </div>
+
+              {isEditingServer ? (
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="url"
+                    value={serverUrl}
+                    onChange={(e) => setServerUrl(e.target.value)}
+                    placeholder="https://your-server.onrender.com/api or http://192.168.1.x:8000/api"
+                    className="w-full px-3 py-2 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveServerUrl}
+                      className="px-4 py-1.5 rounded-full bg-[#163832] text-white text-xs font-bold hover:bg-[#235347] active:scale-95 transition cursor-pointer"
+                    >
+                      Save URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        apiClient.setBaseUrl('');
+                        setServerUrl(apiClient.getBaseUrl());
+                        setIsEditingServer(false);
+                        showToast('Reset to default cloud server', 'info');
+                        refreshCloudData();
+                      }}
+                      className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition cursor-pointer"
+                    >
+                      Reset Default
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#235347] truncate max-w-[220px]">
+                    {serverUrl}
+                  </span>
+                  {serverHealth && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        serverHealth.ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                      }`}
+                    >
+                      {serverHealth.ok ? `Online (${serverHealth.latencyMs}ms)` : 'Unreachable'}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* App Version & OTA Updates Section */}
+          <section
+            aria-labelledby="app-ota-heading"
+            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#235347] shrink-0 border border-[#8EB69B]/30">
+                  <DownloadCloud size={20} strokeWidth={2.2} />
+                </div>
+                <div className="text-left">
+                  <h3
+                    id="app-ota-heading"
+                    className="text-sm font-extrabold text-[#051F20]"
+                  >
+                    Software Updates & App Installation
+                  </h3>
+                  <p className="text-xs font-medium text-[#235347]">
+                    Over-The-Air push distribution & live device adoption
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => checkForUpdates(true)}
+                className="px-3.5 py-1.5 rounded-full bg-[#235347] text-white text-xs font-bold hover:bg-[#163832] transition flex items-center gap-1.5 cursor-pointer shadow-sm shrink-0 active:scale-95 touch-target-44"
+              >
+                <RefreshCw size={12} />
+                <span>Check for Updates</span>
+              </button>
+            </div>
+
+            {/* If update is available: Highlighted Box with Direct Download */}
+            {updateInfo ? (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-emerald-50 border-2 border-emerald-500/50 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={18} className="text-emerald-700" />
+                    <span className="font-extrabold text-sm text-[#051F20]">
+                      GeoHub v{updateInfo.version} Available!
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
+                    Update Ready
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#163832]">
+                  <span>Installed: v{APP_VERSION}</span>
+                  <ArrowRight size={13} className="text-[#235347]" />
+                  <span className="text-emerald-800 font-bold">New: v{updateInfo.version} ({updateInfo.file_size_mb || '6.5 MB'})</span>
+                </div>
+
+                {updateInfo.release_notes && (
+                  <div className="bg-white/90 rounded-xl p-3 text-xs text-[#163832] border border-[#DAF1DE]">
+                    <span className="font-bold block mb-1 text-[#051F20]">What's New in this Build:</span>
+                    <p className="whitespace-pre-line text-[#235347]">{updateInfo.release_notes}</p>
+                  </div>
+                )}
+
+                {/* In-Card Download Progress */}
+                {isDownloadingUpdate && (
+                  <div className="flex flex-col gap-1.5 bg-white rounded-xl p-3 border border-emerald-300">
+                    <div className="flex justify-between text-xs font-bold text-[#163832]">
+                      <span>{updateStatusMessage || 'Downloading update...'}</span>
+                      <span>{updateDownloadProgress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#DAF1DE] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
+                        style={{ width: `${Math.max(5, updateDownloadProgress)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleDirectUpdateFromSettings}
+                  disabled={isDownloadingUpdate}
+                  className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm cursor-pointer transition active:scale-98 touch-target-44 disabled:opacity-75"
+                >
+                  <DownloadCloud size={16} />
+                  <span>{isDownloadingUpdate ? 'Downloading & Launching Installer...' : 'Download & Update Now'}</span>
+                </button>
+              </div>
+            ) : (
+              /* Version Up-To-Date Row */
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                    <CheckCircle2 size={18} />
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#051F20] block">GeoHub is up to date</span>
+                    <span className="text-[#235347] font-mono">Installed: v{APP_VERSION} (Build {APP_VERSION_CODE})</span>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B]/40">
+                  Latest Build
+                </span>
+              </div>
+            )}
+
+            {/* SuperAdmin / Coordinator OTA Management & Fleet Audit */}
+            {(isFaculty || isPresident || isManagementLead) && (
+              <div className="border-t border-[#DAF1DE] pt-3 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Radio size={14} className="text-[#235347]" />
+                    <span className="text-xs font-bold text-[#051F20]">Device Adoption & Telemetry</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={fetchDeviceAudit}
+                    disabled={isLoadingAudit}
+                    className="text-xs text-[#235347] font-semibold underline hover:text-[#051F20] cursor-pointer disabled:opacity-50"
+                  >
+                    {isLoadingAudit ? 'Loading...' : deviceAudit ? 'Refresh Fleet' : 'Load Fleet Audit'}
+                  </button>
+                </div>
+
+                {deviceAudit && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-[#051F20] block">{deviceAudit.total_devices}</span>
+                      <span className="text-xs font-medium text-[#235347]">Enrolled</span>
+                    </div>
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-emerald-800 block">{deviceAudit.adoption_percentage}%</span>
+                      <span className="text-xs font-medium text-emerald-700">Updated</span>
+                    </div>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-amber-800 block">{deviceAudit.outdated_devices}</span>
+                      <span className="text-xs font-medium text-amber-700">Outdated</span>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleBroadcastUpdate}
+                  disabled={isBroadcasting}
+                  className="w-full py-2.5 rounded-2xl bg-white border border-[#235347] text-[#235347] hover:bg-[#DAF1DE]/30 text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm disabled:opacity-60"
+                >
+                  <Send size={14} />
+                  <span>{isBroadcasting ? 'Broadcasting Alert...' : 'Broadcast OTA Update Alert to Devices'}</span>
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* -------------------------------------------------------------
+          TAB 3: SETTINGS & APP UPDATES
+          ------------------------------------------------------------- */}
+      {activeProfileTab === 'settings' && (
+        <div className="flex flex-col gap-3.5">
+          {/* Software Updates as primary hero card */}
+          <section
+            aria-labelledby="app-ota-heading-settings"
+            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#235347] shrink-0 border border-[#8EB69B]/30">
+                  <DownloadCloud size={20} strokeWidth={2.2} />
+                </div>
+                <div className="text-left">
+                  <h3
+                    id="app-ota-heading-settings"
+                    className="text-sm font-extrabold text-[#051F20]"
+                  >
+                    Software Updates & App Installation
+                  </h3>
+                  <p className="text-xs font-medium text-[#235347]">
+                    Manage app versions, OTA downloads, and update alerts
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => checkForUpdates(true)}
+                className="px-3.5 py-1.5 rounded-full bg-[#235347] text-white text-xs font-bold hover:bg-[#163832] transition flex items-center gap-1.5 cursor-pointer shadow-sm shrink-0 active:scale-95 touch-target-44"
+              >
+                <RefreshCw size={12} />
+                <span>Check for Updates</span>
+              </button>
+            </div>
+
+            {/* If update is available: Highlighted Box with Direct Download */}
+            {updateInfo ? (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-emerald-50 border-2 border-emerald-500/50 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={18} className="text-emerald-700" />
+                    <span className="font-extrabold text-sm text-[#051F20]">
+                      GeoHub v{updateInfo.version} Available!
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
+                    Update Ready
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#163832]">
+                  <span>Installed: v{APP_VERSION}</span>
+                  <ArrowRight size={13} className="text-[#235347]" />
+                  <span className="text-emerald-800 font-bold">New: v{updateInfo.version} ({updateInfo.file_size_mb || '6.5 MB'})</span>
+                </div>
+
+                {updateInfo.release_notes && (
+                  <div className="bg-white/90 rounded-xl p-3 text-xs text-[#163832] border border-[#DAF1DE]">
+                    <span className="font-bold block mb-1 text-[#051F20]">What's New in this Build:</span>
+                    <p className="whitespace-pre-line text-[#235347]">{updateInfo.release_notes}</p>
+                  </div>
+                )}
+
+                {/* In-Card Download Progress */}
+                {isDownloadingUpdate && (
+                  <div className="flex flex-col gap-1.5 bg-white rounded-xl p-3 border border-emerald-300">
+                    <div className="flex justify-between text-xs font-bold text-[#163832]">
+                      <span>{updateStatusMessage || 'Downloading update...'}</span>
+                      <span>{updateDownloadProgress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-[#DAF1DE] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
+                        style={{ width: `${Math.max(5, updateDownloadProgress)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleDirectUpdateFromSettings}
+                  disabled={isDownloadingUpdate}
+                  className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm cursor-pointer transition active:scale-98 touch-target-44 disabled:opacity-75"
+                >
+                  <DownloadCloud size={16} />
+                  <span>{isDownloadingUpdate ? 'Downloading & Launching Installer...' : 'Download & Update Now'}</span>
+                </button>
+              </div>
+            ) : (
+              /* Version Up-To-Date Row */
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                    <CheckCircle2 size={18} />
+                  </div>
+                  <div>
+                    <span className="font-bold text-[#051F20] block">GeoHub is up to date</span>
+                    <span className="text-[#235347] font-mono">Installed: v{APP_VERSION} (Build {APP_VERSION_CODE})</span>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B]/40">
+                  Latest Build
+                </span>
+              </div>
+            )}
+
+            {/* SuperAdmin / Coordinator OTA Management & Fleet Audit */}
+            {(isFaculty || isPresident || isManagementLead) && (
+              <div className="border-t border-[#DAF1DE] pt-3 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Radio size={14} className="text-[#235347]" />
+                    <span className="text-xs font-bold text-[#051F20]">Device Adoption & Telemetry</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={fetchDeviceAudit}
+                    disabled={isLoadingAudit}
+                    className="text-xs text-[#235347] font-semibold underline hover:text-[#051F20] cursor-pointer disabled:opacity-50"
+                  >
+                    {isLoadingAudit ? 'Loading...' : deviceAudit ? 'Refresh Fleet' : 'Load Fleet Audit'}
+                  </button>
+                </div>
+
+                {deviceAudit && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-[#051F20] block">{deviceAudit.total_devices}</span>
+                      <span className="text-xs font-medium text-[#235347]">Enrolled</span>
+                    </div>
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-emerald-800 block">{deviceAudit.adoption_percentage}%</span>
+                      <span className="text-xs font-medium text-emerald-700">Updated</span>
+                    </div>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 text-center">
+                      <span className="text-base font-extrabold text-amber-800 block">{deviceAudit.outdated_devices}</span>
+                      <span className="text-xs font-medium text-amber-700">Outdated</span>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleBroadcastUpdate}
+                  disabled={isBroadcasting}
+                  className="w-full py-2.5 rounded-2xl bg-white border border-[#235347] text-[#235347] hover:bg-[#DAF1DE]/30 text-xs font-bold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm disabled:opacity-60"
+                >
+                  <Send size={14} />
+                  <span>{isBroadcasting ? 'Broadcasting Alert...' : 'Broadcast OTA Update Alert to Devices'}</span>
+                </button>
+              </div>
+            )}
+          </section>
+
+          {/* Cloud Server & Cross-Device Sync Section */}
+          <section
+            aria-labelledby="cloud-sync-heading-settings"
+            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] shrink-0">
+                  <Cloud size={20} strokeWidth={2.2} />
+                </div>
+                <div className="text-left">
+                  <h3
+                    id="cloud-sync-heading-settings"
+                    className="text-sm font-extrabold text-[#051F20]"
+                  >
+                    Cloud Server & Cross-Device Sync
+                  </h3>
+                  <p className="text-xs font-medium text-[#235347]">
+                    Configure backend endpoint and database synchronization
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleTestServer}
+                  disabled={isTestingServer}
+                  className="px-3 py-1.5 rounded-full bg-[#DAF1DE] text-[#163832] text-xs font-bold hover:bg-[#8EB69B]/40 transition active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                >
+                  <RefreshCw size={12} className={isTestingServer ? 'animate-spin' : ''} />
+                  <span>Test</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => refreshCloudData()}
+                  disabled={isSyncing}
+                  className="px-3 py-1.5 rounded-full bg-[#163832] text-white text-xs font-bold hover:bg-[#235347] transition active:scale-95 disabled:opacity-50 cursor-pointer flex items-center gap-1"
+                >
+                  <RefreshCw size={12} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>Sync</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Current Endpoint */}
+            <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#051F20]">Server Endpoint</span>
+                <button
+                  type="button"
+                  onClick={() => setIsEditingServer(!isEditingServer)}
+                  className="text-xs font-bold text-[#235347] hover:underline cursor-pointer bg-transparent border-0 p-0"
+                >
+                  {isEditingServer ? 'Cancel' : 'Change URL'}
+                </button>
+              </div>
+
+              {isEditingServer ? (
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="url"
+                    value={serverUrl}
+                    onChange={(e) => setServerUrl(e.target.value)}
+                    placeholder="https://your-server.onrender.com/api or http://192.168.1.x:8000/api"
+                    className="w-full px-3 py-2 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveServerUrl}
+                      className="px-4 py-1.5 rounded-full bg-[#163832] text-white text-xs font-bold hover:bg-[#235347] active:scale-95 transition cursor-pointer"
+                    >
+                      Save URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        apiClient.setBaseUrl('');
+                        setServerUrl(apiClient.getBaseUrl());
+                        setIsEditingServer(false);
+                        showToast('Reset to default cloud server', 'info');
+                        refreshCloudData();
+                      }}
+                      className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition cursor-pointer"
+                    >
+                      Reset Default
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mono text-[#235347] truncate max-w-[220px]">
+                    {serverUrl}
+                  </span>
+                  {serverHealth && (
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                        serverHealth.ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                      }`}
+                    >
+                      {serverHealth.ok ? `Online (${serverHealth.latencyMs}ms)` : 'Unreachable'}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
           </section>
         </div>
       )}

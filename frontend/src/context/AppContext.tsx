@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   UserModel,
   UserRole,
@@ -62,6 +62,7 @@ import {
 } from '../data/mockData';
 import { canAccessRoute, canScanForEvent, normalizeRole, getRolePermissions, validateEventOtp, OtpValidationResult } from '../core/permissions';
 import { apiClient } from '../api/client';
+import { checkForAppUpdate, registerDeviceTelemetry, AppVersionManifest, CheckUpdateResult } from '../core/versionChecker';
 
 interface AppContextType {
   currentUser: UserModel;
@@ -94,9 +95,18 @@ interface AppContextType {
   selectedUserId: string | null;
   isRoleSwitcherOpen: boolean;
   isPhoneFrame: boolean;
+  isSyncing: boolean;
+  refreshCloudData: () => Promise<void>;
   toast: { message: string; type?: 'success' | 'error' | 'info' } | null;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   hideToast: () => void;
+
+  // OTA Push Updates
+  updateInfo: AppVersionManifest | null;
+  isUpdateModalOpen: boolean;
+  setIsUpdateModalOpen: (open: boolean) => void;
+  isUpdateMandatory: boolean;
+  checkForUpdates: (manual?: boolean) => Promise<CheckUpdateResult>;
 
   // Authentication
   isAuthenticated: boolean;
@@ -321,6 +331,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToast(null);
   };
 
+  // OTA Push Update State
+  const [updateInfo, setUpdateInfo] = useState<AppVersionManifest | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+  const [isUpdateMandatory, setIsUpdateMandatory] = useState<boolean>(false);
+
+  const checkForUpdates = useCallback(
+    async (manual: boolean = false): Promise<CheckUpdateResult> => {
+      try {
+        const result = await checkForAppUpdate();
+        if (result.hasUpdate && result.updateInfo) {
+          setUpdateInfo(result.updateInfo);
+          setIsUpdateMandatory(result.isMandatory);
+          setIsUpdateModalOpen(true);
+        } else if (manual) {
+          showToast(`You are on the latest version (v${result.currentVersion}).`, 'success');
+        }
+        return result;
+      } catch {
+        if (manual) {
+          showToast('Could not reach the update server. Try again later.', 'error');
+        }
+        return {
+          hasUpdate: false,
+          updateInfo: null,
+          isMandatory: false,
+          currentVersion: '1.5.4',
+          latestVersion: '1.5.4',
+        };
+      }
+    },
+    []
+  );
+
+  // Lifecycle check on app mount, window focus, and visibility resume
+  useEffect(() => {
+    registerDeviceTelemetry(currentUser?.rollNo || currentUser?.email);
+
+    // Initial check on app startup
+    checkForUpdates(false);
+
+    const handleFocus = () => checkForUpdates(false);
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        checkForUpdates(false);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    if (typeof window !== 'undefined') {
+      (window as any).checkAppUpdate = (manual = true) => checkForUpdates(manual);
+    }
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [currentUser?.rollNo, currentUser?.email, checkForUpdates]);
+
   const setActiveTab = (tab: string) => {
     const guard = canAccessRoute(tab, currentUser.role);
     if (!guard.allowed) {
@@ -337,10 +407,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const handleUrlRoute = () => {
       const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
-      const path = window.location.pathname.replace(/^\//, '').trim();
-      const targetRoute = hash || (path && path !== 'index.html' ? path : '');
+      const rawPath = window.location.pathname.replace(/^\//, '').trim();
 
-      if (!targetRoute) return;
+      // Filter out static asset file paths, index.html, etc. inside Android WebView & web
+      const isAssetPath =
+        !rawPath ||
+        rawPath === 'index.html' ||
+        rawPath === 'assets/index.html' ||
+        rawPath.startsWith('assets') ||
+        rawPath.includes('.html') ||
+        rawPath.includes('.js') ||
+        rawPath.includes('.css');
+
+      const cleanPath = isAssetPath ? '' : rawPath;
+      const targetRoute = hash || cleanPath;
+
+      if (!targetRoute) {
+        setActiveTabState('home');
+        return;
+      }
 
       const guard = canAccessRoute(targetRoute, currentUser.role);
       if (!guard.allowed) {
@@ -359,39 +444,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('hashchange', handleUrlRoute);
   }, [currentUser.role]);
 
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
   // Live Backend Data Synchronization with TiDB Cloud FastAPI
-  useEffect(() => {
-    let isMounted = true;
-    const syncWithBackend = async () => {
-      try {
-        // 1. Sync Events
-        const liveEvents = await apiClient.getEvents().catch(() => null);
-        if (isMounted && Array.isArray(liveEvents) && liveEvents.length > 0) {
-          setEvents(liveEvents.map((e: any): EventModel => ({
-            id: e.id,
-            title: e.title,
-            description: e.description || '',
-            category: e.type || 'Academic',
-            venue: e.venue || 'Campus Auditorium',
-            startDate: e.date_time || new Date().toISOString(),
-            endDate: e.date_time || new Date().toISOString(),
-            status: e.status || 'draft',
-            capacity: 350,
-            registeredUserIds: [],
-            volunteerIds: e.volunteer_user_ids || [],
-            assignedScannerUserIds: e.assigned_scanner_user_ids || [],
-            posterUrl: e.poster_url || undefined,
-            geofenceEnabled: Boolean(e.geofence_enabled),
-            geofenceRadiusMeters: e.geofence_radius_meters || 100,
-            cancellationReason: e.cancellation_reason || undefined,
-            budget: Number(e.budget || 0),
-            createdBy: e.created_by || 'u_admin_02',
-          })));
-        }
+  const syncWithBackend = useCallback(async () => {
+    setIsSyncing(true);
+    try {
+      // 1. Sync Events
+      const liveEvents = await apiClient.getEvents().catch(() => null);
+      if (Array.isArray(liveEvents) && liveEvents.length > 0) {
+        const mappedEvents: EventModel[] = liveEvents.map((e: any): EventModel => ({
+          id: e.id,
+          title: e.title,
+          description: e.description || '',
+          category: e.type || 'Academic',
+          venue: e.venue || 'Campus Auditorium',
+          startDate: e.date_time || new Date().toISOString(),
+          endDate: e.date_time || new Date().toISOString(),
+          status: e.status || 'approved',
+          capacity: 350,
+          registeredUserIds: [],
+          volunteerIds: e.volunteer_user_ids || [],
+          assignedScannerUserIds: e.assigned_scanner_user_ids || [],
+          posterUrl: e.poster_url || undefined,
+          geofenceEnabled: Boolean(e.geofence_enabled),
+          geofenceRadiusMeters: e.geofence_radius_meters || 100,
+          cancellationReason: e.cancellation_reason || undefined,
+          budget: Number(e.budget || 0),
+          createdBy: e.created_by || 'u_admin_02',
+        }));
+
+        setEvents((prev) => {
+          const serverEventIds = new Set(mappedEvents.map((m) => m.id));
+          const localOnly = prev.filter(
+            (p) => !serverEventIds.has(p.id) && p.id.startsWith('event_')
+          );
+          return [...mappedEvents, ...localOnly];
+        });
+      }
 
         // 2. Sync Users & Official Chapter Roster
         const liveUsers = await apiClient.getUsers().catch(() => null);
-        if (isMounted && Array.isArray(liveUsers) && liveUsers.length > 0) {
+        if (Array.isArray(liveUsers) && liveUsers.length > 0) {
           const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
             uid: u.id,
             rollNo: u.roll_no,
@@ -420,7 +514,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // 3. Sync Squads & Teams
         const liveTeams = await apiClient.getTeams().catch(() => null);
-        if (isMounted && Array.isArray(liveTeams) && liveTeams.length > 0) {
+        if (Array.isArray(liveTeams) && liveTeams.length > 0) {
           setTeams((prev) => prev.map((t) => {
             const matched = liveTeams.find((lt: any) => lt.name.toLowerCase() === t.name.toLowerCase() || lt.id === t.id);
             if (!matched) return t;
@@ -435,7 +529,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // 4. Sync Duty Tasks
         const liveTasks = await apiClient.getTasks('all').catch(() => null);
-        if (isMounted && Array.isArray(liveTasks) && liveTasks.length > 0) {
+        if (Array.isArray(liveTasks) && liveTasks.length > 0) {
           setTasks(liveTasks.map((t: any): TaskModel => ({
             id: t.id,
             title: t.title,
@@ -456,7 +550,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // 5. Sync Treasury Budget Requests
         const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
-        if (isMounted && Array.isArray(liveBudget) && liveBudget.length > 0) {
+        if (Array.isArray(liveBudget) && liveBudget.length > 0) {
           setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
             id: b.id,
             teamName: b.team_name,
@@ -471,7 +565,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // 6. Sync Official Financial Ledger Expenses
         const liveExpenses = await apiClient.getExpenses().catch(() => null);
-        if (isMounted && Array.isArray(liveExpenses) && liveExpenses.length > 0) {
+        if (Array.isArray(liveExpenses) && liveExpenses.length > 0) {
           setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
             id: exp.id,
             title: exp.title,
@@ -489,7 +583,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         // 7. Sync Governance Audit Logs
         const liveAudits = await apiClient.getAuditLogs().catch(() => null);
-        if (isMounted && Array.isArray(liveAudits) && liveAudits.length > 0) {
+        if (Array.isArray(liveAudits) && liveAudits.length > 0) {
           setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
             id: a.id,
             actorId: a.actor_id,
@@ -504,11 +598,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }
       } catch {
         // Resilient fallback keeps local cache when server is starting up or offline
+      } finally {
+        setIsSyncing(false);
       }
-    };
+    },
+    []
+  );
+
+  const refreshCloudData = useCallback(async () => {
+    await syncWithBackend();
+    showToast('✓ Synchronized with cloud server', 'success');
+  }, [syncWithBackend, showToast]);
+
+  // Periodic and Event-Driven Cloud Synchronization
+  useEffect(() => {
     syncWithBackend();
-    return () => { isMounted = false; };
-  }, []);
+
+    // Auto-refresh events and data every 25 seconds
+    const interval = setInterval(() => {
+      syncWithBackend();
+    }, 25000);
+
+    const handleOnline = () => {
+      syncWithBackend();
+    };
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [syncWithBackend]);
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -688,28 +808,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newStudent;
   };
 
-  const createEvent = (newEventData: Omit<EventModel, 'id' | 'registeredUserIds' | 'volunteerIds'>) => {
-    const newId = `event_${Date.now()}`;
+  const createEvent = async (newEventData: Omit<EventModel, 'id' | 'registeredUserIds' | 'volunteerIds'>) => {
+    const tempId = `event_${Date.now()}`;
     const newEvent: EventModel = {
       ...newEventData,
-      id: newId,
+      id: tempId,
       registeredUserIds: [currentUser.uid],
       volunteerIds: [],
     };
     setEvents((prev) => [newEvent, ...prev]);
 
-    // Persist event to TiDB Cloud backend
-    apiClient.createEvent({
-      title: newEventData.title,
-      type: newEventData.category,
-      date_time: newEventData.startDate,
-      venue: newEventData.venue,
-      description: newEventData.description,
-      budget: newEventData.budget || 0,
-      academic_year: '2026-2027',
-      volunteer_user_ids: [],
-      status: newEventData.status || 'draft',
-    }).catch(() => {});
+    try {
+      const serverEvent = await apiClient.createEvent({
+        title: newEventData.title,
+        type: newEventData.category,
+        date_time: newEventData.startDate,
+        venue: newEventData.venue,
+        description: newEventData.description,
+        budget: newEventData.budget || 0,
+        academic_year: '2026-2027',
+        volunteer_user_ids: [],
+        status: newEventData.status || 'approved',
+      });
+
+      if (serverEvent && serverEvent.id) {
+        setEvents((prev) =>
+          prev.map((ev) => (ev.id === tempId ? { ...ev, id: serverEvent.id } : ev))
+        );
+        showToast('✓ Event created and synchronized to cloud!', 'success');
+      } else {
+        showToast('✓ Event created.', 'success');
+      }
+    } catch (err: any) {
+      console.warn('[Event Sync] Cloud server unreachable, saved locally:', err?.message);
+      showToast('Event saved on this phone. Cloud sync pending.', 'info');
+    }
   };
 
   const updateEvent = (eventId: string, updatedFields: Partial<EventModel>) => {
@@ -1687,6 +1820,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedUserId,
         isRoleSwitcherOpen,
         isPhoneFrame,
+        isSyncing,
+        refreshCloudData,
         setCurrentUser,
         switchRole,
         setActiveTab,
@@ -1761,6 +1896,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toast,
         showToast,
         hideToast,
+        updateInfo,
+        isUpdateModalOpen,
+        setIsUpdateModalOpen,
+        isUpdateMandatory,
+        checkForUpdates,
       }}
     >
       {children}

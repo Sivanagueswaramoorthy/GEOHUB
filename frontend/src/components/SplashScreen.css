@@ -1,11 +1,9 @@
 /* ==========================================================================
-   GeoHub - Minimalist Animated Splash Screen
-   Exclusively presents:
-   1. GeoClub Official Emblem Logo with gentle floating & glow
-   2. "Green Eco Organization" Brand Title with entrance animation
+   GeoHub - Flagship Premium Splash Screen & Network Verification
+   Soft Pastel 3D + Frosted Glassmorphism Theme
    ========================================================================== */
 
-.splash-screen-overlay {
+.splash-overlay {
   position: fixed;
   inset: 0;
   z-index: 99999;
@@ -13,176 +11,137 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(120% 90% at 50% 42%, #DAF1DE 0%, #F4FAF5 45%, #FFFFFF 100%);
+  background: radial-gradient(circle at 50% 38%, rgba(218, 241, 222, 0.95) 0%, rgba(246, 251, 247, 1) 60%, #EEF7F0 100%);
   overflow: hidden;
   user-select: none;
-  cursor: pointer;
-  transition: opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.48s cubic-bezier(0.4, 0, 0.2, 1),
-              visibility 0.48s ease;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
 }
 
-.splash-screen-overlay.splash-closing {
+.splash-overlay.splash-closing {
   opacity: 0;
   transform: scale(1.03);
   pointer-events: none;
-  visibility: hidden;
 }
 
-/* Ambient Background Lights & Rings */
-.splash-ambient-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
+/* Ambient Radial Aura Lights */
 .splash-glow-disc {
   position: absolute;
-  top: 45%;
+  top: 36%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(35, 83, 71, 0.25) 0%, rgba(142, 182, 155, 0.12) 50%, transparent 75%);
+  background: radial-gradient(circle, rgba(142, 182, 155, 0.35) 0%, rgba(218, 241, 222, 0.22) 50%, transparent 75%);
   filter: blur(32px);
-  animation: splash-glow-breathe 3.2s ease-in-out infinite alternate;
+  pointer-events: none;
+  animation: splash-glow-breathe 3.4s ease-in-out infinite alternate;
 }
 
 @keyframes splash-glow-breathe {
   0% {
-    transform: translate(-50%, -50%) scale(0.9);
+    transform: translate(-50%, -50%) scale(0.92);
     opacity: 0.65;
   }
   100% {
     transform: translate(-50%, -50%) scale(1.15);
-    opacity: 1;
+    opacity: 0.95;
   }
 }
 
-
-
-/* Center Stack: Logo & Brand Title */
-.splash-brand-center {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0 24px;
-  box-sizing: border-box;
+/* Glassmorphism Lower Dock Card */
+.splash-glass-dock {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 20px 48px -12px rgba(5, 31, 32, 0.14),
+              0 0 0 1px rgba(142, 182, 155, 0.25);
+  transition: all 0.3s ease;
 }
 
-/* Logo Image Container with Premium White Badge Background */
-.splash-logo-container {
-  width: 164px;
-  height: 124px;
-  background-color: #FFFFFF;
-  border-radius: 28px;
-  padding: 16px 20px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 18px 38px -8px rgba(35, 83, 71, 0.24),
-              0 4px 14px rgba(5, 31, 32, 0.05),
-              0 0 0 1.5px rgba(142, 182, 155, 0.85);
-  animation: splash-logo-enter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-             splash-logo-float 3.4s ease-in-out infinite alternate 0.8s;
+.splash-glass-dock-error {
+  background: rgba(255, 250, 250, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(217, 83, 79, 0.38);
+  box-shadow: 0 20px 48px -12px rgba(217, 83, 79, 0.22);
 }
 
-.splash-logo-img {
+/* Shimmering Progress Bar */
+.splash-progress-track {
   width: 100%;
+  height: 9px;
+  background-color: #DAF1DE;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(5, 31, 32, 0.08);
+}
+
+.splash-progress-fill {
   height: 100%;
-  object-fit: contain;
-  display: block;
+  border-radius: 9999px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes splash-logo-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.68) translateY(22px);
-  }
-  100% {
+.splash-progress-fill-active {
+  background: linear-gradient(90deg, #163832 0%, #235347 50%, #8EB69B 100%);
+  box-shadow: 0 0 12px rgba(142, 182, 155, 0.6);
+}
+
+.splash-progress-fill-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
+  animation: splash-shimmer-sweep 1.8s infinite;
+}
+
+@keyframes splash-shimmer-sweep {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(250%); }
+}
+
+.splash-progress-fill-error {
+  background-color: #D9534F;
+  box-shadow: 0 0 12px rgba(217, 83, 79, 0.45);
+}
+
+.splash-progress-fill-success {
+  background: linear-gradient(90deg, #163832 0%, #235347 60%, #8EB69B 100%);
+  box-shadow: 0 0 12px rgba(35, 83, 71, 0.45);
+}
+
+.splash-pulse-dot {
+  animation: splash-dot-pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes splash-dot-pulse {
+  0%, 100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
-}
-
-@keyframes splash-logo-float {
-  0% {
-    transform: translateY(0);
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
   }
-  100% {
-    transform: translateY(-8px);
-  }
-}
-
-/* "Green Eco Organization" Brand Title */
-.splash-brand-text {
-  margin: 24px 0 0 0;
-  font-family: var(--font-family, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
-  font-size: clamp(23px, 6vw, 30px);
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  line-height: 1.25;
-  color: #0B2B26;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 1.3em;
-  white-space: pre-wrap;
-}
-
-.splash-text-content {
-  background: linear-gradient(135deg, #051F20 0%, #0B2B26 45%, #235347 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline;
-}
-
-/* Typing Caret */
-.splash-cursor {
-  display: inline-block;
-  width: 2.5px;
-  height: 0.85em;
-  background-color: #235347;
-  margin-left: 3px;
-  vertical-align: -0.05em;
-  border-radius: 2px;
-  box-shadow: 0 0 8px rgba(35, 83, 71, 0.6);
-  transition: opacity 0.4s ease;
-}
-
-.splash-cursor.cursor-typing {
-  opacity: 1;
-  animation: splash-cursor-blink 0.55s ease-in-out infinite;
-}
-
-.splash-cursor.cursor-finished {
-  animation: splash-cursor-blink 0.8s ease-in-out 3;
-  opacity: 0;
-}
-
-@keyframes splash-cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .splash-screen-overlay,
-  .splash-logo-container,
-  .splash-logo-img,
-  .splash-brand-text,
-  .splash-cursor {
+  .splash-overlay,
+  .splash-glow-disc,
+  .splash-progress-fill,
+  .splash-progress-fill-active::after,
+  .splash-pulse-dot {
     animation: none !important;
-    transition: opacity 0.2s ease !important;
-    opacity: 1 !important;
-    transform: none !important;
+    transition: none !important;
   }
 }

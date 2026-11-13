@@ -4,9 +4,35 @@
  * automatic token management, and resilient fallback across all 17 operations.
  */
 
-const API_BASE_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) ||
-  '/api';
+export const DEFAULT_CLOUD_API = 'https://geohub-backend.onrender.com/api';
+
+export function resolveApiBaseUrl(): string {
+  if (typeof window !== 'undefined') {
+    const customUrl = localStorage.getItem('geohub_api_base_url');
+    if (customUrl && customUrl.trim()) {
+      return customUrl.trim().replace(/\/+$/, '');
+    }
+  }
+
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) || '';
+  if (envUrl && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+
+  // Detect Android APK wrapper environment
+  const isApk =
+    typeof navigator !== 'undefined' &&
+    (navigator.userAgent.includes('GeoHubMobileApp') ||
+      (typeof window !== 'undefined' && window.location.hostname === 'appassets.androidplatform.net'));
+
+  if (isApk) {
+    // In APK, relative '/api' resolves to Android local assets which 404s.
+    // Fall back to default cloud API.
+    return DEFAULT_CLOUD_API;
+  }
+
+  return '/api';
+}
 
 class ApiClient {
   private token: string | null = null;
@@ -14,6 +40,39 @@ class ApiClient {
   constructor() {
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('geohub_access_token');
+      (window as any).setGeoHubServerUrl = (url: string) => this.setBaseUrl(url);
+      (window as any).getGeoHubServerUrl = () => this.getBaseUrl();
+    }
+  }
+
+  public getBaseUrl(): string {
+    return resolveApiBaseUrl();
+  }
+
+  public setBaseUrl(url: string) {
+    if (typeof window !== 'undefined') {
+      if (url && url.trim()) {
+        const clean = url.trim().replace(/\/+$/, '');
+        localStorage.setItem('geohub_api_base_url', clean);
+      } else {
+        localStorage.removeItem('geohub_api_base_url');
+      }
+    }
+  }
+
+  public async testServerHealth(): Promise<{ ok: boolean; latencyMs?: number; message?: string }> {
+    const baseUrl = this.getBaseUrl();
+    const startTime = performance.now();
+    try {
+      // Test either health endpoint or base
+      const testUrl = baseUrl.endsWith('/api')
+        ? `${baseUrl.slice(0, -4)}/health`
+        : `${baseUrl}/health`;
+      const res = await fetch(testUrl, { method: 'GET', cache: 'no-store' });
+      const latencyMs = Math.round(performance.now() - startTime);
+      return { ok: res.ok, latencyMs, message: res.ok ? 'Connected' : `HTTP ${res.status}` };
+    } catch (e: any) {
+      return { ok: false, message: e?.message || 'Connection refused' };
     }
   }
 
@@ -36,7 +95,9 @@ class ApiClient {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+    const baseUrl = this.getBaseUrl();
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${baseUrl}${cleanEndpoint}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -48,11 +109,17 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    const isTest = typeof import.meta !== 'undefined' && import.meta.env?.MODE === 'test';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), isTest ? 100 : 8000);
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
+        signal: options.signal || controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         let errorDetail = 'API request failed';
@@ -264,6 +331,67 @@ class ApiClient {
 
   public async getDashboardStats() {
     return await this.request<any>('/dashboard/stats');
+  }
+
+  // ==========================================
+  // SuperAdmin Role Governance & Operations
+  // ==========================================
+  public async getAdminRolesCredentials() {
+    return await this.request<any[]>('/admin/roles-credentials');
+  }
+
+  public async setAdminRoleCredentials(payload: {
+    role: string;
+    roll_no: string;
+    name?: string;
+    email?: string;
+    password?: string;
+    status?: string;
+  }) {
+    return await this.request<{
+      status: string;
+      message: string;
+      user: any;
+    }>('/admin/set-role-credentials', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async getAdminPermissionsMatrix() {
+    return await this.request<{
+      flags: string[];
+      matrix: Record<string, Record<string, boolean>>;
+      roles: string[];
+      has_overrides: boolean;
+      overridden_roles: string[];
+    }>('/admin/permissions-matrix');
+  }
+
+  public async updateAdminPermissionsMatrix(payload: {
+    role: string;
+    permissions?: Record<string, boolean>;
+    action?: 'enable_all' | 'disable_all' | null;
+  }) {
+    return await this.request<{
+      status: string;
+      message: string;
+      effective_matrix: any;
+    }>('/admin/permissions-matrix', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async resetAdminPermissionsMatrix(role: string = 'all') {
+    return await this.request<{
+      status: string;
+      message: string;
+      effective_matrix: any;
+    }>('/admin/reset-permissions-matrix', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    });
   }
 }
 

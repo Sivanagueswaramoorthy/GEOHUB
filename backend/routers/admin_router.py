@@ -1,0 +1,295 @@
+import json
+from datetime import datetime
+from typing import Dict, Any, List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from database import get_db, SessionLocal, engine, Base
+import models
+import auth
+
+router = APIRouter(prefix="/admin", tags=["SuperAdmin Governance & Operation Controls"])
+
+# Baseline canonical roles
+CANONICAL_ROLES = [
+    {"role": "super_admin", "badge": "Super Admin", "default_post": "Faculty Advisor", "default_name": "Dr. Sarah Jenkins", "default_roll": "FAC01", "default_email": "sarah.jenkins@college.edu"},
+    {"role": "coordinator", "badge": "Coordinator", "default_post": "Club President", "default_name": "Alex Rivera", "default_roll": "21GEO001", "default_email": "alex.rivera@college.edu"},
+    {"role": "management", "badge": "Management Lead", "default_post": "Vice President", "default_name": "Elena Rostova", "default_roll": "21GEO010", "default_email": "elena.rostova@college.edu"},
+    {"role": "documentation", "badge": "Documentation", "default_post": "Documentation Lead", "default_name": "Aarav Patel", "default_roll": "22GEO018", "default_email": "aarav.patel@college.edu"},
+    {"role": "treasurer", "badge": "Treasurer", "default_post": "Treasurer", "default_name": "Ananya Iyer", "default_roll": "22GEO019", "default_email": "ananya.iyer@college.edu"},
+    {"role": "promotion", "badge": "Promotion", "default_post": "Promotion Lead", "default_name": "David Chen", "default_roll": "22GEO014", "default_email": "david.chen@college.edu"},
+    {"role": "volunteer", "badge": "Lead Volunteer", "default_post": "Squad Volunteer", "default_name": "Liam Vance", "default_roll": "23GEO042", "default_email": "liam.vance@college.edu"},
+    {"role": "student", "badge": "Student Member", "default_post": "Club Member", "default_name": "Maya Patel", "default_roll": "23GEO088", "default_email": "maya.patel@college.edu"},
+]
+
+class RoleCredentialPayload(BaseModel):
+    role: str
+    roll_no: str
+    name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    status: Optional[str] = "active"
+
+class MatrixUpdatePayload(BaseModel):
+    role: str
+    permissions: Optional[Dict[str, bool]] = None
+    action: Optional[str] = None # "enable_all" | "disable_all" | None
+
+class MatrixResetPayload(BaseModel):
+    role: Optional[str] = "all"
+
+def load_overrides_into_cache():
+    """Initializes in-memory auth.DYNAMIC_OVERRIDES from database records."""
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception:
+        pass
+    db = SessionLocal()
+    try:
+        overrides = db.query(models.RolePermissionOverride).all()
+        for ov in overrides:
+            try:
+                auth.DYNAMIC_OVERRIDES[ov.role] = json.loads(ov.overrides_json)
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"[Admin Notice] Could not load permission overrides: {e}")
+    finally:
+        db.close()
+
+# Load overrides on module load
+load_overrides_into_cache()
+
+@router.get("/roles-credentials")
+def get_roles_credentials(db: Session = Depends(get_db)):
+    """
+    Returns credentials, usernames/roll numbers, scholar names, emails,
+    and account statuses for all 8 official chapter roles.
+    """
+    results = []
+    for meta in CANONICAL_ROLES:
+        role_key = meta["role"]
+        norm = auth.normalize_role(role_key)
+
+        # Look up existing user for this role
+        user = db.query(models.User).filter(
+            (models.User.role == role_key) | (models.User.role == norm)
+        ).first()
+
+        if user:
+            results.append({
+                "role": role_key,
+                "badge": meta["badge"],
+                "user_id": user.id,
+                "name": user.name,
+                "roll_no": user.roll_no or meta["default_roll"],
+                "email": user.email,
+                "post": user.post or meta["default_post"],
+                "status": user.status or "active",
+                "is_registered": True,
+            })
+        else:
+            results.append({
+                "role": role_key,
+                "badge": meta["badge"],
+                "user_id": f"u_{role_key}_default",
+                "name": meta["default_name"],
+                "roll_no": meta["default_roll"],
+                "email": meta["default_email"],
+                "post": meta["default_post"],
+                "status": "active",
+                "is_registered": False,
+            })
+    return results
+
+@router.post("/set-role-credentials")
+def set_role_credentials(payload: RoleCredentialPayload, db: Session = Depends(get_db)):
+    """
+    Allows SuperAdmin to set or update the Username (Roll No / Email),
+    scholar name, and password for any role.
+    """
+    role_key = payload.role.strip().lower()
+    roll_no_clean = payload.roll_no.strip().upper()
+    norm = auth.normalize_role(role_key)
+
+    # Find existing user for this role or roll number
+    user = db.query(models.User).filter(
+        (models.User.role == role_key) | (models.User.roll_no == roll_no_clean)
+    ).first()
+
+    default_meta = next((r for r in CANONICAL_ROLES if r["role"] == role_key), None)
+    default_name = default_meta["default_name"] if default_meta else f"Role ({role_key})"
+    default_email = default_meta["default_email"] if default_meta else f"{role_key}@college.edu"
+    default_post = default_meta["default_post"] if default_meta else "Officer"
+
+    if not user:
+        # Create new user record
+        user = models.User(
+            roll_no=roll_no_clean,
+            name=payload.name or default_name,
+            email=payload.email or default_email,
+            role=role_key,
+            post=default_post,
+            hashed_password=auth.get_password_hash(payload.password or "GeoHub2026!"),
+            status=payload.status or "active",
+        )
+        db.add(user)
+    else:
+        # Update existing user
+        user.roll_no = roll_no_clean
+        if payload.name:
+            user.name = payload.name
+        if payload.email:
+            user.email = payload.email
+        if payload.password and payload.password.strip():
+            user.hashed_password = auth.get_password_hash(payload.password.strip())
+        if payload.status:
+            user.status = payload.status
+        user.role = role_key
+
+    # Log governance audit event
+    audit = models.AuditLog(
+        actor_id="super_admin",
+        actor_name="Super Admin",
+        action="UPDATE_ROLE_CREDENTIALS",
+        target_type="role_credentials",
+        target_id=role_key,
+        target_name=f"{role_key} ({roll_no_clean})",
+        details=f"SuperAdmin updated credentials for {role_key}. Username set to {roll_no_clean}.",
+    )
+    db.add(audit)
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "status": "success",
+        "message": f"Credentials updated for role '{role_key}' (Username: {user.roll_no})",
+        "user": {
+            "id": user.id,
+            "role": user.role,
+            "roll_no": user.roll_no,
+            "name": user.name,
+            "email": user.email,
+            "status": user.status,
+        }
+    }
+
+@router.get("/permissions-matrix")
+def get_permissions_matrix():
+    """
+    Returns the complete list of operation flags and current effective
+    authorities for all roles, including live overrides.
+    """
+    return auth.get_effective_matrix()
+
+@router.put("/permissions-matrix")
+def update_permissions_matrix(payload: MatrixUpdatePayload, db: Session = Depends(get_db)):
+    """
+    Updates operational authorities for a role.
+    Supports individual flag toggling, or master 'enable_all' / 'disable_all'.
+    """
+    role_key = payload.role.strip().lower()
+    norm = auth.normalize_role(role_key)
+    all_flags = auth.MATRIX.get("flags", [])
+
+    # Load existing overrides for this role or create new
+    override_rec = db.query(models.RolePermissionOverride).filter(
+        models.RolePermissionOverride.role == norm
+    ).first()
+
+    current_perms = {}
+    if override_rec and override_rec.overrides_json:
+        try:
+            current_perms = json.loads(override_rec.overrides_json)
+        except Exception:
+            current_perms = {}
+    else:
+        current_perms = dict(auth.MATRIX.get("matrix", {}).get(norm, {}))
+
+    if payload.action == "enable_all":
+        for flag in all_flags:
+            current_perms[flag] = True
+    elif payload.action == "disable_all":
+        # Safeguard: Do not allow disabling all operations for super_admin / faculty
+        if norm == "faculty":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="SuperAdmin / Faculty operations cannot be completely revoked."
+            )
+        for flag in all_flags:
+            current_perms[flag] = False
+    elif payload.permissions:
+        current_perms.update(payload.permissions)
+
+    # Persist in database
+    if not override_rec:
+        override_rec = models.RolePermissionOverride(
+            role=norm,
+            overrides_json=json.dumps(current_perms),
+            updated_by="super_admin",
+        )
+        db.add(override_rec)
+    else:
+        override_rec.overrides_json = json.dumps(current_perms)
+        override_rec.updated_at = datetime.utcnow()
+
+    # Update in-memory auth cache immediately
+    auth.DYNAMIC_OVERRIDES[norm] = current_perms
+
+    # Audit log
+    audit = models.AuditLog(
+        actor_id="super_admin",
+        actor_name="Super Admin",
+        action="UPDATE_PERMISSIONS_MATRIX",
+        target_type="permissions_matrix",
+        target_id=norm,
+        target_name=f"Role: {norm}",
+        details=f"SuperAdmin updated operation authorities for {norm}. Action: {payload.action or 'custom_toggle'}.",
+    )
+    db.add(audit)
+
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": f"Updated operations authority for role '{norm}'",
+        "effective_matrix": auth.get_effective_matrix(),
+    }
+
+@router.post("/reset-permissions-matrix")
+def reset_permissions_matrix(payload: MatrixResetPayload, db: Session = Depends(get_db)):
+    """
+    Restores default institutional permissions matrix baseline.
+    """
+    target = (payload.role or "all").strip().lower()
+
+    if target == "all":
+        db.query(models.RolePermissionOverride).delete()
+        auth.DYNAMIC_OVERRIDES.clear()
+    else:
+        norm = auth.normalize_role(target)
+        db.query(models.RolePermissionOverride).filter(
+            models.RolePermissionOverride.role == norm
+        ).delete()
+        auth.DYNAMIC_OVERRIDES.pop(norm, None)
+
+    audit = models.AuditLog(
+        actor_id="super_admin",
+        actor_name="Super Admin",
+        action="RESET_PERMISSIONS_MATRIX",
+        target_type="permissions_matrix",
+        target_id=target,
+        target_name=f"Target: {target}",
+        details=f"SuperAdmin reset permissions matrix to default baseline for {target}.",
+    )
+    db.add(audit)
+
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": f"Reset permissions matrix to default institutional baseline for {target}",
+        "effective_matrix": auth.get_effective_matrix(),
+    }

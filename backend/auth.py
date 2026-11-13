@@ -28,6 +28,23 @@ if os.path.exists(MATRIX_FILE):
 
 PERMISSIONS_MATRIX = MATRIX
 
+# In-memory dynamic permission overrides loaded from database
+DYNAMIC_OVERRIDES: Dict[str, Dict[str, bool]] = {}
+
+def get_effective_matrix() -> Dict[str, Any]:
+    """Returns the effective permissions matrix factoring in dynamic overrides."""
+    base_matrix = MATRIX.get("matrix", {})
+    effective: Dict[str, Dict[str, bool]] = {}
+    for r, flags in base_matrix.items():
+        effective[r] = dict(flags)
+        if r in DYNAMIC_OVERRIDES:
+            effective[r].update(DYNAMIC_OVERRIDES[r])
+    return {
+        "roles": MATRIX.get("roles", []),
+        "flags": MATRIX.get("flags", []),
+        "matrix": effective,
+    }
+
 def normalize_role(role: Optional[str]) -> str:
     """Normalize legacy role strings to final role names."""
     if not role:
@@ -42,6 +59,7 @@ def normalize_role(role: Optional[str]) -> str:
         "treasurer": "treasurer",
         "social_media": "promotion",
         "promotion": "promotion",
+        "management": "coordinator",
         "member": "student",
         "volunteer": "student",
         "team_admin": "student",
@@ -51,13 +69,18 @@ def normalize_role(role: Optional[str]) -> str:
 
 def has_permission(user, flag: str, context: Optional[Dict[str, Any]] = None, resource: Optional[Dict[str, Any]] = None) -> bool:
     """Three-layer permission check:
-    Layer 1: Role permission flag.
+    Layer 1: Role permission flag with SuperAdmin dynamic override precedence.
     Layer 2: Squad post authority (active tenure).
     Deny by default: missing flag or ungranted = false.
     """
     ctx = resource or context or {}
     role = user.role if hasattr(user, "role") else user.get("role")
     norm_role = normalize_role(role)
+
+    # SuperAdmin dynamic overrides precedence
+    if norm_role in DYNAMIC_OVERRIDES and flag in DYNAMIC_OVERRIDES[norm_role]:
+        return bool(DYNAMIC_OVERRIDES[norm_role][flag])
+
     role_perms = MATRIX.get("matrix", {}).get(norm_role, {})
     if role_perms.get(flag, False):
         return True
@@ -146,6 +169,16 @@ def get_current_active_user(current_user: models.User = Depends(get_current_user
     if current_user.status == "disabled":
         raise HTTPException(status_code=403, detail="Account is disabled.")
     return current_user
+
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login", auto_error=False)
+
+def get_optional_user(token: Optional[str] = Depends(oauth2_scheme_optional), db: Session = Depends(get_db)) -> Optional[models.User]:
+    if not token:
+        return None
+    try:
+        return get_current_user(token=token, db=db)
+    except Exception:
+        return None
 
 def require_permission(flag: str):
     """FastAPI route dependency checking permission flag on the active user."""

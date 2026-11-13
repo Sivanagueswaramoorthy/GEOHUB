@@ -16,6 +16,8 @@ from routers import (
     dashboard_router,
     audit_router,
     finance_router,
+    app_router,
+    admin_router,
 )
 
 # Create database tables
@@ -56,6 +58,11 @@ if os.path.exists(assets_dir):
 if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
+# Mount static downloads directory for Over-The-Air (OTA) APK distribution
+STATIC_DOWNLOADS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static_downloads")
+os.makedirs(STATIC_DOWNLOADS, exist_ok=True)
+app.mount("/downloads", StaticFiles(directory=STATIC_DOWNLOADS), name="downloads")
+
 # Mount local uploads folder for static image/file access
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
@@ -69,6 +76,8 @@ app.include_router(gallery_router.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard_router.router, prefix=settings.API_V1_STR)
 app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)
+app.include_router(app_router.router, prefix=settings.API_V1_STR)
+app.include_router(admin_router.router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 def health_check():

@@ -10,6 +10,7 @@ export interface NotFoundViewProps {
 }
 
 export const NotFoundView: React.FC<NotFoundViewProps> = ({
+  attemptedRoute,
   onGoHome,
 }) => {
   const { setActiveTab } = useApp();
@@ -22,6 +23,20 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
       window.location.hash = '';
     }
   };
+
+  // If accidentally routed here due to asset loader paths or blank hash, automatically redirect to home
+  React.useEffect(() => {
+    const route = (attemptedRoute || '').toLowerCase();
+    if (
+      !route ||
+      route === 'home' ||
+      route === 'index.html' ||
+      route.includes('index.html') ||
+      route.startsWith('assets')
+    ) {
+      handleReturnHome();
+    }
+  }, [attemptedRoute]);
 
   return (
     <div

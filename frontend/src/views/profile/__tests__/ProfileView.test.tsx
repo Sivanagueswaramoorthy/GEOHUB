@@ -107,4 +107,21 @@ describe('ProfileView Component', () => {
     // Should indicate updating state or show success
     expect(updateBtn).toBeDisabled();
   });
+
+  it('renders Settings tab with Software Updates card and check trigger', async () => {
+    render(
+      <AppProvider>
+        <ProfileView />
+      </AppProvider>
+    );
+
+    // Switch to Settings tab
+    const settingsTabBtn = screen.getByRole('button', { name: /Settings/i });
+    fireEvent.click(settingsTabBtn);
+
+    // Verify Software Updates card is visible
+    expect(screen.getByText('Software Updates & App Installation')).toBeInTheDocument();
+    expect(screen.getByText(/GeoHub is up to date/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Check for Updates/i })).toBeInTheDocument();
+  });
 });

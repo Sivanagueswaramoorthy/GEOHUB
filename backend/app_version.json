@@ -1,0 +1,12 @@
+{
+  "version": "1.5.5",
+  "version_code": 12,
+  "apk_filename": "geohub-app.apk",
+  "release_notes": "Instant App Launch Update Popup & Settings Updater",
+  "download_url": "/downloads/geohub-app.apk",
+  "min_supported_version": "1.0.0",
+  "released_at": "2026-11-13",
+  "file_size_bytes": 6861075,
+  "file_size_mb": "6.54 MB",
+  "sha256": "3670ECF9DCD9693E068D210937B6F293760A78B8B89E8C8B62DB76F77CE42B88"
+}

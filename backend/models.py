@@ -186,3 +186,26 @@ class Expense(Base):
     logged_by = Column(String(64), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class AppDevice(Base):
+    __tablename__ = "app_devices"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    device_id = Column(String(128), unique=True, index=True, nullable=False)
+    user_id = Column(String(64), nullable=True, index=True) # roll_no or user id
+    device_name = Column(String(128), default="Android Device")
+    os_version = Column(String(64), default="Android")
+    app_version = Column(String(32), default="1.5.0")
+    fcm_token = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True)
+    last_seen_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class RolePermissionOverride(Base):
+    __tablename__ = "role_permission_overrides"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    role = Column(String(32), unique=True, index=True, nullable=False) # e.g. coordinator
+    overrides_json = Column(Text, nullable=False, default="{}") # JSON of { "canApproveEvents": true, ... }
+    updated_by = Column(String(64), nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+

@@ -18,6 +18,7 @@ import {
   ListChecks,
   History,
   ShieldAlert,
+  RefreshCw,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getRolePermissions } from '../../core/permissions';
@@ -52,6 +53,8 @@ export const ClubEventsView: React.FC = () => {
     cancelEvent,
     setActiveTab,
     showToast,
+    refreshCloudData,
+    isSyncing,
   } = useApp();
 
   const perms = getRolePermissions(currentUser.role);
@@ -636,17 +639,31 @@ export const ClubEventsView: React.FC = () => {
           </p>
         </div>
 
-        {/* Read-only screens HIDE create buttons */}
-        {perms.canCreateEditEvents && (
-          <PillButton
-            variant="primary"
-            size="sm"
-            icon={<Plus size={16} strokeWidth={1.75} />}
-            onClick={() => setIsCreateOpen(true)}
+        <div className="flex items-center gap-2">
+          {/* Cloud Sync Refresh Button */}
+          <button
+            type="button"
+            onClick={() => refreshCloudData()}
+            disabled={isSyncing}
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] transition active:scale-95 disabled:opacity-50 cursor-pointer border border-[#8EB69B]/30"
+            title="Refresh events from cloud"
+            aria-label="Refresh events from cloud"
           >
-            New event
-          </PillButton>
-        )}
+            <RefreshCw size={15} className={isSyncing ? 'animate-spin' : ''} />
+          </button>
+
+          {/* Read-only screens HIDE create buttons */}
+          {perms.canCreateEditEvents && (
+            <PillButton
+              variant="primary"
+              size="sm"
+              icon={<Plus size={16} strokeWidth={1.75} />}
+              onClick={() => setIsCreateOpen(true)}
+            >
+              New event
+            </PillButton>
+          )}
+        </div>
       </div>
 
       {/* 2) Filter Chips: All, Registered (if student), Workshop, Field, Symposium */}

@@ -6,6 +6,8 @@ import { PageTransition } from './components/shared/PageTransition';
 import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
+import { UpdateAvailableModal } from './components/modals/UpdateAvailableModal';
+import { checkForAppUpdate, registerDeviceTelemetry, AppVersionManifest } from './core/versionChecker';
 
 // Five Primary Screens
 import { HomeView } from './views/home/HomeView';
@@ -40,6 +42,7 @@ import { ChangePasswordView } from './features/auth/ChangePasswordView';
 import { AuditDetailPage } from './features/audits/AuditDetailPage';
 import { AuditLogView } from './views/audit/AuditLogView';
 import { DesignSystemView } from './views/design/DesignSystemView';
+import { SuperAdminOperationsView } from './views/admin/SuperAdminOperationsView';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -66,7 +69,15 @@ const MainAppContent: React.FC = () => {
     if (typeof window === 'undefined') return;
 
     const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
-    const path = window.location.pathname.replace(/^\//, '').trim();
+    const rawPath = window.location.pathname.replace(/^\//, '').trim();
+    const isAsset =
+      !rawPath ||
+      rawPath === 'index.html' ||
+      rawPath === 'assets/index.html' ||
+      rawPath.startsWith('assets') ||
+      rawPath.includes('.html');
+    const path = isAsset ? '' : rawPath;
+
     const isDesignSystem = hash === 'design-system' || path === 'design-system' || hash === 'design_system' || path === 'design_system';
     if (isDesignSystem) {
       setActiveTab('design-system');
@@ -262,6 +273,10 @@ const MainAppContent: React.FC = () => {
       case 'audit-logs':
       case 'audit_log':
         return <AuditLogView />;
+      case 'role_governance':
+      case 'role_credentials':
+      case 'super_admin_governance':
+        return <SuperAdminOperationsView onBack={() => setActiveTab('operations')} />;
       case 'design-system':
       case 'design_system':
         return <DesignSystemView />;
@@ -273,6 +288,16 @@ const MainAppContent: React.FC = () => {
         }
         if (activeTab === 'audits') {
           return <AuditLogView />;
+        }
+        // If activeTab is empty, an asset path, or unrecognized, fall back gracefully to HomeView instead of blocking entry
+        if (
+          !activeTab ||
+          activeTab === 'home' ||
+          activeTab === 'dashboard' ||
+          activeTab.includes('index.html') ||
+          activeTab.startsWith('assets')
+        ) {
+          return <HomeView />;
         }
         return <NotFoundView attemptedRoute={activeTab} onGoHome={() => setActiveTab('home')} />;
     }
@@ -326,12 +351,45 @@ const MainAppContent: React.FC = () => {
   );
 };
 
-export function App() {
+const GlobalUpdateModal: React.FC = () => {
+  const { updateInfo, isUpdateModalOpen, setIsUpdateModalOpen, isUpdateMandatory } = useApp();
+  return (
+    <UpdateAvailableModal
+      isOpen={isUpdateModalOpen}
+      updateInfo={updateInfo}
+      isMandatory={isUpdateMandatory}
+      onClose={() => setIsUpdateModalOpen(false)}
+    />
+  );
+};
+
+const AppContentWithSplash: React.FC = () => {
+  const { checkForUpdates } = useApp();
   const [showSplash, setShowSplash] = React.useState(() => {
     if (typeof window === 'undefined') return false;
-    // Skip splash on automated audits/direct hashes or when already signed in
-    if (window.localStorage.getItem('geohub_auth_session')) return false;
-    if (window.location.hash && window.location.hash !== '#login') return false;
+
+    // Detect if running inside Android APK wrapper
+    const isApk =
+      navigator.userAgent.includes('GeoHubMobileApp') ||
+      window.location.hostname === 'appassets.androidplatform.net' ||
+      Boolean((window as any).AndroidBridge);
+
+    // In APK: ALWAYS open the splash screen on launch to verify internet stability,
+    // even if already authenticated, blocking entry until stable connection is confirmed.
+    if (isApk) {
+      return true;
+    }
+
+    // Explicit bypass for automated tests or headless audits
+    if (window.location.search.includes('bypass_splash') || (window as any).__GEOHUB_E2E_AUDIT__) {
+      return false;
+    }
+
+    // Direct hash deep-linking in automated layout audits (e.g. #non_existent_route_test)
+    if (window.location.hash && window.location.hash !== '#login' && window.location.hash !== '#home') {
+      return false;
+    }
+
     return true;
   });
 
@@ -341,9 +399,26 @@ export function App() {
   }, []);
 
   return (
-    <AppProvider>
-      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
+    <>
+      {showSplash && (
+        <SplashScreen
+          onFinish={() => {
+            setShowSplash(false);
+            // Re-trigger update check right after splash completes network verification
+            checkForUpdates(false);
+          }}
+        />
+      )}
+      <GlobalUpdateModal />
       <MainAppContent />
+    </>
+  );
+};
+
+export function App() {
+  return (
+    <AppProvider>
+      <AppContentWithSplash />
     </AppProvider>
   );
 }

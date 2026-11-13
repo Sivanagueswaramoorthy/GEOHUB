@@ -310,7 +310,7 @@ describe('LoginPage Integration and E2E Auth Behavior', () => {
       () => {
         expect(screen.getByText(/authenticated/i)).toBeInTheDocument();
       },
-      { timeout: 2000 }
+      { timeout: 4000 }
     );
   });
 

@@ -2,11 +2,15 @@ package com.club.geohub
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -20,6 +24,203 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.webkit.WebViewAssetLoader
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import androidx.core.content.FileProvider
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
+
+class AndroidNetworkBridge(private val context: Context, private val webView: WebView? = null) {
+
+    @JavascriptInterface
+    fun isConnected(): Boolean {
+        return try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
+            val network = cm.activeNetwork ?: return false
+            val caps = cm.getNetworkCapabilities(network) ?: return false
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } catch (e: Exception) {
+            Log.e("GeoHubNetwork", "Error checking connection: ${e.message}")
+            false
+        }
+    }
+
+    @JavascriptInterface
+    fun isValidated(): Boolean {
+        return try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
+            val network = cm.activeNetwork ?: return false
+            val caps = cm.getNetworkCapabilities(network) ?: return false
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        } catch (e: Exception) {
+            Log.e("GeoHubNetwork", "Error validating network: ${e.message}")
+            false
+        }
+    }
+
+    @JavascriptInterface
+    fun getNetworkType(): String {
+        return try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return "NONE"
+            val network = cm.activeNetwork ?: return "NONE"
+            val caps = cm.getNetworkCapabilities(network) ?: return "NONE"
+            when {
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "WIFI"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "CELLULAR"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "ETHERNET"
+                else -> "OTHER"
+            }
+        } catch (e: Exception) {
+            "NONE"
+        }
+    }
+
+    @JavascriptInterface
+    fun getAppVersion(): String {
+        return try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            pInfo.versionName ?: "1.5.0"
+        } catch (e: Exception) {
+            "1.5.0"
+        }
+    }
+
+    @JavascriptInterface
+    fun getAppVersionCode(): Int {
+        return try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pInfo.longVersionCode.toInt()
+            } else {
+                @Suppress("DEPRECATION")
+                pInfo.versionCode
+            }
+        } catch (e: Exception) {
+            7
+        }
+    }
+
+    @JavascriptInterface
+    fun downloadAndInstallApk(apkUrl: String) {
+        thread(start = true) {
+            try {
+                Log.d("GeoHubOTA", "Starting APK download from: $apkUrl")
+                postProgressToWeb(5, "Connecting to update server...")
+
+                val targetUrl = if (apkUrl.startsWith("http://") || apkUrl.startsWith("https://")) {
+                    apkUrl
+                } else {
+                    "https://geohub-backend.onrender.com" + if (apkUrl.startsWith("/")) apkUrl else "/$apkUrl"
+                }
+
+                val url = URL(targetUrl)
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 15000
+                    readTimeout = 30000
+                    requestMethod = "GET"
+                    instanceFollowRedirects = true
+                }
+                connection.connect()
+
+                val fileLength = connection.contentLength
+                val saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
+                val apkFile = File(saveDir, "geohub-update.apk")
+                if (apkFile.exists()) {
+                    apkFile.delete()
+                }
+
+                postProgressToWeb(15, "Downloading update package...")
+
+                var input: InputStream? = null
+                var output: FileOutputStream? = null
+                try {
+                    input = connection.inputStream
+                    output = FileOutputStream(apkFile)
+
+                    val buffer = ByteArray(8192)
+                    var total: Long = 0
+                    var count: Int
+                    var lastReported = 15
+
+                    while (input.read(buffer).also { count = it } != -1) {
+                        total += count
+                        output.write(buffer, 0, count)
+                        if (fileLength > 0) {
+                            val percent = (15 + (total * 80 / fileLength)).toInt().coerceIn(15, 95)
+                            if (percent >= lastReported + 5) {
+                                lastReported = percent
+                                postProgressToWeb(percent, "Downloading update: $percent%")
+                            }
+                        }
+                    }
+                    output.flush()
+                } finally {
+                    output?.close()
+                    input?.close()
+                    connection.disconnect()
+                }
+
+                postProgressToWeb(98, "Preparing package installer...")
+                Log.d("GeoHubOTA", "APK downloaded successfully to ${apkFile.absolutePath} (${apkFile.length()} bytes)")
+
+                // Launch package installer on UI thread
+                (context as? AppCompatActivity)?.runOnUiThread {
+                    installApkFile(apkFile)
+                }
+            } catch (e: Exception) {
+                Log.e("GeoHubOTA", "Download/Install failed: ${e.message}", e)
+                postProgressToWeb(-1, "Update failed: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    private fun postProgressToWeb(percent: Int, statusMsg: String) {
+        webView?.post {
+            val script = "window.__onApkDownloadProgress && window.__onApkDownloadProgress($percent, '${statusMsg.replace("'", "\\'")}');"
+            webView.evaluateJavascript(script, null)
+        }
+    }
+
+    private fun installApkFile(apkFile: File) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (!context.packageManager.canRequestPackageInstalls()) {
+                    val manageIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                        data = Uri.parse("package:${context.packageName}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(manageIntent)
+                }
+            }
+
+            val apkUri: Uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                apkFile
+            )
+
+            val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(apkUri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(installIntent)
+            postProgressToWeb(100, "Package installer opened.")
+        } catch (e: Exception) {
+            Log.e("GeoHubOTA", "Package installer launch failed: ${e.message}")
+            postProgressToWeb(-1, "Installer error: ${e.localizedMessage}")
+        }
+    }
+}
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,6 +247,9 @@ class MainActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+
+            // Inject native network verification & OTA installer bridge
+            addJavascriptInterface(AndroidNetworkBridge(this@MainActivity, this), "AndroidBridge")
 
             settings.apply {
                 javaScriptEnabled = true

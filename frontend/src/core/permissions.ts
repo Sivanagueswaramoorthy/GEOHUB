@@ -658,6 +658,22 @@ export const canAccessRoute = (
     }
   }
 
+  // SuperAdmin Role Credentials & Operations Governance: Faculty / SuperAdmin only
+  if (
+    normalizedRoute === 'role_governance' ||
+    normalizedRoute === 'role-governance' ||
+    normalizedRoute === 'role_credentials' ||
+    normalizedRoute === 'super_admin_governance'
+  ) {
+    if (normRole !== 'faculty') {
+      return {
+        allowed: false,
+        redirect: 'home',
+        message: "You don't have access - SuperAdmin clearance required",
+      };
+    }
+  }
+
   // Finance & Ledger: faculty, treasurer, coordinator
   if (normalizedRoute === 'finance' || normalizedRoute === 'treasurer' || normalizedRoute === 'ledger') {
     if (!perms.canAccessFinance && !perms.canAccessLedger) {
