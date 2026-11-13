@@ -75,53 +75,80 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
 
     # 2. Canonical alias match (e.g. SA01, FAC01, superadmin, faculty, president)
     if not user:
-        if ident_lower in ("super_admin", "superadmin", "sa01"):
-            user = db.query(models.User).filter(
-                (models.User.role == "super_admin") |
-                (models.User.roll_no == "SA01")
-            ).first()
-        elif ident_lower in ("faculty", "fac01", "21geo000", "fac999"):
-            user = db.query(models.User).filter(
-                (models.User.role == "faculty") |
-                (models.User.roll_no.in_(["FAC01", "21GEO000", "FAC999"]))
-            ).first()
-        elif ident_lower in ("coordinator", "president", "admin", "21geo001"):
-            user = db.query(models.User).filter(
-                (models.User.role.in_(["coordinator", "admin"])) |
-                (models.User.roll_no == "21GEO001")
-            ).first()
+        alias_map = {
+            "super_admin": "SA01",
+            "superadmin": "SA01",
+            "sa01": "SA01",
+            "super": "SA01",
+            "faculty": "FAC01",
+            "fac01": "FAC01",
+            "advisor": "FAC01",
+            "coordinator": "21GEO001",
+            "president": "21GEO001",
+            "admin": "21GEO001",
+            "pres": "21GEO001",
+            "21geo001": "21GEO001",
+            "management": "21GEO010",
+            "mgmt": "21GEO010",
+            "vicepresident": "21GEO010",
+            "vp": "21GEO010",
+            "21geo010": "21GEO010",
+            "documentation": "22GEO018",
+            "doc": "22GEO018",
+            "docs": "22GEO018",
+            "22geo018": "22GEO018",
+            "treasurer": "22GEO019",
+            "treasury": "22GEO019",
+            "finance": "22GEO019",
+            "22geo019": "22GEO019",
+            "promotion": "22GEO014",
+            "promo": "22GEO014",
+            "social": "22GEO014",
+            "22geo014": "22GEO014",
+            "volunteer": "23GEO042",
+            "vol": "23GEO042",
+            "23geo042": "23GEO042",
+            "student": "23GEO088",
+            "member": "23GEO088",
+            "scholar": "23GEO088",
+            "23geo088": "23GEO088",
+        }
+        target_roll = alias_map.get(ident_lower)
+        if target_roll:
+            user = db.query(models.User).filter(models.User.roll_no == target_roll).first()
 
-    # 3. Auto-seed SA01 if not found and requested
-    if not user and ident_lower in ("super_admin", "superadmin", "sa01"):
-        user = models.User(
-            id="u_super_admin_sa01",
-            roll_no="SA01",
-            name="System SuperAdmin",
-            email="superadmin@college.edu",
-            role="super_admin",
-            post="System Administrator",
-            hashed_password=auth.get_password_hash("GeoHub2026!"),
-            status="active"
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-
-    # 4. Auto-seed FAC01 if not found and requested
-    if not user and ident_lower in ("faculty", "fac01", "21geo000"):
-        user = models.User(
-            id="u_faculty_fac01",
-            roll_no="FAC01",
-            name="Dr. Sarah Jenkins",
-            email="sarah.jenkins@college.edu",
-            role="faculty",
-            post="Faculty Advisor",
-            hashed_password=auth.get_password_hash("GeoHub2026!"),
-            status="active"
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+    # 3. Dynamic auto-seed for any canonical role if missing from database
+    if not user:
+        canonical_templates = {
+            "SA01": ("u_super_admin_sa01", "superadmin@college.edu", "System SuperAdmin", "super_admin", "System Administrator", "Platform Governance & IT"),
+            "FAC01": ("u_faculty_fac01", "sarah.jenkins@college.edu", "Dr. Sarah Jenkins", "faculty", "Faculty Advisor", "Geography & Geomatics"),
+            "21GEO001": ("u_admin_02", "alex.rivera@college.edu", "Alex Rivera", "coordinator", "Club President", "Geoinformatics Engineering"),
+            "21GEO010": ("u_mgmt_06", "elena.rostova@college.edu", "Elena Rostova", "management", "Vice President", "Geology & Environmental Management"),
+            "22GEO018": ("u_doc_lead_08", "aarav.patel@college.edu", "Aarav Patel", "documentation", "Documentation Lead", "Geoinformatics & Archival Science"),
+            "22GEO019": ("u_treasurer_07", "ananya.iyer@college.edu", "Ananya Iyer", "treasurer", "Treasurer", "Economics & Financial Analytics"),
+            "22GEO014": ("u_promo_03", "david.chen@college.edu", "David Chen", "promotion", "Promotion Lead", "Earth Science & Media"),
+            "23GEO042": ("u_volunteer_05", "liam.vance@college.edu", "Liam Vance", "volunteer", "Lead Volunteer", "Environmental Studies"),
+            "23GEO088": ("u_member_04", "maya.patel@college.edu", "Maya Patel", "student", "Club Member", "Cartography & Geography"),
+        }
+        matched_roll = alias_map.get(ident_lower, ident_upper)
+        if matched_roll in canonical_templates:
+            uid, email, name, role, post, dept = canonical_templates[matched_roll]
+            user = models.User(
+                id=uid,
+                roll_no=matched_roll,
+                name=name,
+                email=email,
+                role=role,
+                post=post,
+                department=dept,
+                hashed_password=auth.get_password_hash("GeoHub2026!"),
+                is_volunteer=(1 if role == "volunteer" else 0),
+                status="active",
+                created_at=datetime.utcnow()
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
 
     if not user or not auth.verify_password(login_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect credentials. Please verify your roll number/email and password.")

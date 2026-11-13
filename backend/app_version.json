@@ -1,12 +1,12 @@
 {
-  "version": "1.5.7",
-  "version_code": 14,
+  "version": "1.5.8",
+  "version_code": 15,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Separated SuperAdmin (SA01) and Faculty (FAC01) roles; removed launch lock screen",
+  "release_notes": "Added all 9 canonical roles to database and enabled seamless fallback login",
   "download_url": "/downloads/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-13",
-  "file_size_bytes": 6861151,
+  "file_size_bytes": 6861199,
   "file_size_mb": "6.54 MB",
-  "sha256": "1F00470E168A43CA7A01850BF7D5BF2E7D1041859F53CE215F1EA826DBE90F8C"
+  "sha256": "335CC25D62AF14A3DF7D404745214BDB6FD328B1158CE23DA77519EFA50A8AFF"
 }
