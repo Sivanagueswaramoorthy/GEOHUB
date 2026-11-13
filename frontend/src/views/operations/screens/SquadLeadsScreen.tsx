@@ -10,8 +10,9 @@ import {
   Award,
   Calendar,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, EmptyState } from '../../../components/shared';
 import { canAssignSquadLead } from '../../../core/permissions';
+import { useApp } from '../../../context/AppContext';
 import { ScholarRecord } from './MemberDirectoryScreen';
 
 export interface SquadLeadsScreenProps {
@@ -25,6 +26,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
+  const { users } = useApp();
   const [showAppointModal, setShowAppointModal] = useState(false);
   const [editingLead, setEditingLead] = useState<ScholarRecord | null>(null);
   const [stepDownTarget, setStepDownTarget] = useState<ScholarRecord | null>(null);
@@ -40,12 +42,29 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
   const [editPost, setEditPost] = useState('');
   const [editSquad, setEditSquad] = useState('Promotion');
 
-  const [leads, setLeads] = useState<ScholarRecord[]>([
-    { uid: 'u-mgmt', name: 'Divya Rao', role: 'management', squad: 'Management', isLead: true, post: 'Management Lead', email: 'divya.rao@geohub.edu', rollNo: '22GEO005' },
-    { uid: 'u-promo', name: 'Sneha Patel', role: 'management', squad: 'Promotion', isLead: true, post: 'Promotion Lead', email: 'sneha.patel@geohub.edu', rollNo: '22GEO012' },
-    { uid: 'u-treas', name: 'Ananya Iyer', role: 'management', squad: 'Treasury', isLead: true, post: 'Treasury Lead', email: 'ananya.iyer@geohub.edu', rollNo: '22GEO023' },
-    { uid: 'u-doc', name: 'Aarav Patel', role: 'coordinator', squad: 'Documentation', isLead: true, post: 'Documentation Lead', email: 'aarav.patel@geohub.edu', rollNo: '22GEO034' },
-  ]);
+  const initialLeads: ScholarRecord[] = React.useMemo(() => {
+    return (users || [])
+      .filter(
+        (u) =>
+          u.squadMemberships?.some((m) => m.isLead) ||
+          (u.post && u.post.toLowerCase().includes('lead'))
+      )
+      .map((u) => {
+        const leadMembership = u.squadMemberships?.find((m) => m.isLead);
+        return {
+          uid: u.uid,
+          name: u.name,
+          role: u.role,
+          squad: leadMembership ? leadMembership.squad : u.team || 'Management',
+          isLead: true,
+          post: u.post || u.teamRole || 'Squad Lead',
+          email: u.email,
+          rollNo: u.rollNo,
+        };
+      });
+  }, [users]);
+
+  const [leads, setLeads] = useState<ScholarRecord[]>(initialLeads);
 
   const canEdit = !readOnly && canAssignSquadLead(currentUser);
 
@@ -176,61 +195,69 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
-          {leads.map((lead) => (
-            <div
-              key={lead.uid}
-              className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-3"
-            >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-10 h-10 rounded-xl bg-[#DAF1DE] text-[#163832] font-extrabold text-xs flex items-center justify-center shrink-0 border border-[#8EB69B]/40">
-                  {lead.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
-                      {lead.name}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0">
-                      {lead.squad}
-                    </span>
+        {leads.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
+            {leads.map((lead) => (
+              <div
+                key={lead.uid}
+                className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-10 h-10 rounded-xl bg-[#DAF1DE] text-[#163832] font-extrabold text-xs flex items-center justify-center shrink-0 border border-[#8EB69B]/40">
+                    {lead.name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[#235347] truncate">
-                    <span className="font-semibold text-[#163832] truncate">{lead.post}</span>
-                    <span>•</span>
-                    <span className="font-mono text-[#051F20]">{lead.rollNo}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
+                        {lead.name}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0">
+                        {lead.squad}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[#235347] truncate">
+                      <span className="font-semibold text-[#163832] truncate">{lead.post}</span>
+                      <span>•</span>
+                      <span className="font-mono text-[#051F20]">{lead.rollNo}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              {canEdit && (
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditingLead(lead);
-                      setEditPost(lead.post);
-                      setEditSquad(lead.squad);
-                    }}
-                    className="w-8 h-8 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer shadow-2xs"
-                    title="Edit Designation"
-                  >
-                    <Edit2 size={13} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStepDownTarget(lead)}
-                    className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
-                    title="Step Down Lead"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                {/* Actions */}
+                {canEdit && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingLead(lead);
+                        setEditPost(lead.post);
+                        setEditSquad(lead.squad);
+                      }}
+                      className="w-8 h-8 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer shadow-2xs"
+                      title="Edit Designation"
+                    >
+                      <Edit2 size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setStepDownTarget(lead)}
+                      className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
+                      title="Step Down Lead"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            mascot="shield"
+            title="No Appointed Squad Leads"
+            description="No scholars are currently designated as squad leadership council officers."
+          />
+        )}
       </div>
 
       {/* Step Down Confirm Dialog */}

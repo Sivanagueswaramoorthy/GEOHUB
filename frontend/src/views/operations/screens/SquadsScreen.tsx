@@ -13,7 +13,8 @@ import {
   UserCheck,
   CheckSquare,
 } from 'lucide-react';
-import { AnimatedNumber } from '../../../components/shared';
+import { AnimatedNumber, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 import { ScholarRecord } from './MemberDirectoryScreen';
 
 export interface SquadsScreenProps {
@@ -29,50 +30,54 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
   currentUser,
   onSubViewChange,
 }) => {
+  const { users, tasks } = useApp();
   const [selectedSquadId, setSelectedSquadId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
 
-  const [members, setMembers] = useState<ScholarRecord[]>([
-    { uid: 'u-1', name: 'Dr. Sarah Jenkins', role: 'faculty', squad: 'Management', isLead: true, post: 'Faculty Advisor', email: 'sarah.jenkins@geohub.edu', rollNo: 'FAC001' },
-    { uid: 'u-2', name: 'Aarav Patel', role: 'coordinator', squad: 'Documentation', isLead: true, post: 'Documentation Lead', email: 'aarav.patel@geohub.edu', rollNo: '22GEO034' },
-    { uid: 'u-3', name: 'Divya Rao', role: 'management', squad: 'Management', isLead: true, post: 'Management Lead', email: 'divya.rao@geohub.edu', rollNo: '22GEO005' },
-    { uid: 'u-4', name: 'Sneha Patel', role: 'management', squad: 'Promotion', isLead: true, post: 'Promotion Lead', email: 'sneha.patel@geohub.edu', rollNo: '22GEO012' },
-    { uid: 'u-5', name: 'Ananya Iyer', role: 'management', squad: 'Treasury', isLead: true, post: 'Treasury Lead', email: 'ananya.iyer@geohub.edu', rollNo: '22GEO023' },
-    { uid: 'u-6', name: 'Kunal Sen', role: 'student', squad: 'Promotion', isLead: false, post: 'Promotion Associate', email: 'kunal.sen@geohub.edu', rollNo: '23GEO045' },
-    { uid: 'u-7', name: 'Maya Patel', role: 'student', squad: 'Management', isLead: false, post: 'Logistics Associate', email: 'maya.patel@geohub.edu', rollNo: '24GEO102' },
-    { uid: 'u-8', name: 'David Chen', role: 'student', squad: 'Documentation', isLead: false, post: 'Field Archivist', email: 'david.chen@geohub.edu', rollNo: '24GEO055' },
-  ]);
+  const initialMembers: ScholarRecord[] = React.useMemo(() => {
+    return (users || []).map((u) => {
+      const isLead =
+        u.squadMemberships?.some((m) => m.isLead) ||
+        (u.post && u.post.toLowerCase().includes('lead')) ||
+        false;
+      const squad = u.team || u.squadMemberships?.[0]?.squad || 'Management';
+      return {
+        uid: u.uid,
+        name: u.name,
+        role: u.role,
+        squad: squad,
+        isLead: !!isLead,
+        post: u.post || u.teamRole || 'Scholar Member',
+        email: u.email,
+        rollNo: u.rollNo,
+      };
+    });
+  }, [users]);
+
+  const [members, setMembers] = useState<ScholarRecord[]>(initialMembers);
 
   const squadDefinitions = [
     {
       id: 'Management',
       name: 'Management Squad',
       icon: Shield,
-      tasksTotal: 8,
-      tasksDone: 6,
     },
     {
       id: 'Promotion',
       name: 'Promotion Squad',
       icon: Megaphone,
-      tasksTotal: 10,
-      tasksDone: 8,
     },
     {
       id: 'Treasury',
       name: 'Treasury Squad',
       icon: Coins,
-      tasksTotal: 6,
-      tasksDone: 5,
     },
     {
       id: 'Documentation',
       name: 'Documentation Squad',
       icon: FileText,
-      tasksTotal: 7,
-      tasksDone: 6,
     },
   ];
 
@@ -177,30 +182,38 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            {squadMembers.map((m) => (
-              <div
-                key={m.uid}
-                className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-3"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
-                      {m.name}
-                    </span>
-                    {m.isLead && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
-                        Lead
+          {squadMembers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              {squadMembers.map((m) => (
+                <div
+                  key={m.uid}
+                  className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
+                        {m.name}
                       </span>
-                    )}
+                      {m.isLead && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
+                          Lead
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-[#235347] font-semibold block truncate mt-0.5">
+                      {m.rollNo} • {m.post}
+                    </span>
                   </div>
-                  <span className="text-xs text-[#235347] font-semibold block truncate mt-0.5">
-                    {m.rollNo} • {m.post}
-                  </span>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              mascot="leaf"
+              title="No Squad Members Enrolled"
+              description={`No scholars are currently assigned to ${squadDef.name}.`}
+            />
+          )}
         </div>
 
         {/* Modal: Enroll Member */}
@@ -241,6 +254,10 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
       </div>
     );
   }
+
+  const completedTasksCount = (tasks || []).filter((t) => t.status === 'done').length;
+  const overallCompletion = tasks && tasks.length > 0 ? Math.round((completedTasksCount / tasks.length) * 100) : 0;
+  const totalOfficers = members.filter((m) => m.isLead).length;
 
   // Primary Squads Overview
   return (
@@ -286,7 +303,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
             </div>
           </div>
           <div className="font-extrabold text-[#051F20] text-base sm:text-lg mt-1">
-            84%
+            <AnimatedNumber value={overallCompletion} />%
           </div>
         </div>
 
@@ -298,7 +315,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
             </div>
           </div>
           <div className="font-extrabold text-[#051F20] text-base sm:text-lg mt-1">
-            4 Leads
+            <AnimatedNumber value={totalOfficers} /> Leads
           </div>
         </div>
       </div>
@@ -316,7 +333,10 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
             const Icon = squad.icon;
             const squadMembers = members.filter((m) => m.squad === squad.id);
             const lead = squadMembers.find((m) => m.isLead);
-            const progressPercent = Math.round((squad.tasksDone / squad.tasksTotal) * 100);
+            const squadTasks = (tasks || []).filter((t) => t.team === squad.id);
+            const tasksTotal = squadTasks.length;
+            const tasksDone = squadTasks.filter((t) => t.status === 'done').length;
+            const progressPercent = tasksTotal > 0 ? Math.round((tasksDone / tasksTotal) * 100) : 0;
 
             return (
               <div
@@ -353,7 +373,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
                       />
                     </div>
                     <span className="font-semibold text-xs text-[#051F20]">
-                      {squad.tasksDone}/{squad.tasksTotal} Tasks
+                      {tasksDone}/{tasksTotal} Tasks
                     </span>
                   </div>
                   <span className="font-bold text-[#163832] inline-flex items-center gap-0.5 hover:underline">

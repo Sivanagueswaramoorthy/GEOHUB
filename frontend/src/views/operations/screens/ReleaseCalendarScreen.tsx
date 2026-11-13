@@ -12,7 +12,8 @@ import {
   ChevronRight,
   Eye,
 } from 'lucide-react';
-import { AnimatedNumber, PillButton } from '../../../components/shared';
+import { AnimatedNumber, PillButton, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface CampaignReleaseItem {
   id: string;
@@ -41,55 +42,26 @@ export const ReleaseCalendarScreen: React.FC<ReleaseCalendarScreenProps> = ({
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const { campaigns: contextCampaigns, events } = useApp();
   // Form states
   const [newTitle, setNewTitle] = useState('');
-  const [newEvent, setNewEvent] = useState('GEO FEST 2026');
+  const [newEvent, setNewEvent] = useState(events?.[0]?.title || 'Chapter Event');
   const [newChannel, setNewChannel] = useState<'Instagram' | 'LinkedIn' | 'Notice Board' | 'WhatsApp Broadcast' | 'Circular'>('Instagram');
   const [newDate, setNewDate] = useState('2026-11-12');
   const [newCaption, setNewCaption] = useState('');
 
-  const [campaigns, setCampaigns] = useState<CampaignReleaseItem[]>([
-    {
-      id: 'cr-1',
-      title: 'GEO FEST 2026 Official Teaser Poster',
-      event: 'GEO FEST 2026',
-      channel: 'Instagram',
-      scheduledDate: '2026-11-06',
-      status: 'Scheduled',
-      caption: 'The annual campus odyssey returns! Register for tech symposiums, geo-challenges, and drone showcases.',
-      author: 'Sneha Patel',
-    },
-    {
-      id: 'cr-2',
-      title: 'Dean Sanctioned Guest Speaker Lineup',
-      event: 'GEO FEST 2026',
-      channel: 'LinkedIn',
-      scheduledDate: '2026-11-08',
-      status: 'Scheduled',
-      caption: 'Welcoming Dr. K. Radhakrishnan (Former ISRO Chairman) as Keynote Speaker for our GeoTech Symposium.',
-      author: 'Sneha Patel',
-    },
-    {
-      id: 'cr-3',
-      title: 'Volunteer Onboarding Call: Turnstile Logistics',
-      event: 'Campus Topo Camp',
-      channel: 'WhatsApp Broadcast',
-      scheduledDate: '2026-11-04',
-      status: 'Live',
-      caption: 'Mandatory briefing for all squad volunteers at 4:30 PM in Geomatics Seminar Hall 2.',
-      author: 'Divya Rao',
-    },
-    {
-      id: 'cr-4',
-      title: 'Pre-Event Retrospective & Circular Announcement',
-      event: 'Annual Drone Survey',
-      channel: 'Circular',
-      scheduledDate: '2026-10-28',
-      status: 'Completed',
-      caption: 'Official college circular approved by Faculty Advisor Dr. Sarah Jenkins.',
-      author: 'Aarav Patel',
-    },
-  ]);
+  const [campaigns, setCampaigns] = useState<CampaignReleaseItem[]>(() => {
+    return (contextCampaigns || []).map((c: any) => ({
+      id: c.id,
+      title: c.name || c.title || 'Campaign',
+      event: c.eventTitle || 'Campus Initiative',
+      channel: (c.channel || 'Instagram') as any,
+      scheduledDate: c.startDate || 'Upcoming',
+      status: (c.status || 'Scheduled') as any,
+      caption: c.caption || c.description || 'Publicity release',
+      author: c.author || 'Promotion Lead',
+    }));
+  });
 
   const channels = ['All', 'Instagram', 'LinkedIn', 'Notice Board', 'WhatsApp Broadcast', 'Circular'];
 
@@ -218,52 +190,60 @@ export const ReleaseCalendarScreen: React.FC<ReleaseCalendarScreenProps> = ({
 
         {/* Release Cards Feed */}
         <div className="space-y-3 pt-1">
-          {filteredCampaigns.map((camp) => (
-            <div
-              key={camp.id}
-              className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-bold text-[#051F20] text-xs sm:text-sm">
-                    {camp.title}
-                  </span>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                      camp.status === 'Scheduled'
-                        ? 'bg-[rgba(242,184,75,0.18)] text-[#051F20] border border-[rgba(242,184,75,0.4)]'
-                        : camp.status === 'Live'
-                        ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
-                        : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE]'
-                    }`}
-                  >
-                    {camp.status}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-white border border-[#DAF1DE] text-[#235347]">
-                    {camp.channel}
-                  </span>
+          {filteredCampaigns.length > 0 ? (
+            filteredCampaigns.map((camp) => (
+              <div
+                key={camp.id}
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-[#051F20] text-xs sm:text-sm">
+                      {camp.title}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                        camp.status === 'Scheduled'
+                          ? 'bg-[rgba(242,184,75,0.18)] text-[#051F20] border border-[rgba(242,184,75,0.4)]'
+                          : camp.status === 'Live'
+                          ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
+                          : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE]'
+                      }`}
+                    >
+                      {camp.status}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-white border border-[#DAF1DE] text-[#235347]">
+                      {camp.channel}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-[#235347] mt-1 line-clamp-2">
+                    {camp.caption}
+                  </p>
+
+                  <div className="flex items-center gap-3 mt-1.5 text-xs text-[#235347]/80">
+                    <span>Event: <strong className="text-[#051F20]">{camp.event}</strong></span>
+                    <span>•</span>
+                    <span>Date: <strong className="text-[#051F20]">{camp.scheduledDate}</strong></span>
+                    <span>•</span>
+                    <span>Lead: {camp.author}</span>
+                  </div>
                 </div>
 
-                <p className="text-xs text-[#235347] mt-1 line-clamp-2">
-                  {camp.caption}
-                </p>
-
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-[#235347]/80">
-                  <span>Event: <strong className="text-[#051F20]">{camp.event}</strong></span>
-                  <span>•</span>
-                  <span>Date: <strong className="text-[#051F20]">{camp.scheduledDate}</strong></span>
-                  <span>•</span>
-                  <span>Lead: {camp.author}</span>
+                <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
+                  <span className="h-8 px-3 rounded-xl bg-white border border-[#DAF1DE] text-xs font-bold text-[#163832] flex items-center gap-1 shadow-2xs">
+                    <Clock size={13} /> {camp.scheduledDate}
+                  </span>
                 </div>
               </div>
-
-              <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
-                <span className="h-8 px-3 rounded-xl bg-white border border-[#DAF1DE] text-xs font-bold text-[#163832] flex items-center gap-1 shadow-2xs">
-                  <Clock size={13} /> {camp.scheduledDate}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyState
+              mascot="megaphone"
+              title="No Releases Scheduled"
+              description="Plan upcoming media releases, teaser reels, and flyers."
+            />
+          )}
         </div>
       </div>
 

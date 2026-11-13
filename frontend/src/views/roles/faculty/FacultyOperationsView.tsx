@@ -40,22 +40,40 @@ export const FacultyOperationsView: React.FC = () => {
   const [academicYear, setAcademicYear] = useState('2026-2027');
   const [gateSecurityLevel, setGateSecurityLevel] = useState('Standard Gate Pass');
 
-  const [selectedEventId, setSelectedEventId] = useState<string>(events[0]?.id || 'event_01');
+  const [selectedEventId, setSelectedEventId] = useState<string>(events[0]?.id || '');
   const selectedEvent = events.find((e) => e.id === selectedEventId) || events[0];
 
-  const [eventGrants, setEventGrants] = useState<{ squad: string; leadName: string; permission: 'read' | 'write' }[]>([
-    { squad: 'Management', leadName: 'Vikram Seth', permission: 'write' },
-    { squad: 'Promotion', leadName: 'Maya Patel', permission: 'write' },
-    { squad: 'Documentation', leadName: 'Kavita Rao', permission: 'write' },
-    { squad: 'Treasurer', leadName: 'Devon Vance', permission: 'write' },
-  ]);
+  interface GrantItem {
+    squad: string;
+    leadName: string;
+    permission: 'read' | 'write';
+  }
+
+  const initialGrants: GrantItem[] = React.useMemo(() => {
+    return ['Management', 'Promotion', 'Documentation', 'Treasurer'].map((squad) => {
+      const lead = users.find(
+        (u) =>
+          u.team === squad &&
+          (u.post?.toLowerCase().includes('lead') ||
+            u.squadMemberships?.some((m) => m.isLead))
+      );
+      return {
+        squad,
+        leadName: lead?.name || 'Assigned Officer',
+        permission: 'write',
+      };
+    });
+  }, [users]);
+
+  const [eventGrants, setEventGrants] = useState<GrantItem[]>(initialGrants);
 
   const handleTogglePermission = (idx: number) => {
     setEventGrants((prev) =>
       prev.map((g, i) => {
         if (i !== idx) return g;
         const newPerm = g.permission === 'write' ? 'read' : 'write';
-        showToast(`Updated ${g.squad} squad access for "${selectedEvent.title}" to ${newPerm.toUpperCase()}`);
+        const eventTitle = selectedEvent ? selectedEvent.title : 'Event';
+        showToast(`Updated ${g.squad} squad access for "${eventTitle}" to ${newPerm.toUpperCase()}`);
         return { ...g, permission: newPerm };
       })
     );
@@ -214,17 +232,23 @@ export const FacultyOperationsView: React.FC = () => {
             <label className="text-xs font-bold text-[#051F20] block mb-1">
               Select Event
             </label>
-            <select
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              className="w-full h-11 rounded-2xl border border-[#DAF1DE] px-3 text-xs bg-white text-[#051F20] outline-none"
-            >
-              {events.map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.title} ({ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming'})
-                </option>
-              ))}
-            </select>
+            {events.length > 0 ? (
+              <select
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                className="w-full h-11 rounded-2xl border border-[#DAF1DE] px-3 text-xs bg-white text-[#051F20] outline-none"
+              >
+                {events.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title} ({ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming'})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-semibold text-[#235347]">
+                No active events available to configure
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">

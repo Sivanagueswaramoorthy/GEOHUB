@@ -12,7 +12,8 @@ import {
   Calendar,
   Tag,
 } from 'lucide-react';
-import { AnimatedNumber } from '../../../components/shared';
+import { AnimatedNumber, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface MediaUploadItem {
   id: string;
@@ -37,58 +38,26 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const [selectedEvent, setSelectedEvent] = useState('GEO FEST 2026');
+  const { gallery, events } = useApp();
+  const [selectedEvent, setSelectedEvent] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [previewMedia, setPreviewMedia] = useState<MediaUploadItem | null>(null);
 
-  const [mediaList, setMediaList] = useState<MediaUploadItem[]>([
-    {
-      id: 'm-1',
-      event: 'GEO FEST 2026',
-      title: 'Inaugural Keynote Session Dr Radhakrishnan',
-      type: 'image',
-      category: 'Keynote Photos',
-      size: '4.2 MB',
-      uploadedBy: 'Aarav Patel',
-      date: '2026-11-04',
-      url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'm-2',
-      event: 'GEO FEST 2026',
-      title: 'Auditorium Drone Aerial Flyover',
-      type: 'video',
-      category: 'Drone Footage',
-      size: '48.5 MB',
-      uploadedBy: 'David Chen',
-      date: '2026-11-04',
-      url: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'm-3',
-      event: 'GEO FEST 2026',
-      title: 'Student Exhibition Stalls & Robotics Demo',
-      type: 'image',
-      category: 'Stage & Audience',
-      size: '3.1 MB',
-      uploadedBy: 'Sneha Patel',
-      date: '2026-11-04',
-      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'm-4',
-      event: 'Campus Topo Camp',
-      title: 'Theodolite Field Station Alignment',
-      type: 'image',
-      category: 'Field Stations',
-      size: '2.8 MB',
-      uploadedBy: 'Divya Rao',
-      date: '2026-10-22',
-      url: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&auto=format&fit=crop&q=80',
-    },
-  ]);
+  const [mediaList, setMediaList] = useState<MediaUploadItem[]>(() => {
+    return (gallery || []).map((g: any) => ({
+      id: g.id,
+      event: g.eventTitle || 'Chapter Initiative',
+      title: g.title,
+      type: g.type || 'image',
+      category: g.category || 'Event Photos',
+      size: g.size || '3.5 MB',
+      uploadedBy: g.uploadedBy || 'Documentation Lead',
+      date: g.uploadedAt ? new Date(g.uploadedAt).toLocaleDateString() : 'Today',
+      url: g.url,
+    }));
+  });
 
   const categories = ['All', 'Keynote Photos', 'Drone Footage', 'Stage & Audience', 'Field Stations'];
 
@@ -222,8 +191,11 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
               className="h-8 px-2.5 rounded-xl border border-[#DAF1DE] text-xs font-semibold text-[#051F20] bg-[#F6FBF7] cursor-pointer"
             >
               <option value="All">All Events</option>
-              <option value="GEO FEST 2026">GEO FEST 2026</option>
-              <option value="Campus Topo Camp">Campus Topo Camp</option>
+              {(events || []).map((ev) => (
+                <option key={ev.id} value={ev.title}>
+                  {ev.title}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -251,39 +223,49 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
 
         {/* Gallery Grid (Responsive 1-col on tiny mobile, 2-col on standard mobile, 3-col on tablet/desktop) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
-          {filteredMedia.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setPreviewMedia(item)}
-              className="group rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] overflow-hidden hover:border-[#8EB69B] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
-            >
-              <div className="relative aspect-video w-full bg-[#163832]/10 overflow-hidden">
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-2 left-2 flex items-center gap-1.5">
-                  <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-[#051F20]/80 text-white backdrop-blur-xs">
-                    {item.type.toUpperCase()}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-white/90 text-[#051F20] backdrop-blur-xs">
-                    {item.size}
-                  </span>
+          {filteredMedia.length > 0 ? (
+            filteredMedia.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setPreviewMedia(item)}
+                className="group rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] overflow-hidden hover:border-[#8EB69B] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+              >
+                <div className="relative aspect-video w-full bg-[#163832]/10 overflow-hidden">
+                  <img
+                    src={item.url}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-2 left-2 flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md text-xs font-bold bg-[#051F20]/80 text-white backdrop-blur-xs">
+                      {item.type.toUpperCase()}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-xs font-semibold bg-white/90 text-[#051F20] backdrop-blur-xs">
+                      {item.size}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="p-3 space-y-1">
-                <div className="text-xs font-bold text-[#051F20] line-clamp-1">
-                  {item.title}
-                </div>
-                <div className="flex items-center justify-between text-xs text-[#235347]">
-                  <span>{item.category}</span>
-                  <span>{item.uploadedBy}</span>
+                <div className="p-3 space-y-1">
+                  <div className="text-xs font-bold text-[#051F20] line-clamp-1">
+                    {item.title}
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-[#235347]">
+                    <span>{item.category}</span>
+                    <span>{item.uploadedBy}</span>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="col-span-full">
+              <EmptyState
+                mascot="camera"
+                title="No Media Uploaded"
+                description="Upload high-resolution event photography and aerial documentation."
+              />
             </div>
-          ))}
+          )}
         </div>
       </div>
 

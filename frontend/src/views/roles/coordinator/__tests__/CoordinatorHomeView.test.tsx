@@ -35,9 +35,9 @@ describe('CoordinatorHomeView StatTile Counting Test', () => {
       vi.advanceTimersByTime(1000);
     });
 
-    // Verify numbers have animated to their real targets: 8, 7, 28
+    // Verify numbers have animated to their real targets: 0 events, 0 pending, 8 volunteers
     expect(screen.getByText('8')).toBeInTheDocument();
-    expect(screen.getAllByText('7').length).toBeGreaterThan(0);
-    expect(screen.getByText('28')).toBeInTheDocument();
+    const finalZeros = screen.getAllByText('0');
+    expect(finalZeros.length).toBeGreaterThanOrEqual(2);
   });
 });

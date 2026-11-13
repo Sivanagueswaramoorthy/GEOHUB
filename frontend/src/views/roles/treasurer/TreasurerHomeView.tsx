@@ -27,15 +27,14 @@ export interface TreasurerHomeViewProps {
 export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
   const { events, budgetRequests, expenses, setActiveTab } = useApp();
 
-  const totalSpent = (expenses || []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-  const totalBudget = (events || []).reduce((sum, e) => sum + (Number(e.budget) || 0), 0);
-  const available = Math.max(0, totalBudget - totalSpent);
+  const totalSpent = (expenses || []).reduce((sum, e) => sum + (e.amount || 0), 0);
+  const totalCorpus = (events || []).reduce((sum, e) => sum + (e.budget || 0), 0);
+  const availableBudget = Math.max(0, totalCorpus - totalSpent);
 
-  const formatAmount = (num: number) => {
-    if (num <= 0) return '₹0';
-    if (num >= 100000) return `₹${(num / 100000).toFixed(1)}L`;
-    if (num >= 1000) return `₹${(num / 1000).toFixed(1)}k`;
-    return `₹${num.toLocaleString()}`;
+  const formatCurrency = (amount: number) => {
+    if (amount <= 0) return '₹0';
+    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`;
+    return `₹${amount.toLocaleString()}`;
   };
 
   return (
@@ -70,7 +69,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         }
       />
 
-      {/* 2) StatTiles: Events, Spent, Available, Total - Computed dynamically */}
+      {/* 2) StatTiles: Events, Spent, Available, Total */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <StatTile
           icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
@@ -82,7 +81,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<TrendingUp size={20} strokeWidth={1.75} className="lucide" />}
-          value={formatAmount(totalSpent)}
+          value={formatCurrency(totalSpent)}
           label="Spent"
           footnote="Utilized"
           tint="amber"
@@ -90,7 +89,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<CheckCircle2 size={20} strokeWidth={1.75} className="lucide" />}
-          value={formatAmount(available)}
+          value={formatCurrency(availableBudget)}
           label="Available"
           footnote="Remaining"
           tint="sage"
@@ -98,7 +97,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<DollarSign size={20} strokeWidth={1.75} className="lucide" />}
-          value={formatAmount(totalBudget)}
+          value={formatCurrency(totalCorpus)}
           label="Total"
           footnote="Corpus"
           tint="mint"
@@ -106,22 +105,22 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
       </div>
 
-      {/* 3) Budget Requests list - only rendered when requests exist */}
-      {budgetRequests && budgetRequests.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          <SectionHeader
-            title="Budget Requests"
-            actionLabel="View all"
-            onAction={() => setActiveTab('ledger')}
-          />
+      {/* 3) Budget Requests list with View, each marked Approved or Pending */}
+      <div className="flex flex-col gap-2.5">
+        <SectionHeader
+          title="Budget Requests"
+          actionLabel="View all"
+          onAction={() => setActiveTab('ledger')}
+        />
 
-          <div className="flex flex-col gap-2">
-            {budgetRequests.slice(0, 3).map((req) => (
+        <div className="flex flex-col gap-2">
+          {budgetRequests && budgetRequests.length > 0 ? (
+            budgetRequests.slice(0, 3).map((req) => (
               <ListRow
                 key={req.id}
                 icon={<DollarSign size={20} strokeWidth={1.75} className="lucide" />}
                 title={req.teamName || 'Squad Budget Proposal'}
-                subtitle={`₹${(req.requestedAmount || 0).toLocaleString()} • ${req.reason || 'Allocation request'}`}
+                subtitle={`₹${req.requestedAmount.toLocaleString()} • ${req.reason || 'Allocation request'}`}
                 meta={
                   <div className="flex items-center gap-2">
                     <StatusChip
@@ -139,10 +138,21 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
                 }
                 onClick={() => setActiveTab('ledger')}
               />
-            ))}
-          </div>
+            ))
+          ) : (
+            <div
+              className="bg-white border border-[#DAF1DE] p-4 text-center"
+              style={{ borderRadius: '24px' }}
+            >
+              <EmptyState
+                mascot="wallet"
+                title="No active requests"
+                description="All budget disbursements are balanced"
+              />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

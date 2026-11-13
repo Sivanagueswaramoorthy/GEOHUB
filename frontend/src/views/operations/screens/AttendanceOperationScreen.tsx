@@ -11,7 +11,7 @@ import {
   Search,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
-import { StatusChip } from '../../../components/shared';
+import { StatusChip, EmptyState } from '../../../components/shared';
 
 export interface AttendanceOperationScreenProps {
   readOnly?: boolean;
@@ -61,17 +61,9 @@ export const AttendanceOperationScreen: React.FC<AttendanceOperationScreenProps>
   const [rosterSearch, setRosterSearch] = useState('');
 
   const chosenEvent =
-    events?.find((e) => e.id === chosenEventId) ||
-    events?.[0] || {
-      id: 'event_01',
-      title: 'GEO FEST 2026: Campus Odyssey',
-      venue: 'University Grand Auditorium',
-      startDate: new Date().toISOString(),
-      category: 'Flagship Event',
-      eventType: 'internal',
-    };
+    events?.find((e) => e.id === chosenEventId) || events?.[0];
 
-  const isExternalEvent = chosenEvent.eventType === 'external';
+  const isExternalEvent = chosenEvent?.eventType === 'external';
 
   // 20-second validity countdown timer for QR code
   useEffect(() => {
@@ -220,6 +212,18 @@ export const AttendanceOperationScreen: React.FC<AttendanceOperationScreenProps>
       showToast?.(res?.error || 'Invalid or expired OTP', 'error');
     }
   };
+
+  if (!events || events.length === 0 || !chosenEvent) {
+    return (
+      <div className="flex flex-col gap-3.5 pb-24 select-none">
+        <EmptyState
+          mascot="calendar"
+          title="No Active Events"
+          description="Create or schedule a chapter event first to enable smart QR passes, OTP check-ins, and turnstile verification."
+        />
+      </div>
+    );
+  }
 
   const dynamicQrPayload = `GEO-PASS:${chosenEvent.id}:${currentUser?.uid || 'u_guest'}:${tokenSeed}:${currentUser?.rollNo || '21GEO001'}:${otp}`;
 

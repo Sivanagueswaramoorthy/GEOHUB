@@ -14,7 +14,8 @@ import {
   QrCode,
   Layers,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog, PillButton } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, PillButton, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface ApprovalQueueItem {
   id: string;
@@ -42,58 +43,27 @@ export const ApprovalsScreen: React.FC<ApprovalsScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
+  const { approvals } = useApp();
   const [activeTab, setActiveTab] = useState<'all' | 'event' | 'budget' | 'join_request' | 'attendance'>('all');
   const [selectedItem, setSelectedItem] = useState<ApprovalQueueItem | null>(null);
   const [actionType, setActionType] = useState<'Approve' | 'Reject' | null>(null);
   const [feedbackNote, setFeedbackNote] = useState('');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  const [items, setItems] = useState<ApprovalQueueItem[]>([
-    {
-      id: 'appr-1',
-      type: 'event',
-      title: 'GEO FEST 2026: Campus Odyssey Technical Proposal',
-      requesterName: 'Aarav Patel',
-      requesterRole: 'Documentation Lead',
-      submittedAt: '2026-11-04 09:30',
-      event: 'GEO FEST 2026',
-      details: 'Requesting Dean institutional sanction and Main Auditorium reservation for 2 full days.',
-      status: 'pending',
-    },
-    {
-      id: 'appr-2',
-      type: 'budget',
-      title: 'Honorarium & Keynote Rigging Advance Voucher',
-      requesterName: 'Ananya Iyer',
-      requesterRole: 'Treasury Lead',
-      submittedAt: '2026-11-04 10:15',
-      amount: 45000,
-      event: 'GEO FEST 2026',
-      details: 'Guest travel reimbursement advance and PA mixer installation advance.',
-      status: 'pending',
-    },
-    {
-      id: 'appr-3',
-      type: 'join_request',
-      title: 'Volunteer Squad Accession: Rohan Dave',
-      requesterName: 'Rohan Dave',
-      requesterRole: 'Student (23GEO014)',
-      submittedAt: '2026-11-03 14:00',
-      details: 'Enrolling into Management Squad for Turnstile QR Scanner verification station.',
-      status: 'pending',
-    },
-    {
-      id: 'appr-4',
-      type: 'attendance',
-      title: 'Manual Turnstile Override: Kunal Sen (23GEO045)',
-      requesterName: 'Priya Sharma',
-      requesterRole: 'Gate 1 Turnstile Volunteer',
-      submittedAt: '2026-11-04 11:20',
-      event: 'GEO FEST 2026',
-      details: 'Student phone battery drained during gate entry; student ID card physically verified.',
-      status: 'pending',
-    },
-  ]);
+  const [items, setItems] = useState<ApprovalQueueItem[]>(() => {
+    return (approvals || []).map((a: any) => ({
+      id: a.id,
+      type: (a.type || 'event') as any,
+      title: a.title,
+      requesterName: a.submittedBy || 'Chapter Member',
+      requesterRole: a.requestedTeam || 'Member',
+      submittedAt: a.submittedAt || new Date().toISOString(),
+      amount: a.amount,
+      event: a.event,
+      details: a.details || a.description || 'Institutional request pending approval.',
+      status: a.status || 'pending',
+    }));
+  });
 
   const filteredItems = items.filter((item) => {
     if (activeTab !== 'all' && item.type !== activeTab) return false;
@@ -236,86 +206,94 @@ export const ApprovalsScreen: React.FC<ApprovalsScreenProps> = ({
 
         {/* Items Feed */}
         <div className="space-y-3 pt-1">
-          {filteredItems.map((item) => {
-            const Icon = getIconForType(item.type);
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item) => {
+              const Icon = getIconForType(item.type);
 
-            return (
-              <div
-                key={item.id}
-                className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0 shadow-2xs">
-                    <Icon size={18} strokeWidth={2.2} />
-                  </div>
+              return (
+                <div
+                  key={item.id}
+                  className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0 shadow-2xs">
+                      <Icon size={18} strokeWidth={2.2} />
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-[#051F20] text-xs sm:text-sm">
-                        {item.title}
-                      </span>
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                          item.status === 'approved'
-                            ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
-                            : item.status === 'rejected'
-                            ? 'bg-[#D9534F]/10 text-[#D9534F] border border-[#D9534F]/30'
-                            : 'bg-[#F2B84B] text-[#051F20]'
-                        }`}
-                      >
-                        {item.status.toUpperCase()}
-                      </span>
-                      {item.amount && (
-                        <span className="px-2 py-0.5 rounded-md text-xs font-extrabold bg-white border border-[#DAF1DE] text-[#051F20]">
-                          ₹{item.amount.toLocaleString()}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-[#051F20] text-xs sm:text-sm">
+                          {item.title}
                         </span>
-                      )}
-                    </div>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                            item.status === 'approved'
+                              ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
+                              : item.status === 'rejected'
+                              ? 'bg-[#D9534F]/10 text-[#D9534F] border border-[#D9534F]/30'
+                              : 'bg-[#F2B84B] text-[#051F20]'
+                          }`}
+                        >
+                          {item.status.toUpperCase()}
+                        </span>
+                        {item.amount && (
+                          <span className="px-2 py-0.5 rounded-md text-xs font-extrabold bg-white border border-[#DAF1DE] text-[#051F20]">
+                            ₹{item.amount.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
 
-                    <p className="text-xs text-[#235347] mt-1 line-clamp-2">
-                      {item.details}
-                    </p>
+                      <p className="text-xs text-[#235347] mt-1 line-clamp-2">
+                        {item.details}
+                      </p>
 
-                    <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-[#235347]/80">
-                      <span>Requester: <strong>{item.requesterName}</strong> ({item.requesterRole})</span>
-                      <span>•</span>
-                      <span>Submitted: {item.submittedAt}</span>
+                      <div className="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-[#235347]/80">
+                        <span>Requester: <strong>{item.requesterName}</strong> ({item.requesterRole})</span>
+                        <span>•</span>
+                        <span>Submitted: {item.submittedAt}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Actions */}
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                  {canApprove && item.status === 'pending' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setActionType('Approve');
-                        }}
-                        className="h-9 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 transition-all shadow-xs cursor-pointer touch-target-44"
-                        data-testid={`btn-approve-${item.id}`}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setActionType('Reject');
-                        }}
-                        className="h-9 px-4 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer touch-target-44"
-                        data-testid={`btn-reject-${item.id}`}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    {canApprove && item.status === 'pending' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setActionType('Approve');
+                          }}
+                          className="h-9 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 transition-all shadow-xs cursor-pointer touch-target-44"
+                          data-testid={`btn-approve-${item.id}`}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setActionType('Reject');
+                          }}
+                          className="h-9 px-4 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer touch-target-44"
+                          data-testid={`btn-reject-${item.id}`}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <EmptyState
+              mascot="shield"
+              title="Approval Queue Clear"
+              description="No pending sanction or accession requests awaiting review."
+            />
+          )}
         </div>
       </div>
 

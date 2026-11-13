@@ -11,7 +11,8 @@ import {
   Newspaper,
   Clock,
 } from 'lucide-react';
-import { AnimatedNumber } from '../../../components/shared';
+import { AnimatedNumber, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface BulletinItem {
   id: string;
@@ -41,37 +42,20 @@ export const BulletinsDailyReportScreen: React.FC<BulletinsDailyReportScreenProp
   // Form states
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<'Daily Report' | 'Urgent Clearance' | 'General Circular' | 'Press Briefing'>('Daily Report');
+  const { dailyNews } = useApp();
   const [content, setContent] = useState('');
 
-  const [bulletins, setBulletins] = useState<BulletinItem[]>([
-    {
-      id: 'b-1',
-      title: 'GEO FEST 2026: Day 1 Operations & Turnstile Attendance Recap',
-      category: 'Daily Report',
-      date: '2026-11-04',
-      author: 'Aarav Patel (Documentation Lead)',
-      content: '98.4% turnstile verification achieved across Gates 1 and 2. Keynote auditorium reached capacity at 10:15 AM with zero incident reports.',
-      signedBy: 'Dr. Sarah Jenkins (Faculty Advisor)',
-    },
-    {
-      id: 'b-2',
-      title: 'Mandatory Stage Rigging & Electrical Clearance Brief',
-      category: 'Urgent Clearance',
-      date: '2026-11-03',
-      author: 'Divya Rao (Management Lead)',
-      content: 'All stage rigging, sound telemetry and temporary power feeds inspected and passed by Campus Electrical Division.',
-      signedBy: 'Campus Engineering Officer',
-    },
-    {
-      id: 'b-3',
-      title: 'Official Circular: Semester End Field Expedition Registration',
-      category: 'General Circular',
-      date: '2026-10-30',
-      author: 'Elena Rostova (Secretary)',
-      content: 'Open registration for Geomatics field expedition to Western Ghats biodiversity corridor. Limited to 40 verified scholars.',
-      signedBy: 'Dr. Sarah Jenkins (Faculty Advisor)',
-    },
-  ]);
+  const [bulletins, setBulletins] = useState<BulletinItem[]>(() => {
+    return (dailyNews || []).map((n) => ({
+      id: n.id,
+      title: n.title,
+      category: 'Daily Report' as const,
+      date: n.publishedAt ? new Date(n.publishedAt).toLocaleDateString() : 'Today',
+      author: n.authorName || n.author || 'Chapter Lead',
+      content: n.content,
+      signedBy: 'Faculty Advisor',
+    }));
+  });
 
   const categories = ['All', 'Daily Report', 'Urgent Clearance', 'General Circular', 'Press Briefing'];
 
@@ -203,52 +187,60 @@ export const BulletinsDailyReportScreen: React.FC<BulletinsDailyReportScreenProp
 
         {/* Bulletins Feed */}
         <div className="space-y-3 pt-1">
-          {filteredBulletins.map((bulletin) => (
-            <div
-              key={bulletin.id}
-              className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all space-y-2.5"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-bold text-[#051F20] text-sm sm:text-base">
-                    {bulletin.title}
-                  </span>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                      bulletin.category === 'Urgent Clearance'
-                        ? 'bg-[#D9534F]/10 text-[#D9534F] border border-[#D9534F]/30'
-                        : bulletin.category === 'Daily Report'
-                        ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
-                        : 'bg-white text-[#235347] border border-[#DAF1DE]'
-                    }`}
-                  >
-                    {bulletin.category}
-                  </span>
+          {filteredBulletins.length > 0 ? (
+            filteredBulletins.map((bulletin) => (
+              <div
+                key={bulletin.id}
+                className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all space-y-2.5"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-[#051F20] text-sm sm:text-base">
+                      {bulletin.title}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                        bulletin.category === 'Urgent Clearance'
+                          ? 'bg-[#D9534F]/10 text-[#D9534F] border border-[#D9534F]/30'
+                          : bulletin.category === 'Daily Report'
+                          ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
+                          : 'bg-white text-[#235347] border border-[#DAF1DE]'
+                      }`}
+                    >
+                      {bulletin.category}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    <button
+                      type="button"
+                      onClick={() => handlePrintBulletin(bulletin)}
+                      className="h-8 px-3 rounded-xl bg-white border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] active:scale-95 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+                    >
+                      <Printer size={13} />
+                      <span>Print PDF</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-center">
-                  <button
-                    type="button"
-                    onClick={() => handlePrintBulletin(bulletin)}
-                    className="h-8 px-3 rounded-xl bg-white border border-[#DAF1DE] text-xs font-bold text-[#163832] hover:bg-[#DAF1DE] active:scale-95 transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
-                  >
-                    <Printer size={13} />
-                    <span>Print PDF</span>
-                  </button>
+                <p className="text-xs text-[#235347] leading-relaxed">
+                  {bulletin.content}
+                </p>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#DAF1DE] text-xs text-[#235347]/80">
+                  <span>Author: <strong>{bulletin.author}</strong></span>
+                  <span>Sign-off: <strong>{bulletin.signedBy}</strong></span>
+                  <span className="text-xs font-semibold text-[#051F20]">Date: {bulletin.date}</span>
                 </div>
               </div>
-
-              <p className="text-xs text-[#235347] leading-relaxed">
-                {bulletin.content}
-              </p>
-
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#DAF1DE] text-xs text-[#235347]/80">
-                <span>Author: <strong>{bulletin.author}</strong></span>
-                <span>Sign-off: <strong>{bulletin.signedBy}</strong></span>
-                <span className="text-xs font-semibold text-[#051F20]">Date: {bulletin.date}</span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyState
+              mascot="notebook"
+              title="No Bulletins Published"
+              description="Official press bulletins and chapter dispatches will appear here."
+            />
+          )}
         </div>
       </div>
 

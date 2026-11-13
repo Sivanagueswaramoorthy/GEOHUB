@@ -11,7 +11,8 @@ import {
   Shield,
   FileText,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog, PillButton, SearchField } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, PillButton, SearchField, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface BudgetRequest {
   id: string;
@@ -43,6 +44,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
+  const { events } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Flagged' | 'Rejected'>('All');
   const [selectedReq, setSelectedReq] = useState<BudgetRequest | null>(null);
@@ -53,9 +55,10 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
   const isFaculty = currentUser?.role === 'faculty' || currentUser?.role === 'super_admin';
 
   // Metrics
+  const totalCorpus = (events || []).reduce((sum, ev) => sum + (ev.budget || 0), 0);
   const totalAllocated = budgetRequests
     .filter((b) => b.status === 'Approved')
-    .reduce((sum, b) => sum + b.amount, 180000);
+    .reduce((sum, b) => sum + b.amount, 0);
   const totalPending = budgetRequests.filter((b) => b.status === 'Pending').length;
   const totalApproved = budgetRequests.filter((b) => b.status === 'Approved').length;
 
@@ -105,7 +108,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
             </div>
           </div>
           <div className="font-extrabold text-[#051F20] text-base sm:text-lg mt-1">
-            ₹<AnimatedNumber value="450000" />
+            ₹<AnimatedNumber value={totalCorpus} />
           </div>
         </div>
 
@@ -129,7 +132,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
             </div>
           </div>
           <div className="font-extrabold text-[#163832] text-base sm:text-lg mt-1">
-            ₹<AnimatedNumber value={Math.max(0, 450000 - totalAllocated)} />
+            ₹<AnimatedNumber value={Math.max(0, totalCorpus - totalAllocated)} />
           </div>
         </div>
 
@@ -188,11 +191,11 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
         {/* Request Cards List */}
         <div className="space-y-3 pt-1">
           {filteredRequests.length === 0 ? (
-            <div className="py-12 text-center text-[#235347]">
-              <FileText size={36} className="mx-auto text-[#8EB69B] mb-2 opacity-60" />
-              <p className="text-xs font-bold text-[#051F20]">No budget requests found</p>
-              <p className="text-xs text-[#235347] mt-0.5">Try adjusting your search query or filter</p>
-            </div>
+            <EmptyState
+              mascot="coin"
+              title="Budget Queue Clear"
+              description="No expenditure sanction requests in the current filter."
+            />
           ) : (
             filteredRequests.map((req) => (
               <div

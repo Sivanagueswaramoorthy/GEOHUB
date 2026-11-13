@@ -10,7 +10,8 @@ import {
   Tag,
   Coins,
 } from 'lucide-react';
-import { AnimatedNumber, SearchField } from '../../../components/shared';
+import { AnimatedNumber, SearchField, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 import { ExpenseItem } from './AddExpenseScreen';
 
 export interface ExpenditureLedgerScreenProps {
@@ -28,13 +29,18 @@ export const ExpenditureLedgerScreen: React.FC<ExpenditureLedgerScreenProps> = (
   onLogAudit,
   currentUser,
 }) => {
+  const { events } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedEvent, setSelectedEvent] = useState<string>('All');
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   const categories = ['All', 'Equipment', 'Refreshments', 'Travel', 'Printing', 'Honorarium'];
-  const eventsList = ['All', 'Annual Drone Survey', 'Campus Topo Camp 2026', 'GeoTech Annual Symposium', 'General Club Operations'];
+  const eventsList = [
+    'All',
+    'General Club Operations',
+    ...(events || []).map((e) => e.title),
+  ];
 
   const filteredExpenses = expenses.filter((exp) => {
     if (selectedCategory !== 'All' && exp.category !== selectedCategory) return false;
@@ -162,11 +168,11 @@ export const ExpenditureLedgerScreen: React.FC<ExpenditureLedgerScreenProps> = (
         {/* Ledger Items Feed (Card rows that scale fluidly from 360px mobile to desktop) */}
         <div className="space-y-2.5 pt-1">
           {filteredExpenses.length === 0 ? (
-            <div className="py-12 text-center text-[#235347]">
-              <FileSpreadsheet size={36} className="mx-auto text-[#8EB69B] mb-2 opacity-60" />
-              <p className="text-xs font-bold text-[#051F20]">No ledger transactions match criteria</p>
-              <p className="text-xs text-[#235347] mt-0.5">Clear filters or try a different search</p>
-            </div>
+            <EmptyState
+              mascot="wallet"
+              title="Ledger Clear"
+              description="No expenditure transactions recorded in the official audit books."
+            />
           ) : (
             filteredExpenses.map((exp, idx) => (
               <div

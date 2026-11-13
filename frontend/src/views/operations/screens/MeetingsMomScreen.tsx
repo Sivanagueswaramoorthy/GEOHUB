@@ -12,7 +12,8 @@ import {
   ChevronUp,
   Shield,
 } from 'lucide-react';
-import { AnimatedNumber } from '../../../components/shared';
+import { AnimatedNumber, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface ActionItem {
   id: string;
@@ -44,7 +45,8 @@ export const MeetingsMomScreen: React.FC<MeetingsMomScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>('m-1');
+  const { meetings: contextMeetings } = useApp();
+  const [expandedMeetingId, setExpandedMeetingId] = useState<string | null>(null);
   const [showConveneModal, setShowConveneModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -55,38 +57,24 @@ export const MeetingsMomScreen: React.FC<MeetingsMomScreenProps> = ({
   const [newDateTime, setNewDateTime] = useState('2026-11-08 16:30');
   const [newAgenda, setNewAgenda] = useState('');
 
-  const [meetings, setMeetings] = useState<MeetingItem[]>([
-    {
-      id: 'm-1',
-      title: 'GEO FEST 2026: Steering Committee & Duty Checkpoint',
-      type: 'Pre-Event Briefing',
-      dateTime: '2026-11-05 16:30',
-      venue: 'Main Auditorium Conference Room',
-      quorum: 14,
-      agenda: 'Final inspection of turnstile QR scanners, audio rigging, food catering vouchers, and guest speaker protocol.',
-      momNotes: 'Meeting convened with full quorum. Dean permission letter handed to Faculty Advisor. Treasury allocated ₹1,42,500 vouchers. Gates 1 and 2 assigned 8 volunteers each.',
-      actionItems: [
-        { id: 'act-1', task: 'Rig stage audio monitors and primary mixer', assignedTo: 'David Chen', isDone: true },
-        { id: 'act-2', task: 'Deploy printed QR scanner badges to volunteers', assignedTo: 'Sneha Patel', isDone: true },
-        { id: 'act-3', task: 'Receive guest speaker at North Gate VIP portico', assignedTo: 'Divya Rao', isDone: false },
-        { id: 'act-4', task: 'Reconcile registration desk participant count', assignedTo: 'Ananya Iyer', isDone: false },
-      ],
-    },
-    {
-      id: 'm-2',
-      title: 'Campus Topo Camp: Post-Event Field Retrospective',
-      type: 'Post-Event Retrospective',
-      dateTime: '2026-10-24 11:00',
-      venue: 'Geomatics Lab 2',
-      quorum: 9,
-      agenda: 'Review student field telemetry sheets, theodolite equipment return status, and budget reimbursement receipts.',
-      momNotes: 'All 8 theodolite total stations returned intact. 100% field survey logs collected and stored in Documentation studio archives.',
-      actionItems: [
-        { id: 'act-5', task: 'Upload high-resolution field photos to gallery', assignedTo: 'Aarav Patel', isDone: true },
-        { id: 'act-6', task: 'Submit travel expense receipts to Treasurer', assignedTo: 'Maya Patel', isDone: true },
-      ],
-    },
-  ]);
+  const [meetings, setMeetings] = useState<MeetingItem[]>(() => {
+    return (contextMeetings || []).map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      type: (m.type || 'Steering Committee') as any,
+      dateTime: m.dateTime || m.date || 'Today',
+      venue: m.venue || 'Campus Auditorium',
+      quorum: m.quorum || 10,
+      agenda: m.agenda || 'General chapter coordination',
+      momNotes: m.momNotes || '',
+      actionItems: (m.actionItems || []).map((a: any, idx: number) => ({
+        id: a.id || `act-${idx}`,
+        task: a.task || a.title || 'Action item',
+        assignedTo: a.assignedTo || 'Squad Lead',
+        isDone: Boolean(a.isDone),
+      })),
+    }));
+  });
 
   const handleToggleAction = (meetingId: string, actionId: string) => {
     if (readOnly) return;
@@ -214,7 +202,8 @@ export const MeetingsMomScreen: React.FC<MeetingsMomScreenProps> = ({
         </div>
 
         <div className="space-y-3 pt-1">
-          {meetings.map((meeting) => {
+          {meetings.length > 0 ? (
+            meetings.map((meeting) => {
             const isExpanded = expandedMeetingId === meeting.id;
             const completedCount = meeting.actionItems.filter((a) => a.isDone).length;
 
@@ -331,8 +320,15 @@ export const MeetingsMomScreen: React.FC<MeetingsMomScreenProps> = ({
                 )}
               </div>
             );
-          })}
-        </div>
+          })
+        ) : (
+          <EmptyState
+            mascot="notebook"
+            title="No Meetings Recorded"
+            description="Schedule an executive meeting or upload Minutes of the Meeting (MoM)."
+          />
+        )}
+      </div>
       </div>
 
       {/* Convene Meeting Modal */}

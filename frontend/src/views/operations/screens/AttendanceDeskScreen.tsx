@@ -7,7 +7,7 @@ import {
   UserX,
   Shield,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog, SearchField } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, SearchField, EmptyState } from '../../../components/shared';
 
 export interface AttendeeRosterRecord {
   uid: string;
@@ -37,14 +37,7 @@ export const AttendanceDeskScreen: React.FC<AttendanceDeskScreenProps> = ({
   const [selectedStudentForOverride, setSelectedStudentForOverride] = useState<AttendeeRosterRecord | null>(null);
   const [overrideNotice, setOverrideNotice] = useState<string | null>(null);
 
-  const [roster, setRoster] = useState<AttendeeRosterRecord[]>([
-    { uid: 'att-1', name: 'Kunal Sen', rollNo: '23GEO045', squad: 'Promotion', status: 'present', checkInTime: '09:14 AM' },
-    { uid: 'att-2', name: 'Maya Patel', rollNo: '24GEO102', squad: 'Management', status: 'present', checkInTime: '09:22 AM' },
-    { uid: 'att-3', name: 'Priya Sharma', rollNo: '22GEO088', squad: 'Treasury', status: 'late', checkInTime: '10:05 AM' },
-    { uid: 'att-4', name: 'Rohan Dave', rollNo: '23GEO014', squad: 'Management', status: 'absent' },
-    { uid: 'att-5', name: 'David Chen', rollNo: '24GEO055', squad: 'Documentation', status: 'present', checkInTime: '09:08 AM' },
-    { uid: 'att-6', name: 'Elena Rostova', rollNo: '22GEO019', squad: 'Management', status: 'absent' },
-  ]);
+  const [roster, setRoster] = useState<AttendeeRosterRecord[]>([]);
 
   const totalPresent = roster.filter((r) => r.status === 'present').length;
   const totalLate = roster.filter((r) => r.status === 'late').length;
@@ -323,9 +316,11 @@ export const AttendanceDeskScreen: React.FC<AttendanceDeskScreenProps> = ({
           ))}
 
           {filteredRoster.length === 0 && (
-            <div className="py-8 text-center text-[#235347] text-xs font-medium">
-              No scholars found matching "{searchQuery}".
-            </div>
+            <EmptyState
+              mascot="leaf"
+              title="No Scholars Enrolled"
+              description={searchQuery ? `No scholars found matching "${searchQuery}".` : 'No scholars are enrolled in attendance roster for this event yet.'}
+            />
           )}
         </div>
       </div>

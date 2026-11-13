@@ -97,17 +97,17 @@ export const DocumentationHomeView: React.FC<DocumentationHomeViewProps> = () =>
         </div>
       </div>
 
-      {/* 3) Upcoming events list - only rendered when events exist */}
-      {upcomingEvents && upcomingEvents.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          <SectionHeader
-            title="Upcoming Events"
-            actionLabel="View all"
-            onAction={() => setActiveTab('events')}
-          />
+      {/* 3) Upcoming events list */}
+      <div className="flex flex-col gap-2.5">
+        <SectionHeader
+          title="Upcoming Events"
+          actionLabel="View all"
+          onAction={() => setActiveTab('events')}
+        />
 
-          <div className="flex flex-col gap-3">
-            {upcomingEvents.map((ev) => {
+        <div className="flex flex-col gap-3">
+          {upcomingEvents && upcomingEvents.length > 0 ? (
+            upcomingEvents.map((ev) => {
               const dateBadge = formatDateBadge(ev.startDate);
               return (
                 <div
@@ -139,12 +139,10 @@ export const DocumentationHomeView: React.FC<DocumentationHomeViewProps> = () =>
                       <span className="text-sm font-bold text-[#051F20] truncate">
                         {ev.title}
                       </span>
-                      {ev.venue && (
-                        <div className="flex items-center gap-1.5 text-xs font-medium text-[#235347] truncate mt-0.5">
-                          <MapPin size={12} strokeWidth={1.75} className="lucide" />
-                          <span className="truncate">{ev.venue}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-[#235347] truncate mt-0.5">
+                        <MapPin size={12} strokeWidth={1.75} className="lucide" />
+                        <span className="truncate">{ev.venue}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -153,10 +151,16 @@ export const DocumentationHomeView: React.FC<DocumentationHomeViewProps> = () =>
                   </div>
                 </div>
               );
-            })}
-          </div>
+            })
+          ) : (
+            <EmptyState
+              title="No Upcoming Events"
+              description="No upcoming events scheduled for documentation."
+              mascot="calendar"
+            />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

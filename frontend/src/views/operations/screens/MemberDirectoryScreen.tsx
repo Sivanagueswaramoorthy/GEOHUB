@@ -12,8 +12,9 @@ import {
   Mail,
   Award,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog, SearchField } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, SearchField, EmptyState } from '../../../components/shared';
 import { canAddSquadMember, canRemoveMember } from '../../../core/permissions';
+import { useApp } from '../../../context/AppContext';
 
 export interface ScholarRecord {
   uid: string;
@@ -54,16 +55,19 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const [editPost, setEditPost] = useState('');
   const [editSquad, setEditSquad] = useState('Promotion');
 
-  const [members, setMembers] = useState<ScholarRecord[]>([
-    { uid: 'u-1', name: 'Dr. Sarah Jenkins', role: 'faculty', squad: 'Management', isLead: true, post: 'Faculty Advisor', email: 'sarah.jenkins@geohub.edu', rollNo: 'FAC001' },
-    { uid: 'u-2', name: 'Aarav Patel', role: 'coordinator', squad: 'Documentation', isLead: true, post: 'Documentation Lead', email: 'aarav.patel@geohub.edu', rollNo: '22GEO034' },
-    { uid: 'u-3', name: 'Divya Rao', role: 'management', squad: 'Management', isLead: true, post: 'Management Lead', email: 'divya.rao@geohub.edu', rollNo: '22GEO005' },
-    { uid: 'u-4', name: 'Sneha Patel', role: 'management', squad: 'Promotion', isLead: true, post: 'Promotion Lead', email: 'sneha.patel@geohub.edu', rollNo: '22GEO012' },
-    { uid: 'u-5', name: 'Ananya Iyer', role: 'management', squad: 'Treasury', isLead: true, post: 'Treasury Lead', email: 'ananya.iyer@geohub.edu', rollNo: '22GEO023' },
-    { uid: 'u-6', name: 'Kunal Sen', role: 'student', squad: 'Promotion', isLead: false, post: 'Promotion Associate', email: 'kunal.sen@geohub.edu', rollNo: '23GEO045' },
-    { uid: 'u-7', name: 'Maya Patel', role: 'student', squad: 'Management', isLead: false, post: 'Logistics Associate', email: 'maya.patel@geohub.edu', rollNo: '24GEO102' },
-    { uid: 'u-8', name: 'David Chen', role: 'student', squad: 'Documentation', isLead: false, post: 'Field Archivist', email: 'david.chen@geohub.edu', rollNo: '24GEO055' },
-  ]);
+  const { users } = useApp();
+  const [members, setMembers] = useState<ScholarRecord[]>(() => {
+    return (users || []).map((u) => ({
+      uid: u.uid,
+      name: u.name,
+      role: u.role,
+      squad: u.team || 'Management',
+      isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
+      post: u.post || 'Chapter Member',
+      email: u.email,
+      rollNo: u.rollNo || u.uid,
+    }));
+  });
 
   const canRemove = canRemoveMember(currentUser);
   const canAdd = canAddSquadMember(currentUser, selectedSquad === 'All' ? 'Promotion' : selectedSquad);
@@ -244,62 +248,72 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
         {/* Members Cards List (Grid on desktop, clean rows on mobile) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
-          {filteredMembers.map((m) => (
-            <div
-              key={m.uid}
-              className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-3"
-            >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] font-extrabold text-xs flex items-center justify-center shrink-0 border border-[#8EB69B]/40">
-                  {m.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
-                      {m.name}
-                    </span>
-                    {m.isLead && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0">
-                        Lead
+          {filteredMembers.length > 0 ? (
+            filteredMembers.map((m) => (
+              <div
+                key={m.uid}
+                className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] font-extrabold text-xs flex items-center justify-center shrink-0 border border-[#8EB69B]/40">
+                    {m.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
+                        {m.name}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[#235347] truncate">
-                    <span className="font-semibold text-[#163832] truncate">{m.post}</span>
-                    <span>•</span>
-                    <span className="font-mono text-[#051F20]">{m.rollNo || 'N/A'}</span>
+                      {m.isLead && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B] shrink-0">
+                          Lead
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[#235347] truncate">
+                      <span className="font-semibold text-[#163832] truncate">{m.post}</span>
+                      <span>•</span>
+                      <span className="font-mono text-[#051F20]">{m.rollNo || 'N/A'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                {!readOnly && (
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEdit(m)}
-                    className="w-8 h-8 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer shadow-2xs"
-                    data-testid={`btn-edit-member-${m.uid}`}
-                    title="Edit Scholar"
-                  >
-                    <Edit2 size={13} />
-                  </button>
-                )}
+                {/* Actions */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(m)}
+                      className="w-8 h-8 rounded-xl bg-white border border-[#DAF1DE] text-[#163832] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer shadow-2xs"
+                      data-testid={`btn-edit-member-${m.uid}`}
+                      title="Edit Scholar"
+                    >
+                      <Edit2 size={13} />
+                    </button>
+                  )}
 
-                {canRemove && m.role !== 'faculty' && m.role !== 'coordinator' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMemberToRemove(m)}
-                    className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
-                    data-testid={`btn-remove-member-${m.uid}`}
-                    title="Remove Scholar"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                )}
+                  {canRemove && m.role !== 'faculty' && m.role !== 'coordinator' && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMemberToRemove(m)}
+                      className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
+                      data-testid={`btn-remove-member-${m.uid}`}
+                      title="Remove Scholar"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="col-span-full">
+              <EmptyState
+                mascot="leaf"
+                title="No Members Found"
+                description={searchQuery ? `No scholars match "${searchQuery}".` : 'No scholars are enrolled in the selected squad.'}
+              />
             </div>
-          ))}
+          )}
         </div>
       </div>
 

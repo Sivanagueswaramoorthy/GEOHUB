@@ -11,7 +11,7 @@ import {
   Filter,
   Users,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, EmptyState } from '../../../components/shared';
 
 export interface MilestoneItem {
   id: string;
@@ -39,44 +39,7 @@ export const LeadActivityReviewScreen: React.FC<LeadActivityReviewScreenProps> =
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneItem | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    {
-      id: 'm-1',
-      squad: 'Management',
-      lead: 'Divya Rao',
-      title: 'Auditorium Turnstile & Crowd Safety Blueprint',
-      description: 'Stage rigging clearance obtained from Campus Electrical Division. 12 volunteers briefed for Gate 1 and 2 check-in stations.',
-      submittedDate: '2026-11-04',
-      status: 'Pending',
-    },
-    {
-      id: 'm-2',
-      squad: 'Promotion',
-      lead: 'Sneha Patel',
-      title: 'Campus Sponsorship Pitch Deck & Social Campaign',
-      description: 'Banners installed at North Quad. Keynote speaker teaser video posted on Instagram with 1,400+ campus impressions.',
-      submittedDate: '2026-11-03',
-      status: 'Pending',
-    },
-    {
-      id: 'm-3',
-      squad: 'Treasury',
-      lead: 'Ananya Iyer',
-      title: 'Field Topo Camp Advance Reimbursement Ledger',
-      description: 'All 8 student travel vouchers and equipment logistics invoices reconciled with ₹0 variance against sanctioned budget.',
-      submittedDate: '2026-10-25',
-      status: 'Approved',
-    },
-    {
-      id: 'm-4',
-      squad: 'Documentation',
-      lead: 'Aarav Patel',
-      title: 'High-Res Keynote Video Telemetry Archives',
-      description: 'Indexed raw SD card media and generated official press circular for Dean Academic Records.',
-      submittedDate: '2026-10-28',
-      status: 'Approved',
-    },
-  ]);
+  const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
 
   const pendingCount = milestones.filter((m) => m.status === 'Pending').length;
 
@@ -170,13 +133,14 @@ export const LeadActivityReviewScreen: React.FC<LeadActivityReviewScreenProps> =
         </div>
 
         <div className="space-y-3 pt-1">
-          {milestones.map((m) => (
-            <div
-              key={m.id}
-              className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
+          {milestones.length > 0 ? (
+            milestones.map((m) => (
+              <div
+                key={m.id}
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-[#051F20] text-xs sm:text-sm">
                       {m.title}
                     </span>
@@ -207,30 +171,37 @@ export const LeadActivityReviewScreen: React.FC<LeadActivityReviewScreenProps> =
                   </div>
                 </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                {canApprove && m.status === 'Pending' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleSignOff(m.id, m.title)}
-                      className="h-9 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 transition-all shadow-xs cursor-pointer touch-target-44"
-                      data-testid={`btn-signoff-${m.id}`}
-                    >
-                      Sign Off
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleFlag(m.id, m.title)}
-                      className="h-9 px-3.5 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer touch-target-44"
-                    >
-                      Clarify
-                    </button>
-                  </>
-                )}
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                  {canApprove && m.status === 'Pending' && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleSignOff(m.id, m.title)}
+                        className="h-9 px-4 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 transition-all shadow-xs cursor-pointer touch-target-44"
+                        data-testid={`btn-signoff-${m.id}`}
+                      >
+                        Sign Off
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFlag(m.id, m.title)}
+                        className="h-9 px-3.5 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer touch-target-44"
+                      >
+                        Clarify
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyState
+              mascot="tree"
+              title="No Milestones Logged"
+              description="Operational milestones will track here as squad tasks complete."
+            />
+          )}
         </div>
       </div>
     </div>

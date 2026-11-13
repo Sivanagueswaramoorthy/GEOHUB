@@ -58,7 +58,7 @@ export const ManagementHomeView: React.FC = () => {
         }
       />
 
-      {/* 2) StatTiles: Squad leads, Pending approvals, Meetings - Real dynamic values */}
+      {/* 2) StatTiles: Squad leads, Pending approvals, Meetings */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
           icon={<Users size={20} strokeWidth={1.75} className="lucide" />}
@@ -86,17 +86,17 @@ export const ManagementHomeView: React.FC = () => {
         />
       </div>
 
-      {/* 3) Recent Meetings List - only rendered when scheduled meetings exist */}
-      {upcomingMeetings && upcomingMeetings.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          <SectionHeader
-            title="Scheduled Meetings"
-            actionLabel="View all"
-            onAction={() => setActiveTab('meetings')}
-          />
+      {/* 3) Recent Meetings List */}
+      <div className="flex flex-col gap-2.5">
+        <SectionHeader
+          title="Scheduled Meetings"
+          actionLabel="View all"
+          onAction={() => setActiveTab('meetings')}
+        />
 
-          <div className="flex flex-col gap-2">
-            {upcomingMeetings.slice(0, 3).map((meet) => (
+        <div className="flex flex-col gap-2">
+          {meetings && meetings.length > 0 ? (
+            meetings.slice(0, 3).map((meet) => (
               <ListRow
                 key={meet.id}
                 icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
@@ -110,10 +110,16 @@ export const ManagementHomeView: React.FC = () => {
                 }
                 onClick={() => setActiveTab('meetings')}
               />
-            ))}
-          </div>
+            ))
+          ) : (
+            <EmptyState
+              title="No Scheduled Meetings"
+              description="Create a chapter meeting or minutes of meeting to get started."
+              mascot="calendar"
+            />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

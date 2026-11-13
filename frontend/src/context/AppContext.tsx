@@ -211,7 +211,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [posts, setPosts] = useState<SocialPost[]>(initialSocialPosts);
   const [campaigns, setCampaigns] = useState<CampaignPlan[]>(initialCampaignPlans);
   const [dailyNews, setDailyNews] = useState<DailyNewsItem[]>(initialDailyNews);
-  // Real institutional audit logs only - initialized clean with zero sample or dummy records
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
 
   const addAuditLog = (entry: Omit<AuditLogItem, 'id' | 'timestamp'>) => {
@@ -317,17 +316,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let isMounted = true;
     const syncWithBackend = async () => {
       try {
-        const [eventsRes, tasksRes, teamsRes, auditsRes] = await Promise.allSettled([
-          apiClient.getEvents(),
-          apiClient.getTasks('all'),
-          apiClient.getTeams(),
-          apiClient.getAuditLogs(),
-        ]);
-
-        if (!isMounted) return;
-
-        if (eventsRes.status === 'fulfilled' && Array.isArray(eventsRes.value) && eventsRes.value.length > 0) {
-          setEvents(eventsRes.value.map((e: any): EventModel => ({
+        const liveEvents = await apiClient.getEvents();
+        if (isMounted && Array.isArray(liveEvents) && liveEvents.length > 0) {
+          setEvents(liveEvents.map((e: any): EventModel => ({
             id: e.id,
             title: e.title,
             description: e.description || '',
@@ -348,58 +339,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             createdBy: e.created_by || 'u_admin_02',
           })));
         }
-
-        if (tasksRes.status === 'fulfilled' && Array.isArray(tasksRes.value) && tasksRes.value.length > 0) {
-          setTasks(tasksRes.value.map((t: any): TaskModel => ({
-            id: t.id,
-            title: t.title,
-            description: t.description || '',
-            team: t.team_id || 'Management',
-            assigneeId: (t.assigned_user_ids && t.assigned_user_ids[0]) || 'u_admin_02',
-            assigneeName: 'Squad Member',
-            status: t.status === 'in_progress' ? 'in_progress' : t.status === 'done' ? 'done' : 'todo',
-            dueDate: t.deadline || new Date().toISOString(),
-            priority: 'medium',
-            createdById: t.created_by || 'u_admin_02',
-            createdByName: 'Coordinator',
-            comments: [],
-            createdAt: new Date().toISOString(),
-          })));
-        }
-
-        if (teamsRes.status === 'fulfilled' && Array.isArray(teamsRes.value) && teamsRes.value.length > 0) {
-          setTeams(teamsRes.value.map((tm: any): TeamModel => ({
-            id: tm.id,
-            name: tm.name,
-            description: tm.description || '',
-            leadId: (tm.admin_user_ids && tm.admin_user_ids[0]) || 'u_admin_02',
-            leadName: `${tm.name} Lead`,
-            leadIds: tm.admin_user_ids || [],
-            memberIds: tm.member_user_ids || [],
-            totalTasks: 0,
-            completedTasks: 0,
-            iconName: 'Shield',
-          })));
-        }
-
-        if (auditsRes.status === 'fulfilled' && Array.isArray(auditsRes.value) && auditsRes.value.length > 0) {
-          setAuditLogs(auditsRes.value.map((a: any): AuditLogItem => ({
-            id: String(a.id),
-            actorId: a.actor_id,
-            actorName: a.actor_name,
-            actorRole: a.actor_role,
-            action: a.action,
-            targetType: a.target_type,
-            targetId: a.target_id,
-            targetName: a.target_name,
-            beforeState: a.before_state,
-            afterState: a.after_state,
-            details: a.details,
-            timestamp: a.timestamp,
-          })));
-        }
       } catch {
-        // Resilient fallback keeps local state when server is starting up or offline
+        // Resilient fallback keeps local cache when server is starting up or offline
       }
     };
     syncWithBackend();

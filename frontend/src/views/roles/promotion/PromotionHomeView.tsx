@@ -62,7 +62,7 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
         }
       />
 
-      {/* 2) StatTiles: Scheduled, Posted, Events - Real dynamic values */}
+      {/* 2) StatTiles: Scheduled, Posted, Events */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
           icon={<Clock size={20} strokeWidth={1.75} className="lucide" />}
@@ -90,17 +90,17 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
         />
       </div>
 
-      {/* 3) Approval list - only rendered when campaign approvals exist */}
-      {promoApprovals && promoApprovals.length > 0 && (
-        <div className="flex flex-col gap-2.5">
-          <SectionHeader
-            title="Campaign Approvals"
-            actionLabel="View all"
-            onAction={() => setActiveTab('approvals')}
-          />
+      {/* 3) Approval list with Approved/Pending chips */}
+      <div className="flex flex-col gap-2.5">
+        <SectionHeader
+          title="Campaign Approvals"
+          actionLabel="View all"
+          onAction={() => setActiveTab('approvals')}
+        />
 
-          <div className="flex flex-col gap-2">
-            {promoApprovals.slice(0, 3).map((item) => (
+        <div className="flex flex-col gap-2">
+          {promoApprovals && promoApprovals.length > 0 ? (
+            promoApprovals.slice(0, 3).map((item) => (
               <ListRow
                 key={item.id}
                 icon={<FileCheck2 size={20} strokeWidth={1.75} className="lucide" />}
@@ -114,10 +114,16 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
                 }
                 onClick={() => setActiveTab('approvals')}
               />
-            ))}
-          </div>
+            ))
+          ) : (
+            <EmptyState
+              title="No Approvals Pending"
+              description="All promotional media campaigns have been reviewed."
+              mascot="megaphone"
+            />
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

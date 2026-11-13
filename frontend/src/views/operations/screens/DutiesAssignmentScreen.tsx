@@ -13,7 +13,8 @@ import {
   Shield,
   ClipboardCheck,
 } from 'lucide-react';
-import { AnimatedNumber, SearchField } from '../../../components/shared';
+import { AnimatedNumber, SearchField, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface DutyAssignmentRecord {
   id: string;
@@ -41,84 +42,30 @@ export const DutiesAssignmentScreen: React.FC<DutiesAssignmentScreenProps> = ({
   const [viewMode, setViewMode] = useState<'by_member' | 'by_event'>('by_member');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const { tasks } = useApp();
   const [notice, setNotice] = useState<string | null>(null);
 
   // Form states
   const [newAssignee, setNewAssignee] = useState('Maya Patel');
   const [newRoll, setNewRoll] = useState('24GEO102');
   const [newSquad, setNewSquad] = useState('Management');
-  const [newEvent, setNewEvent] = useState('GEO FEST 2026: Campus Odyssey');
+  const [newEvent, setNewEvent] = useState('Chapter Event');
   const [newTask, setNewTask] = useState('');
   const [newStation, setNewStation] = useState('Gate 2 Registration Counter');
 
-  const [duties, setDuties] = useState<DutyAssignmentRecord[]>([
-    {
-      id: 'duty-1',
-      eventId: 'ev-geofest',
-      eventTitle: 'GEO FEST 2026: Campus Odyssey',
-      assigneeName: 'Ananya Iyer',
-      assigneeRoll: '22GEO023',
-      squad: 'Treasury',
-      task: 'Honorarium and audio rigging voucher clearance',
-      station: 'Main Auditorium Finance Station',
-      status: 'completed',
-    },
-    {
-      id: 'duty-2',
-      eventId: 'ev-geofest',
-      eventTitle: 'GEO FEST 2026: Campus Odyssey',
-      assigneeName: 'Sneha Patel',
-      assigneeRoll: '22GEO012',
-      squad: 'Promotion',
-      task: 'Stage banners, guest photo wall & live social feed dispatch',
-      station: 'Stage Media Deck & North Entrance',
-      status: 'in_progress',
-    },
-    {
-      id: 'duty-3',
-      eventId: 'ev-geofest',
-      eventTitle: 'GEO FEST 2026: Campus Odyssey',
-      assigneeName: 'Aarav Patel',
-      assigneeRoll: '22GEO034',
-      squad: 'Documentation',
-      task: 'High-res keynote session recording & circular documentation',
-      station: 'Press Gallery Tech Station',
-      status: 'in_progress',
-    },
-    {
-      id: 'duty-4',
-      eventId: 'ev-geofest',
-      eventTitle: 'GEO FEST 2026: Campus Odyssey',
-      assigneeName: 'Maya Patel',
-      assigneeRoll: '24GEO102',
-      squad: 'Management',
-      task: 'Participant kit distribution, QR scanner check-in desk',
-      station: 'Gate 2 Registration Desk',
-      status: 'completed',
-    },
-    {
-      id: 'duty-5',
-      eventId: 'ev-gis',
-      eventTitle: 'GIS & Satellite Telemetry Workshop',
-      assigneeName: 'Priya Sharma',
-      assigneeRoll: '22GEO088',
-      squad: 'Treasury',
-      task: 'GIS software workstation license budget allocation vouchers',
-      station: 'Geomatics Lab 3 Desk',
-      status: 'in_progress',
-    },
-    {
-      id: 'duty-6',
-      eventId: 'ev-drone',
-      eventTitle: 'Campus Biodiversity Drone Survey',
-      assigneeName: 'David Chen',
-      assigneeRoll: '24GEO055',
-      squad: 'Documentation',
-      task: 'Drone telemetry micro-SD card indexing & field flight logbook',
-      station: 'North Quad Drone Base Station',
-      status: 'completed',
-    },
-  ]);
+  const [duties, setDuties] = useState<DutyAssignmentRecord[]>(() => {
+    return (tasks || []).map((t: any) => ({
+      id: t.id,
+      eventId: t.eventId || 'ev_active',
+      eventTitle: t.eventTitle || 'Campus Initiative',
+      assigneeName: t.assigneeName || 'Squad Member',
+      assigneeRoll: t.assigneeRoll || '21GEO001',
+      squad: t.team || 'Management',
+      task: t.title || t.task || 'Assigned Duty',
+      station: t.station || 'Field Station',
+      status: t.status === 'done' ? ('completed' as const) : ('in_progress' as const),
+    }));
+  });
 
   const totalCompleted = duties.filter((d) => d.status === 'completed').length;
 
@@ -276,52 +223,60 @@ export const DutiesAssignmentScreen: React.FC<DutiesAssignmentScreenProps> = ({
 
         {/* Duty Cards List */}
         <div className="space-y-2.5 pt-1">
-          {filteredDuties.map((duty) => (
-            <div
-              key={duty.id}
-              className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
-                    {duty.task}
-                  </span>
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold shrink-0 ${
-                      duty.status === 'completed'
-                        ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
-                        : 'bg-[rgba(242,184,75,0.18)] text-[#051F20] border border-[rgba(242,184,75,0.4)]'
-                    }`}
-                  >
-                    {duty.status === 'completed' ? 'Completed' : 'In Progress'}
-                  </span>
+          {filteredDuties.length > 0 ? (
+            filteredDuties.map((duty) => (
+              <div
+                key={duty.id}
+                className="p-3 sm:p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
+                      {duty.task}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold shrink-0 ${
+                        duty.status === 'completed'
+                          ? 'bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]'
+                          : 'bg-[rgba(242,184,75,0.18)] text-[#051F20] border border-[rgba(242,184,75,0.4)]'
+                      }`}
+                    >
+                      {duty.status === 'completed' ? 'Completed' : 'In Progress'}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5 mt-1 text-xs text-[#235347]">
+                    <span>Assignee: <strong className="text-[#051F20]">{duty.assigneeName}</strong> ({duty.assigneeRoll})</span>
+                    <span>•</span>
+                    <span>{duty.station}</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-1.5 mt-1 text-xs text-[#235347]">
-                  <span>Assignee: <strong className="text-[#051F20]">{duty.assigneeName}</strong> ({duty.assigneeRoll})</span>
-                  <span>•</span>
-                  <span>{duty.station}</span>
+                {/* Status Toggle Action */}
+                <div className="shrink-0 self-end sm:self-center">
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStatus(duty.id, duty.status, duty.task)}
+                      className={`h-8 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer touch-target-44 active:scale-95 ${
+                        duty.status === 'completed'
+                          ? 'bg-white border-[#DAF1DE] text-[#235347] hover:bg-[#DAF1DE]'
+                          : 'bg-[#163832] text-white border-transparent hover:bg-[#0B2B26]'
+                      }`}
+                    >
+                      {duty.status === 'completed' ? 'Reopen' : 'Mark Done'}
+                    </button>
+                  )}
                 </div>
               </div>
-
-              {/* Status Toggle Action */}
-              <div className="shrink-0 self-end sm:self-center">
-                {!readOnly && (
-                  <button
-                    type="button"
-                    onClick={() => handleToggleStatus(duty.id, duty.status, duty.task)}
-                    className={`h-8 px-3 rounded-xl text-xs font-bold border transition-all cursor-pointer touch-target-44 active:scale-95 ${
-                      duty.status === 'completed'
-                        ? 'bg-white border-[#DAF1DE] text-[#235347] hover:bg-[#DAF1DE]'
-                        : 'bg-[#163832] text-white border-transparent hover:bg-[#0B2B26]'
-                    }`}
-                  >
-                    {duty.status === 'completed' ? 'Reopen' : 'Mark Done'}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyState
+              mascot="calendar"
+              title="No Duties Assigned"
+              description="No squad duties have been dispatched for this session."
+            />
+          )}
         </div>
       </div>
 

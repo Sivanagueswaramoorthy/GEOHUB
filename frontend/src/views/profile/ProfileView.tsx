@@ -429,7 +429,7 @@ export const ProfileView: React.FC = () => {
                 className="text-lg font-extrabold text-[#0F3638] tracking-tight"
                 style={{ fontSize: '20px', lineHeight: '24px' }}
               >
-                {userAttendanceCount || 12}
+                {userAttendanceCount}
               </span>
               <span className="text-[11px] font-medium text-[#52705E]">Verified Check-ins</span>
             </div>
