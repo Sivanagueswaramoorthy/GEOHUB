@@ -19,9 +19,13 @@ import {
 export const FacultyHomeView: React.FC = () => {
   const { approvals, events, auditLogs, setActiveTab } = useApp();
 
-  const pendingApprovals = approvals.filter((a) => a.status === 'pending');
-  const liveEvents = events.filter((e) => e.status === 'live');
+  const pendingApprovals = (approvals || []).filter((a) => a.status === 'pending');
+  const liveEvents = (events || []).filter((e) => e.status === 'live');
   const recentAudits = (auditLogs || []).slice(0, 3);
+  const totalBudget = (events || []).reduce((sum, e) => sum + (Number(e.budget) || 0), 0);
+  const budgetFormatted = totalBudget > 0
+    ? (totalBudget >= 100000 ? `₹${(totalBudget / 100000).toFixed(1)}L` : `₹${totalBudget.toLocaleString()}`)
+    : '₹0';
 
   return (
     <div className="flex flex-col gap-5 select-none">
@@ -59,25 +63,25 @@ export const FacultyHomeView: React.FC = () => {
         }
       />
 
-      {/* 2) StatTiles: Total events, Live, Budget (₹4.5L) */}
+      {/* 2) StatTiles: Total events, Live, Budget - Real computed counts */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
           icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(events.length || 7)}
+          value={String(events.length)}
           label="Total events"
           tint="mint"
           onClick={() => setActiveTab('events')}
         />
         <StatTile
           icon={<Radio size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(liveEvents.length || 2)}
+          value={String(liveEvents.length)}
           label="Live"
           tint="amber"
           onClick={() => setActiveTab('events')}
         />
         <StatTile
           icon={<Coins size={20} strokeWidth={1.75} className="lucide" />}
-          value="₹4.5L"
+          value={budgetFormatted}
           label="Budget"
           footnote="Corpus"
           tint="sage"
@@ -85,17 +89,17 @@ export const FacultyHomeView: React.FC = () => {
         />
       </div>
 
-      {/* 3) Audit Feed list */}
-      <div className="flex flex-col gap-2.5">
-        <SectionHeader
-          title="Audit Feed"
-          actionLabel="View all"
-          onAction={() => setActiveTab('audit_logs')}
-        />
+      {/* 3) Audit Feed list - Only rendered when genuine audit logs exist */}
+      {recentAudits.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <SectionHeader
+            title="Audit Feed"
+            actionLabel="View all"
+            onAction={() => setActiveTab('audit_logs')}
+          />
 
-        <div className="flex flex-col gap-2">
-          {recentAudits.length > 0 ? (
-            recentAudits.map((audit) => (
+          <div className="flex flex-col gap-2">
+            {recentAudits.map((audit) => (
               <div
                 key={audit.id}
                 onClick={() => setActiveTab('audit_logs')}
@@ -106,9 +110,11 @@ export const FacultyHomeView: React.FC = () => {
                   <span className="text-sm font-bold text-[#051F20] truncate">
                     {audit.action || 'Sanction logged'}
                   </span>
-                  <span className="text-xs font-medium text-[#235347] truncate">
-                    {audit.targetName || audit.targetType || 'Institutional record'}
-                  </span>
+                  {(audit.targetName || audit.targetType) && (
+                    <span className="text-xs font-medium text-[#235347] truncate">
+                      {audit.targetName || audit.targetType}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -118,16 +124,10 @@ export const FacultyHomeView: React.FC = () => {
                   <StatusChip status="approved" label="Audited" />
                 </div>
               </div>
-            ))
-          ) : (
-            <EmptyState
-              title="No Audit Records"
-              description="No recent institutional audit actions logged."
-              mascot="shield"
-            />
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

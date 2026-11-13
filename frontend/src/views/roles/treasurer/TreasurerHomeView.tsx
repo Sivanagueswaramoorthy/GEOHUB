@@ -25,7 +25,18 @@ export interface TreasurerHomeViewProps {
 }
 
 export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
-  const { events, budgetRequests, setActiveTab } = useApp();
+  const { events, budgetRequests, expenses, setActiveTab } = useApp();
+
+  const totalSpent = (expenses || []).reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+  const totalBudget = (events || []).reduce((sum, e) => sum + (Number(e.budget) || 0), 0);
+  const available = Math.max(0, totalBudget - totalSpent);
+
+  const formatAmount = (num: number) => {
+    if (num <= 0) return '₹0';
+    if (num >= 100000) return `₹${(num / 100000).toFixed(1)}L`;
+    if (num >= 1000) return `₹${(num / 1000).toFixed(1)}k`;
+    return `₹${num.toLocaleString()}`;
+  };
 
   return (
     <div className="flex flex-col gap-5 select-none">
@@ -59,11 +70,11 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         }
       />
 
-      {/* 2) StatTiles: Events, Spent, Available, Total (Reconciled: ₹1.8L + ₹2.7L = ₹4.5L) */}
+      {/* 2) StatTiles: Events, Spent, Available, Total - Computed dynamically */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <StatTile
           icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(events.length || 7)}
+          value={String(events.length)}
           label="Events"
           footnote="Sponsored"
           tint="mint"
@@ -71,7 +82,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<TrendingUp size={20} strokeWidth={1.75} className="lucide" />}
-          value="₹1.8L"
+          value={formatAmount(totalSpent)}
           label="Spent"
           footnote="Utilized"
           tint="amber"
@@ -79,7 +90,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<CheckCircle2 size={20} strokeWidth={1.75} className="lucide" />}
-          value="₹2.7L"
+          value={formatAmount(available)}
           label="Available"
           footnote="Remaining"
           tint="sage"
@@ -87,7 +98,7 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
         <StatTile
           icon={<DollarSign size={20} strokeWidth={1.75} className="lucide" />}
-          value="₹4.5L"
+          value={formatAmount(totalBudget)}
           label="Total"
           footnote="Corpus"
           tint="mint"
@@ -95,22 +106,22 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
         />
       </div>
 
-      {/* 3) Budget Requests list with View, each marked Approved or Pending */}
-      <div className="flex flex-col gap-2.5">
-        <SectionHeader
-          title="Budget Requests"
-          actionLabel="View all"
-          onAction={() => setActiveTab('ledger')}
-        />
+      {/* 3) Budget Requests list - only rendered when requests exist */}
+      {budgetRequests && budgetRequests.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <SectionHeader
+            title="Budget Requests"
+            actionLabel="View all"
+            onAction={() => setActiveTab('ledger')}
+          />
 
-        <div className="flex flex-col gap-2">
-          {budgetRequests && budgetRequests.length > 0 ? (
-            budgetRequests.slice(0, 3).map((req) => (
+          <div className="flex flex-col gap-2">
+            {budgetRequests.slice(0, 3).map((req) => (
               <ListRow
                 key={req.id}
                 icon={<DollarSign size={20} strokeWidth={1.75} className="lucide" />}
                 title={req.teamName || 'Squad Budget Proposal'}
-                subtitle={`₹${req.requestedAmount.toLocaleString()} • ${req.reason || 'Allocation request'}`}
+                subtitle={`₹${(req.requestedAmount || 0).toLocaleString()} • ${req.reason || 'Allocation request'}`}
                 meta={
                   <div className="flex items-center gap-2">
                     <StatusChip
@@ -128,21 +139,10 @@ export const TreasurerHomeView: React.FC<TreasurerHomeViewProps> = () => {
                 }
                 onClick={() => setActiveTab('ledger')}
               />
-            ))
-          ) : (
-            <div
-              className="bg-white border border-[#DAF1DE] p-4 text-center"
-              style={{ borderRadius: '24px' }}
-            >
-              <EmptyState
-                mascot="wallet"
-                title="No active requests"
-                description="All budget disbursements are balanced"
-              />
-            </div>
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

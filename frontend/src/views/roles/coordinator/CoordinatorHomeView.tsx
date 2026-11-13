@@ -71,42 +71,42 @@ export const CoordinatorHomeView: React.FC<CoordinatorHomeViewProps> = ({
         }
       />
 
-      {/* 2) StatTiles: Events, Pending, Volunteers */}
+      {/* 2) StatTiles: Events, Pending, Volunteers - Real dynamic values */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
           icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(events.length || 7)}
+          value={String(events.length)}
           label="Events"
           tint="mint"
           onClick={() => setActiveTab('events')}
         />
         <StatTile
           icon={<AlertCircle size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(pendingCount || 3)}
+          value={String(pendingCount)}
           label="Pending"
           tint="amber"
           onClick={() => setActiveTab('operations')}
         />
         <StatTile
           icon={<Users size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(users.length || 25)}
+          value={String(users.length)}
           label="Volunteers"
           tint="sage"
           onClick={() => setActiveTab('operations')}
         />
       </div>
 
-      {/* 3) "Need action" list with View all */}
-      <div className="flex flex-col gap-2.5">
-        <SectionHeader
-          title="Need action"
-          actionLabel="View all"
-          onAction={() => setActiveTab('operations')}
-        />
+      {/* 3) "Need action" list - only rendered when actionable items exist */}
+      {items && items.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <SectionHeader
+            title="Need action"
+            actionLabel="View all"
+            onAction={() => setActiveTab('operations')}
+          />
 
-        <div className="flex flex-col gap-2">
-          {items && items.length > 0 ? (
-            items.slice(0, 3).map((item) => (
+          <div className="flex flex-col gap-2">
+            {items.slice(0, 3).map((item) => (
               <ListRow
                 key={item.id}
                 icon={<Clock size={20} strokeWidth={1.75} className="lucide" />}
@@ -121,16 +121,10 @@ export const CoordinatorHomeView: React.FC<CoordinatorHomeViewProps> = ({
                   }
                 }}
               />
-            ))
-          ) : (
-            <EmptyState
-              title="All Caught Up"
-              description="No pending actions requiring immediate coordinator review."
-              mascot="shield"
-            />
-          )}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -48,26 +48,16 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
   const handleRegister = registerForEvent || globalRegister;
 
   // Personal audit activity for member (DEC-04 & AUD-01)
-  const myCheckedIns = attendance.filter(
+  const myCheckedIns = (attendance || []).filter(
     (a) => a.userId === currentUser.uid || a.userEmail === currentUser.email
   );
-  const myTasks = tasks.filter((t) => t.assigneeId === currentUser.uid);
-  const myAuditLogs = (auditLogs || []).filter(
-    (log) => log.actorId === currentUser.uid || log.targetId === currentUser.uid
-  ).slice(0, 3);
-
-  const nextEvent = events[0] || {
-    id: 'event_01',
-    title: 'QGIS Remote Sensing',
-    venue: 'Grand Auditorium',
-    startDate: new Date().toISOString(),
-    category: 'Workshop',
-  };
+  const myTasks = (tasks || []).filter((t) => t.assigneeId === currentUser.uid);
+  const nextEvent = events && events.length > 0 ? events[0] : null;
 
   const isAssignedScanner =
-    events.some((ev) => ev.assignedScannerUserIds?.includes(currentUser.uid));
+    Boolean(events && events.some((ev) => ev.assignedScannerUserIds?.includes(currentUser.uid)));
 
-  const upcomingEvents = events.slice(0, 3);
+  const upcomingEvents = (events || []).slice(0, 3);
 
   const formatDateBadge = (dateStr: string) => {
     try {
@@ -83,7 +73,7 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
 
   return (
     <div className="flex flex-col gap-5 select-none">
-      {/* 1) HeroCard with floating leaf: "Good morning, {Name}", subtitle "Campus geomatics & eco initiatives", CTA "Join event" */}
+      {/* 1) HeroCard with floating leaf: "Good morning, {Name}", subtitle "Campus geomatics & eco initiatives" */}
       <HeroCard
         variant="mint"
         title={`Good morning, ${currentUser.name.split(' ')[0]}`}
@@ -92,21 +82,31 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
         mascotSize="lg"
         chip={<StatusChip status="live" label="Active" />}
         action={
-          <PillButton
-            variant="primary"
-            fullWidth
-            onClick={() => {
-              handleRegister(nextEvent.id);
-              handleToast('✓ Registered! Gate pass active.');
-            }}
-          >
-            Join event
-          </PillButton>
+          nextEvent ? (
+            <PillButton
+              variant="primary"
+              fullWidth
+              onClick={() => {
+                handleRegister(nextEvent.id);
+                handleToast('✓ Registered! Gate pass active.');
+              }}
+            >
+              Join {nextEvent.title.length > 20 ? `${nextEvent.title.slice(0, 20)}...` : nextEvent.title}
+            </PillButton>
+          ) : (
+            <PillButton
+              variant="primary"
+              fullWidth
+              onClick={() => setActiveTab('events')}
+            >
+              Explore Chapter Events
+            </PillButton>
+          )
         }
       />
 
       {/* 2) Scanner Assignment Entry Card (if assigned) */}
-      {isAssignedScanner && (
+      {isAssignedScanner && nextEvent && (
         <PastelCard
           variant="sage"
           showArrow
@@ -134,7 +134,7 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
         <div className="grid grid-cols-3 gap-2.5">
           <StatTile
             icon={<Calendar size={18} strokeWidth={2} />}
-            value={String(events.length || 3)}
+            value={String(events.length)}
             label="Events"
             tint="mint"
             onClick={() => setActiveTab('events')}
@@ -148,7 +148,7 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
           />
           <StatTile
             icon={<Users size={18} strokeWidth={2} />}
-            value="4"
+            value={String((useApp().teams || []).length || 4)}
             label="Squads"
             tint="sage"
             onClick={() => setActiveTab('teams')}
@@ -214,69 +214,64 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
         </div>
       </div>
 
-      {/* 5) My Activity Feed (DEC-04 & AUD-01: Personal Audit Log) */}
-      <div className="flex flex-col gap-2.5">
-        <SectionHeader
-          title="My Activity"
-          actionLabel="View all"
-          onAction={() => setActiveTab('tasks')}
-        />
-
+      {/* 5) My Activity Feed (DEC-04 & AUD-01: Personal Audit Log) - Only rendered when genuine activity exists */}
+      {(myCheckedIns.length > 0 || myTasks.length > 0) && (
         <div className="flex flex-col gap-2.5">
-          {myCheckedIns.length > 0 ? (
-            myCheckedIns.slice(0, 2).map((rec) => (
-              <div
-                key={rec.id}
-                className="p-3.5 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={18} className="text-[#163832]" />
+          <SectionHeader
+            title="My Activity"
+            actionLabel="View all"
+            onAction={() => setActiveTab('tasks')}
+          />
+
+          <div className="flex flex-col gap-2.5">
+            {myCheckedIns.length > 0 ? (
+              myCheckedIns.slice(0, 2).map((rec) => (
+                <div
+                  key={rec.id}
+                  className="p-3.5 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center shrink-0">
+                      <CheckCircle2 size={18} className="text-[#163832]" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-[#051F20] truncate">
+                        Attended {rec.eventTitle}
+                      </span>
+                      <span className="text-[12px] font-medium text-[#235347] truncate">
+                        Gate check-in verified • {rec.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-bold text-[#051F20] truncate">
-                      Attended {rec.eventTitle}
-                    </span>
-                    <span className="text-[12px] font-medium text-[#235347] truncate">
-                      Gate check-in verified • {rec.status}
-                    </span>
-                  </div>
+                  <StatusChip status="done" label="Verified" />
                 </div>
-                <StatusChip status="done" label="Verified" />
-              </div>
-            ))
-          ) : myTasks.length > 0 ? (
-            myTasks.slice(0, 2).map((t) => (
-              <div
-                key={t.id}
-                className="p-3.5 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center shrink-0">
-                    <Award size={18} className="text-[#163832]" />
+              ))
+            ) : (
+              myTasks.slice(0, 2).map((t) => (
+                <div
+                  key={t.id}
+                  className="p-3.5 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center shrink-0">
+                      <Award size={18} className="text-[#163832]" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-[#051F20] truncate">
+                        Duty: {t.title}
+                      </span>
+                      <span className="text-[12px] font-medium text-[#235347] truncate">
+                        {t.status === 'done' ? 'Completed' : 'Assigned by Management'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-bold text-[#051F20] truncate">
-                      Duty: {t.title}
-                    </span>
-                    <span className="text-[12px] font-medium text-[#235347] truncate">
-                      {t.status === 'done' ? 'Completed' : 'Assigned by Management'}
-                    </span>
-                  </div>
+                  <StatusChip status={t.status === 'done' ? 'done' : 'live'} />
                 </div>
-                <StatusChip status={t.status === 'done' ? 'done' : 'live'} />
-              </div>
-            ))
-          ) : (
-            <div className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-center flex flex-col items-center gap-1">
-              <span className="text-xs font-bold text-[#051F20]">No recent actions</span>
-              <span className="text-xs text-[#235347]">
-                Register for events or complete assigned squad duties to see your activity timeline here.
-              </span>
-            </div>
-          )}
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
