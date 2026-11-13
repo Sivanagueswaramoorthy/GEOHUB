@@ -42,7 +42,7 @@ export const FacultyHomeView: React.FC = () => {
             >
               <span>Approvals</span>
               {pendingApprovals.length > 0 && (
-                <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#DAF1DE] text-[#051F20]">
+                <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#FAF3E5] text-[#D4A359] border border-[#E5CE9F]/50">
                   {pendingApprovals.length}
                 </span>
               )}

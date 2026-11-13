@@ -33,28 +33,28 @@ export const StatusChip: React.FC<StatusChipProps> = ({
     switch (normStatus) {
       case 'draft':
         return {
-          bg: '#DAF1DE',
-          color: '#235347',
-          border: '1px solid #8EB69B',
+          bg: 'rgba(107, 142, 120, 0.15)',
+          color: '#0F3638',
+          border: '1px solid rgba(107, 142, 120, 0.30)',
           text: label || 'Draft',
         };
       case 'submitted':
         return {
-          bg: 'rgba(142, 182, 155, 0.25)',
-          color: '#0B2B26',
-          border: '1px solid #8EB69B',
+          bg: 'rgba(107, 142, 120, 0.18)',
+          color: '#0F3638',
+          border: '1px solid rgba(107, 142, 120, 0.35)',
           text: label || 'Submitted',
         };
       case 'approved':
         return {
-          bg: '#235347',
+          bg: '#184E50',
           color: '#FFFFFF',
           border: 'none',
           text: label || 'Approved',
         };
       case 'live':
         return {
-          bg: '#163832',
+          bg: '#184E50',
           color: '#FFFFFF',
           border: 'none',
           text: label || 'Live',
@@ -62,47 +62,47 @@ export const StatusChip: React.FC<StatusChipProps> = ({
         };
       case 'done':
         return {
-          bg: '#DAF1DE',
-          color: '#0B2B26',
-          border: '1px solid #8EB69B',
+          bg: 'rgba(107, 142, 120, 0.15)',
+          color: '#0F3638',
+          border: '1px solid rgba(107, 142, 120, 0.30)',
           text: label || 'Done',
           hasCheck: true,
         };
       case 'archived':
         return {
           bg: '#FFFFFF',
-          color: '#235347',
-          border: '1px solid #DAF1DE',
+          color: '#52705E',
+          border: '1px solid #E5ECE8',
           text: label || 'Archived',
         };
       case 'cancelled':
       case 'rejected':
         return {
-          bg: 'rgba(217, 83, 79, 0.12)',
-          color: '#D9534F',
-          border: '1px solid rgba(217, 83, 79, 0.35)',
+          bg: 'rgba(200, 109, 81, 0.14)',
+          color: '#C86D51',
+          border: '1px solid rgba(200, 109, 81, 0.35)',
           text: label || (normStatus === 'rejected' ? 'Rejected' : 'Cancelled'),
         };
       case 'pending':
         return {
-          bg: 'rgba(242, 184, 75, 0.16)',
-          color: '#051F20',
-          border: '1px solid rgba(242, 184, 75, 0.40)',
+          bg: 'rgba(212, 163, 89, 0.15)',
+          color: '#0F3638',
+          border: '1px solid rgba(212, 163, 89, 0.35)',
           text: label || 'Pending',
         };
       case 'low-stock':
       case 'low_stock':
         return {
-          bg: 'rgba(242, 184, 75, 0.16)',
-          color: '#051F20',
-          border: '1px solid rgba(242, 184, 75, 0.40)',
+          bg: 'rgba(212, 163, 89, 0.15)',
+          color: '#0F3638',
+          border: '1px solid rgba(212, 163, 89, 0.35)',
           text: label || 'Low stock',
         };
       default:
         return {
-          bg: '#DAF1DE',
-          color: '#051F20',
-          border: '1px solid #DAF1DE',
+          bg: 'rgba(24, 78, 80, 0.08)',
+          color: '#0F3638',
+          border: '1px solid rgba(24, 78, 80, 0.15)',
           text: label || status,
         };
     }

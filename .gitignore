@@ -49,6 +49,7 @@ __pycache__/
 **/__pycache__/
 *.py[cod]
 *$py.class
+*.db
 backend/geohub.db-journal
 
 # Node / Frontend

@@ -59,11 +59,16 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=schemas.TokenResponse)
 def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
-    email_clean = login_data.email.strip().lower()
-    user = db.query(models.User).filter(models.User.email == email_clean).first()
+    ident = (login_data.identifier or login_data.roll_no or login_data.email or "").strip()
+    if not ident:
+        raise HTTPException(status_code=400, detail="Please provide a valid Roll Number or Email.")
+
+    user = db.query(models.User).filter(
+        (models.User.email == ident.lower()) | (models.User.roll_no == ident.upper())
+    ).first()
 
     if not user or not auth.verify_password(login_data.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect email or password.")
+        raise HTTPException(status_code=400, detail="Incorrect credentials. Please verify your roll number/email and password.")
 
     if user.status == "disabled":
         raise HTTPException(status_code=403, detail="Your account has been disabled by an administrator.")
@@ -72,6 +77,46 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
     return schemas.TokenResponse(
         access_token=token,
         user=schemas.UserResponse.from_orm(user)
+    )
+
+@router.post("/change-password", response_model=schemas.PasswordChangeResponse)
+def change_password(
+    data: schemas.PasswordChangeRequest,
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Secure Change Password matching the GeoHub Security Modal."""
+    if not auth.verify_password(data.old_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password entered is incorrect."
+        )
+
+    if data.old_password == data.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from your current password."
+        )
+
+    # Update hash in TiDB / MySQL
+    current_user.hashed_password = auth.get_password_hash(data.new_password)
+    current_user.updated_at = datetime.utcnow()
+    db.commit()
+
+    # Immutable Audit Log
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="password_change",
+        target_type="user",
+        target_id=current_user.id,
+        target_name=current_user.name,
+        details="User updated scholar password credentials."
+    )
+
+    return schemas.PasswordChangeResponse(
+        success=True,
+        message="Password successfully updated! Your new credentials are now active."
     )
 
 @router.get("/me", response_model=schemas.UserResponse)

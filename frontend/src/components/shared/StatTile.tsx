@@ -22,39 +22,38 @@ export const StatTile: React.FC<StatTileProps> = ({
   className = '',
   style,
 }) => {
-  const getTintStyles = () => {
+  const getBadgeStyles = () => {
     switch (tint) {
       case 'mint':
       case 'teal':
         return {
-          bg: '#DAF1DE',
-          border: '1px solid #8EB69B',
-        };
-      case 'lavender':
-        return {
-          bg: '#DAF1DE',
-          border: '1px solid #8EB69B',
+          bg: 'rgba(24, 78, 80, 0.08)',
+          color: '#184E50',
+          border: '1px solid rgba(24, 78, 80, 0.12)',
         };
       case 'amber':
         return {
-          bg: 'rgba(242, 184, 75, 0.14)',
-          border: '1px solid rgba(242, 184, 75, 0.35)',
+          bg: 'rgba(212, 163, 89, 0.15)',
+          color: '#D4A359',
+          border: '1px solid rgba(212, 163, 89, 0.25)',
         };
       case 'sage':
         return {
-          bg: 'rgba(142, 182, 155, 0.16)',
-          border: '1px solid #8EB69B',
+          bg: 'rgba(107, 142, 120, 0.15)',
+          color: '#52705E',
+          border: '1px solid rgba(107, 142, 120, 0.25)',
         };
       case 'white':
       default:
         return {
-          bg: '#FFFFFF',
-          border: '1px solid #DAF1DE',
+          bg: '#F8FAF9',
+          color: '#184E50',
+          border: '1px solid #E5ECE8',
         };
     }
   };
 
-  const tintStyles = getTintStyles();
+  const badgeStyles = getBadgeStyles();
 
   return (
     <div
@@ -62,28 +61,33 @@ export const StatTile: React.FC<StatTileProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       className={`p-4 flex flex-col justify-between select-none transition-all ${
-        onClick ? 'pressable cursor-pointer hover:shadow-md' : ''
+        onClick ? 'pressable cursor-pointer hover:border-[#184E50]/30 hover:shadow-md' : ''
       } ${className}`}
       style={{
         borderRadius: '24px',
-        backgroundColor: tintStyles.bg,
-        border: tintStyles.border,
-        boxShadow: '0 8px 24px rgba(5, 31, 32, 0.06)',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #E5ECE8',
+        boxShadow: '0 4px 16px -2px rgba(15, 54, 56, 0.05)',
         minHeight: '110px',
         ...style,
       }}
     >
       <div className="flex items-center justify-between">
-        {/* 40px Circular White Icon Container with Soft Shadow */}
+        {/* 40px Circular Icon Container with Botanical Badge Accent */}
         <div
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-[#163832] shadow-[0_4px_12px_rgba(5,31,32,0.06)] border border-[#DAF1DE] shrink-0"
+          className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-transform"
+          style={{
+            backgroundColor: badgeStyles.bg,
+            color: badgeStyles.color,
+            border: badgeStyles.border,
+          }}
         >
           {icon}
         </div>
 
         {footnote && (
           <span
-            className="text-xs font-semibold text-[#235347] max-w-[90px] truncate text-right"
+            className="text-[11px] font-semibold text-[#52705E] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F8FAF9] border border-[#E5ECE8]"
           >
             {footnote}
           </span>
@@ -92,13 +96,13 @@ export const StatTile: React.FC<StatTileProps> = ({
 
       <div className="mt-3">
         <div
-          className="font-bold tracking-tight text-[#051F20]"
+          className="font-extrabold tracking-tight text-[#0F3638]"
           style={{ fontSize: '24px', lineHeight: '28px' }}
         >
           <AnimatedNumber value={value} />
         </div>
         <div
-          className="text-xs font-semibold text-[#235347] mt-0.5 truncate"
+          className="text-xs font-semibold text-[#52705E] mt-0.5 truncate"
         >
           {label}
         </div>

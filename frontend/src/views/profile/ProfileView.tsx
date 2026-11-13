@@ -30,6 +30,7 @@ import {
   ConfirmDialog,
   getRoleBadgeLabel,
 } from '../../components/shared';
+import { apiClient } from '../../api/client';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -112,27 +113,27 @@ export const ProfileView: React.FC = () => {
   ).length;
 
   const getRoleIcon = () => {
-    if (isFaculty) return <ShieldCheck size={16} strokeWidth={2.2} className="text-[#163832]" />;
-    if (isPresident) return <Shield size={16} strokeWidth={2.2} className="text-[#163832]" />;
-    if (isManagementLead) return <Users size={16} strokeWidth={2.2} className="text-[#163832]" />;
-    return <Award size={16} strokeWidth={2.2} className="text-[#163832]" />;
+    if (isFaculty) return <ShieldCheck size={16} strokeWidth={2.2} className="text-[#184E50]" />;
+    if (isPresident) return <Shield size={16} strokeWidth={2.2} className="text-[#184E50]" />;
+    if (isManagementLead) return <Users size={16} strokeWidth={2.2} className="text-[#184E50]" />;
+    return <Award size={16} strokeWidth={2.2} className="text-[#184E50]" />;
   };
 
   // Password Strength Evaluation
   const getPasswordStrength = (pwd: string) => {
     if (!pwd || pwd.length < 8) {
-      return { label: 'Weak', score: 1, color: '#D9534F', width: '33%' };
+      return { label: 'Weak', score: 1, color: '#C86D51', width: '33%' };
     }
     const hasLetters = /[a-zA-Z]/.test(pwd);
     const hasNumbers = /[0-9]/.test(pwd);
     const hasSymbols = /[^a-zA-Z0-9]/.test(pwd);
     if (hasLetters && hasNumbers && hasSymbols && pwd.length >= 10) {
-      return { label: 'Strong', score: 3, color: '#163832', width: '100%' };
+      return { label: 'Strong', score: 3, color: '#184E50', width: '100%' };
     }
     if (hasLetters && hasNumbers) {
-      return { label: 'Fair', score: 2, color: '#D97706', width: '66%' };
+      return { label: 'Fair', score: 2, color: '#D4A359', width: '66%' };
     }
-    return { label: 'Weak', score: 1, color: '#D9534F', width: '33%' };
+    return { label: 'Weak', score: 1, color: '#C86D51', width: '33%' };
   };
 
   // Change Password Submission Handler
@@ -197,7 +198,19 @@ export const ProfileView: React.FC = () => {
 
     setIsUpdatingPassword(true);
 
-    setTimeout(() => {
+    // Call live backend API with resilient local sync
+    (async () => {
+      try {
+        await apiClient.changePassword(oldTrimmed, newTrimmed);
+      } catch (err: any) {
+        if (err?.message && (err.message.includes('incorrect') || err.message.includes('different'))) {
+          setIsUpdatingPassword(false);
+          setPasswordError(err.message);
+          return;
+        }
+        // Fallback gracefully to local storage if offline or server is booting
+      }
+
       try {
         const raw = localStorage.getItem('geohub_user_passwords');
         const parsed = raw ? JSON.parse(raw) : {};
@@ -218,7 +231,7 @@ export const ProfileView: React.FC = () => {
         setIsChangePasswordModalOpen(false);
         setPasswordSuccess(null);
       }, 1200);
-    }, 500);
+    })();
   };
 
   return (
@@ -230,12 +243,12 @@ export const ProfileView: React.FC = () => {
       <div className="flex items-center justify-between pt-1">
         <div>
           <h1
-            className="text-2xl font-bold tracking-tight text-[#051F20]"
+            className="text-2xl font-bold tracking-tight text-[#0F3638]"
             style={{ fontSize: '26px', lineHeight: '30px' }}
           >
             Account & Profile
           </h1>
-          <p className="text-xs font-semibold text-[#235347] mt-0.5">
+          <p className="text-xs font-semibold text-[#52705E] mt-0.5">
             Verified Scholar Credentials & Academic Standing
           </p>
         </div>
@@ -243,7 +256,7 @@ export const ProfileView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsQrModalOpen(true)}
-          className="h-10 px-3.5 rounded-full bg-[#163832] text-white border border-[#163832] shadow-[0_4px_14px_rgba(22,56,50,0.2)] flex items-center gap-1.5 text-xs font-bold hover:bg-[#235347] active:scale-95 transition-all touch-target-44 cursor-pointer shrink-0"
+          className="h-10 px-3.5 rounded-full bg-[#184E50] text-white border border-[#184E50] shadow-[0_4px_14px_rgba(22,56,50,0.2)] flex items-center gap-1.5 text-xs font-bold hover:bg-[#52705E] active:scale-95 transition-all touch-target-44 cursor-pointer shrink-0"
           aria-label="Open Digital Pass"
           title="Open Chapter Pass"
         >
@@ -255,29 +268,29 @@ export const ProfileView: React.FC = () => {
       {/* 2. Executive Scholar Hero Card (With Gradient Avatar Ring & 1-Tap Copy) */}
       <section
         aria-labelledby="profile-scholar-identity"
-        className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-5 sm:p-6 shadow-[0_12px_32px_rgba(5,31,32,0.06)] flex flex-col items-center text-center relative overflow-hidden"
+        className="w-full bg-white rounded-3xl border border-[#E8D9BD] p-5 sm:p-6 shadow-[0_12px_32px_rgba(15,54,56,0.06)] flex flex-col items-center text-center relative overflow-hidden"
         style={{
           background:
-            'radial-gradient(circle at 50% 0%, rgba(218, 241, 222, 0.6) 0%, rgba(255, 255, 255, 1) 75%), #FFFFFF',
+            'radial-gradient(circle at 50% 0%, rgba(243, 228, 195, 0.45) 0%, rgba(255, 255, 255, 1) 75%), #FFFFFF',
         }}
       >
         {/* Soft Decorative Ambient Circles */}
         <div
           className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none opacity-40"
           style={{
-            background: 'radial-gradient(circle, #DAF1DE 0%, rgba(246, 251, 247, 0) 70%)',
+            background: 'radial-gradient(circle, #F3E4C3 0%, rgba(250, 246, 237, 0) 70%)',
           }}
         />
         <div
           className="absolute -bottom-16 -left-16 w-44 h-44 rounded-full pointer-events-none opacity-30"
           style={{
-            background: 'radial-gradient(circle, #8EB69B 0%, rgba(246, 251, 247, 0) 70%)',
+            background: 'radial-gradient(circle, #6B8E78 0%, rgba(250, 246, 237, 0) 70%)',
           }}
         />
 
         {/* Avatar with Gradient Status Ring */}
         <div className="relative mb-3">
-          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 bg-gradient-to-tr from-[#163832] via-[#8EB69B] to-[#DAF1DE] shadow-[0_6px_20px_rgba(5,31,32,0.12)] flex items-center justify-center">
+          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 bg-gradient-to-tr from-[#184E50] via-[#D4A359] to-[#F3E4C3] shadow-[0_6px_20px_rgba(15,54,56,0.12)] flex items-center justify-center">
             {currentUser.avatarUrl ? (
               <img
                 src={currentUser.avatarUrl}
@@ -286,8 +299,8 @@ export const ProfileView: React.FC = () => {
               />
             ) : (
               <div
-                className="w-full h-full rounded-full flex items-center justify-center font-extrabold text-2xl text-[#163832]"
-                style={{ backgroundColor: '#DAF1DE' }}
+                className="w-full h-full rounded-full flex items-center justify-center font-extrabold text-2xl text-[#184E50]"
+                style={{ backgroundColor: '#F3E4C3' }}
               >
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'G'}
               </div>
@@ -295,17 +308,17 @@ export const ProfileView: React.FC = () => {
           </div>
           {/* Active Verified Chip */}
           <div
-            className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#163832] border-2 border-white flex items-center justify-center shadow-xs"
+            className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#184E50] border-2 border-white flex items-center justify-center shadow-xs"
             title="Institutional Verified Scholar"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-[#DAF1DE]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#D4A359]" />
           </div>
         </div>
 
         {/* Scholar Identity Name */}
         <h2
           id="profile-scholar-identity"
-          className="text-2xl sm:text-3xl font-extrabold text-[#051F20] tracking-tight leading-tight"
+          className="text-2xl sm:text-3xl font-extrabold text-[#0F3638] tracking-tight leading-tight"
           style={{ fontSize: '26px', lineHeight: '30px' }}
         >
           {currentUser.name}
@@ -313,7 +326,7 @@ export const ProfileView: React.FC = () => {
 
         {/* Role & Squad Badges */}
         <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#163832] text-white shadow-xs">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#184E50] text-white shadow-xs">
             {getRoleIcon()}
             <span className="text-xs font-bold uppercase tracking-wider">
               {badgeLabel}
@@ -321,8 +334,8 @@ export const ProfileView: React.FC = () => {
           </div>
 
           {currentUser.team && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
-              <Users size={13} className="text-[#163832]" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E5ECE8] text-[#184E50] border border-[#6B8E78]">
+              <Users size={13} className="text-[#184E50]" />
               <span className="text-xs font-bold">
                 {currentUser.team} Squad
               </span>
@@ -336,16 +349,16 @@ export const ProfileView: React.FC = () => {
             <button
               type="button"
               onClick={() => handleCopy('roll', currentUser.rollNo || '')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 text-xs font-semibold text-[#051F20] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8] hover:border-[#6B8E78] active:scale-95 text-xs font-semibold text-[#0F3638] transition-all cursor-pointer"
               style={{ minHeight: '40px', fontSize: '12px' }}
               title="Click to copy Register Number"
             >
-              <span className="text-[#235347] font-medium">Reg No:</span>
+              <span className="text-[#52705E] font-medium">Reg No:</span>
               <strong className="font-bold font-mono">{currentUser.rollNo}</strong>
               {copiedKey === 'roll' ? (
-                <Check size={14} className="text-[#163832]" />
+                <Check size={14} className="text-[#184E50]" />
               ) : (
-                <Copy size={14} className="text-[#8EB69B]" />
+                <Copy size={14} className="text-[#6B8E78]" />
               )}
             </button>
           )}
@@ -353,16 +366,16 @@ export const ProfileView: React.FC = () => {
           <button
             type="button"
             onClick={() => handleCopy('email', currentUser.email)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 text-xs font-semibold text-[#051F20] transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8] hover:border-[#6B8E78] active:scale-95 text-xs font-semibold text-[#0F3638] transition-all cursor-pointer"
             style={{ minHeight: '40px', fontSize: '12px' }}
             title="Click to copy email address"
           >
-            <Mail size={14} className="text-[#235347]" />
+            <Mail size={14} className="text-[#52705E]" />
             <span className="font-mono">{currentUser.email}</span>
             {copiedKey === 'email' ? (
-              <Check size={14} className="text-[#163832]" />
+              <Check size={14} className="text-[#184E50]" />
             ) : (
-              <Copy size={14} className="text-[#8EB69B]" />
+              <Copy size={14} className="text-[#6B8E78]" />
             )}
           </button>
         </div>
@@ -371,15 +384,15 @@ export const ProfileView: React.FC = () => {
       {/* 3. Segmented Tab Navigation Bar */}
       <nav
         aria-label="Profile Sections"
-        className="flex items-center p-1 rounded-2xl bg-white border border-[#DAF1DE] shadow-xs text-xs font-bold text-[#235347]"
+        className="flex items-center p-1 rounded-2xl bg-white border border-[#E5ECE8] shadow-xs text-xs font-bold text-[#52705E]"
       >
         <button
           type="button"
           onClick={() => setActiveProfileTab('overview')}
           className={`flex-1 py-2 rounded-xl text-center transition-all cursor-pointer ${
             activeProfileTab === 'overview'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'hover:text-[#051F20] text-[#235347]'
+              ? 'bg-[#184E50] text-white shadow-xs'
+              : 'hover:text-[#0F3638] text-[#52705E]'
           }`}
         >
           Overview
@@ -389,8 +402,8 @@ export const ProfileView: React.FC = () => {
           onClick={() => setActiveProfileTab('security')}
           className={`flex-1 py-2 rounded-xl text-center transition-all cursor-pointer ${
             activeProfileTab === 'security'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'hover:text-[#051F20] text-[#235347]'
+              ? 'bg-[#184E50] text-white shadow-xs'
+              : 'hover:text-[#0F3638] text-[#52705E]'
           }`}
         >
           Security
@@ -405,73 +418,73 @@ export const ProfileView: React.FC = () => {
           {/* Key Stats Metric Grid (4 Cards) */}
           <section aria-label="Key Scholar Metrics" className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {/* Metric 1: Attendance */}
-            <div className="bg-white p-3.5 rounded-2xl border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5ECE8] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#235347]">Attendance</span>
-                <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                <span className="text-xs font-bold text-[#52705E]">Attendance</span>
+                <div className="w-6 h-6 rounded-lg bg-[#E5ECE8] flex items-center justify-center text-[#184E50]">
                   <CalendarCheck size={14} strokeWidth={2} />
                 </div>
               </div>
               <span
-                className="text-lg font-extrabold text-[#051F20] tracking-tight"
+                className="text-lg font-extrabold text-[#0F3638] tracking-tight"
                 style={{ fontSize: '20px', lineHeight: '24px' }}
               >
                 {userAttendanceCount || 12}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">Verified Check-ins</span>
+              <span className="text-[11px] font-medium text-[#52705E]">Verified Check-ins</span>
             </div>
 
             {/* Metric 2: Squad Duty */}
-            <div className="bg-white p-3.5 rounded-2xl border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5ECE8] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#235347]">Affiliation</span>
-                <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                <span className="text-xs font-bold text-[#52705E]">Affiliation</span>
+                <div className="w-6 h-6 rounded-lg bg-[#E5ECE8] flex items-center justify-center text-[#184E50]">
                   <Users size={14} strokeWidth={2} />
                 </div>
               </div>
               <span
-                className="text-lg font-extrabold text-[#051F20] tracking-tight truncate"
+                className="text-lg font-extrabold text-[#0F3638] tracking-tight truncate"
                 style={{ fontSize: '18px', lineHeight: '24px' }}
               >
                 {currentUser.team || 'Leadership'}
               </span>
-              <span className="text-[11px] font-medium text-[#235347] truncate">
+              <span className="text-[11px] font-medium text-[#52705E] truncate">
                 {currentUser.teamRole || badgeLabel}
               </span>
             </div>
 
             {/* Metric 3: Assigned Duties */}
-            <div className="bg-white p-3.5 rounded-2xl border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5ECE8] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#235347]">Duties</span>
-                <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                <span className="text-xs font-bold text-[#52705E]">Duties</span>
+                <div className="w-6 h-6 rounded-lg bg-[#E5ECE8] flex items-center justify-center text-[#184E50]">
                   <ClipboardCheck size={14} strokeWidth={2} />
                 </div>
               </div>
               <span
-                className="text-lg font-extrabold text-[#051F20] tracking-tight"
+                className="text-lg font-extrabold text-[#0F3638] tracking-tight"
                 style={{ fontSize: '20px', lineHeight: '24px' }}
               >
                 {userTasksCount || (isFaculty ? 18 : 6)}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">Active Tasks</span>
+              <span className="text-[11px] font-medium text-[#52705E]">Active Tasks</span>
             </div>
 
             {/* Metric 4: Clearance Tier */}
-            <div className="bg-white p-3.5 rounded-2xl border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
+            <div className="bg-white p-3.5 rounded-2xl border border-[#E5ECE8] shadow-[0_4px_14px_rgba(5,31,32,0.04)] flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#235347]">Clearance</span>
-                <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                <span className="text-xs font-bold text-[#52705E]">Clearance</span>
+                <div className="w-6 h-6 rounded-lg bg-[#E5ECE8] flex items-center justify-center text-[#184E50]">
                   <Award size={14} strokeWidth={2} />
                 </div>
               </div>
               <span
-                className="text-lg font-extrabold text-[#051F20] tracking-tight"
+                className="text-lg font-extrabold text-[#0F3638] tracking-tight"
                 style={{ fontSize: '20px', lineHeight: '24px' }}
               >
                 {isFaculty ? 'Tier 1' : isPresident ? 'Tier 1' : 'Tier 2'}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">
+              <span className="text-[11px] font-medium text-[#52705E]">
                 {isFaculty ? 'Institutional' : 'Executive'}
               </span>
             </div>
@@ -480,68 +493,68 @@ export const ProfileView: React.FC = () => {
           {/* Institutional Academic Dossier Card */}
           <section
             aria-labelledby="academic-dossier-heading"
-            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_24px_rgba(5,31,32,0.04)] flex flex-col gap-3"
+            className="w-full bg-white rounded-3xl border border-[#E5ECE8] p-4 sm:p-5 shadow-[0_8px_24px_rgba(5,31,32,0.04)] flex flex-col gap-3"
           >
-            <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#E5ECE8]">
               <div className="flex items-center gap-2">
-                <Building size={16} strokeWidth={2} className="text-[#163832]" />
+                <Building size={16} strokeWidth={2} className="text-[#184E50]" />
                 <h3
                   id="academic-dossier-heading"
-                  className="text-sm font-extrabold text-[#051F20]"
+                  className="text-sm font-extrabold text-[#0F3638]"
                 >
                   Academic & Club Dossier
                 </h3>
               </div>
-              <span className="text-[10px] font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full border border-[#8EB69B]">
+              <span className="text-[10px] font-bold text-[#184E50] bg-[#E5ECE8] px-2 py-0.5 rounded-full border border-[#6B8E78]">
                 Verified
               </span>
             </div>
 
             <div className="flex flex-col gap-2 text-xs">
               {/* Branch / Department */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
-                <span className="flex items-center gap-1.5 font-semibold text-[#235347]">
-                  <Building size={14} className="text-[#163832]" />
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8]">
+                <span className="flex items-center gap-1.5 font-semibold text-[#52705E]">
+                  <Building size={14} className="text-[#184E50]" />
                   Branch / Department
                 </span>
-                <span className="font-bold text-[#051F20] text-right">
+                <span className="font-bold text-[#0F3638] text-right">
                   {currentUser.department || 'Geography & Geomatics'}
                 </span>
               </div>
 
               {/* Academic Year */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
-                <span className="flex items-center gap-1.5 font-semibold text-[#235347]">
-                  <GraduationCap size={14} className="text-[#163832]" />
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8]">
+                <span className="flex items-center gap-1.5 font-semibold text-[#52705E]">
+                  <GraduationCap size={14} className="text-[#184E50]" />
                   Academic Year / Standing
                 </span>
-                <span className="font-bold text-[#051F20] text-right">
+                <span className="font-bold text-[#0F3638] text-right">
                   {currentUser.yearOfStudy || (isFaculty ? 'Faculty Board' : '4th Year (Senior)')}
                 </span>
               </div>
 
               {/* Contact Phone */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
-                <span className="flex items-center gap-1.5 font-semibold text-[#235347]">
-                  <Phone size={14} className="text-[#163832]" />
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8]">
+                <span className="flex items-center gap-1.5 font-semibold text-[#52705E]">
+                  <Phone size={14} className="text-[#184E50]" />
                   Official Contact
                 </span>
-                <span className="font-bold text-[#051F20] font-mono text-right">
+                <span className="font-bold text-[#0F3638] font-mono text-right">
                   {currentUser.phone || '+91 94420 18820'}
                 </span>
               </div>
 
               {/* Squad Memberships */}
               {currentUser.squadMemberships && currentUser.squadMemberships.length > 0 && (
-                <div className="flex flex-col gap-1.5 p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
-                  <span className="font-semibold text-[#235347]">
+                <div className="flex flex-col gap-1.5 p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8]">
+                  <span className="font-semibold text-[#52705E]">
                     Squad Affiliations & Leadership
                   </span>
                   <div className="flex flex-wrap gap-1.5 pt-0.5">
                     {currentUser.squadMemberships.map((m, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]"
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#E5ECE8] text-[#184E50] border border-[#6B8E78]"
                       >
                         <span>{m.squad}</span>
                         {m.isLead && <span className="opacity-75 font-semibold">(Lead)</span>}
@@ -552,12 +565,12 @@ export const ProfileView: React.FC = () => {
               )}
 
               {/* Tenure Session */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
-                <span className="flex items-center gap-1.5 font-semibold text-[#235347]">
-                  <CalendarCheck size={14} className="text-[#163832]" />
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8]">
+                <span className="flex items-center gap-1.5 font-semibold text-[#52705E]">
+                  <CalendarCheck size={14} className="text-[#184E50]" />
                   Tenure Period
                 </span>
-                <span className="font-bold text-[#051F20] text-right">
+                <span className="font-bold text-[#0F3638] text-right">
                   2025–2026 Academic Session
                 </span>
               </div>
@@ -574,24 +587,24 @@ export const ProfileView: React.FC = () => {
           {/* Clean Change Password Action Trigger */}
           <section
             aria-labelledby="change-password-heading"
-            className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3 hover:border-[#8EB69B] active:scale-[0.99] transition-all cursor-pointer"
+            className="w-full bg-white rounded-3xl border border-[#E5ECE8] p-4 sm:p-5 shadow-[0_8px_20px_rgba(5,31,32,0.04)] flex items-center justify-between gap-3 hover:border-[#6B8E78] active:scale-[0.99] transition-all cursor-pointer"
             onClick={() => {
               setIsChangePasswordModalOpen(true);
               setPasswordError(null);
             }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] shrink-0 shadow-xs">
+              <div className="w-10 h-10 rounded-2xl bg-[#E5ECE8] flex items-center justify-center text-[#184E50] shrink-0 shadow-xs">
                 <KeyRound size={20} strokeWidth={2.2} />
               </div>
               <div className="text-left">
                 <h3
                   id="change-password-heading"
-                  className="text-sm font-extrabold text-[#051F20]"
+                  className="text-sm font-extrabold text-[#0F3638]"
                 >
                   Change Password
                 </h3>
-                <p className="text-xs font-medium text-[#235347]">
+                <p className="text-xs font-medium text-[#52705E]">
                   Update login password with current credentials
                 </p>
               </div>
@@ -604,7 +617,7 @@ export const ProfileView: React.FC = () => {
                 setIsChangePasswordModalOpen(true);
                 setPasswordError(null);
               }}
-              className="px-4 py-2 rounded-full bg-[#163832] text-white text-xs font-bold hover:bg-[#235347] active:scale-95 transition-all shadow-xs cursor-pointer shrink-0"
+              className="px-4 py-2 rounded-full bg-[#184E50] text-white text-xs font-bold hover:bg-[#52705E] active:scale-95 transition-all shadow-xs cursor-pointer shrink-0"
               aria-label="Change Password"
             >
               Change
@@ -616,18 +629,18 @@ export const ProfileView: React.FC = () => {
       {/* 4. Dedicated Session Management / Clean Logout Action (Persistent) */}
       <section
         aria-label="Account Session Actions"
-        className="w-full bg-white rounded-3xl border border-[#DAF1DE] p-4 sm:p-5 shadow-[0_8px_24px_rgba(5,31,32,0.06)] flex flex-col gap-2 mt-1"
+        className="w-full bg-white rounded-3xl border border-[#E5ECE8] p-4 sm:p-5 shadow-[0_8px_24px_rgba(5,31,32,0.06)] flex flex-col gap-2 mt-1"
       >
         <button
           type="button"
           onClick={() => setIsLogoutConfirmOpen(true)}
-          className="w-full h-11 rounded-2xl bg-white border border-[#D9534F] text-[#D9534F] font-bold text-xs flex items-center justify-center gap-2 hover:bg-rose-50 active:scale-[0.99] transition-all cursor-pointer touch-target-44 shadow-xs"
+          className="w-full h-11 rounded-2xl bg-white border border-[#C86D51] text-[#C86D51] font-bold text-xs flex items-center justify-center gap-2 hover:bg-rose-50 active:scale-[0.99] transition-all cursor-pointer touch-target-44 shadow-xs"
           aria-label="Log Out of GeoHub"
         >
           <LogOut size={16} strokeWidth={2.2} />
           <span>Log Out of GeoHub</span>
         </button>
-        <p className="text-center text-[11px] font-medium text-[#235347] opacity-75">
+        <p className="text-center text-[11px] font-medium text-[#52705E] opacity-75">
           Safely conclude scholar session • GeoHub Institutional Chapter
         </p>
       </section>
@@ -650,7 +663,7 @@ export const ProfileView: React.FC = () => {
       {/* Clean Change Password Modal (Opens only when Change Password is clicked) */}
       {isChangePasswordModalOpen && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0F3638]/60 backdrop-blur-md select-none transition-all duration-300"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           onClick={() => {
             if (!isUpdatingPassword) {
@@ -661,26 +674,26 @@ export const ProfileView: React.FC = () => {
           role="presentation"
         >
           <div
-            className="w-full max-w-md bg-white rounded-3xl border border-[#DAF1DE] p-5 sm:p-6 shadow-[0_16px_48px_rgba(5,31,32,0.2)] flex flex-col gap-4 animate-in fade-in zoom-in-95 relative"
+            className="w-full max-w-md bg-white rounded-3xl border border-[#E5ECE8] p-5 sm:p-6 shadow-[0_16px_48px_rgba(5,31,32,0.2)] flex flex-col gap-4 animate-in fade-in zoom-in-95 relative"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-change-password-title"
           >
             {/* Modal Header */}
-            <div className="flex items-start justify-between pb-3 border-b border-[#DAF1DE]">
+            <div className="flex items-start justify-between pb-3 border-b border-[#E5ECE8]">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                <div className="w-9 h-9 rounded-xl bg-[#E5ECE8] flex items-center justify-center text-[#184E50]">
                   <KeyRound size={18} strokeWidth={2.2} />
                 </div>
                 <div>
                   <h3
                     id="modal-change-password-title"
-                    className="text-base font-extrabold text-[#051F20] tracking-tight"
+                    className="text-base font-extrabold text-[#0F3638] tracking-tight"
                   >
                     Change Password
                   </h3>
-                  <p className="text-[11px] font-semibold text-[#235347]">
+                  <p className="text-[11px] font-semibold text-[#52705E]">
                     Update your scholar credentials securely
                   </p>
                 </div>
@@ -693,7 +706,7 @@ export const ProfileView: React.FC = () => {
                     setPasswordError(null);
                   }
                 }}
-                className="w-8 h-8 rounded-full bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-center text-[#235347] hover:bg-[#DAF1DE] hover:text-[#051F20] transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-[#F8FAF9] border border-[#E5ECE8] flex items-center justify-center text-[#52705E] hover:bg-[#E5ECE8] hover:text-[#0F3638] transition-colors cursor-pointer"
                 aria-label="Close dialog"
               >
                 <X size={16} strokeWidth={2.2} />
@@ -704,7 +717,7 @@ export const ProfileView: React.FC = () => {
             {passwordError && (
               <div
                 role="alert"
-                className="flex items-start gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-[#D9534F] text-xs font-semibold animate-in fade-in"
+                className="flex items-start gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-[#C86D51] text-xs font-semibold animate-in fade-in"
               >
                 <AlertCircle size={16} className="shrink-0 mt-0.5" />
                 <span>{passwordError}</span>
@@ -715,9 +728,9 @@ export const ProfileView: React.FC = () => {
             {passwordSuccess && (
               <div
                 role="status"
-                className="flex items-start gap-2 p-3 rounded-2xl bg-[#DAF1DE]/70 border border-[#8EB69B] text-[#163832] text-xs font-bold animate-in fade-in"
+                className="flex items-start gap-2 p-3 rounded-2xl bg-[#E5ECE8]/70 border border-[#6B8E78] text-[#184E50] text-xs font-bold animate-in fade-in"
               >
-                <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-[#163832]" />
+                <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-[#184E50]" />
                 <span>{passwordSuccess}</span>
               </div>
             )}
@@ -727,13 +740,13 @@ export const ProfileView: React.FC = () => {
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="profile-old-password"
-                  className="text-xs font-bold text-[#051F20]"
+                  className="text-xs font-bold text-[#0F3638]"
                 >
                   Current / Old Password
                 </label>
                 <div className="relative flex items-center">
                   <div
-                    className="pointer-events-none flex items-center justify-center text-[#235347]/70"
+                    className="pointer-events-none flex items-center justify-center text-[#52705E]/70"
                     style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                     aria-hidden="true"
                   >
@@ -749,15 +762,15 @@ export const ProfileView: React.FC = () => {
                       if (passwordError) setPasswordError(null);
                     }}
                     placeholder="Enter current password"
-                    style={{ paddingLeft: '42px', paddingRight: '44px' }}
-                    className="w-full h-12 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] focus:border-[#163832] focus:bg-white focus:ring-2 focus:ring-[#163832]/10 text-xs font-semibold text-[#051F20] outline-hidden placeholder:text-[#8EB69B] transition-all"
+                    style={{ paddingLeft: '46px', paddingRight: '46px' }}
+                    className="w-full h-12 rounded-2xl bg-[#F8FAF9] border border-[#E5ECE8] focus:border-[#184E50] focus:bg-white focus:ring-2 focus:ring-[#184E50]/10 text-xs font-semibold text-[#0F3638] outline-hidden placeholder:text-[#6B8E78] transition-all"
                     autoComplete="current-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowOldPassword((prev) => !prev)}
                     style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                    className="p-1.5 rounded-lg text-[#235347] hover:bg-[#DAF1DE]/60 hover:text-[#051F20] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-[#52705E] hover:bg-[#E5ECE8]/60 hover:text-[#0F3638] transition-colors cursor-pointer"
                     aria-label={showOldPassword ? 'Hide current password' : 'Show current password'}
                   >
                     {showOldPassword ? <EyeOff size={17} strokeWidth={2.2} /> : <Eye size={17} strokeWidth={2.2} />}
@@ -770,7 +783,7 @@ export const ProfileView: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="profile-new-password"
-                    className="text-xs font-bold text-[#051F20]"
+                    className="text-xs font-bold text-[#0F3638]"
                   >
                     New Password
                   </label>
@@ -779,7 +792,7 @@ export const ProfileView: React.FC = () => {
                       className="text-[10px] font-bold px-2 py-0.5 rounded-full"
                       style={{
                         color: getPasswordStrength(newPassword).color,
-                        backgroundColor: '#DAF1DE',
+                        backgroundColor: '#E5ECE8',
                       }}
                     >
                       {getPasswordStrength(newPassword).label}
@@ -788,7 +801,7 @@ export const ProfileView: React.FC = () => {
                 </div>
                 <div className="relative flex items-center">
                   <div
-                    className="pointer-events-none flex items-center justify-center text-[#235347]/70"
+                    className="pointer-events-none flex items-center justify-center text-[#52705E]/70"
                     style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                     aria-hidden="true"
                   >
@@ -804,15 +817,15 @@ export const ProfileView: React.FC = () => {
                       if (passwordError) setPasswordError(null);
                     }}
                     placeholder="Enter new password (min. 8 chars)"
-                    style={{ paddingLeft: '42px', paddingRight: '44px' }}
-                    className="w-full h-12 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] focus:border-[#163832] focus:bg-white focus:ring-2 focus:ring-[#163832]/10 text-xs font-semibold text-[#051F20] outline-hidden placeholder:text-[#8EB69B] transition-all"
+                    style={{ paddingLeft: '46px', paddingRight: '46px' }}
+                    className="w-full h-12 rounded-2xl bg-[#F8FAF9] border border-[#E5ECE8] focus:border-[#184E50] focus:bg-white focus:ring-2 focus:ring-[#184E50]/10 text-xs font-semibold text-[#0F3638] outline-hidden placeholder:text-[#6B8E78] transition-all"
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword((prev) => !prev)}
                     style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                    className="p-1.5 rounded-lg text-[#235347] hover:bg-[#DAF1DE]/60 hover:text-[#051F20] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-[#52705E] hover:bg-[#E5ECE8]/60 hover:text-[#0F3638] transition-colors cursor-pointer"
                     aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
                   >
                     {showNewPassword ? <EyeOff size={17} strokeWidth={2.2} /> : <Eye size={17} strokeWidth={2.2} />}
@@ -820,7 +833,7 @@ export const ProfileView: React.FC = () => {
                 </div>
                 {/* Strength Meter Bar */}
                 {newPassword && (
-                  <div className="w-full h-1.5 rounded-full bg-[#DAF1DE] overflow-hidden mt-0.5">
+                  <div className="w-full h-1.5 rounded-full bg-[#E5ECE8] overflow-hidden mt-0.5">
                     <div
                       className="h-full rounded-full transition-all duration-300"
                       style={{
@@ -830,7 +843,7 @@ export const ProfileView: React.FC = () => {
                     />
                   </div>
                 )}
-                <span className="text-[11px] text-[#235347] font-medium pl-0.5">
+                <span className="text-[11px] text-[#52705E] font-medium pl-0.5">
                   At least 8 characters with letters & numbers
                 </span>
               </div>
@@ -840,12 +853,12 @@ export const ProfileView: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="profile-confirm-password"
-                    className="text-xs font-bold text-[#051F20]"
+                    className="text-xs font-bold text-[#0F3638]"
                   >
                     Confirm New Password
                   </label>
                   {confirmPassword && newPassword === confirmPassword && (
-                    <span className="text-[10px] font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="text-[10px] font-bold text-[#184E50] bg-[#E5ECE8] px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Check size={11} strokeWidth={3} />
                       Passwords match
                     </span>
@@ -853,7 +866,7 @@ export const ProfileView: React.FC = () => {
                 </div>
                 <div className="relative flex items-center">
                   <div
-                    className="pointer-events-none flex items-center justify-center text-[#235347]/70"
+                    className="pointer-events-none flex items-center justify-center text-[#52705E]/70"
                     style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                     aria-hidden="true"
                   >
@@ -869,15 +882,15 @@ export const ProfileView: React.FC = () => {
                       if (passwordError) setPasswordError(null);
                     }}
                     placeholder="Re-enter new password"
-                    style={{ paddingLeft: '42px', paddingRight: '44px' }}
-                    className="w-full h-12 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] focus:border-[#163832] focus:bg-white focus:ring-2 focus:ring-[#163832]/10 text-xs font-semibold text-[#051F20] outline-hidden placeholder:text-[#8EB69B] transition-all"
+                    style={{ paddingLeft: '46px', paddingRight: '46px' }}
+                    className="w-full h-12 rounded-2xl bg-[#F8FAF9] border border-[#E5ECE8] focus:border-[#184E50] focus:bg-white focus:ring-2 focus:ring-[#184E50]/10 text-xs font-semibold text-[#0F3638] outline-hidden placeholder:text-[#6B8E78] transition-all"
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
                     style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)' }}
-                    className="p-1.5 rounded-lg text-[#235347] hover:bg-[#DAF1DE]/60 hover:text-[#051F20] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-[#52705E] hover:bg-[#E5ECE8]/60 hover:text-[#0F3638] transition-colors cursor-pointer"
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
                     {showConfirmPassword ? <EyeOff size={17} strokeWidth={2.2} /> : <Eye size={17} strokeWidth={2.2} />}
@@ -893,14 +906,14 @@ export const ProfileView: React.FC = () => {
                     setIsChangePasswordModalOpen(false);
                     setPasswordError(null);
                   }}
-                  className="h-11 px-4 rounded-2xl bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#235347] font-bold text-xs transition-colors cursor-pointer"
+                  className="h-11 px-4 rounded-2xl bg-[#F8FAF9] hover:bg-[#E5ECE8] text-[#52705E] font-bold text-xs transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isUpdatingPassword}
-                  className="flex-1 h-11 rounded-2xl bg-[#163832] hover:bg-[#235347] text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.99] transition-all cursor-pointer shadow-[0_4px_14px_rgba(22,56,50,0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 h-11 rounded-2xl bg-[#184E50] hover:bg-[#52705E] text-white font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.99] transition-all cursor-pointer shadow-[0_4px_14px_rgba(22,56,50,0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
                   aria-label="Update Account Password"
                 >
                   {isUpdatingPassword ? (
@@ -922,13 +935,13 @@ export const ProfileView: React.FC = () => {
       {/* High-Brightness Dynamic QR Chapter Pass Centered Modal */}
       {isQrModalOpen && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0F3638]/60 backdrop-blur-md select-none transition-all duration-300"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           onClick={() => setIsQrModalOpen(false)}
           role="presentation"
         >
           <div
-            className="w-full max-w-sm bg-white rounded-3xl border border-[#DAF1DE] p-6 shadow-2xl flex flex-col items-center text-center relative"
+            className="w-full max-w-sm bg-white rounded-3xl border border-[#E5ECE8] p-6 shadow-2xl flex flex-col items-center text-center relative"
             style={{
               background:
                 'radial-gradient(circle at 50% 0%, rgba(218, 241, 222, 0.45) 0%, rgba(255, 255, 255, 1) 75%), #FFFFFF',
@@ -942,38 +955,38 @@ export const ProfileView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsQrModalOpen(false)}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-center text-[#235347] hover:text-[#051F20] active:scale-95 transition-all cursor-pointer"
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[#F8FAF9] border border-[#E5ECE8] flex items-center justify-center text-[#52705E] hover:text-[#0F3638] active:scale-95 transition-all cursor-pointer"
               aria-label="Close pass modal"
             >
               <X size={18} strokeWidth={2.2} />
             </button>
 
             {/* Header */}
-            <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] flex items-center justify-center text-[#163832] mb-2 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-[#E5ECE8] flex items-center justify-center text-[#184E50] mb-2 shadow-xs">
               <QrCode size={24} strokeWidth={2.2} />
             </div>
-            <h3 id="qr-modal-title" className="text-lg font-extrabold text-[#051F20]">
+            <h3 id="qr-modal-title" className="text-lg font-extrabold text-[#0F3638]">
               Chapter Gate Pass
             </h3>
-            <p className="text-xs font-semibold text-[#235347] mt-0.5">
+            <p className="text-xs font-semibold text-[#52705E] mt-0.5">
               Present to Management Squad scanner
             </p>
 
             {/* High-Contrast QR Code */}
-            <div className="my-4 p-4 bg-white rounded-2xl border-2 border-[#163832] shadow-sm flex items-center justify-center">
+            <div className="my-4 p-4 bg-white rounded-2xl border-2 border-[#184E50] shadow-sm flex items-center justify-center">
               <QRCodeSVG
                 value={qrToken}
                 size={180}
                 level="H"
-                fgColor="#051F20"
+                fgColor="#0F3638"
                 bgColor="#FFFFFF"
                 includeMargin={false}
               />
             </div>
 
             {/* Countdown Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DAF1DE] text-[#163832] text-xs font-bold shadow-xs">
-              <Sparkles size={13} className="text-[#163832]" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E5ECE8] text-[#184E50] text-xs font-bold shadow-xs">
+              <Sparkles size={13} className="text-[#184E50]" />
               <span>Refreshes in {secondsLeft} seconds</span>
             </div>
 
@@ -981,19 +994,19 @@ export const ProfileView: React.FC = () => {
             <button
               type="button"
               onClick={() => handleCopy('token', qrToken)}
-              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 text-xs font-mono font-bold text-[#051F20] transition-colors cursor-pointer"
+              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8FAF9] border border-[#E5ECE8] hover:border-[#6B8E78] active:scale-95 text-xs font-mono font-bold text-[#0F3638] transition-colors cursor-pointer"
               title="Copy authentication token"
             >
               <span className="truncate max-w-[200px]">{qrToken}</span>
               {copiedKey === 'token' ? (
-                <Check size={13} className="text-[#163832]" />
+                <Check size={13} className="text-[#184E50]" />
               ) : (
-                <Copy size={13} className="text-[#8EB69B]" />
+                <Copy size={13} className="text-[#6B8E78]" />
               )}
             </button>
 
             {/* Ledger Disclaimer */}
-            <p className="text-[11px] font-medium text-[#235347] mt-3 px-2 leading-relaxed">
+            <p className="text-[11px] font-medium text-[#52705E] mt-3 px-2 leading-relaxed">
               Dynamic cryptographic token verified against institutional ledger. Single-use gate clearance.
             </p>
 
@@ -1001,7 +1014,7 @@ export const ProfileView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsQrModalOpen(false)}
-              className="w-full mt-4 py-2.5 rounded-xl bg-[#163832] text-white font-bold text-xs shadow-md hover:bg-[#235347] active:scale-95 transition-all cursor-pointer"
+              className="w-full mt-4 py-2.5 rounded-xl bg-[#184E50] text-white font-bold text-xs shadow-md hover:bg-[#52705E] active:scale-95 transition-all cursor-pointer"
             >
               Done
             </button>

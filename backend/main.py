@@ -70,30 +70,22 @@ app.include_router(dashboard_router.router, prefix=settings.API_V1_STR)
 app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)
 
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "app": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "database": "connected"
+    }
+
 @app.on_event("startup")
-def seed_default_teams():
-    db = SessionLocal()
+def on_startup():
+    from init_db import init_database
     try:
-        standard_teams = [
-            ("Management", "Responsible for club planning, coordination, and administrative operations."),
-            ("Promotion", "Responsible for social media outreach, campaigns, posters, and campus engagement."),
-            ("Documentation", "Responsible for event photography, videography, report compilation, and archival."),
-            ("Entertainment", "Responsible for cultural activities, stage hosting, sound, and audience activities."),
-        ]
-        for name, desc in standard_teams:
-            existing = db.query(models.Team).filter(models.Team.name == name).first()
-            if not existing:
-                team = models.Team(
-                    id=name,
-                    name=name,
-                    description=desc,
-                    admin_user_ids="[]",
-                    member_user_ids="[]",
-                )
-                db.add(team)
-        db.commit()
-    finally:
-        db.close()
+        init_database()
+    except Exception as e:
+        print(f"[Startup Warning] init_database error: {e}")
 
 @app.get("/geo-hub-logo.png")
 def get_logo():

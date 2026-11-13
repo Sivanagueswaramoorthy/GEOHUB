@@ -7,20 +7,37 @@ class UserRegister(BaseModel):
     name: str
     email: str
     password: str
+    roll_no: Optional[str] = None
+    department: Optional[str] = "Geoinformatics Engineering"
 
 class UserLogin(BaseModel):
-    email: str
+    email: Optional[str] = None
+    roll_no: Optional[str] = None
+    identifier: Optional[str] = None # can be email or roll_no
     password: str
+
+class PasswordChangeRequest(BaseModel):
+    old_password: str
+    new_password: str = Field(..., min_length=8)
+
+class PasswordChangeResponse(BaseModel):
+    success: bool
+    message: str
 
 class UserResponse(BaseModel):
     id: str
+    roll_no: Optional[str] = None
     email: str
     name: str
     role: str
     post: Optional[str] = None
+    department: Optional[str] = "Geoinformatics Engineering"
+    year_of_study: Optional[str] = "4th Year (Senior)"
+    phone: Optional[str] = "+91 94420 18820"
     tenure_end: Optional[datetime] = None
     team: Optional[str] = None
     team_role: Optional[str] = None
+    squad_memberships: Optional[str] = "[]"
     is_volunteer: bool
     status: str
     created_at: datetime

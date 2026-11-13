@@ -56,19 +56,19 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
           minWidth: visualDiameter,
           minHeight: visualDiameter,
           backgroundColor: isAvatar
-            ? '#0B2B26'
+            ? 'var(--teal-forest-dark, #0F3638)'
             : isBell
             ? '#FFFFFF'
-            : 'rgba(22, 56, 50, 0.08)',
+            : 'rgba(24, 78, 80, 0.08)',
           border: isAvatar
-            ? '2px solid #8EB69B'
+            ? '2px solid var(--antique-gold, #D4A359)'
             : isBell
-            ? '1.5px solid #8EB69B'
+            ? '1.5px solid var(--vanilla-latte-border, #E8D9BD)'
             : 'none',
           boxShadow: isAvatar
-            ? '0 3px 8px rgba(5, 31, 32, 0.12)'
+            ? '0 3px 8px rgba(15, 54, 56, 0.12)'
             : isBell
-            ? '0 3px 8px rgba(5, 31, 32, 0.08), inset 0 1px 0 #FFFFFF'
+            ? '0 3px 8px rgba(15, 54, 56, 0.08), inset 0 1px 0 #FFFFFF'
             : 'none',
         }}
       >
@@ -88,7 +88,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
                 height: '8px',
                 minWidth: '8px',
                 minHeight: '8px',
-                backgroundColor: '#D9534F',
+                backgroundColor: 'var(--spiced-terracotta, #C86D51)',
                 boxShadow: '0 0 0 1.5px #FFFFFF',
               }}
             />
@@ -105,7 +105,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
                 padding: '0 4px',
                 fontSize: '12px',
                 lineHeight: isCompact ? '16px' : '18px',
-                backgroundColor: '#D9534F',
+                backgroundColor: 'var(--spiced-terracotta, #C86D51)',
                 boxShadow: '0 0 0 2px #FFFFFF',
               }}
             >

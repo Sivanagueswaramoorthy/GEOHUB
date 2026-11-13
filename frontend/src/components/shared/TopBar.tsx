@@ -170,10 +170,10 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 type="button"
                 onClick={onBack}
-                className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] text-[#051F20] bg-transparent active:scale-[0.95] transition-all duration-150 focus:outline-none shrink-0 cursor-pointer border-0 p-0"
+                className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] text-[#0F3638] bg-transparent active:scale-[0.95] transition-all duration-150 focus:outline-none shrink-0 cursor-pointer border-0 p-0"
                 aria-label="Go back"
               >
-                <ChevronLeft size={26} strokeWidth={2.5} className="lucide text-[#051F20]" />
+                <ChevronLeft size={26} strokeWidth={2.5} className="lucide text-[#0F3638]" />
               </button>
             ) : (
               <button
@@ -208,12 +208,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="flex items-baseline min-w-0" style={{ gap: '6px' }}>
                     {/* Line 1: Custom Org Name in Astafine Luxury Serif */}
                     <span
-                      className="geohub-bar-title font-extrabold text-[#051F20] truncate"
+                      className="geohub-bar-title font-extrabold text-[#D4A359] truncate"
                       style={{
                         fontFamily: astafineSerifFamily,
                         fontSize: '20px',
                         lineHeight: '24px',
                         fontWeight: 900,
+                        color: '#D4A359',
                         letterSpacing: '-0.025em',
                         fontOpticalSizing: 'auto',
                         fontFeatureSettings: "'dlig' 1, 'liga' 1, 'swsh' 1, 'calt' 1",
@@ -226,12 +227,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                     {/* Line 2: Custom Org Subtitle in Astafine Luxury Serif */}
                     {displayOrgSubtitle && (
                       <span
-                        className="geohub-bar-subtitle font-bold text-[#235347] truncate"
+                        className="geohub-bar-subtitle font-bold text-[#D4A359] truncate"
                         style={{
                           fontFamily: astafineSerifFamily,
                           fontSize: '12px',
                           lineHeight: '14px',
                           fontWeight: 700,
+                          color: '#D4A359',
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
                           fontOpticalSizing: 'auto',
@@ -265,7 +267,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <Bell
                   size={18}
                   strokeWidth={2}
-                  className="lucide text-[#051F20]"
+                  className="lucide text-[#0F3638]"
                 />
               </IconCircleButton>
             )}
@@ -276,18 +278,18 @@ export const TopBar: React.FC<TopBarProps> = ({
                 type="button"
                 onClick={handleProfileClick}
                 aria-label="Open profile menu"
-                className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2"
+                className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4A359] focus-visible:ring-offset-2"
                 style={{ minHeight: '44px', minWidth: '44px' }}
               >
-                {/* 38px Avatar Circle in Pine 950 with Sage Ring */}
+                {/* 38px Avatar Circle in Teal Forest with Antique Gold Ring */}
                 <div
                   className="flex items-center justify-center rounded-full shrink-0"
                   style={{
                     width: '38px',
                     height: '38px',
-                    backgroundColor: '#051F20',
-                    border: '2px solid #8EB69B',
-                    boxShadow: '0 2px 8px rgba(5, 31, 32, 0.15)',
+                    backgroundColor: 'var(--teal-forest-dark, #0F3638)',
+                    border: '2px solid var(--antique-gold, #D4A359)',
+                    boxShadow: '0 2px 8px rgba(15, 54, 56, 0.15)',
                   }}
                 >
                   <span
@@ -307,7 +309,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <ChevronDown
                   size={14}
                   strokeWidth={2.5}
-                  className="lucide text-[#235347] shrink-0"
+                  className="lucide text-[#52705E] shrink-0"
                 />
               </button>
             )}

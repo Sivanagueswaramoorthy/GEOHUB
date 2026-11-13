@@ -4,63 +4,85 @@
      ========================================================================== */
 
   /* --------------------------------------------------------------------------
-     1. Brand Palette (Only Brand Colors Allowed)
+     1. Brand Palette (Botanical 5-Tone Spec: Vanilla Latte, Teal Forest, Warm Sage, Spiced Terracotta, Antique Gold)
      -------------------------------------------------------------------------- */
-  --pine-950: #051F20; /* darkest text, dark hero cards, scanner background */
-  --pine-900: #0B2B26; /* dark surfaces, headings on mint */
-  --pine-800: #163832; /* primary buttons, active pill tabs, key icons */
-  --pine-700: #235347; /* secondary text, links, helper meta, chart lines */
-  --sage-400: #8EB69B; /* dividers, chips, progress fills, secondary borders, focus ring */
-  --mint-100: #DAF1DE; /* selected states, card tints, hero radial glow */
+  --vanilla-latte: #F3E4C3;
+  --vanilla-latte-soft: #FAF4E8;
+  --vanilla-latte-cream: #FAF6ED;
+  --vanilla-latte-border: #E8D9BD;
+
+  --teal-forest: #184E50;
+  --teal-forest-dark: #0F3638;
+  --teal-forest-light: #236567;
+
+  --warm-sage: #6B8E78;
+  --warm-sage-dark: #52705E;
+  --warm-sage-tint: #E2ECE5;
+
+  --spiced-terracotta: #C86D51;
+  --spiced-terracotta-soft: #FBF0EB;
+  --spiced-terracotta-border: #F2CFBE;
+
+  --antique-gold: #D4A359;
+  --antique-gold-soft: #FAF3E5;
+  --antique-gold-border: #E5CE9F;
+
+  /* Classic Token Aliases mapped to Botanical Spec */
+  --pine-950: #0F3638; /* darkest text, dark hero cards, scanner background */
+  --pine-900: #184E50; /* dark surfaces, headings */
+  --pine-800: #184E50; /* primary buttons, active pill tabs, key icons */
+  --pine-700: #52705E; /* secondary text, links, helper meta, chart lines */
+  --sage-400: #6B8E78; /* dividers, chips, progress fills, secondary borders, focus ring */
+  --mint-100: #EAF2ED; /* selected states, soft card tints, hero radial glow */
 
   /* --------------------------------------------------------------------------
      2. Derived & Semantic Palette
      -------------------------------------------------------------------------- */
-  --app-bg: #F6FBF7;
-  --bg-scaffold: #F6FBF7;
+  --app-bg: #F8FAF9;
+  --bg-scaffold: #F8FAF9;
   --bg-card: #FFFFFF;
   --bg-sheet: #FFFFFF;
   --bg-modal: #FFFFFF;
-  --bg-subtle: #F6FBF7;
+  --bg-subtle: #F3F6F4;
   --card-white: #FFFFFF;
 
-  --text-primary: #051F20;   /* min 4.5:1 contrast */
-  --text-secondary: #235347; /* secondary text */
+  --text-primary: #0F3638;   /* Teal Forest Dark (min 5.5:1 contrast) */
+  --text-secondary: #52705E; /* Warm Sage Dark */
   --text-on-dark: #FFFFFF;
-  --text-muted: #8EB69B;
+  --text-muted: #6B8E78;     /* Warm Sage */
 
-  /* Semantic (small chips/icons only) */
-  --amber-warn: #F2B84B;  /* pending, review, low stock */
-  --red-danger: #D9534F;  /* cancel, reject, delete */
+  /* Semantic (chips, alerts, badges) */
+  --amber-warn: #D4A359;  /* Antique Gold: VIP badges, pending, review, standing */
+  --red-danger: #C86D51;  /* Spiced Terracotta: notification count, cancel, reject, delete */
 
   /* Semantic backgrounds (translucent) */
-  --amber-bg: rgba(242, 184, 75, 0.14);
-  --amber-border: rgba(242, 184, 75, 0.40);
-  --red-bg: rgba(217, 83, 79, 0.12);
-  --red-border: rgba(217, 83, 79, 0.35);
+  --amber-bg: rgba(212, 163, 89, 0.14);
+  --amber-border: rgba(212, 163, 89, 0.40);
+  --red-bg: rgba(200, 109, 81, 0.12);
+  --red-border: rgba(200, 109, 81, 0.35);
 
   /* Hairline and border tokens */
-  --hairline-mint: 1px solid #DAF1DE;
-  --border-hairline: 1px solid #DAF1DE;
-  --divider: #DAF1DE;
-  --card-border: #DAF1DE;
-  --input-border: #DAF1DE;
+  --hairline-mint: 1px solid #E5ECE8;
+  --border-hairline: 1px solid #E5ECE8;
+  --divider: #E5ECE8;
+  --card-border: #E5ECE8;
+  --input-border: #E5ECE8;
 
   /* Compatibility aliases */
-  --brand-green: #235347;
-  --dark-green: #0B2B26;
-  --darkest-pine: #051F20;
-  --spruce-green: #163832;
-  --sage-green: #8EB69B;
-  --mint-tint: #DAF1DE;
-  --mint-border: #DAF1DE;
-  --mint-text: #051F20;
-  --primary: #163832;
-  --primary-dark: #0B2B26;
-  --primary-light: #DAF1DE;
-  --text-main: #051F20;
-  --danger-red: #D9534F;
-  --warning-amber: #F2B84B;
+  --brand-green: #184E50;
+  --dark-green: #0F3638;
+  --darkest-pine: #0F3638;
+  --spruce-green: #184E50;
+  --sage-green: #6B8E78;
+  --mint-tint: #EAF2ED;
+  --mint-border: #E5ECE8;
+  --mint-text: #0F3638;
+  --primary: #184E50;
+  --primary-dark: #0F3638;
+  --primary-light: #EAF2ED;
+  --text-main: #0F3638;
+  --danger-red: #C86D51;
+  --warning-amber: #D4A359;
 
   /* --------------------------------------------------------------------------
      3. Radius (Strict Scale)
@@ -172,9 +194,10 @@
   }
 }
 
-/* Background Radial Mint Glow Utility */
-.radial-mint-glow {
-  background: radial-gradient(circle at 50% 0%, rgba(218, 241, 222, 0.6) 0%, rgba(246, 251, 247, 0) 70%), #F6FBF7;
+/* Background Radial Crisp Premium Botanical Glow Utility */
+.radial-mint-glow,
+.radial-botanical-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(24, 78, 80, 0.05) 0%, rgba(248, 250, 249, 0) 70%), #F8FAF9;
 }
 
 /* Shimmer animation for Skeleton */
@@ -187,8 +210,9 @@
   }
 }
 
-.mint-shimmer {
-  background: linear-gradient(90deg, #DAF1DE 25%, #F6FBF7 50%, #DAF1DE 75%);
+.mint-shimmer,
+.botanical-shimmer {
+  background: linear-gradient(90deg, #EAF2ED 25%, #F8FAF9 50%, #EAF2ED 75%);
   background-size: 200% 100%;
   animation: mintShimmer 1.8s infinite ease-in-out;
 }

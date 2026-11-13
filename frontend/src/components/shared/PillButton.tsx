@@ -34,29 +34,29 @@ export const PillButton: React.FC<PillButtonProps> = ({
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: '#163832',
+          backgroundColor: '#184E50',
           color: '#FFFFFF',
           border: 'none',
-          boxShadow: '0 4px 14px rgba(22, 56, 50, 0.25)',
+          boxShadow: '0 4px 14px rgba(24, 78, 80, 0.25)',
         };
       case 'secondary':
         return {
-          backgroundColor: '#DAF1DE',
-          color: '#0B2B26',
-          border: '1px solid #8EB69B',
-          boxShadow: '0 2px 8px rgba(5, 31, 32, 0.04)',
+          backgroundColor: '#FFFFFF',
+          color: '#0F3638',
+          border: '1px solid #E5ECE8',
+          boxShadow: '0 2px 8px rgba(15, 54, 56, 0.04)',
         };
       case 'ghost':
         return {
           backgroundColor: 'transparent',
-          color: '#235347',
+          color: '#52705E',
           border: '1px solid transparent',
         };
       case 'destructive':
         return {
-          backgroundColor: 'rgba(217, 83, 79, 0.12)',
-          color: '#D9534F',
-          border: '1px solid rgba(217, 83, 79, 0.25)',
+          backgroundColor: 'rgba(200, 109, 81, 0.12)',
+          color: '#C86D51',
+          border: '1px solid rgba(200, 109, 81, 0.30)',
         };
     }
   };

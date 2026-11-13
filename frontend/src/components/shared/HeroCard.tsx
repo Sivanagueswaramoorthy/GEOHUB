@@ -41,11 +41,11 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       style={{
         borderRadius: '32px',
         boxShadow: isDark
-          ? '0 18px 42px -8px rgba(5, 31, 32, 0.32), 0 8px 20px -4px rgba(5, 31, 32, 0.18)'
-          : '0 16px 36px -6px rgba(5, 31, 32, 0.14), 0 6px 16px -2px rgba(5, 31, 32, 0.08), 0 1px 3px rgba(5, 31, 32, 0.04)',
+          ? '0 18px 42px -8px rgba(15, 54, 56, 0.32), 0 8px 20px -4px rgba(15, 54, 56, 0.18)'
+          : '0 12px 32px -4px rgba(15, 54, 56, 0.08), 0 4px 12px rgba(15, 54, 56, 0.03)',
         border: isDark
-          ? '1px solid rgba(218, 241, 222, 0.20)'
-          : '1.5px solid #8EB69B',
+          ? '1px solid rgba(255, 255, 255, 0.12)'
+          : '1px solid #E5ECE8',
         ...style,
       }}
     >
@@ -57,7 +57,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             <h1
               className="text-2xl font-bold tracking-tight"
               style={{
-                color: isDark ? '#FFFFFF' : '#051F20',
+                color: isDark ? '#FFFFFF' : '#0F3638',
                 lineHeight: 1.25,
                 fontFamily: 'var(--font-family)',
               }}
@@ -68,7 +68,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               <p
                 className="text-xs font-semibold mt-1"
                 style={{
-                  color: isDark ? '#DAF1DE' : '#235347',
+                  color: isDark ? 'rgba(255, 255, 255, 0.85)' : '#52705E',
                   opacity: isDark ? 0.9 : 1,
                 }}
               >
@@ -106,8 +106,8 @@ export const HeroCard: React.FC<HeroCardProps> = ({
         className="pointer-events-none absolute -bottom-10 -right-10 w-44 h-44 rounded-full"
         style={{
           background: isDark
-            ? 'radial-gradient(circle, rgba(218, 241, 222, 0.15) 0%, transparent 70%)'
-            : 'radial-gradient(circle, rgba(218, 241, 222, 0.6) 0%, transparent 70%)',
+            ? 'radial-gradient(circle, rgba(24, 78, 80, 0.25) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(24, 78, 80, 0.08) 0%, transparent 70%)',
         }}
       />
     </div>

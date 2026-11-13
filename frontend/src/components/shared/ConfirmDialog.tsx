@@ -48,12 +48,12 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   const dialogContent = (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0F3638]/60 backdrop-blur-md select-none transition-all duration-300"
       style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-[24px] bg-white p-6 shadow-[0_20px_50px_rgba(5,31,32,0.22)] border border-[#DAF1DE]"
+        className="w-full max-w-sm rounded-[24px] bg-white p-6 shadow-[0_20px_50px_rgba(15,54,56,0.22)] border border-[#E8D9BD]"
         style={{ borderRadius: '24px' }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -63,19 +63,19 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <div
             className="flex items-center justify-center w-10 h-10 rounded-full shrink-0"
             style={{
-              backgroundColor: isDangerActive ? 'rgba(217, 83, 79, 0.12)' : '#DAF1DE',
-              color: isDangerActive ? '#D9534F' : '#163832',
-              border: isDangerActive ? '1px solid rgba(217, 83, 79, 0.3)' : '1px solid #8EB69B',
+              backgroundColor: isDangerActive ? 'rgba(200, 109, 81, 0.12)' : '#F3E4C3',
+              color: isDangerActive ? '#C86D51' : '#184E50',
+              border: isDangerActive ? '1px solid rgba(200, 109, 81, 0.3)' : '1px solid #E8D9BD',
             }}
           >
             <AlertTriangle size={18} strokeWidth={2.2} />
           </div>
-          <h3 className="font-bold text-base text-[#051F20] leading-tight">
+          <h3 className="font-bold text-base text-[#0F3638] leading-tight">
             {title}
           </h3>
         </div>
 
-        <p className="text-xs text-[#235347] font-medium leading-relaxed mb-4">
+        <p className="text-xs text-[#52705E] font-medium leading-relaxed mb-4">
           {message}
         </p>
 
@@ -89,11 +89,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               }}
               placeholder={reasonPlaceholder}
               rows={3}
-              className="w-full p-3 rounded-2xl border border-[#DAF1DE] text-xs text-[#051F20] placeholder-[#8EB69B] outline-none font-medium focus:border-[#8EB69B] resize-none"
+              className="w-full p-3 rounded-2xl border border-[#E8D9BD] text-xs text-[#0F3638] placeholder-[#6B8E78] outline-none font-medium focus:border-[#6B8E78] resize-none"
               style={{ borderRadius: '16px' }}
             />
             {error && (
-              <span className="text-xs font-semibold text-[#D9534F]">{error}</span>
+              <span className="text-xs font-semibold text-[#C86D51]">{error}</span>
             )}
           </div>
         )}

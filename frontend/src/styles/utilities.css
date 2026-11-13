@@ -1024,26 +1024,60 @@
 }
 
 /* Forest Pine Brand Palette Utilities (#051F20, #0B2B26, #163832, #235347, #8EB69B, #DAF1DE) */
-.bg-brand-darkest { background-color: #051F20; }
-.bg-brand-deep { background-color: #0B2B26; }
-.bg-brand-spruce { background-color: #163832; }
-.bg-brand-forest { background-color: #235347; }
-.bg-brand-sage { background-color: #8EB69B; }
-.bg-brand-mint { background-color: #DAF1DE; }
+/* Forest Pine Brand Palette Utilities mapped to Botanical Spec */
+.bg-brand-darkest { background-color: var(--teal-forest-dark, #0F3638); }
+.bg-brand-deep { background-color: var(--teal-forest-dark, #0F3638); }
+.bg-brand-spruce { background-color: var(--teal-forest, #184E50); }
+.bg-brand-forest { background-color: var(--warm-sage-dark, #52705E); }
+.bg-brand-sage { background-color: var(--warm-sage, #6B8E78); }
+.bg-brand-mint { background-color: #EAF2ED; }
 
-.text-brand-darkest { color: #051F20; }
-.text-brand-deep { color: #0B2B26; }
-.text-brand-spruce { color: #163832; }
-.text-brand-forest { color: #235347; }
-.text-brand-sage { color: #8EB69B; }
-.text-brand-mint { color: #DAF1DE; }
+.text-brand-darkest { color: var(--teal-forest-dark, #0F3638); }
+.text-brand-deep { color: var(--teal-forest-dark, #0F3638); }
+.text-brand-spruce { color: var(--teal-forest, #184E50); }
+.text-brand-forest { color: var(--warm-sage-dark, #52705E); }
+.text-brand-sage { color: var(--warm-sage, #6B8E78); }
+.text-brand-mint { color: var(--teal-forest-dark, #0F3638); }
 
-.border-brand-darkest { border-color: #051F20; }
-.border-brand-deep { border-color: #0B2B26; }
-.border-brand-spruce { border-color: #163832; }
-.border-brand-forest { border-color: #235347; }
-.border-brand-sage { border-color: #8EB69B; }
-.border-brand-mint { border-color: #DAF1DE; }
+.border-brand-darkest { border-color: var(--teal-forest-dark, #0F3638); }
+.border-brand-deep { border-color: var(--teal-forest-dark, #0F3638); }
+.border-brand-spruce { border-color: var(--teal-forest, #184E50); }
+.border-brand-forest { border-color: var(--warm-sage-dark, #52705E); }
+.border-brand-sage { border-color: var(--warm-sage, #6B8E78); }
+.border-brand-mint { border-color: #E5ECE8; }
+
+/* Botanical 5-Tone Spec Utilities */
+.bg-vanilla-latte { background-color: #F3E4C3 !important; }
+.bg-vanilla-latte-soft { background-color: #FAF4E8 !important; }
+.bg-vanilla-latte-cream { background-color: #FAF6ED !important; }
+.bg-teal-forest { background-color: #184E50 !important; }
+.bg-teal-forest-dark { background-color: #0F3638 !important; }
+.bg-warm-sage { background-color: #6B8E78 !important; }
+.bg-warm-sage-dark { background-color: #52705E !important; }
+.bg-warm-sage-tint { background-color: #E2ECE5 !important; }
+.bg-spiced-terracotta { background-color: #C86D51 !important; }
+.bg-spiced-terracotta-soft { background-color: #FBF0EB !important; }
+.bg-antique-gold { background-color: #D4A359 !important; }
+.bg-antique-gold-soft { background-color: #FAF3E5 !important; }
+
+.text-vanilla-latte { color: #F3E4C3 !important; }
+.text-teal-forest { color: #184E50 !important; }
+.text-teal-forest-dark { color: #0F3638 !important; }
+.text-warm-sage { color: #6B8E78 !important; }
+.text-warm-sage-dark { color: #52705E !important; }
+.text-spiced-terracotta { color: #C86D51 !important; }
+.text-antique-gold { color: #D4A359 !important; }
+
+.border-vanilla-latte { border-color: #F3E4C3 !important; }
+.border-vanilla-latte-border { border-color: #E8D9BD !important; }
+.border-teal-forest { border-color: #184E50 !important; }
+.border-teal-forest-dark { border-color: #0F3638 !important; }
+.border-warm-sage { border-color: #6B8E78 !important; }
+.border-warm-sage-dark { border-color: #52705E !important; }
+.border-spiced-terracotta { border-color: #C86D51 !important; }
+.border-spiced-terracotta-border { border-color: #F2CFBE !important; }
+.border-antique-gold { border-color: #D4A359 !important; }
+.border-antique-gold-border { border-color: #E5CE9F !important; }
 
 .text-amber-500 {
   color: #F59E0B;
@@ -1464,32 +1498,70 @@ button,
   padding-right: var(--page-padding-x, 12px);
 }
 
-/* Brand Palette Utility Classes */
+/* Brand Palette Utility Classes (Mapped to Botanical 5-Tone Spec) */
 .bg-white { background-color: #FFFFFF !important; }
 .bg-transparent { background-color: transparent !important; }
-.bg-\[\#163832\] { background-color: #163832 !important; }
-.bg-\[\#051F20\] { background-color: #051F20 !important; }
-.bg-\[\#0B2B26\] { background-color: #0B2B26 !important; }
-.bg-\[\#235347\] { background-color: #235347 !important; }
-.bg-\[\#8EB69B\] { background-color: #8EB69B !important; }
-.bg-\[\#DAF1DE\] { background-color: #DAF1DE !important; }
-.bg-\[\#F6FBF7\] { background-color: #F6FBF7 !important; }
-.bg-\[\#DAF1DE\]\/40 { background-color: rgba(218, 241, 222, 0.4) !important; }
+.bg-\[\#163832\] { background-color: var(--teal-forest, #184E50) !important; }
+.bg-\[\#051F20\] { background-color: var(--teal-forest-dark, #0F3638) !important; }
+.bg-\[\#0B2B26\] { background-color: var(--teal-forest-dark, #0F3638) !important; }
+.bg-\[\#235347\] { background-color: var(--warm-sage-dark, #52705E) !important; }
+.bg-\[\#8EB69B\] { background-color: var(--warm-sage, #6B8E78) !important; }
+.bg-\[\#DAF1DE\] { background-color: var(--mint-100, #EAF2ED) !important; }
+.bg-\[\#F6FBF7\] { background-color: var(--app-bg, #F8FAF9) !important; }
+.bg-\[\#DAF1DE\]\/40 { background-color: rgba(234, 242, 237, 0.4) !important; }
+.bg-\[\#DAF1DE\]\/50 { background-color: rgba(234, 242, 237, 0.5) !important; }
+.bg-\[\#DAF1DE\]\/60 { background-color: rgba(234, 242, 237, 0.6) !important; }
+.bg-\[\#DAF1DE\]\/70 { background-color: rgba(234, 242, 237, 0.7) !important; }
+.bg-\[\#163832\]\/10 { background-color: rgba(24, 78, 80, 0.1) !important; }
+.bg-\[\#163832\]\/20 { background-color: rgba(24, 78, 80, 0.2) !important; }
+
+/* Literal utility classes for new hex values */
+.bg-\[\#184E50\] { background-color: #184E50 !important; }
+.bg-\[\#0F3638\] { background-color: #0F3638 !important; }
+.bg-\[\#6B8E78\] { background-color: #6B8E78 !important; }
+.bg-\[\#52705E\] { background-color: #52705E !important; }
+.bg-\[\#C86D51\] { background-color: #C86D51 !important; }
+.bg-\[\#FBF0EB\] { background-color: #FBF0EB !important; }
+.bg-\[\#D4A359\] { background-color: #D4A359 !important; }
+.bg-\[\#FAF3E5\] { background-color: #FAF3E5 !important; }
+.bg-\[\#F3E4C3\] { background-color: #F3E4C3 !important; }
+.bg-\[\#FAF4E8\] { background-color: #F8FAF9 !important; }
+.bg-\[\#FAF6ED\] { background-color: #F8FAF9 !important; }
+.bg-\[\#E8D9BD\] { background-color: #E5ECE8 !important; }
+.bg-\[\#E5ECE8\] { background-color: #E5ECE8 !important; }
+.bg-\[\#EAF2ED\] { background-color: #EAF2ED !important; }
+.bg-\[\#F8FAF9\] { background-color: #F8FAF9 !important; }
 
 .text-white { color: #FFFFFF !important; }
-.text-\[\#051F20\] { color: #051F20 !important; }
-.text-\[\#0B2B26\] { color: #0B2B26 !important; }
-.text-\[\#163832\] { color: #163832 !important; }
-.text-\[\#235347\] { color: #235347 !important; }
-.text-\[\#8EB69B\] { color: #8EB69B !important; }
-.text-\[\#DAF1DE\] { color: #DAF1DE !important; }
-.text-\[\#D9534F\] { color: #D9534F !important; }
-.text-\[\#F2B84B\] { color: #F2B84B !important; }
+.text-\[\#051F20\] { color: var(--teal-forest-dark, #0F3638) !important; }
+.text-\[\#0B2B26\] { color: var(--teal-forest-dark, #0F3638) !important; }
+.text-\[\#163832\] { color: var(--teal-forest, #184E50) !important; }
+.text-\[\#235347\] { color: var(--warm-sage-dark, #52705E) !important; }
+.text-\[\#8EB69B\] { color: var(--warm-sage, #6B8E78) !important; }
+.text-\[\#DAF1DE\] { color: var(--mint-100, #EAF2ED) !important; }
+.text-\[\#D9534F\] { color: var(--spiced-terracotta, #C86D51) !important; }
+.text-\[\#F2B84B\] { color: var(--antique-gold, #D4A359) !important; }
 
-.border-\[\#DAF1DE\] { border-color: #DAF1DE !important; }
-.border-\[\#8EB69B\] { border-color: #8EB69B !important; }
-.border-\[\#163832\] { border-color: #163832 !important; }
-.border-\[\#051F20\] { border-color: #051F20 !important; }
+.text-\[\#184E50\] { color: #184E50 !important; }
+.text-\[\#0F3638\] { color: #0F3638 !important; }
+.text-\[\#6B8E78\] { color: #6B8E78 !important; }
+.text-\[\#52705E\] { color: #52705E !important; }
+.text-\[\#C86D51\] { color: #C86D51 !important; }
+.text-\[\#D4A359\] { color: #D4A359 !important; }
+.text-\[\#F3E4C3\] { color: #D4A359 !important; }
+
+.border-\[\#DAF1DE\] { border-color: var(--card-border, #E5ECE8) !important; }
+.border-\[\#8EB69B\] { border-color: var(--warm-sage, #6B8E78) !important; }
+.border-\[\#163832\] { border-color: var(--teal-forest, #184E50) !important; }
+.border-\[\#051F20\] { border-color: var(--teal-forest-dark, #0F3638) !important; }
+
+.border-\[\#E8D9BD\] { border-color: #E5ECE8 !important; }
+.border-\[\#E5ECE8\] { border-color: #E5ECE8 !important; }
+.border-\[\#184E50\] { border-color: #184E50 !important; }
+.border-\[\#0F3638\] { border-color: #0F3638 !important; }
+.border-\[\#6B8E78\] { border-color: #6B8E78 !important; }
+.border-\[\#C86D51\] { border-color: #C86D51 !important; }
+.border-\[\#D4A359\] { border-color: #D4A359 !important; }
 
 .outline-none { outline: none !important; }
 .border-none { border: none !important; }
