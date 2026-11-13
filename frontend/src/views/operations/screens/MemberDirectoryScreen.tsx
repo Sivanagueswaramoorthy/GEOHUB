@@ -56,7 +56,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const [editPost, setEditPost] = useState('');
   const [editSquad, setEditSquad] = useState('Promotion');
 
-  const { users } = useApp();
+  const { users, setUsers, enrollScholar, showToast } = useApp();
   const [members, setMembers] = useState<ScholarRecord[]>(() => {
     return (users || []).map((u) => ({
       uid: u.uid,
@@ -118,6 +118,13 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
       squad: editSquad,
     };
 
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.uid === selectedMemberToEdit.uid
+          ? { ...u, name: updated.name, post: updated.post, team: updated.squad }
+          : u
+      )
+    );
     setMembers((prev) => prev.map((m) => (m.uid === selectedMemberToEdit.uid ? updated : m)));
     onLogAudit('Member Directory', `Updated scholar profile for ${updated.name} (${updated.squad})`);
 
@@ -128,6 +135,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
   const handleConfirmRemove = () => {
     if (!selectedMemberToRemove) return;
+    setUsers((prev) => prev.filter((u) => u.uid !== selectedMemberToRemove.uid));
     setMembers((prev) => prev.filter((m) => m.uid !== selectedMemberToRemove.uid));
     onLogAudit('Member Directory', `Removed member ${selectedMemberToRemove.name} (${selectedMemberToRemove.squad})`);
     setNotice(`Removed ${selectedMemberToRemove.name} from directory.`);
@@ -139,33 +147,21 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
     e.preventDefault();
     if (!newName.trim()) return;
 
-    const newScholar: ScholarRecord = {
-      uid: `u-${Date.now()}`,
+    const enrolled = enrollScholar({
       name: newName.trim(),
-      role: newRole,
+      role: newRole as any,
       squad: newSquad,
-      isLead: false,
       post: `${newSquad} Associate`,
-      rollNo: `24GEO${Math.floor(100 + Math.random() * 900)}`,
-      email: `${newName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`,
-    };
+    });
 
-    setMembers((prev) => [...prev, newScholar]);
-    onLogAudit('Member Directory', `Enrolled new scholar: ${newScholar.name} (${newScholar.squad})`);
-
-    // Persist new scholar to TiDB Cloud backend
-    apiClient.enrollUser({
-      name: newScholar.name,
-      roll_no: newScholar.rollNo,
-      email: newScholar.email,
-      role: newScholar.role,
-      team: newScholar.squad,
-      post: newScholar.post,
-    }).catch(() => {});
+    onLogAudit('Member Directory', `Enrolled new scholar: ${enrolled.name} (${enrolled.team})`);
 
     setShowAddModal(false);
     setNewName('');
-    setNotice(`Enrolled ${newScholar.name} into ${newScholar.squad} squad.`);
+    setNotice(`Enrolled ${enrolled.name} into ${enrolled.team} squad.`);
+    if (showToast) {
+      showToast(`✓ Enrolled ${enrolled.name} into ${enrolled.team} squad!`);
+    }
     setTimeout(() => setNotice(null), 3500);
   };
 

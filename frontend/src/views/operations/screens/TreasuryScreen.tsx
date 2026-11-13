@@ -10,6 +10,8 @@ import {
   ArrowUpRight,
   Shield,
   FileText,
+  Plus,
+  X,
 } from 'lucide-react';
 import { AnimatedNumber, ConfirmDialog, PillButton, SearchField, EmptyState } from '../../../components/shared';
 import { useApp } from '../../../context/AppContext';
@@ -44,12 +46,20 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const { events } = useApp();
+  const { events, requestBudgetChange, showToast } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Approved' | 'Flagged' | 'Rejected'>('All');
   const [selectedReq, setSelectedReq] = useState<BudgetRequest | null>(null);
   const [actionType, setActionType] = useState<'Approve' | 'Reject' | 'Flag' | null>(null);
   const [decisionNote, setDecisionNote] = useState('');
+
+  // New Request Form State
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newAmount, setNewAmount] = useState('');
+  const [newCategory, setNewCategory] = useState('Equipment');
+  const [newEvent, setNewEvent] = useState('General Operations');
+  const [newReason, setNewReason] = useState('');
 
   const isPresident = canApprove;
   const isFaculty = currentUser?.role === 'faculty' || currentUser?.role === 'super_admin';
@@ -61,6 +71,42 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
     .reduce((sum, b) => sum + b.amount, 0);
   const totalPending = budgetRequests.filter((b) => b.status === 'Pending').length;
   const totalApproved = budgetRequests.filter((b) => b.status === 'Approved').length;
+
+  const handleCreateRequest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newAmount) return;
+
+    const parsedAmount = parseFloat(newAmount) || 0;
+    const newReq: BudgetRequest = {
+      id: `breq-${Date.now()}`,
+      title: newTitle.trim(),
+      event: newEvent || 'General Operations',
+      amount: parsedAmount,
+      category: newCategory,
+      requesterId: currentUser?.uid || 'u_admin_02',
+      requesterName: `${currentUser?.name || 'Treasurer'} (${currentUser?.post || 'Lead'})`,
+      status: 'Pending',
+      date: new Date().toISOString().split('T')[0],
+      note: newReason.trim(),
+    };
+
+    setBudgetRequests((prev) => [newReq, ...prev]);
+    onLogAudit(
+      newReq.event,
+      `Created budget request "${newReq.title}" for ₹${parsedAmount.toLocaleString()} (${newReq.category})`
+    );
+
+    requestBudgetChange(newReq.category, parsedAmount, newReq.note || newReq.title);
+
+    if (showToast) {
+      showToast(`✓ Submitted budget request for ₹${parsedAmount.toLocaleString('en-IN')}!`);
+    }
+
+    setShowNewModal(false);
+    setNewTitle('');
+    setNewAmount('');
+    setNewReason('');
+  };
 
   const handleConfirmDecision = (reason?: string) => {
     if (!selectedReq || !actionType) return;
@@ -153,9 +199,21 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
       <div className="p-4 sm:p-5 bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] space-y-3">
         {/* Header & Search */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-1 border-b border-[#DAF1DE]/70">
-          <h2 className="font-bold text-[#051F20] text-sm sm:text-base">
-            Budget Requests Queue
-          </h2>
+          <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+            <h2 className="font-bold text-[#051F20] text-sm sm:text-base">
+              Budget Requests Queue
+            </h2>
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => setShowNewModal(true)}
+                className="h-8 px-3 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer touch-target-44"
+              >
+                <Plus size={13} />
+                <span>+ Request</span>
+              </button>
+            )}
+          </div>
 
           <div className="w-full sm:w-64">
             <SearchField
@@ -307,6 +365,113 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
         message={`Are you sure you want to ${actionType?.toLowerCase()} the request for "${selectedReq?.title}" (₹${selectedReq?.amount.toLocaleString()})?`}
         reasonPlaceholder="Add optional justification or institutional note..."
       />
+
+      {/* New Budget Request Modal */}
+      {showNewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_12px_36px_rgba(5,31,32,0.15)] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between p-4 border-b border-[#DAF1DE] bg-[#F7FBF8]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
+                  <Coins size={16} />
+                </div>
+                <h3 className="font-bold text-[#051F20] text-sm">New Budget Request</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNewModal(false)}
+                className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:bg-[#DAF1DE] transition-all cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateRequest} className="p-4 space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-[#235347] mb-1">Request Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="e.g. LiPo flight batteries & cables replacement"
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-xs font-bold text-[#235347] mb-1">Amount (₹)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={newAmount}
+                    onChange={(e) => setNewAmount(e.target.value)}
+                    placeholder="4500"
+                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#235347] mb-1">Category</label>
+                  <select
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                  >
+                    <option value="Equipment">Equipment</option>
+                    <option value="Refreshments">Refreshments</option>
+                    <option value="Travel">Travel & Camp</option>
+                    <option value="Printing">Printing & Signage</option>
+                    <option value="Honorarium">Honorarium</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#235347] mb-1">Associated Event</label>
+                <select
+                  value={newEvent}
+                  onChange={(e) => setNewEvent(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                >
+                  <option value="General Operations">General Club Operations</option>
+                  {(events || []).map((ev) => (
+                    <option key={ev.id} value={ev.title}>{ev.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#235347] mb-1">Justification / Reason</label>
+                <textarea
+                  rows={2}
+                  value={newReason}
+                  onChange={(e) => setNewReason(e.target.value)}
+                  placeholder="State the requirement justification for advisor approval..."
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB] resize-none"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#DAF1DE]">
+                <button
+                  type="button"
+                  onClick={() => setShowNewModal(false)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#163832] hover:bg-[#0B2B26] active:scale-95 transition-all shadow-xs cursor-pointer"
+                >
+                  Submit Request
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

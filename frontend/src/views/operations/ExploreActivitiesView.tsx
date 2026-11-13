@@ -90,6 +90,29 @@ const SECTION_ICONS: Record<string, React.FC<{ size?: number; className?: string
   Review: ClipboardCheck,
 };
 
+function loadPersistedState<T>(key: string, fallback: T): T {
+  try {
+    if (typeof window === 'undefined') return fallback;
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+    return parsed;
+  } catch {
+    return fallback;
+  }
+}
+
+function savePersistedState<T>(key: string, data: T): void {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+  } catch {
+    // ignore
+  }
+}
+
 export const ExploreActivitiesView: React.FC = () => {
   const { currentUser, events } = useApp();
   const [selectedModule, setSelectedModule] = useState<ModuleId | null>(() => {
@@ -147,11 +170,35 @@ export const ExploreActivitiesView: React.FC = () => {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  // Clean operational state initialized to empty zero-states
-  const [budgetRequests, setBudgetRequests] = useState<BudgetRequest[]>([]);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
-  const [grants, setGrants] = useState<SquadGrant[]>([]);
-  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+  // Persistent operational state across navigation and browser restarts
+  const [budgetRequests, setBudgetRequests] = useState<BudgetRequest[]>(() => {
+    return loadPersistedState('geohub_store_hub_budget_requests', []);
+  });
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => {
+    return loadPersistedState('geohub_store_hub_expenses', []);
+  });
+  const [grants, setGrants] = useState<SquadGrant[]>(() => {
+    return loadPersistedState('geohub_store_hub_grants', []);
+  });
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>(() => {
+    return loadPersistedState('geohub_store_hub_audit_logs', []);
+  });
+
+  useEffect(() => {
+    savePersistedState('geohub_store_hub_budget_requests', budgetRequests);
+  }, [budgetRequests]);
+
+  useEffect(() => {
+    savePersistedState('geohub_store_hub_expenses', expenses);
+  }, [expenses]);
+
+  useEffect(() => {
+    savePersistedState('geohub_store_hub_grants', grants);
+  }, [grants]);
+
+  useEffect(() => {
+    savePersistedState('geohub_store_hub_audit_logs', auditLogs);
+  }, [auditLogs]);
 
   // Record an audit log entry on every WRITE action
   const logAudit = (moduleId: ModuleId, eventName: string, actionName: string) => {

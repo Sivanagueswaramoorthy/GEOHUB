@@ -30,7 +30,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
   currentUser,
   onSubViewChange,
 }) => {
-  const { users, tasks } = useApp();
+  const { users, tasks, enrollScholar, showToast } = useApp();
   const [selectedSquadId, setSelectedSquadId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
@@ -57,6 +57,10 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
   }, [users]);
 
   const [members, setMembers] = useState<ScholarRecord[]>(initialMembers);
+
+  useEffect(() => {
+    setMembers(initialMembers);
+  }, [initialMembers]);
 
   const squadDefinitions = [
     {
@@ -107,23 +111,21 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
     e.preventDefault();
     if (!newMemberName.trim() || !selectedSquadId) return;
 
-    const newScholar: ScholarRecord = {
-      uid: `u-${Date.now()}`,
+    const enrolled = enrollScholar({
       name: newMemberName.trim(),
       role: 'student',
       squad: selectedSquadId,
-      isLead: false,
       post: `${selectedSquadId} Associate`,
-      rollNo: `24GEO${Math.floor(100 + Math.random() * 900)}`,
-      email: `${newMemberName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`,
-    };
+    });
 
-    setMembers((prev) => [...prev, newScholar]);
-    onLogAudit('Squads', `Enrolled ${newScholar.name} into ${selectedSquadId} squad`);
+    onLogAudit('Squads', `Enrolled ${enrolled.name} into ${selectedSquadId} squad`);
 
     setShowAddModal(false);
     setNewMemberName('');
-    setNotice(`Enrolled ${newScholar.name} into ${selectedSquadId} squad.`);
+    setNotice(`Enrolled ${enrolled.name} into ${selectedSquadId} squad.`);
+    if (showToast) {
+      showToast(`✓ Enrolled ${enrolled.name} into ${selectedSquadId} squad!`);
+    }
     setTimeout(() => setNotice(null), 3500);
   };
 

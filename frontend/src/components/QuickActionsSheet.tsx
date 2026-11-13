@@ -41,6 +41,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
     createEvent,
     createMeeting,
     addStudentToTeam,
+    enrollScholar,
     changeStudentPost,
     addForumMessage,
     uploadGalleryItem,
@@ -406,15 +407,13 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
   const handleStudentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!studentName.trim() || !studentEmail.trim()) return;
-    addStudentToTeam({
-      name: studentName,
-      email: studentEmail,
+    enrollScholar({
+      name: studentName.trim(),
+      email: studentEmail.trim(),
       department: studentDept,
       yearOfStudy: studentYear,
-      team: studentSquad,
+      squad: studentSquad,
       role: 'member',
-      isVolunteer: true,
-      status: 'active',
     });
     showToast(`✓ Enrolled ${studentName} into ${studentSquad} Squad!`);
     setActiveModalAction(null);

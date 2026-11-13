@@ -174,9 +174,47 @@ interface AppContextType {
   addDailyNews: (item: Omit<DailyNewsItem, 'id'>) => void;
   updateDailyNews: (id: string, updates: Partial<DailyNewsItem>) => void;
   deleteDailyNews: (id: string) => void;
+  enrollScholar: (data: {
+    name: string;
+    role?: UserRole;
+    squad: string;
+    post?: string;
+    rollNo?: string;
+    email?: string;
+    department?: string;
+    yearOfStudy?: string;
+    isLead?: boolean;
+  }) => UserModel;
+  setUsers: React.Dispatch<React.SetStateAction<UserModel[]>>;
+  setExpenses: React.Dispatch<React.SetStateAction<ExpenseItem[]>>;
+  setBudgetRequests: React.Dispatch<React.SetStateAction<BudgetChangeRequest[]>>;
+  setAuditLogs: React.Dispatch<React.SetStateAction<AuditLogItem[]>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
+
+function loadPersistedState<T>(key: string, fallback: T): T {
+  try {
+    if (typeof window === 'undefined') return fallback;
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+    return parsed;
+  } catch {
+    return fallback;
+  }
+}
+
+function savePersistedState<T>(key: string, data: T): void {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+  } catch {
+    // quota or private mode fallback
+  }
+}
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserModel>(() => {
@@ -193,26 +231,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return demoSuperAdmin;
   });
-  const [users, setUsers] = useState<UserModel[]>(initialUsers);
-  const [teams, setTeams] = useState<TeamModel[]>(initialTeams);
-  const [events, setEvents] = useState<EventModel[]>(initialEvents);
-  const [tasks, setTasks] = useState<TaskModel[]>(initialTasks);
-  const [approvals, setApprovals] = useState<ApprovalItem[]>(initialApprovals);
-  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery);
-  const [attendance, setAttendance] = useState<AttendanceRecord[]>(initialAttendance);
-  const [notifications, setNotifications] = useState<NotificationModel[]>(initialNotifications);
-  const [report, setReport] = useState<ClubReport>(initialReport);
-  const [meetings, setMeetings] = useState<MeetingModel[]>(initialMeetings);
-  const [memories, setMemories] = useState<MemoryItem[]>(initialMemories);
-  const [forumMessages, setForumMessages] = useState<ForumMessage[]>(initialForumMessages);
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(initialExpenses);
-  const [stockItems, setStockItems] = useState<StockItem[]>(initialStockItems);
-  const [budgetRequests, setBudgetRequests] = useState<BudgetChangeRequest[]>(initialBudgetRequests);
-  const [docTemplates, setDocTemplates] = useState<DocTemplate[]>(initialDocTemplates);
-  const [posts, setPosts] = useState<SocialPost[]>(initialSocialPosts);
-  const [campaigns, setCampaigns] = useState<CampaignPlan[]>(initialCampaignPlans);
-  const [dailyNews, setDailyNews] = useState<DailyNewsItem[]>(initialDailyNews);
-  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
+  const [users, setUsers] = useState<UserModel[]>(() => loadPersistedState('geohub_store_users', initialUsers));
+  const [teams, setTeams] = useState<TeamModel[]>(() => loadPersistedState('geohub_store_teams', initialTeams));
+  const [events, setEvents] = useState<EventModel[]>(() => loadPersistedState('geohub_store_events', initialEvents));
+  const [tasks, setTasks] = useState<TaskModel[]>(() => loadPersistedState('geohub_store_tasks', initialTasks));
+  const [approvals, setApprovals] = useState<ApprovalItem[]>(() => loadPersistedState('geohub_store_approvals', initialApprovals));
+  const [gallery, setGallery] = useState<GalleryItem[]>(() => loadPersistedState('geohub_store_gallery', initialGallery));
+  const [attendance, setAttendance] = useState<AttendanceRecord[]>(() => loadPersistedState('geohub_store_attendance', initialAttendance));
+  const [notifications, setNotifications] = useState<NotificationModel[]>(() => loadPersistedState('geohub_store_notifications', initialNotifications));
+  const [report, setReport] = useState<ClubReport>(() => loadPersistedState('geohub_store_report', initialReport));
+  const [meetings, setMeetings] = useState<MeetingModel[]>(() => loadPersistedState('geohub_store_meetings', initialMeetings));
+  const [memories, setMemories] = useState<MemoryItem[]>(() => loadPersistedState('geohub_store_memories', initialMemories));
+  const [forumMessages, setForumMessages] = useState<ForumMessage[]>(() => loadPersistedState('geohub_store_forumMessages', initialForumMessages));
+  const [expenses, setExpenses] = useState<ExpenseItem[]>(() => loadPersistedState('geohub_store_expenses', initialExpenses));
+  const [stockItems, setStockItems] = useState<StockItem[]>(() => loadPersistedState('geohub_store_stockItems', initialStockItems));
+  const [budgetRequests, setBudgetRequests] = useState<BudgetChangeRequest[]>(() => loadPersistedState('geohub_store_budgetRequests', initialBudgetRequests));
+  const [docTemplates, setDocTemplates] = useState<DocTemplate[]>(() => loadPersistedState('geohub_store_docTemplates', initialDocTemplates));
+  const [posts, setPosts] = useState<SocialPost[]>(() => loadPersistedState('geohub_store_posts', initialSocialPosts));
+  const [campaigns, setCampaigns] = useState<CampaignPlan[]>(() => loadPersistedState('geohub_store_campaigns', initialCampaignPlans));
+  const [dailyNews, setDailyNews] = useState<DailyNewsItem[]>(() => loadPersistedState('geohub_store_dailyNews', initialDailyNews));
+  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(() => loadPersistedState('geohub_store_auditLogs', []));
+
+  // Auto-persist reactive states to local storage
+  useEffect(() => { savePersistedState('geohub_store_users', users); }, [users]);
+  useEffect(() => { savePersistedState('geohub_store_teams', teams); }, [teams]);
+  useEffect(() => { savePersistedState('geohub_store_events', events); }, [events]);
+  useEffect(() => { savePersistedState('geohub_store_tasks', tasks); }, [tasks]);
+  useEffect(() => { savePersistedState('geohub_store_expenses', expenses); }, [expenses]);
+  useEffect(() => { savePersistedState('geohub_store_budgetRequests', budgetRequests); }, [budgetRequests]);
+  useEffect(() => { savePersistedState('geohub_store_auditLogs', auditLogs); }, [auditLogs]);
 
   const addAuditLog = (entry: Omit<AuditLogItem, 'id' | 'timestamp'>) => {
     const newLog: AuditLogItem = {
@@ -345,7 +392,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // 2. Sync Users & Official Chapter Roster
         const liveUsers = await apiClient.getUsers().catch(() => null);
         if (isMounted && Array.isArray(liveUsers) && liveUsers.length > 0) {
-          setUsers(liveUsers.map((u: any): UserModel => ({
+          const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
             uid: u.id,
             rollNo: u.roll_no,
             name: u.name,
@@ -362,7 +409,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             squadMemberships: u.squad_memberships
               ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
               : [],
-          })));
+          }));
+          setUsers((prev) => {
+            const backendIds = new Set(mappedUsers.map((m) => m.uid));
+            const backendRolls = new Set(mappedUsers.map((m) => (m.rollNo || '').toUpperCase()));
+            const localOnly = prev.filter((p) => !backendIds.has(p.uid) && !backendRolls.has((p.rollNo || '').toUpperCase()));
+            return [...mappedUsers, ...localOnly];
+          });
         }
 
         // 3. Sync Squads & Teams
@@ -1155,6 +1208,77 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const enrollScholar = (data: {
+    name: string;
+    role?: UserRole;
+    squad: string;
+    post?: string;
+    rollNo?: string;
+    email?: string;
+    department?: string;
+    yearOfStudy?: string;
+    isLead?: boolean;
+  }): UserModel => {
+    const cleanName = data.name.trim();
+    const cleanSquad = data.squad.trim();
+    const newUid = `u_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const cleanRollNo = data.rollNo?.trim() || `24GEO${Math.floor(100 + Math.random() * 900)}`;
+    const cleanEmail =
+      data.email?.trim() || `${cleanName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`;
+
+    const newScholar: UserModel = {
+      uid: newUid,
+      name: cleanName,
+      role: data.role || 'student',
+      post: data.post || (data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`),
+      team: cleanSquad,
+      teamRole: data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`,
+      rollNo: cleanRollNo,
+      email: cleanEmail,
+      department: data.department || 'Geoinformatics Engineering',
+      yearOfStudy: data.yearOfStudy || '2nd Year',
+      isVolunteer: true,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+    };
+
+    setUsers((prev) => [newScholar, ...prev]);
+
+    if (cleanSquad) {
+      setTeams((prev) =>
+        prev.map((tm) => {
+          if (tm.name.toLowerCase() === cleanSquad.toLowerCase()) {
+            return { ...tm, memberIds: [...new Set([...tm.memberIds, newUid])] };
+          }
+          return tm;
+        })
+      );
+    }
+
+    addAuditLog({
+      actorId: currentUser.uid,
+      actorName: currentUser.name,
+      action: 'scholar_enrolled',
+      targetType: 'user',
+      targetId: newUid,
+      targetName: cleanName,
+      details: `Enrolled ${cleanName} (${cleanRollNo}) into ${cleanSquad} squad as ${newScholar.post}`,
+    });
+
+    apiClient.enrollUser({
+      name: cleanName,
+      roll_no: cleanRollNo,
+      email: cleanEmail,
+      role: newScholar.role,
+      team: cleanSquad,
+      post: newScholar.post,
+      department: newScholar.department,
+      year_of_study: newScholar.yearOfStudy,
+    }).catch(() => {});
+
+    return newScholar;
+  };
+
   const changeStudentPost = (
     userId: string,
     newPost: string,
@@ -1330,11 +1454,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addExpenseItem = (expenseData: Omit<ExpenseItem, 'id' | 'paidBy' | 'status'> & { notes?: string }) => {
     const newExpense: ExpenseItem = {
       ...expenseData,
-      id: `exp_${Date.now()}`,
+      id: `exp_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       paidBy: `${currentUser.name} (${currentUser.post || 'Treasurer Lead'})`,
       status: 'approved',
     };
     setExpenses((prev) => [newExpense, ...prev]);
+
+    addAuditLog({
+      actorId: currentUser.uid,
+      actorName: currentUser.name,
+      action: 'expense_logged',
+      targetType: 'expense',
+      targetId: newExpense.id,
+      targetName: newExpense.title,
+      details: `Logged expenditure of ₹${newExpense.amount.toLocaleString('en-IN')} for ${newExpense.title} (${newExpense.category})`,
+    });
+
+    apiClient.createExpense({
+      title: newExpense.title,
+      amount: newExpense.amount,
+      category: newExpense.category,
+      event_title: newExpense.eventTitle || 'General Club Operations',
+      receipt_url: newExpense.receiptUrl,
+    }).catch(() => {});
   };
 
   const updateExpenseItem = (id: string, updates: Partial<ExpenseItem>) => {
@@ -1380,6 +1522,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'pending',
     };
     setBudgetRequests((prev) => [newReq, ...prev]);
+
+    addAuditLog({
+      actorId: currentUser.uid,
+      actorName: currentUser.name,
+      action: 'budget_requested',
+      targetType: 'budget_request',
+      targetId: newReq.id,
+      targetName: `${teamName} Budget Petition`,
+      details: `Requested ₹${requestedAmount.toLocaleString('en-IN')} for ${teamName}: ${reason}`,
+    });
 
     // Persist budget request to TiDB Cloud backend
     apiClient.submitBudgetRequest(teamName, requestedAmount, reason).catch(() => {});
@@ -1599,6 +1751,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteDailyNews,
         auditLogs,
         addAuditLog,
+        enrollScholar,
+        setUsers,
+        setExpenses,
+        setBudgetRequests,
+        setAuditLogs,
         updateEventStatus,
         assignEventScanners,
         toast,

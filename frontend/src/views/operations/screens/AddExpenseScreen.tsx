@@ -40,7 +40,7 @@ export const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const { events } = useApp();
+  const { events, addExpenseItem, showToast } = useApp();
   const eventOptions = [
     'General Club Operations',
     ...(events || []).map((e) => e.title),
@@ -72,6 +72,21 @@ export const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
 
     setExpenses((prev) => [newExpense, ...prev]);
     onLogAudit(event, `Recorded expense ₹${parsedAmount.toLocaleString()} for ${description}`);
+
+    addExpenseItem({
+      title: description.trim(),
+      amount: parsedAmount,
+      category: (category === 'Equipment' || category === 'Refreshments' || category === 'Printing' ? category : 'Other') as any,
+      eventTitle: event,
+      buyingDate: new Date().toISOString(),
+      receiptUrl: billProof,
+      vendorName: 'Campus Vendor',
+      approvedBy: 'Dr. Sarah Jenkins (Faculty Advisor)',
+    });
+
+    if (showToast) {
+      showToast(`✓ Recorded expense of ₹${parsedAmount.toLocaleString('en-IN')}!`);
+    }
 
     // Persist expense directly to TiDB Cloud
     apiClient.createExpense({
