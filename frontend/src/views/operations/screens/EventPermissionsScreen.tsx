@@ -9,7 +9,8 @@ import {
   UserCheck,
   AlertCircle,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog } from '../../../components/shared';
+import { AnimatedNumber, ConfirmDialog, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 import { SquadGrant, grantSquadAccess, revokeSquadAccess } from '../../../core/permissions';
 
 export interface EventPermissionsScreenProps {
@@ -27,11 +28,12 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
+  const { events } = useApp();
   const [selectedGrantToRevoke, setSelectedGrantToRevoke] = useState<SquadGrant | null>(null);
   const [showGrantModal, setShowGrantModal] = useState(false);
-  const [grantUser, setGrantUser] = useState('Arun Kumar');
+  const [grantUser, setGrantUser] = useState('');
   const [grantSquad, setGrantSquad] = useState('documentation');
-  const [grantEvent, setGrantEvent] = useState('evt-geotech-2026');
+  const [grantEvent, setGrantEvent] = useState(events[0]?.id || 'evt-general');
   const [notice, setNotice] = useState<string | null>(null);
 
   const handleConfirmRevoke = () => {
@@ -52,12 +54,17 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
 
   const handleConfirmGrant = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!grantUser.trim()) return;
+
+    const targetEvent = events.find((ev) => ev.id === grantEvent);
+    const eventName = targetEvent ? targetEvent.title : 'General Chapter Operations';
+
     const created = grantSquadAccess({
       userId: `usr-grantee-${Date.now().toString().slice(-4)}`,
-      userName: grantUser,
+      userName: grantUser.trim(),
       squad: grantSquad,
       eventId: grantEvent,
-      eventName: grantEvent === 'evt-geotech-2026' ? 'GeoTech 2026' : 'Campus Topo Camp 2026',
+      eventName,
       access: 'write',
       grantedBy: currentUser?.name || 'Authorized Lead',
     });
@@ -66,6 +73,7 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
     onLogAudit(created.eventName || grantEvent, `Granted single-event WRITE access to ${grantUser}`);
 
     setShowGrantModal(false);
+    setGrantUser('');
     setNotice(`Granted single-event write access to ${grantUser}.`);
     setTimeout(() => setNotice(null), 3500);
   };
@@ -145,13 +153,14 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
         </div>
 
         <div className="space-y-2.5 pt-1">
-          {grants.map((grant) => (
-            <div
-              key={grant.id}
-              className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
+          {grants.length > 0 ? (
+            grants.map((grant) => (
+              <div
+                key={grant.id}
+                className="p-3.5 sm:p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold text-[#051F20] text-xs sm:text-sm">
                       {grant.userName || grant.userId}
                     </span>
@@ -172,21 +181,28 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
                   </p>
                 </div>
 
-              {/* Action */}
-              <div className="shrink-0 self-end sm:self-center">
-                {!readOnly && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedGrantToRevoke(grant)}
-                    className="h-8 px-3 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer"
-                    data-testid={`btn-revoke-grant-${grant.id}`}
-                  >
-                    Revoke Grant
-                  </button>
-                )}
+                {/* Action */}
+                <div className="shrink-0 self-end sm:self-center">
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedGrantToRevoke(grant)}
+                      className="h-8 px-3 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] text-xs font-bold hover:bg-[#D9534F]/10 active:scale-95 transition-all cursor-pointer"
+                      data-testid={`btn-revoke-grant-${grant.id}`}
+                    >
+                      Revoke Grant
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <EmptyState
+              mascot="shield"
+              title="No Event Permission Grants"
+              description="Single-event squad permissions and access grants will display here."
+            />
+          )}
         </div>
       </div>
 
@@ -256,8 +272,15 @@ export const EventPermissionsScreen: React.FC<EventPermissionsScreenProps> = ({
                     onChange={(e) => setGrantEvent(e.target.value)}
                     className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
                   >
-                    <option value="evt-geotech-2026">GeoTech 2026</option>
-                    <option value="evt-topo-2026">Campus Topo Camp 2026</option>
+                    {events.length > 0 ? (
+                      events.map((ev) => (
+                        <option key={ev.id} value={ev.id}>
+                          {ev.title}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="evt-general">General Chapter Operations</option>
+                    )}
                   </select>
                 </div>
               </div>

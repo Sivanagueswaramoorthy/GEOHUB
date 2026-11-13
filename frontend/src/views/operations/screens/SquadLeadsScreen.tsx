@@ -36,7 +36,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
   const [appointName, setAppointName] = useState('');
   const [appointSquad, setAppointSquad] = useState('Promotion');
   const [appointPost, setAppointPost] = useState('Promotion Lead');
-  const [appointRoll, setAppointRoll] = useState('23GEO088');
+  const [appointRoll, setAppointRoll] = useState('');
 
   // Form states for Edit
   const [editPost, setEditPost] = useState('');

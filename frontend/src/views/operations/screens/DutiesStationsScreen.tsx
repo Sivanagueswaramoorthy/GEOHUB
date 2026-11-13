@@ -41,12 +41,12 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const [selectedEvent, setSelectedEvent] = useState('GEO FEST 2026');
+  const [selectedEvent, setSelectedEvent] = useState('General Operations');
   const [selectedStation, setSelectedStation] = useState<DutyStation | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [newVolName, setNewVolName] = useState('Rohan Dave');
-  const [newVolRoll, setNewVolRoll] = useState('23GEO014');
-  const [newVolShift, setNewVolShift] = useState('08:30 AM - 01:00 PM');
+  const [newVolName, setNewVolName] = useState('');
+  const [newVolRoll, setNewVolRoll] = useState('');
+  const [newVolShift, setNewVolShift] = useState('Morning Shift');
   const [notice, setNotice] = useState<string | null>(null);
 
   const [stations, setStations] = useState<DutyStation[]>([]);

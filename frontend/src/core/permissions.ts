@@ -1079,30 +1079,7 @@ export interface SquadGrant {
   grantedAt: string;
 }
 
-export const MOCK_SQUAD_GRANTS: SquadGrant[] = [
-  {
-    id: 'grant-doc-1',
-    userId: 'user-arun',
-    userName: 'Arun Kumar',
-    squad: 'documentation',
-    eventId: 'evt-geotech-2026',
-    eventName: 'GeoTech Annual Symposium 2026',
-    access: 'write',
-    grantedBy: 'Documentation Lead',
-    grantedAt: '2026-10-25T10:00:00.000Z',
-  },
-  {
-    id: 'grant-mgmt-1',
-    userId: 'user-priya',
-    userName: 'Priya Sharma',
-    squad: 'management',
-    eventId: 'evt-green-marathon',
-    eventName: 'Green Eco Marathon',
-    access: 'write',
-    grantedBy: 'Management Lead',
-    grantedAt: '2026-10-26T14:30:00.000Z',
-  },
-];
+export const MOCK_SQUAD_GRANTS: SquadGrant[] = [];
 
 export const grantSquadAccess = (
   grant: Omit<SquadGrant, 'id' | 'grantedAt'>

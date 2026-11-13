@@ -147,77 +147,11 @@ export const ExploreActivitiesView: React.FC = () => {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
-  // Live mock state for interactive module behaviors
-  const [budgetRequests, setBudgetRequests] = useState<BudgetRequest[]>([
-    {
-      id: 'req-1',
-      title: 'Drone Sensor Calibration & Servicing',
-      event: 'Annual Drone Survey',
-      amount: 14500,
-      category: 'Equipment',
-      requesterId: 'usr-treasurer-vikram',
-      requesterName: 'Vikram Mehta (Treasurer)',
-      status: 'Pending',
-      date: '2026-10-28',
-    },
-    {
-      id: 'req-2',
-      title: 'Field Camp Logistics & Hydration',
-      event: 'Campus Topo Camp 2026',
-      amount: 3200,
-      category: 'Logistics',
-      requesterId: 'usr-mgmt-1',
-      requesterName: 'Divya Rao (Management)',
-      status: 'Approved',
-      date: '2026-10-25',
-    },
-    {
-      id: 'req-3',
-      title: 'Keynote Speaker Honorarium',
-      event: 'GeoTech Annual Symposium',
-      amount: 10000,
-      category: 'Honorarium',
-      requesterId: 'usr-faculty-1',
-      requesterName: 'Dr. Ramesh (Faculty)',
-      status: 'Pending',
-      date: '2026-10-29',
-    },
-  ]);
-
-  const [expenses, setExpenses] = useState<ExpenseItem[]>([
-    {
-      id: 'exp-1',
-      event: 'Annual Drone Survey',
-      amount: 4200,
-      category: 'Batteries & Cables',
-      description: 'LiPo flight batteries replacement kit',
-      actor: 'Vikram Mehta',
-      time: '2026-10-27 11:30 AM',
-      billProof: 'INV-4412.pdf',
-    },
-    {
-      id: 'exp-2',
-      event: 'Campus Topo Camp 2026',
-      amount: 1850,
-      category: 'Refreshments',
-      description: 'Mineral water & glucose for field surveyors',
-      actor: 'Vikram Mehta',
-      time: '2026-10-26 04:15 PM',
-      billProof: 'INV-3981.pdf',
-    },
-  ]);
-
-  const [grants, setGrants] = useState<SquadGrant[]>(MOCK_SQUAD_GRANTS);
-  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([
-    {
-      id: 'log-1',
-      actor: 'System Admin',
-      module: 'treasury',
-      event: 'Annual Drone Survey',
-      action: 'Budget baseline configured',
-      time: '2026-10-20T09:00:00Z',
-    },
-  ]);
+  // Clean operational state initialized to empty zero-states
+  const [budgetRequests, setBudgetRequests] = useState<BudgetRequest[]>([]);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [grants, setGrants] = useState<SquadGrant[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
 
   // Record an audit log entry on every WRITE action
   const logAudit = (moduleId: ModuleId, eventName: string, actionName: string) => {

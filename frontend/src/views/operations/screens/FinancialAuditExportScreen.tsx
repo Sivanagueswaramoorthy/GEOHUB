@@ -12,6 +12,7 @@ import {
   Building,
 } from 'lucide-react';
 import { AnimatedNumber } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface FinancialAuditExportScreenProps {
   readOnly: boolean;
@@ -24,8 +25,18 @@ export const FinancialAuditExportScreen: React.FC<FinancialAuditExportScreenProp
   onLogAudit,
   currentUser,
 }) => {
+  const { events, expenses } = useApp();
   const [selectedEvent, setSelectedEvent] = useState('All Events (Overall)');
   const [exportNotice, setExportNotice] = useState<string | null>(null);
+
+  const eventOptions = [
+    'All Events (Comprehensive)',
+    ...(events || []).map((e) => e.title),
+  ];
+
+  const totalSanctioned = (events || []).reduce((sum, e) => sum + (e.budget || 0), 0);
+  const totalDisbursed = (expenses || []).reduce((sum, e) => sum + e.amount, 0);
+  const surplus = Math.max(0, totalSanctioned - totalDisbursed);
 
   const handleExport = (format: 'PDF' | 'CSV' | 'JSON') => {
     onLogAudit(selectedEvent, `Generated formal ${format} audit statement for "${selectedEvent}"`);
@@ -70,10 +81,11 @@ export const FinancialAuditExportScreen: React.FC<FinancialAuditExportScreenProp
               onChange={(e) => setSelectedEvent(e.target.value)}
               className="w-full sm:w-64 p-2 rounded-xl border border-[#DAF1DE] text-xs font-semibold text-[#051F20] bg-[#F6FBF7] focus:outline-none focus:border-[#163832] cursor-pointer"
             >
-              <option value="All Events (Overall)">All Events (Comprehensive)</option>
-              <option value="Annual Drone Survey">Annual Drone Survey</option>
-              <option value="Campus Topo Camp 2026">Campus Topo Camp 2026</option>
-              <option value="GeoTech Annual Symposium">GeoTech Annual Symposium</option>
+              {eventOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -83,21 +95,21 @@ export const FinancialAuditExportScreen: React.FC<FinancialAuditExportScreenProp
           <div className="p-2.5 sm:p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
             <span className="text-xs text-[#235347] font-bold uppercase tracking-wide">Sanctioned</span>
             <div className="font-extrabold text-[#051F20] text-base mt-1">
-              ₹<AnimatedNumber value="180000" />
+              ₹<AnimatedNumber value={totalSanctioned} />
             </div>
           </div>
 
           <div className="p-2.5 sm:p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
             <span className="text-xs text-[#235347] font-bold uppercase tracking-wide">Disbursed</span>
             <div className="font-extrabold text-[#051F20] text-base mt-1">
-              ₹<AnimatedNumber value="142500" />
+              ₹<AnimatedNumber value={totalDisbursed} />
             </div>
           </div>
 
           <div className="p-2.5 sm:p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE]">
             <span className="text-xs text-[#235347] font-bold uppercase tracking-wide">Surplus</span>
             <div className="font-extrabold text-[#163832] text-base mt-1">
-              ₹<AnimatedNumber value="37500" />
+              ₹<AnimatedNumber value={surplus} />
             </div>
           </div>
 

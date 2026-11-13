@@ -40,6 +40,7 @@ import {
   demoVolunteer,
   demoManagement,
   demoUsersList,
+  initialUsers,
   initialTeams,
   initialEvents,
   initialTasks,
@@ -192,7 +193,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return demoSuperAdmin;
   });
-  const [users, setUsers] = useState<UserModel[]>(demoUsersList);
+  const [users, setUsers] = useState<UserModel[]>(initialUsers);
   const [teams, setTeams] = useState<TeamModel[]>(initialTeams);
   const [events, setEvents] = useState<EventModel[]>(initialEvents);
   const [tasks, setTasks] = useState<TaskModel[]>(initialTasks);
@@ -372,6 +373,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const loginWithUser = (user: UserModel) => {
     setCurrentUser(user);
     setIsAuthenticated(true);
+    setUsers((prev) => (prev.some((u) => u.uid === user.uid) ? prev : [user, ...prev]));
     switch (user.role) {
       case 'super_admin':
       case 'admin':

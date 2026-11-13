@@ -11,6 +11,7 @@ import {
   User,
 } from 'lucide-react';
 import { AnimatedNumber, PillButton } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface ExpenseItem {
   id: string;
@@ -38,7 +39,12 @@ export const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
-  const [event, setEvent] = useState('Annual Drone Survey');
+  const { events } = useApp();
+  const eventOptions = [
+    'General Club Operations',
+    ...(events || []).map((e) => e.title),
+  ];
+  const [event, setEvent] = useState(eventOptions[0] || 'General Club Operations');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Equipment');
   const [description, setDescription] = useState('');
@@ -120,10 +126,11 @@ export const AddExpenseScreen: React.FC<AddExpenseScreenProps> = ({
                 onChange={(e) => setEvent(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] focus:outline-none focus:border-[#163832]"
               >
-                <option value="Annual Drone Survey">Annual Drone Survey</option>
-                <option value="Campus Topo Camp 2026">Campus Topo Camp 2026</option>
-                <option value="GeoTech Annual Symposium">GeoTech Annual Symposium</option>
-                <option value="General Club Operations">General Club Operations</option>
+                {eventOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
               </select>
             </div>
 
