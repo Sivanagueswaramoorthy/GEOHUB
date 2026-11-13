@@ -112,73 +112,96 @@ class AndroidNetworkBridge(private val context: Context, private val webView: We
     @JavascriptInterface
     fun downloadAndInstallApk(apkUrl: String) {
         thread(start = true) {
-            try {
-                Log.d("GeoHubOTA", "Starting APK download from: $apkUrl")
-                postProgressToWeb(5, "Connecting to update server...")
+            val cdnFallbackUrl = "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk"
+            val initialUrl = if (apkUrl.startsWith("http://") || apkUrl.startsWith("https://")) {
+                apkUrl
+            } else {
+                "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main" + if (apkUrl.startsWith("/")) apkUrl else "/$apkUrl"
+            }
 
-                val targetUrl = if (apkUrl.startsWith("http://") || apkUrl.startsWith("https://")) {
-                    apkUrl
-                } else {
-                    "https://geohub-backend.onrender.com" + if (apkUrl.startsWith("/")) apkUrl else "/$apkUrl"
-                }
+            var downloadSuccess = false
+            val candidateUrls = if (initialUrl != cdnFallbackUrl) listOf(initialUrl, cdnFallbackUrl) else listOf(initialUrl)
 
-                val url = URL(targetUrl)
-                val connection = (url.openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 15000
-                    readTimeout = 30000
-                    requestMethod = "GET"
-                    instanceFollowRedirects = true
-                }
-                connection.connect()
-
-                val fileLength = connection.contentLength
-                val saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
-                val apkFile = File(saveDir, "geohub-update.apk")
-                if (apkFile.exists()) {
-                    apkFile.delete()
-                }
-
-                postProgressToWeb(15, "Downloading update package...")
-
-                var input: InputStream? = null
-                var output: FileOutputStream? = null
+            for (targetUrl in candidateUrls) {
                 try {
-                    input = connection.inputStream
-                    output = FileOutputStream(apkFile)
+                    Log.d("GeoHubOTA", "Attempting APK download from: $targetUrl")
+                    postProgressToWeb(5, "Connecting to update server...")
 
-                    val buffer = ByteArray(8192)
-                    var total: Long = 0
-                    var count: Int
-                    var lastReported = 15
+                    val url = URL(targetUrl)
+                    val connection = (url.openConnection() as HttpURLConnection).apply {
+                        connectTimeout = 15000
+                        readTimeout = 30000
+                        requestMethod = "GET"
+                        instanceFollowRedirects = true
+                    }
+                    connection.connect()
 
-                    while (input.read(buffer).also { count = it } != -1) {
-                        total += count
-                        output.write(buffer, 0, count)
-                        if (fileLength > 0) {
-                            val percent = (15 + (total * 80 / fileLength)).toInt().coerceIn(15, 95)
-                            if (percent >= lastReported + 5) {
-                                lastReported = percent
-                                postProgressToWeb(percent, "Downloading update: $percent%")
+                    if (connection.responseCode !in 200..299) {
+                        Log.w("GeoHubOTA", "HTTP error ${connection.responseCode} from $targetUrl, trying next source...")
+                        connection.disconnect()
+                        continue
+                    }
+
+                    val fileLength = connection.contentLength
+                    val saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
+                    val apkFile = File(saveDir, "geohub-update.apk")
+                    if (apkFile.exists()) {
+                        apkFile.delete()
+                    }
+
+                    postProgressToWeb(15, "Downloading update package...")
+
+                    var input: InputStream? = null
+                    var output: FileOutputStream? = null
+                    try {
+                        input = connection.inputStream
+                        output = FileOutputStream(apkFile)
+
+                        val buffer = ByteArray(8192)
+                        var total: Long = 0
+                        var count: Int
+                        var lastReported = 15
+
+                        while (input.read(buffer).also { count = it } != -1) {
+                            total += count
+                            output.write(buffer, 0, count)
+                            if (fileLength > 0) {
+                                val percent = (15 + (total * 80 / fileLength)).toInt().coerceIn(15, 95)
+                                if (percent >= lastReported + 5) {
+                                    lastReported = percent
+                                    postProgressToWeb(percent, "Downloading update: $percent%")
+                                }
                             }
                         }
+                        output.flush()
+                    } finally {
+                        output?.close()
+                        input?.close()
+                        connection.disconnect()
                     }
-                    output.flush()
-                } finally {
-                    output?.close()
-                    input?.close()
-                    connection.disconnect()
-                }
 
-                postProgressToWeb(98, "Preparing package installer...")
-                Log.d("GeoHubOTA", "APK downloaded successfully to ${apkFile.absolutePath} (${apkFile.length()} bytes)")
+                    if (apkFile.length() < 100000) {
+                        Log.w("GeoHubOTA", "Downloaded file too small (${apkFile.length()} bytes), trying fallback...")
+                        apkFile.delete()
+                        continue
+                    }
 
-                // Launch package installer on UI thread
-                (context as? AppCompatActivity)?.runOnUiThread {
-                    installApkFile(apkFile)
+                    postProgressToWeb(98, "Preparing package installer...")
+                    Log.d("GeoHubOTA", "APK downloaded successfully to ${apkFile.absolutePath} (${apkFile.length()} bytes)")
+
+                    // Launch package installer on UI thread
+                    (context as? AppCompatActivity)?.runOnUiThread {
+                        installApkFile(apkFile)
+                    }
+                    downloadSuccess = true
+                    break
+                } catch (e: Exception) {
+                    Log.e("GeoHubOTA", "Failed download from $targetUrl: ${e.message}")
                 }
-            } catch (e: Exception) {
-                Log.e("GeoHubOTA", "Download/Install failed: ${e.message}", e)
-                postProgressToWeb(-1, "Update failed: ${e.localizedMessage}")
+            }
+
+            if (!downloadSuccess) {
+                postProgressToWeb(-1, "Update download failed across all servers. Please check your network connection.")
             }
         }
     }

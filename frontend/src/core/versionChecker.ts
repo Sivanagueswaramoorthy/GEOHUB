@@ -48,14 +48,43 @@ export function compareSemver(v1: string, v2: string): number {
   return 0;
 }
 
+export const FALLBACK_VERSION_URL =
+  'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/backend/app_version.json';
+export const CDN_APK_URL =
+  'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk';
+
 /**
  * Queries the backend for latest version manifest and checks if an update is available.
+ * Uses a resilient 2-tier check: primary API endpoint followed by high-speed global CDN fallback.
  */
 export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
   const baseUrl = resolveApiBaseUrl();
+
+  const parseAndEvaluate = (data: AppVersionManifest): CheckUpdateResult => {
+    const isNewer = compareSemver(APP_VERSION, data.version) > 0;
+    const isMandatory = Boolean(
+      data.min_supported_version && compareSemver(APP_VERSION, data.min_supported_version) > 0
+    );
+
+    // If download_url is relative, ensure a robust direct fallback
+    const resolvedDownloadUrl =
+      data.download_url && !data.download_url.startsWith('http')
+        ? CDN_APK_URL
+        : data.download_url || CDN_APK_URL;
+
+    return {
+      hasUpdate: isNewer,
+      updateInfo: isNewer ? { ...data, download_url: resolvedDownloadUrl } : null,
+      isMandatory,
+      currentVersion: APP_VERSION,
+      latestVersion: data.version,
+    };
+  };
+
+  // Tier 1: Primary API server check
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
 
     const res = await fetch(`${baseUrl}/app/version`, {
       method: 'GET',
@@ -64,38 +93,41 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
     });
     clearTimeout(timeoutId);
 
-    if (!res.ok) {
-      return {
-        hasUpdate: false,
-        updateInfo: null,
-        isMandatory: false,
-        currentVersion: APP_VERSION,
-        latestVersion: APP_VERSION,
-      };
+    if (res.ok) {
+      const data: AppVersionManifest = await res.json();
+      return parseAndEvaluate(data);
     }
-
-    const data: AppVersionManifest = await res.json();
-    const isNewer = compareSemver(APP_VERSION, data.version) > 0;
-    const isMandatory = Boolean(
-      data.min_supported_version && compareSemver(APP_VERSION, data.min_supported_version) > 0
-    );
-
-    return {
-      hasUpdate: isNewer,
-      updateInfo: isNewer ? data : null,
-      isMandatory,
-      currentVersion: APP_VERSION,
-      latestVersion: data.version,
-    };
   } catch {
-    return {
-      hasUpdate: false,
-      updateInfo: null,
-      isMandatory: false,
-      currentVersion: APP_VERSION,
-      latestVersion: APP_VERSION,
-    };
+    // Fall through to Tier 2 CDN check
   }
+
+  // Tier 2: Global jsDelivr / GitHub CDN fallback check
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    const res = await fetch(FALLBACK_VERSION_URL, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data: AppVersionManifest = await res.json();
+      return parseAndEvaluate(data);
+    }
+  } catch {
+    // Both tiers exhausted
+  }
+
+  return {
+    hasUpdate: false,
+    updateInfo: null,
+    isMandatory: false,
+    currentVersion: APP_VERSION,
+    latestVersion: APP_VERSION,
+  };
 }
 
 /**
@@ -180,8 +212,17 @@ export function triggerApkInstallation(rawDownloadUrl: string): void {
   let fullUrl = rawDownloadUrl;
 
   if (!rawDownloadUrl.startsWith('http://') && !rawDownloadUrl.startsWith('https://')) {
-    const origin = baseUrl.replace(/\/api$/, '');
-    fullUrl = `${origin}${rawDownloadUrl.startsWith('/') ? '' : '/'}${rawDownloadUrl}`;
+    const isApk =
+      typeof navigator !== 'undefined' &&
+      (navigator.userAgent.includes('GeoHubMobileApp') ||
+        (typeof window !== 'undefined' && window.location.hostname === 'appassets.androidplatform.net'));
+
+    if (isApk || baseUrl.includes('onrender.com')) {
+      fullUrl = CDN_APK_URL;
+    } else {
+      const origin = baseUrl.replace(/\/api$/, '');
+      fullUrl = `${origin}${rawDownloadUrl.startsWith('/') ? '' : '/'}${rawDownloadUrl}`;
+    }
   }
 
   // Check for native Android bridge

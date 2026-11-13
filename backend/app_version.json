@@ -1,12 +1,12 @@
 {
-  "version": "1.5.9",
-  "version_code": 16,
+  "version": "1.6.0",
+  "version_code": 17,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "New official release with all 9 canonical roles & instant login credentials",
-  "download_url": "/downloads/geohub-app.apk",
+  "release_notes": "Official GeoHub v1.6.0 with all 9 canonical roles, SuperAdmin governance & resilient global CDN OTA update",
+  "download_url": "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-13",
-  "file_size_bytes": 6861199,
+  "file_size_bytes": 6861527,
   "file_size_mb": "6.54 MB",
-  "sha256": "2807CC415600075FCBC04345BD11A50576F6F9E2CFF23A408DE897B44171C117"
+  "sha256": "F5038E60716AA7C40C5F457C26E194CA48C37E267B47D3AC38580BF7FE074DB2"
 }

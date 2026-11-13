@@ -89,6 +89,35 @@ describe('Version Checker & OTA System', () => {
       expect(result.hasUpdate).toBe(false);
       expect(result.updateInfo).toBeNull();
     });
+
+    it('falls back to Tier 2 CDN manifest when primary server 404s', async () => {
+      const mockCdnManifest = {
+        version: '1.9.99',
+        version_code: 105,
+        apk_filename: 'geohub-app.apk',
+        release_notes: 'CDN fallback release',
+        download_url: 'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk',
+        min_supported_version: '1.0.0',
+        released_at: '2026-11-13',
+      };
+
+      // First call (primary API) fails with 404; second call (CDN) succeeds
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 404,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockCdnManifest,
+        } as Response);
+
+      const result = await checkForAppUpdate();
+      expect(result.hasUpdate).toBe(true);
+      expect(result.latestVersion).toBe('1.9.99');
+      expect(result.updateInfo?.download_url).toContain('jsdelivr.net');
+    });
   });
 
   describe('Device Telemetry', () => {
