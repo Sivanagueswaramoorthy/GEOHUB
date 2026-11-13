@@ -1,12 +1,12 @@
 {
-  "version": "1.5.8",
-  "version_code": 15,
+  "version": "1.5.9",
+  "version_code": 16,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Added all 9 canonical roles to database and enabled seamless fallback login",
+  "release_notes": "New official release with all 9 canonical roles & instant login credentials",
   "download_url": "/downloads/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-13",
   "file_size_bytes": 6861199,
   "file_size_mb": "6.54 MB",
-  "sha256": "335CC25D62AF14A3DF7D404745214BDB6FD328B1158CE23DA77519EFA50A8AFF"
+  "sha256": "2807CC415600075FCBC04345BD11A50576F6F9E2CFF23A408DE897B44171C117"
 }

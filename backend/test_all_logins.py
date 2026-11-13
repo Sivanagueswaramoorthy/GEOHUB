@@ -46,3 +46,4 @@ for roll, pwd in test_cases:
 
 if all_passed:
     print("\nALL 22 LOGIN COMBINATIONS PASSED PERFECTLY!")
+
