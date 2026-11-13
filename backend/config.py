@@ -16,7 +16,7 @@ class Settings:
 
     # TiDB Cloud MySQL Configuration
     TIDB_HOST: str = os.getenv("TIDB_HOST", "gateway01.ap-southeast-1.prod.aws.tidbcloud.com")
-    TIDB_PORT: int = int(os.getenv("TIDB_PORT", "4000"))
+    TIDB_PORT: int = int(os.getenv("TIDB_PORT", "3306"))
     TIDB_USER: str = os.getenv("TIDB_USERNAME", os.getenv("TIDB_USER", "2oGb7FpyxpLhZWE.root"))
     TIDB_PASSWORD: str = os.getenv("TIDB_PASSWORD", "pEVtiQBWbs9PAGBB")
     TIDB_DATABASE: str = os.getenv("TIDB_DATABASE", "geohub")
