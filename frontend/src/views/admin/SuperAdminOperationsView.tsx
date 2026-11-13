@@ -82,7 +82,8 @@ const OPERATIONS: OperationDef[] = [
 ];
 
 const DEFAULT_ROLES: RoleMeta[] = [
-  { role: 'super_admin', badge: 'Super Admin', name: 'Dr. Sarah Jenkins', roll_no: 'FAC01', email: 'sarah.jenkins@college.edu', post: 'Faculty Advisor', status: 'active' },
+  { role: 'super_admin', badge: 'Super Admin', name: 'System SuperAdmin', roll_no: 'SA01', email: 'superadmin@college.edu', post: 'System Administrator', status: 'active' },
+  { role: 'faculty', badge: 'Faculty Advisor', name: 'Dr. Sarah Jenkins', roll_no: 'FAC01', email: 'sarah.jenkins@college.edu', post: 'Faculty Advisor', status: 'active' },
   { role: 'coordinator', badge: 'Coordinator', name: 'Alex Rivera', roll_no: '21GEO001', email: 'alex.rivera@college.edu', post: 'Club President', status: 'active' },
   { role: 'management', badge: 'Management Lead', name: 'Elena Rostova', roll_no: '21GEO010', email: 'elena.rostova@college.edu', post: 'Vice President', status: 'active' },
   { role: 'documentation', badge: 'Documentation', name: 'Aarav Patel', roll_no: '22GEO018', email: 'aarav.patel@college.edu', post: 'Documentation Lead', status: 'active' },

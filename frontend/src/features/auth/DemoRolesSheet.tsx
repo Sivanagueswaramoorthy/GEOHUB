@@ -3,6 +3,7 @@ import { X, ShieldCheck, Shield, Users2, FileText, DollarSign, Megaphone, UserCh
 import { UserModel } from '../../types';
 import {
   demoSuperAdmin,
+  demoFaculty,
   demoAdmin,
   demoManagement,
   demoDocLead,
@@ -26,11 +27,22 @@ export interface DemoPersona {
 
 export const DEMO_PERSONAS: DemoPersona[] = [
   {
+    id: 'super_admin',
+    name: 'System SuperAdmin',
+    roleTitle: 'Super Admin',
+    description: 'Master platform controls, role credentials & operations matrix',
+    user: demoSuperAdmin,
+    initials: 'SA',
+    badgeBg: '#051F20',
+    badgeColor: '#DAF1DE',
+    icon: <ShieldCheck size={20} strokeWidth={1.75} className="text-[#DAF1DE]" />,
+  },
+  {
     id: 'faculty',
     name: 'Dr. Sarah Jenkins',
     roleTitle: 'Faculty Advisor',
-    description: 'System oversight, sanctions, club approvals & dossiers',
-    user: demoSuperAdmin,
+    description: 'Institutional oversight, sanctions, club approvals & audit logs',
+    user: demoFaculty,
     initials: 'SJ',
     badgeBg: '#DAF1DE',
     badgeColor: '#163832',

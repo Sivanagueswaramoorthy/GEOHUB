@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { UserModel, UserRole, UserStatus } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { canAccessRoute } from '../../core/permissions';
-import { demoUsersList, demoSuperAdmin, demoAdmin, demoManagement, demoDocLead, demoTreasurer, demoTeamAdmin, demoVolunteer, demoMember } from '../../data/mockData';
+import { demoUsersList, demoSuperAdmin, demoFaculty, demoAdmin, demoManagement, demoDocLead, demoTreasurer, demoTeamAdmin, demoVolunteer, demoMember } from '../../data/mockData';
 import { LoginFormData } from './auth.schema';
 import { apiClient } from '../../api/client';
 
@@ -236,15 +236,19 @@ export const useLogin = (options?: UseLoginOptions) => {
 
         if (!found) {
           if (
-            id === 'fac01' ||
+            id === 'sa01' ||
             id === 'superadmin' ||
             id === 'super' ||
-            id.includes('superadmin') ||
+            id.includes('superadmin')
+          ) {
+            found = demoSuperAdmin;
+          } else if (
+            id === 'fac01' ||
             id === 'faculty' ||
             id.includes('advisor') ||
             trimmedIdentifier.includes('sarah')
           ) {
-            found = demoSuperAdmin;
+            found = demoFaculty;
           } else if (
             id === '21geo001' ||
             id === 'admin' ||

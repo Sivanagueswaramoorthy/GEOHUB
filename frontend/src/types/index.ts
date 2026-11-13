@@ -1,18 +1,18 @@
 export type FinalRole =
+  | 'super_admin'
   | 'faculty'
   | 'coordinator'
   | 'documentation'
   | 'treasurer'
   | 'promotion'
+  | 'volunteer'
   | 'student'
   | 'management';
 
 export type LegacyRole =
-  | 'super_admin'
   | 'admin'
   | 'team_admin'
   | 'member'
-  | 'volunteer'
   | 'social_media';
 
 export type UserRole = FinalRole | LegacyRole;

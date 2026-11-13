@@ -64,8 +64,8 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
   // 2. Backward Compatibility & Migration of Old Role Names
   // =========================================================================
   describe('Legacy Role Migration & Normalization', () => {
-    it('normalizes super_admin to faculty', () => {
-      expect(normalizeRole('super_admin')).toBe('faculty');
+    it('normalizes super_admin as super_admin', () => {
+      expect(normalizeRole('super_admin')).toBe('super_admin');
       const perms = getRolePermissions('super_admin');
       expect(perms.canApproveEvents).toBe(true);
       expect(perms.canArchiveEvents).toBe(true);
@@ -87,9 +87,9 @@ describe('RBAC Hardened Permissions Matrix & Security Suite', () => {
       expect(perms.canManageCampaigns).toBe(true);
     });
 
-    it('normalizes member and volunteer to student', () => {
+    it('normalizes member to student and preserves canonical volunteer role', () => {
       expect(normalizeRole('member')).toBe('student');
-      expect(normalizeRole('volunteer')).toBe('student');
+      expect(normalizeRole('volunteer')).toBe('volunteer');
       expect(normalizeRole('team_admin')).toBe('student');
     });
 

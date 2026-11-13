@@ -81,6 +81,7 @@ export const normalizeRole = (role?: string | null): FinalRole => {
   const clean = role.toLowerCase().trim();
   switch (clean) {
     case 'super_admin':
+      return 'super_admin';
     case 'faculty':
       return 'faculty';
     case 'admin':
@@ -95,8 +96,9 @@ export const normalizeRole = (role?: string | null): FinalRole => {
     case 'social_media':
     case 'promotion':
       return 'promotion';
-    case 'member':
     case 'volunteer':
+      return 'volunteer';
+    case 'member':
     case 'team_admin':
     case 'student':
     default:
@@ -106,16 +108,16 @@ export const normalizeRole = (role?: string | null): FinalRole => {
 
 export const isSuperAdminRole = (role: UserRole | string): boolean => {
   const norm = normalizeRole(role);
-  return norm === 'faculty';
+  return norm === 'super_admin';
 };
 
 /**
  * Checks if a role is read-only for Events.
- * Treasurer, Promotion, Documentation, and Student are read-only for events.
+ * Treasurer, Promotion, Documentation, Volunteer, and Student are read-only for events.
  */
 export const isReadOnlyEventsRole = (role?: UserRole | string): boolean => {
   const norm = normalizeRole(role);
-  return norm === 'treasurer' || norm === 'promotion' || norm === 'documentation' || norm === 'student';
+  return norm === 'treasurer' || norm === 'promotion' || norm === 'documentation' || norm === 'student' || norm === 'volunteer';
 };
 
 /**
@@ -658,14 +660,14 @@ export const canAccessRoute = (
     }
   }
 
-  // SuperAdmin Role Credentials & Operations Governance: Faculty / SuperAdmin only
+  // SuperAdmin Role Credentials & Operations Governance: SuperAdmin only
   if (
     normalizedRoute === 'role_governance' ||
     normalizedRoute === 'role-governance' ||
     normalizedRoute === 'role_credentials' ||
     normalizedRoute === 'super_admin_governance'
   ) {
-    if (normRole !== 'faculty') {
+    if (normRole !== 'super_admin') {
       return {
         allowed: false,
         redirect: 'home',

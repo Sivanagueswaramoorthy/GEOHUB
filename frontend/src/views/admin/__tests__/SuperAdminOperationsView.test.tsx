@@ -7,13 +7,13 @@ import { AppProvider } from '../../../context/AppContext';
 import { canAccessRoute } from '../../../core/permissions';
 
 describe('SuperAdminOperationsView & Governance Security Tests', () => {
-  it('enforces route guard denying student access and permitting super_admin/faculty', () => {
+  it('enforces route guard denying student and faculty access and permitting super_admin', () => {
     const studentCheck = canAccessRoute('role_governance', 'student');
     expect(studentCheck.allowed).toBe(false);
     expect(studentCheck.message).toContain('SuperAdmin clearance required');
 
     const facultyCheck = canAccessRoute('role_governance', 'faculty');
-    expect(facultyCheck.allowed).toBe(true);
+    expect(facultyCheck.allowed).toBe(false);
 
     const superAdminCheck = canAccessRoute('role_governance', 'super_admin');
     expect(superAdminCheck.allowed).toBe(true);

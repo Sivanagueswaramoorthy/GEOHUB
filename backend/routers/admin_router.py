@@ -11,9 +11,10 @@ import auth
 
 router = APIRouter(prefix="/admin", tags=["SuperAdmin Governance & Operation Controls"])
 
-# Baseline canonical roles
+# Baseline canonical roles (9 distinct platform roles)
 CANONICAL_ROLES = [
-    {"role": "super_admin", "badge": "Super Admin", "default_post": "Faculty Advisor", "default_name": "Dr. Sarah Jenkins", "default_roll": "FAC01", "default_email": "sarah.jenkins@college.edu"},
+    {"role": "super_admin", "badge": "Super Admin", "default_post": "System Administrator", "default_name": "System SuperAdmin", "default_roll": "SA01", "default_email": "superadmin@college.edu"},
+    {"role": "faculty", "badge": "Faculty Advisor", "default_post": "Faculty Advisor", "default_name": "Dr. Sarah Jenkins", "default_roll": "FAC01", "default_email": "sarah.jenkins@college.edu"},
     {"role": "coordinator", "badge": "Coordinator", "default_post": "Club President", "default_name": "Alex Rivera", "default_roll": "21GEO001", "default_email": "alex.rivera@college.edu"},
     {"role": "management", "badge": "Management Lead", "default_post": "Vice President", "default_name": "Elena Rostova", "default_roll": "21GEO010", "default_email": "elena.rostova@college.edu"},
     {"role": "documentation", "badge": "Documentation", "default_post": "Documentation Lead", "default_name": "Aarav Patel", "default_roll": "22GEO018", "default_email": "aarav.patel@college.edu"},
@@ -212,11 +213,11 @@ def update_permissions_matrix(payload: MatrixUpdatePayload, db: Session = Depend
         for flag in all_flags:
             current_perms[flag] = True
     elif payload.action == "disable_all":
-        # Safeguard: Do not allow disabling all operations for super_admin / faculty
-        if norm == "faculty":
+        # Safeguard: Do not allow disabling all operations for super_admin
+        if norm == "super_admin":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="SuperAdmin / Faculty operations cannot be completely revoked."
+                detail="SuperAdmin operations cannot be completely revoked."
             )
         for flag in all_flags:
             current_perms[flag] = False

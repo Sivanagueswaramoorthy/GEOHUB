@@ -14,7 +14,25 @@ import {
 } from '../types';
 
 export const demoSuperAdmin: UserModel = {
-  uid: 'u_super_admin_01',
+  uid: 'u_super_admin_sa01',
+  email: 'superadmin@college.edu',
+  rollNo: 'SA01',
+  name: 'System SuperAdmin',
+  role: 'super_admin',
+  post: 'System Administrator',
+  team: 'Platform Governance',
+  teamRole: 'System Administrator',
+  squadMemberships: [{ squad: 'Management', isLead: true }],
+  isVolunteer: false,
+  status: 'active',
+  department: 'Platform Governance & IT',
+  yearOfStudy: 'System Administrator',
+  phone: '+1 (555) 010-0001',
+  createdAt: '2025-08-01T09:00:00Z',
+};
+
+export const demoFaculty: UserModel = {
+  uid: 'u_faculty_fac01',
   email: 'sarah.jenkins@college.edu',
   rollNo: 'FAC01',
   name: 'Dr. Sarah Jenkins',
@@ -30,7 +48,6 @@ export const demoSuperAdmin: UserModel = {
   phone: '+1 (555) 019-2831',
   createdAt: '2025-08-01T09:00:00Z',
 };
-export const demoFaculty = demoSuperAdmin;
 
 export const demoAdmin: UserModel = {
   uid: 'u_admin_02',
@@ -171,6 +188,7 @@ export const demoManagement: UserModel = {
 
 export const demoUsersList: UserModel[] = [
   demoSuperAdmin,
+  demoFaculty,
   demoAdmin,
   demoManagement,
   demoTeamAdmin,

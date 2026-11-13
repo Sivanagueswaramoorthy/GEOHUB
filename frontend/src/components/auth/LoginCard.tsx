@@ -12,7 +12,8 @@ export interface DemoRoleCredential {
 }
 
 export const ALL_DEMO_CREDENTIALS: DemoRoleCredential[] = [
-  { role: 'Faculty', rollNo: 'FAC01', password: 'admin123', description: 'Faculty Advisor · Full Oversight' },
+  { role: 'Super Admin', rollNo: 'SA01', password: 'admin123', description: 'System Administrator · Master Operations' },
+  { role: 'Faculty', rollNo: 'FAC01', password: 'admin123', description: 'Faculty Advisor · Institutional Oversight' },
   { role: 'President', rollNo: '21GEO001', password: 'admin123', description: 'Club President / Coordinator' },
   { role: 'Management', rollNo: '21GEO010', password: 'admin123', description: 'Management Lead · Logistics' },
   { role: 'Treasurer', rollNo: '22GEO019', password: 'admin123', description: 'Treasury & Expense Ledger' },

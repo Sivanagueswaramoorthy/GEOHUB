@@ -24,15 +24,18 @@ export const NotFoundView: React.FC<NotFoundViewProps> = ({
     }
   };
 
-  // If accidentally routed here due to asset loader paths or blank hash, automatically redirect to home
+  // If accidentally routed here due to asset loader paths, blank hash, or root, automatically redirect to home
   React.useEffect(() => {
     const route = (attemptedRoute || '').toLowerCase();
     if (
       !route ||
+      route === '/' ||
       route === 'home' ||
       route === 'index.html' ||
       route.includes('index.html') ||
-      route.startsWith('assets')
+      route.startsWith('assets') ||
+      route.startsWith('android_asset') ||
+      route.includes('android_asset')
     ) {
       handleReturnHome();
     }

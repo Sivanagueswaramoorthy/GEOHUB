@@ -32,6 +32,7 @@ import {
 } from '../types';
 import {
   demoSuperAdmin,
+  demoFaculty,
   demoAdmin,
   demoTeamAdmin,
   demoDocLead,
@@ -239,7 +240,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-    return demoSuperAdmin;
+    return demoFaculty;
   });
   const [users, setUsers] = useState<UserModel[]>(() => loadPersistedState('geohub_store_users', initialUsers));
   const [teams, setTeams] = useState<TeamModel[]>(() => loadPersistedState('geohub_store_teams', initialTeams));
@@ -415,6 +416,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         rawPath === 'index.html' ||
         rawPath === 'assets/index.html' ||
         rawPath.startsWith('assets') ||
+        rawPath.startsWith('android_asset') ||
+        rawPath.includes('android_asset') ||
         rawPath.includes('.html') ||
         rawPath.includes('.js') ||
         rawPath.includes('.css');
@@ -680,8 +683,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     let targetUser: UserModel = demoSuperAdmin;
     const norm = normalizeRole(role);
     switch (norm) {
-      case 'faculty':
+      case 'super_admin':
         targetUser = demoSuperAdmin;
+        break;
+      case 'faculty':
+        targetUser = demoFaculty;
         break;
       case 'coordinator':
         targetUser = demoAdmin;
@@ -697,6 +703,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         break;
       case 'treasurer':
         targetUser = demoTreasurer;
+        break;
+      case 'volunteer':
+        targetUser = demoVolunteer;
         break;
       case 'student':
       default:
@@ -719,7 +728,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
     setIsAuthenticated(false);
-    setCurrentUser(demoSuperAdmin);
+    setCurrentUser(demoFaculty);
     setActiveTabState('login');
     setSelectedEventId(null);
     setSelectedTaskId(null);

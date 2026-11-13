@@ -11,7 +11,7 @@ def test_roles_credentials():
     res = client.get("/api/admin/roles-credentials")
     assert res.status_code == 200
     roles = res.json()
-    assert len(roles) == 8
+    assert len(roles) == 9
     print(f"✓ GET /api/admin/roles-credentials returned {len(roles)} canonical roles")
 
     # Set credentials for coordinator
@@ -63,13 +63,40 @@ def test_permissions_matrix():
     })
     assert reset_res.status_code == 200
     rst_data = reset_res.json()
-    # Baseline for coordinator: canCreateEditEvents is True, canApproveBudget is False
+    # Baseline for coordinator: canCreateEditEvents is True, canArchiveEvents is False
     assert rst_data["effective_matrix"]["matrix"]["coordinator"]["canCreateEditEvents"] is True
-    assert rst_data["effective_matrix"]["matrix"]["coordinator"]["canApproveBudget"] is False
+    assert rst_data["effective_matrix"]["matrix"]["coordinator"]["canArchiveEvents"] is False
     print("✓ POST /api/admin/reset-permissions-matrix verified: restored default institutional baseline")
+
+def test_superadmin_faculty_separation():
+    # 1. Test SuperAdmin login
+    sa_res = client.post("/api/auth/login", json={"roll_no": "SA01", "password": "admin123"})
+    assert sa_res.status_code == 200, f"SuperAdmin login failed: {sa_res.text}"
+    sa_user = sa_res.json()["user"]
+    assert sa_user["role"] == "super_admin"
+    assert sa_user["roll_no"] == "SA01"
+    print("✓ SuperAdmin (SA01) logged in successfully with role 'super_admin'")
+
+    # 2. Test Faculty login
+    fac_res = client.post("/api/auth/login", json={"roll_no": "FAC01", "password": "admin123"})
+    assert fac_res.status_code == 200, f"Faculty login failed: {fac_res.text}"
+    fac_user = fac_res.json()["user"]
+    assert fac_user["role"] == "faculty"
+    assert fac_user["roll_no"] == "FAC01"
+    print("✓ Faculty (FAC01) logged in successfully with distinct role 'faculty'")
+
+    # 3. SuperAdmin root protection guard
+    disable_sa = client.put("/api/admin/permissions-matrix", json={
+        "role": "super_admin",
+        "action": "disable_all"
+    })
+    assert disable_sa.status_code == 400
+    assert "SuperAdmin operations cannot be completely revoked" in disable_sa.json()["detail"]
+    print("✓ SuperAdmin root protection guard confirmed (cannot revoke all super_admin operations)")
 
 if __name__ == "__main__":
     test_roles_credentials()
     test_permissions_matrix()
-    print("\nAll SuperAdmin governance tests passed successfully!")
+    test_superadmin_faculty_separation()
+    print("\nAll SuperAdmin and Faculty governance tests passed successfully!")
 

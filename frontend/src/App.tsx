@@ -75,6 +75,8 @@ const MainAppContent: React.FC = () => {
       rawPath === 'index.html' ||
       rawPath === 'assets/index.html' ||
       rawPath.startsWith('assets') ||
+      rawPath.startsWith('android_asset') ||
+      rawPath.includes('android_asset') ||
       rawPath.includes('.html');
     const path = isAsset ? '' : rawPath;
 
@@ -273,7 +275,14 @@ const MainAppContent: React.FC = () => {
       case 'audit-logs':
       case 'audit_log':
         return <AuditLogView />;
+      case 'settings':
+        return <ProfileView />;
+      case 'posts':
+      case 'assign_post':
+      case 'assign-posts':
+        return <HomeView />;
       case 'role_governance':
+      case 'role-governance':
       case 'role_credentials':
       case 'super_admin_governance':
         return <SuperAdminOperationsView onBack={() => setActiveTab('operations')} />;
@@ -289,17 +298,8 @@ const MainAppContent: React.FC = () => {
         if (activeTab === 'audits') {
           return <AuditLogView />;
         }
-        // If activeTab is empty, an asset path, or unrecognized, fall back gracefully to HomeView instead of blocking entry
-        if (
-          !activeTab ||
-          activeTab === 'home' ||
-          activeTab === 'dashboard' ||
-          activeTab.includes('index.html') ||
-          activeTab.startsWith('assets')
-        ) {
-          return <HomeView />;
-        }
-        return <NotFoundView attemptedRoute={activeTab} onGoHome={() => setActiveTab('home')} />;
+        // Always fall back gracefully to HomeView instead of blocking entry with a lock screen
+        return <HomeView />;
     }
   };
 
