@@ -26,3 +26,4 @@ services:
         value: mysql+pymysql://2oGb7FpyxpLhZWE.root:pEVtiQBWbs9PAGBB@gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/geohub
       - key: SSL_CA
         value: /etc/ssl/certs/ca-certificates.crt
+

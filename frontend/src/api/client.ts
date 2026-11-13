@@ -1,7 +1,7 @@
 /**
  * GeoHub API Client - Python FastAPI & TiDB Cloud Integration
  * Connects frontend client to backend REST endpoints with JWT bearer authentication,
- * automatic token management, and resilient fallback.
+ * automatic token management, and resilient fallback across all 17 operations.
  */
 
 const API_BASE_URL =
@@ -67,7 +67,9 @@ class ApiClient {
 
       return await response.json();
     } catch (err: any) {
-      console.warn(`[GeoHub API Client] Request to ${url} failed:`, err?.message);
+      if (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== 'test') {
+        console.warn(`[GeoHub API Client] Request to ${url} failed:`, err?.message);
+      }
       throw err;
     }
   }
@@ -97,17 +99,46 @@ class ApiClient {
     return await this.request<any>('/auth/me');
   }
 
+  public async setUserRole(userId: string, role: string, post?: string) {
+    return await this.request<any>('/auth/set-role', {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId, role, post }),
+    });
+  }
+
   // ==========================================
-  // Events Endpoints
+  // Events & Approvals Endpoints
   // ==========================================
-  public async getEvents() {
-    return await this.request<any[]>('/events');
+  public async getEvents(status?: string) {
+    const query = status ? `?status=${status}` : '';
+    return await this.request<any[]>(`/events${query}`);
   }
 
   public async createEvent(eventData: any) {
     return await this.request<any>('/events', {
       method: 'POST',
       body: JSON.stringify(eventData),
+    });
+  }
+
+  public async updateEventStatus(eventId: string, newStatus: string) {
+    return await this.request<any>(`/events/${eventId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: newStatus }),
+    });
+  }
+
+  public async cancelEvent(eventId: string, reason: string) {
+    return await this.request<any>(`/events/${eventId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
+  public async assignEventScanners(eventId: string, scannerUserIds: string[]) {
+    return await this.request<any>(`/events/${eventId}/scanners`, {
+      method: 'POST',
+      body: JSON.stringify({ scanner_user_ids: scannerUserIds }),
     });
   }
 
@@ -118,15 +149,42 @@ class ApiClient {
   }
 
   // ==========================================
-  // Tasks & Operational Duties
+  // Squads, Membership & Tasks
   // ==========================================
-  public async getTasks() {
-    return await this.request<any[]>('/tasks');
+  public async getTeams() {
+    return await this.request<any[]>('/teams');
+  }
+
+  public async submitJoinRequest(teamId: string, requestedRole?: string) {
+    return await this.request<any>('/teams/join-request', {
+      method: 'POST',
+      body: JSON.stringify({ team_id: teamId, requested_role: requestedRole }),
+    });
+  }
+
+  public async getTasks(scope: 'my_tasks' | 'team' | 'all' = 'my_tasks', status?: string) {
+    const params = new URLSearchParams({ scope });
+    if (status) params.append('status', status);
+    return await this.request<any[]>(`/tasks?${params.toString()}`);
+  }
+
+  public async createTask(taskData: any) {
+    return await this.request<any>('/tasks', {
+      method: 'POST',
+      body: JSON.stringify(taskData),
+    });
   }
 
   public async updateTaskStatus(taskId: string, status: string) {
     return await this.request<any>(`/tasks/${taskId}/status?status=${status}`, {
       method: 'PUT',
+    });
+  }
+
+  public async submitTaskProof(taskId: string, proofUrl: string) {
+    return await this.request<any>(`/tasks/${taskId}/proof`, {
+      method: 'POST',
+      body: JSON.stringify({ proof_url: proofUrl }),
     });
   }
 
@@ -153,10 +211,14 @@ class ApiClient {
   }
 
   // ==========================================
-  // Financial Ledger
+  // Financial Ledger & Treasury
   // ==========================================
+  public async getBudgetRequests() {
+    return await this.request<any[]>('/finance/budget-requests');
+  }
+
   public async submitBudgetRequest(teamName: string, amount: number, reason: string) {
-    return await this.request<any>('/finance/budget-request', {
+    return await this.request<any>('/finance/budget-requests', {
       method: 'POST',
       body: JSON.stringify({
         team_name: teamName,
@@ -164,6 +226,23 @@ class ApiClient {
         reason,
       }),
     });
+  }
+
+  public async approveBudgetRequest(requestId: string) {
+    return await this.request<any>(`/finance/budget-requests/${requestId}/approve`, {
+      method: 'POST',
+    });
+  }
+
+  // ==========================================
+  // Audit Logs & Analytics
+  // ==========================================
+  public async getAuditLogs() {
+    return await this.request<any[]>('/audit-logs');
+  }
+
+  public async getDashboardStats() {
+    return await this.request<any>('/dashboard/stats');
   }
 }
 

@@ -60,6 +60,7 @@ import {
   initialDailyNews,
 } from '../data/mockData';
 import { canAccessRoute, canScanForEvent, normalizeRole, getRolePermissions, validateEventOtp, OtpValidationResult } from '../core/permissions';
+import { apiClient } from '../api/client';
 
 interface AppContextType {
   currentUser: UserModel;
@@ -338,6 +339,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.addEventListener('hashchange', handleUrlRoute);
     return () => window.removeEventListener('hashchange', handleUrlRoute);
   }, [currentUser.role]);
+
+  // Live Backend Data Synchronization with TiDB Cloud FastAPI
+  useEffect(() => {
+    let isMounted = true;
+    const syncWithBackend = async () => {
+      try {
+        const liveEvents = await apiClient.getEvents();
+        if (isMounted && Array.isArray(liveEvents) && liveEvents.length > 0) {
+          setEvents(liveEvents.map((e: any): EventModel => ({
+            id: e.id,
+            title: e.title,
+            description: e.description || '',
+            category: e.type || 'Academic',
+            venue: e.venue || 'Campus Auditorium',
+            startDate: e.date_time || new Date().toISOString(),
+            endDate: e.date_time || new Date().toISOString(),
+            status: e.status || 'draft',
+            capacity: 350,
+            registeredUserIds: [],
+            volunteerIds: e.volunteer_user_ids || [],
+            assignedScannerUserIds: e.assigned_scanner_user_ids || [],
+            posterUrl: e.poster_url || undefined,
+            geofenceEnabled: Boolean(e.geofence_enabled),
+            geofenceRadiusMeters: e.geofence_radius_meters || 100,
+            cancellationReason: e.cancellation_reason || undefined,
+            budget: Number(e.budget || 0),
+            createdBy: e.created_by || 'u_admin_02',
+          })));
+        }
+      } catch {
+        // Resilient fallback keeps local cache when server is starting up or offline
+      }
+    };
+    syncWithBackend();
+    return () => { isMounted = false; };
+  }, []);
 
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
