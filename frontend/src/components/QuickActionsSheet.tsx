@@ -109,6 +109,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
 
   const [announcementText, setAnnouncementText] = useState('');
 
+  const [studentRollNo, setStudentRollNo] = useState('');
   const [studentName, setStudentName] = useState('');
   const [studentEmail, setStudentEmail] = useState('');
   const [studentDept, setStudentDept] = useState('Geography & Earth Sciences');
@@ -406,16 +407,25 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
 
   const handleStudentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentName.trim() || !studentEmail.trim()) return;
+    if (!studentRollNo.trim() || !studentName.trim()) return;
+
+    const cleanRoll = studentRollNo.trim().toUpperCase();
+    const cleanName = studentName.trim();
+    const cleanEmail = studentEmail.trim() || `${cleanRoll.toLowerCase()}@geohub.edu`;
+
     enrollScholar({
-      name: studentName.trim(),
-      email: studentEmail.trim(),
+      name: cleanName,
+      rollNo: cleanRoll,
+      email: cleanEmail,
       department: studentDept,
       yearOfStudy: studentYear,
       squad: studentSquad,
-      role: 'member',
+      role: 'student',
     });
-    showToast(`✓ Enrolled ${studentName} into ${studentSquad} Squad!`);
+    showToast(`✓ Student ${cleanName} (${cleanRoll}) enrolled! Login: ${cleanRoll} | Password: geohub`);
+    setStudentRollNo('');
+    setStudentName('');
+    setStudentEmail('');
     setActiveModalAction(null);
     onClose();
     setActiveTab('members');
@@ -1013,7 +1023,18 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       >
         <form onSubmit={handleStudentSubmit} className="flex flex-col gap-3 py-1">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Student Full Name</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Roll Number *</label>
+            <input
+              type="text"
+              required
+              value={studentRollNo}
+              onChange={(e) => setStudentRollNo(e.target.value)}
+              placeholder="e.g. 24GEO002"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold outline-none focus:border-emerald-500 uppercase"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Student Full Name *</label>
             <input
               type="text"
               required
@@ -1024,13 +1045,12 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">College Email Address</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">College Email Address (optional)</label>
             <input
               type="email"
-              required
               value={studentEmail}
               onChange={(e) => setStudentEmail(e.target.value)}
-              placeholder="e.g. liam.w@college.edu"
+              placeholder="e.g. 24geo002@geohub.edu"
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
             />
           </div>
@@ -1070,6 +1090,17 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
               <option value="Documentation">Documentation Squad</option>
               <option value="Entertainment">Entertainment Squad</option>
             </select>
+          </div>
+          <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
+            <div>
+              <div className="font-bold text-[#0B2B26]">Default Login Credentials</div>
+              <div className="text-[11px] text-[#235347]">
+                Username: <strong>{studentRollNo.trim().toUpperCase() || 'Roll Number'}</strong> • Password: <strong>geohub</strong>
+              </div>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
+              geohub
+            </span>
           </div>
           <button
             type="submit"

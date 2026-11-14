@@ -1327,12 +1327,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const addStudentToTeam = (studentData: Omit<UserModel, 'uid'>) => {
     const newUid = `u_${Date.now()}`;
+    const cleanRollNo = studentData.rollNo ? studentData.rollNo.trim().toUpperCase() : `24GEO${Math.floor(100 + Math.random() * 900)}`;
     const newStudent: UserModel = {
       ...studentData,
       uid: newUid,
+      rollNo: cleanRollNo,
       role: 'student',
       isVolunteer: false,
-      post: studentData.post || 'Student',
+      post: studentData.post || 'Student Member',
       teamRole: studentData.teamRole || 'Student',
       status: 'active',
       createdAt: new Date().toISOString(),
@@ -1348,6 +1350,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         })
       );
     }
+
+    addAuditLog({
+      actorId: currentUser.uid,
+      actorName: currentUser.name,
+      action: 'student_added',
+      targetType: 'user',
+      targetId: newUid,
+      targetName: newStudent.name,
+      details: `Added student ${newStudent.name} (${cleanRollNo}) with default credentials (password: geohub)`,
+    });
+
+    apiClient
+      .enrollUser({
+        name: newStudent.name,
+        roll_no: cleanRollNo,
+        email: newStudent.email || `${cleanRollNo.toLowerCase()}@geohub.edu`,
+        role: 'student',
+        team: newStudent.team,
+        post: newStudent.post,
+        department: newStudent.department,
+        year_of_study: newStudent.yearOfStudy,
+        password: 'geohub',
+      })
+      .catch(() => {});
   };
 
   const enrollScholar = (data: {
@@ -1416,6 +1442,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       post: newScholar.post,
       department: newScholar.department,
       year_of_study: newScholar.yearOfStudy,
+      password: 'geohub',
     }).catch(() => {});
 
     return newScholar;

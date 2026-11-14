@@ -47,6 +47,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const [notice, setNotice] = useState<string | null>(null);
 
   // Form states for Add
+  const [newRollNo, setNewRollNo] = useState('');
   const [newName, setNewName] = useState('');
   const [newSquad, setNewSquad] = useState('Promotion');
   const [newRole, setNewRole] = useState('student');
@@ -145,24 +146,29 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    if (!newRollNo.trim() || !newName.trim()) return;
+
+    const cleanRoll = newRollNo.trim().toUpperCase();
+    const cleanName = newName.trim();
 
     const enrolled = enrollScholar({
-      name: newName.trim(),
+      name: cleanName,
+      rollNo: cleanRoll,
       role: newRole as any,
       squad: newSquad,
       post: `${newSquad} Associate`,
     });
 
-    onLogAudit('Member Directory', `Enrolled new scholar: ${enrolled.name} (${enrolled.team})`);
+    onLogAudit('Member Directory', `Enrolled new scholar: ${enrolled.name} (${cleanRoll}) in ${enrolled.team}`);
 
     setShowAddModal(false);
+    setNewRollNo('');
     setNewName('');
-    setNotice(`Enrolled ${enrolled.name} into ${enrolled.team} squad.`);
+    setNotice(`Enrolled ${enrolled.name} (${cleanRoll}). Login: ${cleanRoll} | Password: geohub`);
     if (showToast) {
-      showToast(`✓ Enrolled ${enrolled.name} into ${enrolled.team} squad!`);
+      showToast(`✓ Student ${enrolled.name} (${cleanRoll}) enrolled! Login: ${cleanRoll} | Password: geohub`);
     }
-    setTimeout(() => setNotice(null), 3500);
+    setTimeout(() => setNotice(null), 4000);
   };
 
   return (
@@ -446,7 +452,21 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
             <form onSubmit={handleAddMember} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                  Scholar Full Name
+                  Roll Number *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 24GEO002"
+                  value={newRollNo}
+                  onChange={(e) => setNewRollNo(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                  Scholar Full Name *
                 </label>
                 <input
                   type="text"
@@ -472,6 +492,18 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
                   <option value="Treasury">Treasury Squad</option>
                   <option value="Documentation">Documentation Squad</option>
                 </select>
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-[#0B2B26]">Default Login Credentials</div>
+                  <div className="text-[11px] text-[#235347]">
+                    Username: <strong>{newRollNo.trim().toUpperCase() || 'Roll Number'}</strong> • Password: <strong>geohub</strong>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
+                  geohub
+                </span>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

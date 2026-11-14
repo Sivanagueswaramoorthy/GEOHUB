@@ -1,12 +1,12 @@
 {
-  "version": "1.6.0",
-  "version_code": 17,
+  "version": "1.6.1",
+  "version_code": 18,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Official GeoHub v1.6.0 with all 9 canonical roles, SuperAdmin governance & resilient global CDN OTA update",
+  "release_notes": "Add student member by Roll No and Name with instant Roll No username & default password 'geohub'",
   "download_url": "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk",
   "min_supported_version": "1.0.0",
-  "released_at": "2026-11-13",
-  "file_size_bytes": 6861527,
+  "released_at": "2026-11-14",
+  "file_size_bytes": 6862067,
   "file_size_mb": "6.54 MB",
-  "sha256": "F5038E60716AA7C40C5F457C26E194CA48C37E267B47D3AC38580BF7FE074DB2"
+  "sha256": "117E48193A6001931912A95471A1C79F730A4B52AAEA2965EE72848575403274"
 }

@@ -23,12 +23,21 @@ describe('Auth Validation Schema (Zod)', () => {
     }
   });
 
-  it('rejects passwords shorter than 8 characters', () => {
+  it('rejects passwords shorter than 6 characters', () => {
     const res = schema.safeParse({ email: 'alex@college.edu', password: '123' });
     expect(res.success).toBe(false);
     if (!res.success) {
-      expect(res.error.issues[0]?.message).toBe('Password must be at least 8 characters');
+      expect(res.error.issues[0]?.message).toBe('Password must be at least 6 characters');
     }
+  });
+
+  it('accepts default student password "geohub" (6 characters)', () => {
+    const res = schema.safeParse({
+      rollNo: '24GEO002',
+      password: 'geohub',
+      rememberMe: true,
+    });
+    expect(res.success).toBe(true);
   });
 
   it('validates institutional domain constraint when configured', () => {
@@ -334,6 +343,42 @@ describe('LoginPage Integration and E2E Auth Behavior', () => {
     // Official images must be rendered
     expect(screen.getByAltText(/green eco sprout mascot/i)).toBeInTheDocument();
     expect(screen.getByAltText(/green eco organization logo/i)).toBeInTheDocument();
+  });
+
+  it('authenticates newly added student with Roll No and default password "geohub"', async () => {
+    // Stage an enrolled student in persistent storage
+    const testStudent = {
+      uid: 'u_test_student_02',
+      rollNo: '24GEO002',
+      name: 'Kavitha Ramesh',
+      email: '24geo002@geohub.edu',
+      role: 'student',
+      post: 'Student Member',
+      team: 'Promotion',
+      status: 'active',
+    };
+    localStorage.setItem('geohub_store_users', JSON.stringify([testStudent]));
+
+    render(
+      <AppProvider>
+        <LoginPage />
+      </AppProvider>
+    );
+
+    const rollNoInput = screen.getByPlaceholderText(/enter your reg no/i);
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
+
+    fireEvent.change(rollNoInput, { target: { value: '24GEO002' } });
+    fireEvent.change(passwordInput, { target: { value: 'geohub' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /sign in with reg no/i }));
+
+    await waitFor(
+      () => {
+        expect(screen.getByText(/authenticated/i)).toBeInTheDocument();
+      },
+      { timeout: 4000 }
+    );
   });
 });
 

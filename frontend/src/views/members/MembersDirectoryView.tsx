@@ -25,6 +25,7 @@ export const MembersDirectoryView: React.FC = () => {
     currentUser,
     changeStudentPost,
     updateUserRoleAndTeam,
+    setActiveTab,
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -125,19 +126,30 @@ export const MembersDirectoryView: React.FC = () => {
           </p>
         </div>
 
-        <span
-          style={{
-            fontSize: '12px',
-            fontWeight: 800,
-            padding: '4px 12px',
-            borderRadius: '9999px',
-            backgroundColor: '#DAF1DE',
-            color: '#0B2B26',
-            border: '1px solid #8EB69B',
-          }}
-        >
-          {users.length} Scholars
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              fontSize: '12px',
+              fontWeight: 800,
+              padding: '4px 12px',
+              borderRadius: '9999px',
+              backgroundColor: '#DAF1DE',
+              color: '#0B2B26',
+              border: '1px solid #8EB69B',
+            }}
+          >
+            {users.length} Scholars
+          </span>
+          {setActiveTab && (
+            <PillButton
+              variant="primary"
+              size="sm"
+              onClick={() => setActiveTab('add_students')}
+            >
+              Add Student
+            </PillButton>
+          )}
+        </div>
       </div>
 
       {/* Filter Chips & Search Bar */}

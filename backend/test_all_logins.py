@@ -30,6 +30,10 @@ test_cases = [
     ('volunteer', 'admin123'),
     ('23GEO088', 'admin123'),
     ('student', 'admin123'),
+    ('23GEO088', 'geohub'),
+    ('student', 'geohub'),
+    ('24GEO001', 'geohub'),
+    ('24GEO002', 'geohub'),
 ]
 
 all_passed = True
@@ -45,5 +49,5 @@ for roll, pwd in test_cases:
         all_passed = False
 
 if all_passed:
-    print("\nALL 22 LOGIN COMBINATIONS PASSED PERFECTLY!")
+    print(f"\nALL {len(test_cases)} LOGIN COMBINATIONS PASSED PERFECTLY!")
 

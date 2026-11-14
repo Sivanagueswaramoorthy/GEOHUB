@@ -293,14 +293,14 @@ class ExpenseResponse(BaseModel):
 class UserEnrollRequest(BaseModel):
     name: str
     roll_no: str
-    email: str
-    role: str = "student"
-    post: Optional[str] = None
-    department: Optional[str] = None
-    year_of_study: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = "student"
+    post: Optional[str] = "Student Member"
+    department: Optional[str] = "Geoinformatics Engineering"
+    year_of_study: Optional[str] = "1st Year"
     phone: Optional[str] = None
-    team: Optional[str] = None
-    team_role: Optional[str] = None
+    team: Optional[str] = "General"
+    team_role: Optional[str] = "Member"
     is_volunteer: Optional[bool] = False
-    password: Optional[str] = "GeoHub2026!"
+    password: Optional[str] = "geohub"
 

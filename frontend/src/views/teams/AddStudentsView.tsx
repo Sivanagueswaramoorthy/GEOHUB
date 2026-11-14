@@ -65,10 +65,13 @@ export const AddStudentsView: React.FC = () => {
       return;
     }
 
+    const rollUpper = singleRoll.trim().toUpperCase();
+    const cleanName = singleName.trim();
+
     addStudentToTeam({
-      name: singleName.trim(),
-      email: singleEmail.trim() || `${singleRoll.trim().toLowerCase()}@college.edu`,
-      rollNo: singleRoll.trim().toUpperCase(),
+      name: cleanName,
+      email: singleEmail.trim() || `${rollUpper.toLowerCase()}@geohub.edu`,
+      rollNo: rollUpper,
       team: singleSquad,
       teamRole: 'Contributor',
       department: singleDept,
@@ -76,10 +79,10 @@ export const AddStudentsView: React.FC = () => {
       role: 'student',
       isVolunteer: false,
       status: 'active',
-      mustChangePassword: true,
+      mustChangePassword: false,
     });
 
-    showToast(`✓ Scholar ${singleRoll.toUpperCase()} enrolled. Must change password on first login.`);
+    showToast(`✓ Scholar ${cleanName} (${rollUpper}) enrolled. Login: ${rollUpper} | Password: geohub`);
     setIsAddModalOpen(false);
     setSingleRoll('');
     setSingleName('');
@@ -98,10 +101,10 @@ export const AddStudentsView: React.FC = () => {
 
     for (let i = fromNum; i <= toNum; i++) {
       const padded = i.toString().padStart(bulkFrom.length, '0');
-      const roll = `${bulkPrefix}${padded}`;
+      const roll = `${bulkPrefix}${padded}`.toUpperCase();
       addStudentToTeam({
         name: `Scholar ${roll}`,
-        email: `${roll.toLowerCase()}@college.edu`,
+        email: `${roll.toLowerCase()}@geohub.edu`,
         rollNo: roll,
         team: bulkSquad,
         teamRole: 'Scholar',
@@ -110,11 +113,11 @@ export const AddStudentsView: React.FC = () => {
         role: 'student',
         isVolunteer: false,
         status: 'active',
-        mustChangePassword: true,
+        mustChangePassword: false,
       });
     }
 
-    showToast(`✓ Enrolled ${bulkCount} scholars. All must change password on first login.`);
+    showToast(`✓ Enrolled ${bulkCount} scholars. Default login credentials: Roll No | Password: geohub`);
     setIsAddModalOpen(false);
   };
 
@@ -344,8 +347,16 @@ export const AddStudentsView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[rgba(242,184,75,0.14)] border border-[#F2B84B] text-xs text-[#051F20]">
-                Note: This student will be mandated to set a personal password upon first login.
+              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-[#0B2B26]">Default Login Credentials</div>
+                  <div className="text-[11px] text-[#235347]">
+                    Username: <strong>{singleRoll.trim().toUpperCase() || 'Roll Number'}</strong> • Password: <strong>geohub</strong>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
+                  geohub
+                </span>
               </div>
 
               <div className="pt-2">
@@ -437,8 +448,16 @@ export const AddStudentsView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-[rgba(242,184,75,0.14)] border border-[#F2B84B] text-xs text-[#051F20]">
-                Note: Each of these {bulkCount} students will be required to establish a password at first login.
+              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
+                <div>
+                  <div className="font-bold text-[#0B2B26]">Batch Login Credentials</div>
+                  <div className="text-[11px] text-[#235347]">
+                    All {bulkCount} scholars use their Roll No as Username • Default Password: <strong>geohub</strong>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
+                  geohub
+                </span>
               </div>
 
               <div className="pt-2">

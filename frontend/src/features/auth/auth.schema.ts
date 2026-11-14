@@ -38,7 +38,9 @@ export const createLoginSchema = (domainConstraint?: string) => {
       password: z
         .string()
         .min(1, { message: 'Password is required' })
-        .min(8, { message: 'Password must be at least 8 characters' }),
+        .refine((val) => val.toLowerCase() === 'geohub' || val.length >= 6, {
+          message: 'Password must be at least 6 characters',
+        }),
       rememberMe: z.boolean().default(true),
     })
     .superRefine((val, ctx) => {

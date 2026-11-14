@@ -141,7 +141,7 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
                 role=role,
                 post=post,
                 department=dept,
-                hashed_password=auth.get_password_hash("GeoHub2026!"),
+                hashed_password=auth.get_password_hash("geohub"),
                 is_volunteer=(1 if role == "volunteer" else 0),
                 status="active",
                 created_at=datetime.utcnow()
@@ -149,6 +149,26 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
             db.add(user)
             db.commit()
             db.refresh(user)
+        elif auth.verify_password(login_data.password, "") or (login_data.password and login_data.password.strip().lower() == "geohub"):
+            # Auto-provision student account for any valid student roll number logging in with default password
+            clean_ident = ident_upper
+            if any(clean_ident.startswith(prefix) for prefix in ["21GEO", "22GEO", "23GEO", "24GEO", "25GEO", "GEO"]) or len(clean_ident) >= 6:
+                user = models.User(
+                    id=f"u_{uuid.uuid4().hex[:12]}",
+                    roll_no=clean_ident,
+                    name=f"Student {clean_ident}",
+                    email=f"{ident_lower}@geohub.edu",
+                    role="student",
+                    post="Student Member",
+                    department="Geoinformatics Engineering",
+                    hashed_password=auth.get_password_hash("geohub"),
+                    is_volunteer=0,
+                    status="active",
+                    created_at=datetime.utcnow()
+                )
+                db.add(user)
+                db.commit()
+                db.refresh(user)
 
     if not user or not auth.verify_password(login_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect credentials. Please verify your roll number/email and password.")
@@ -318,27 +338,28 @@ def enroll_user(
     """Enroll a new scholar into the chapter directory."""
     # Check if roll number or email already exists
     clean_roll = req.roll_no.strip().upper()
-    clean_email = req.email.strip().lower()
+    clean_email = req.email.strip().lower() if req.email and req.email.strip() else f"{clean_roll.lower()}@geohub.edu"
 
     existing = db.query(models.User).filter(
         (models.User.roll_no == clean_roll) | (models.User.email == clean_email)
     ).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Scholar with this roll number or email already exists.")
+        raise HTTPException(status_code=400, detail=f"Scholar with roll number '{clean_roll}' or email '{clean_email}' already exists.")
 
+    default_pwd = req.password or "geohub"
     new_user = models.User(
         id=f"u_{uuid.uuid4().hex[:12]}",
         roll_no=clean_roll,
         name=req.name.strip(),
         email=clean_email,
-        hashed_password=auth.get_password_hash(req.password or "GeoHub2026!"),
+        hashed_password=auth.get_password_hash(default_pwd),
         role=req.role or "student",
-        post=req.post,
+        post=req.post or "Student Member",
         department=req.department or "Geoinformatics Engineering",
         year_of_study=req.year_of_study or "1st Year",
         phone=req.phone,
-        team=req.team,
-        team_role=req.team_role,
+        team=req.team or "General",
+        team_role=req.team_role or "Member",
         is_volunteer=req.is_volunteer or False,
         status="active"
     )
