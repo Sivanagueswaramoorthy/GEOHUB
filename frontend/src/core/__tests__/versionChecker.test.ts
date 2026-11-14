@@ -96,7 +96,7 @@ describe('Version Checker & OTA System', () => {
         version_code: 105,
         apk_filename: 'geohub-app.apk',
         release_notes: 'CDN fallback release',
-        download_url: 'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk',
+        download_url: 'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk',
         min_supported_version: '1.0.0',
         released_at: '2026-11-13',
       };
@@ -116,7 +116,7 @@ describe('Version Checker & OTA System', () => {
       const result = await checkForAppUpdate();
       expect(result.hasUpdate).toBe(true);
       expect(result.latestVersion).toBe('1.9.99');
-      expect(result.updateInfo?.download_url).toContain('jsdelivr.net');
+      expect(result.updateInfo?.download_url).toContain('geohub-app.apk');
     });
   });
 

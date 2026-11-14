@@ -49,9 +49,9 @@ export function compareSemver(v1: string, v2: string): number {
 }
 
 export const FALLBACK_VERSION_URL =
-  'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/backend/app_version.json';
+  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/backend/app_version.json';
 export const CDN_APK_URL =
-  'https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk';
+  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk';
 
 /**
  * Queries the backend for latest version manifest and checks if an update is available.
