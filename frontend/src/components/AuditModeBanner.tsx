@@ -20,8 +20,8 @@ export const AuditModeBanner: React.FC<AuditModeBannerProps> = ({
     <div
       className="p-3.5 rounded-2xl border transition-all shadow-2xs"
       style={{
-        backgroundColor: '#F8FAFC',
-        borderColor: '#E2E8F0',
+        backgroundColor: '#F6FBF7',
+        borderColor: '#DAF1DE',
       }}
     >
       <div className="flex items-start gap-3">

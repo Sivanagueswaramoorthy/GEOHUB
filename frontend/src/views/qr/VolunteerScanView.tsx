@@ -380,8 +380,8 @@ export const VolunteerScanView: React.FC = () => {
                 const isEntered = idx < otpDigits.length;
                 const isCurrent = idx === otpDigits.length;
 
-                let borderStyle = '1px solid #E2E8F0';
-                let bgStyle = '#F8FAFC';
+                let borderStyle = '1px solid #DAF1DE';
+                let bgStyle = '#F6FBF7';
                 let shadowStyle = 'none';
 
                 if (otpError) {
@@ -471,7 +471,7 @@ export const VolunteerScanView: React.FC = () => {
                   style={{
                     fontSize: '13px',
                     fontWeight: 500,
-                    color: '#64748B',
+                    color: '#235347',
                     letterSpacing: '0.01em',
                     marginBottom: '6px',
                   }}
@@ -483,7 +483,7 @@ export const VolunteerScanView: React.FC = () => {
                     width: '56px',
                     height: '3px',
                     borderRadius: '9999px',
-                    backgroundColor: '#E2E8F0',
+                    backgroundColor: '#DAF1DE',
                     margin: '0 auto',
                   }}
                 />
@@ -624,10 +624,10 @@ export const VolunteerScanView: React.FC = () => {
                 gap: '8px',
                 padding: '6px 16px',
                 borderRadius: '9999px',
-                border: '1px solid #E2E8F0',
-                backgroundColor: '#F8FAF9',
+                border: '1px solid #DAF1DE',
+                backgroundColor: '#F6FBF7',
                 fontSize: '12px',
-                color: '#5A7370',
+                color: '#235347',
               }}
             >
               <span>Demo:</span>

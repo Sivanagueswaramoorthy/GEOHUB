@@ -170,10 +170,10 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 type="button"
                 onClick={onBack}
-                className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] text-[#0F3638] bg-transparent active:scale-[0.95] transition-all duration-150 focus:outline-none shrink-0 cursor-pointer border-0 p-0"
+                className="flex items-center justify-center w-10 h-10 min-w-[40px] min-h-[40px] text-[#051F20] bg-transparent active:scale-[0.95] transition-all duration-150 focus:outline-none shrink-0 cursor-pointer border-0 p-0"
                 aria-label="Go back"
               >
-                <ChevronLeft size={26} strokeWidth={2.5} className="lucide text-[#0F3638]" />
+                <ChevronLeft size={26} strokeWidth={2.5} className="lucide text-[#051F20]" />
               </button>
             ) : (
               <button
@@ -267,7 +267,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <Bell
                   size={18}
                   strokeWidth={2}
-                  className="lucide text-[#0F3638]"
+                  className="lucide text-[#051F20]"
                 />
               </IconCircleButton>
             )}
@@ -281,15 +281,15 @@ export const TopBar: React.FC<TopBarProps> = ({
                 className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4A359] focus-visible:ring-offset-2"
                 style={{ minHeight: '44px', minWidth: '44px' }}
               >
-                {/* 38px Avatar Circle in Teal Forest with Antique Gold Ring */}
+                {/* 38px Avatar Circle in Pine 950 with Antique Gold Ring */}
                 <div
                   className="flex items-center justify-center rounded-full shrink-0"
                   style={{
                     width: '38px',
                     height: '38px',
-                    backgroundColor: 'var(--teal-forest-dark, #0F3638)',
+                    backgroundColor: 'var(--pine-950, #051F20)',
                     border: '2px solid var(--antique-gold, #D4A359)',
-                    boxShadow: '0 2px 8px rgba(15, 54, 56, 0.15)',
+                    boxShadow: '0 2px 8px rgba(5, 31, 32, 0.15)',
                   }}
                 >
                   <span
@@ -309,7 +309,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <ChevronDown
                   size={14}
                   strokeWidth={2.5}
-                  className="lucide text-[#52705E] shrink-0"
+                  className="lucide text-[#235347] shrink-0"
                 />
               </button>
             )}

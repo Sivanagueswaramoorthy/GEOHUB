@@ -128,7 +128,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
             <div
               style={{
                 fontSize: '12px',
-                color: '#64748B',
+                color: '#235347',
                 fontWeight: 600,
                 marginTop: '4px',
                 lineHeight: 1.4,
@@ -194,7 +194,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
               cy="50"
               r={radius}
               fill="none"
-              stroke="#F1F5F9"
+              stroke="#DAF1DE"
               strokeWidth={10}
             />
 
@@ -324,8 +324,8 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                   padding: '6px 8px',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  backgroundColor: isHovered ? '#DAF1DE' : '#F8FAFC',
-                  border: isHovered ? '1px solid #8EB69B' : '1px solid #F1F5F9',
+                  backgroundColor: isHovered ? '#DAF1DE' : '#F6FBF7',
+                  border: isHovered ? '1px solid #8EB69B' : '1px solid #DAF1DE',
                   transition: 'background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease',
                   transform: isHovered ? 'translateX(2px)' : 'none',
                 }}
@@ -387,7 +387,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
           <div
             style={{
               height: '1px',
-              backgroundColor: '#F1F5F9',
+              backgroundColor: '#DAF1DE',
               marginBottom: '14px',
             }}
           />
@@ -414,7 +414,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                 style={{
                   fontSize: '13px',
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: '#051F20',
                   margin: 0,
                   letterSpacing: '-0.01em',
                 }}
@@ -427,7 +427,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
               style={{
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#64748B',
+                color: '#235347',
               }}
             >
               {effectivePostHolders.length} Officers
@@ -447,16 +447,16 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                     gap: '10px',
                     padding: '8px 12px',
                     borderRadius: '10px',
-                    backgroundColor: '#F8FAFC',
+                    backgroundColor: '#F6FBF7',
                     border: '1px solid #EDF2F7',
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F1F5F9';
-                    e.currentTarget.style.borderColor = '#CBD5E1';
+                    e.currentTarget.style.backgroundColor = '#DAF1DE';
+                    e.currentTarget.style.borderColor = '#8EB69B';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                    e.currentTarget.style.backgroundColor = '#F6FBF7';
                     e.currentTarget.style.borderColor = '#EDF2F7';
                   }}
                 >
@@ -465,7 +465,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                     style={{
                       fontSize: '12.5px',
                       fontWeight: 750,
-                      color: '#0F172A',
+                      color: '#051F20',
                       letterSpacing: '-0.01em',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -485,8 +485,8 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                       padding: '3px 10px',
                       borderRadius: '999px',
                       backgroundColor: '#FFFFFF',
-                      border: '1px solid #CBD5E1',
-                      color: '#0F172A',
+                      border: '1px solid #8EB69B',
+                      color: '#051F20',
                       boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                       flexShrink: 0,
                       whiteSpace: 'nowrap',

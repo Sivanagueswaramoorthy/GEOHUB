@@ -107,7 +107,7 @@ export const Image: React.FC<ImageProps> = ({
       ...containerStyle,
       aspectRatio: '16 / 9',
       borderRadius: '24px',
-      backgroundColor: '#0F172A',
+      backgroundColor: '#051F20',
     };
   } else if (variant === 'event') {
     containerStyle = {
@@ -115,7 +115,7 @@ export const Image: React.FC<ImageProps> = ({
       aspectRatio: '16 / 9',
       borderTopLeftRadius: '24px',
       borderTopRightRadius: '24px',
-      backgroundColor: '#F1F5F9',
+      backgroundColor: '#DAF1DE',
     };
   } else if (variant === 'avatar') {
     containerStyle = {
@@ -124,7 +124,7 @@ export const Image: React.FC<ImageProps> = ({
       height: `${avatarSize}px`,
       borderRadius: '999px',
       flexShrink: 0,
-      backgroundColor: '#F1F5F9',
+      backgroundColor: '#DAF1DE',
     };
   } else if (variant === 'logo') {
     containerStyle = {
@@ -143,7 +143,7 @@ export const Image: React.FC<ImageProps> = ({
       ...containerStyle,
       aspectRatio: '1 / 1',
       borderRadius: '16px',
-      backgroundColor: '#F1F5F9',
+      backgroundColor: '#DAF1DE',
     };
   }
 
@@ -157,7 +157,7 @@ export const Image: React.FC<ImageProps> = ({
       {!hasLoaded && (
         <div
           className="absolute inset-0 bg-slate-100 animate-pulse"
-          style={{ position: 'absolute', inset: 0, backgroundColor: '#F1F5F9' }}
+          style={{ position: 'absolute', inset: 0, backgroundColor: '#DAF1DE' }}
         />
       )}
 

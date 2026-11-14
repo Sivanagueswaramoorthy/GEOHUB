@@ -162,11 +162,11 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            backgroundColor: '#F8FAFC',
+            backgroundColor: '#F6FBF7',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#64748B',
+            color: '#235347',
           }}
         >
           <MoreVertical size={20} strokeWidth={1.75} />
@@ -182,7 +182,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
-          backgroundColor: '#F8FAFC',
+          backgroundColor: '#F6FBF7',
         }}
       >
         {messages.map((msg) => (
@@ -267,9 +267,9 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                             alignItems: 'center',
                             justifyContent: 'space-between',
                             padding: '10px 12px',
-                            backgroundColor: '#F8FAFC',
+                            backgroundColor: '#F6FBF7',
                             borderRadius: '12px',
-                            border: '1px solid #F1F5F9',
+                            border: '1px solid #DAF1DE',
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -278,12 +278,12 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                               <div style={{ fontSize: '12px', fontWeight: 700, color: '#051F20' }}>
                                 {item.title}
                               </div>
-                              <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <div style={{ fontSize: '11px', color: '#235347', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <Clock size={16} strokeWidth={1.75} /> {item.time}
                               </div>
                             </div>
                           </div>
-                          <span style={{ color: '#94A3B8', fontSize: '14px' }}>•••</span>
+                          <span style={{ color: '#8EB69B', fontSize: '14px' }}>•••</span>
                         </div>
                       ))}
                     </div>
@@ -295,7 +295,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             <span
               style={{
                 fontSize: '11px',
-                color: '#94A3B8',
+                color: '#8EB69B',
                 marginRight: msg.sender === 'user' ? '4px' : '0',
                 marginLeft: msg.sender === 'ai' ? '40px' : '0',
               }}
@@ -314,7 +314,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           padding: '8px 16px',
           overflowX: 'auto',
           backgroundColor: '#FFFFFF',
-          borderTop: '1px solid #F1F5F9',
+          borderTop: '1px solid #DAF1DE',
         }}
       >
         {[
@@ -360,8 +360,8 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
             width: '36px',
             height: '36px',
             borderRadius: '50%',
-            backgroundColor: '#F8FAFC',
-            color: '#64748B',
+            backgroundColor: '#F6FBF7',
+            color: '#235347',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -382,8 +382,8 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
               borderRadius: '999px',
               padding: '10px 42px 10px 16px',
               fontSize: '13px',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
+              backgroundColor: '#F6FBF7',
+              border: '1px solid #DAF1DE',
             }}
           />
           <button

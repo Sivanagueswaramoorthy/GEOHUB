@@ -318,7 +318,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
-              color: '#94A3B8',
+              color: '#8EB69B',
             }}
           >
             Suggestions
@@ -338,10 +338,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Search size={14} color="#94A3B8" />
+                <Search size={14} color="#8EB69B" />
                 <span>{item}</span>
               </div>
-              <CornerDownLeft size={12} color="#CBD5E1" />
+              <CornerDownLeft size={12} color="#8EB69B" />
             </div>
           ))}
         </div>

@@ -27,9 +27,9 @@ export const Chip: React.FC<ChipProps> = ({
   style,
 }) => {
   // Variant defaults
-  let defaultBg = '#F1F5F9';
-  let defaultBorder = '#E2E8F0';
-  let defaultText = '#475569';
+  let defaultBg = '#DAF1DE';
+  let defaultBorder = '#DAF1DE';
+  let defaultText = '#235347';
 
   const lower = label.toLowerCase();
 
@@ -57,14 +57,14 @@ export const Chip: React.FC<ChipProps> = ({
       defaultBorder = '#8EB69B';
       defaultText = '#163832';
     } else {
-      defaultBg = '#F8FAFC';
-      defaultBorder = '#E2E8F0';
-      defaultText = '#475569';
+      defaultBg = '#F6FBF7';
+      defaultBorder = '#DAF1DE';
+      defaultText = '#235347';
     }
   } else if (variant === 'year') {
-    defaultBg = '#F8FAFC';
-    defaultBorder = '#E2E8F0';
-    defaultText = '#64748B';
+    defaultBg = '#F6FBF7';
+    defaultBorder = '#DAF1DE';
+    defaultText = '#235347';
   } else if (variant === 'status') {
     if (lower.includes('live') || lower.includes('happening')) {
       defaultBg = '#FEF2F2';
@@ -79,9 +79,9 @@ export const Chip: React.FC<ChipProps> = ({
       defaultBorder = '#FDE68A';
       defaultText = '#92400E';
     } else if (lower.includes('archived') || lower.includes('cancelled')) {
-      defaultBg = '#F1F5F9';
-      defaultBorder = '#E2E8F0';
-      defaultText = '#64748B';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#DAF1DE';
+      defaultText = '#235347';
     }
   }
 

@@ -27,9 +27,9 @@ export const StatTile: React.FC<StatTileProps> = ({
       case 'mint':
       case 'teal':
         return {
-          bg: 'rgba(24, 78, 80, 0.08)',
-          color: '#184E50',
-          border: '1px solid rgba(24, 78, 80, 0.12)',
+          bg: 'rgba(22, 56, 50, 0.08)',
+          color: '#163832',
+          border: '1px solid rgba(22, 56, 50, 0.12)',
         };
       case 'amber':
         return {
@@ -39,16 +39,16 @@ export const StatTile: React.FC<StatTileProps> = ({
         };
       case 'sage':
         return {
-          bg: 'rgba(107, 142, 120, 0.15)',
-          color: '#52705E',
-          border: '1px solid rgba(107, 142, 120, 0.25)',
+          bg: 'rgba(142, 182, 155, 0.15)',
+          color: '#235347',
+          border: '1px solid rgba(142, 182, 155, 0.25)',
         };
       case 'white':
       default:
         return {
-          bg: '#F8FAF9',
-          color: '#184E50',
-          border: '1px solid #E5ECE8',
+          bg: '#F6FBF7',
+          color: '#163832',
+          border: '1px solid #DAF1DE',
         };
     }
   };
@@ -61,13 +61,13 @@ export const StatTile: React.FC<StatTileProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       className={`p-4 flex flex-col justify-between select-none transition-all ${
-        onClick ? 'pressable cursor-pointer hover:border-[#184E50]/30 hover:shadow-md' : ''
+        onClick ? 'pressable cursor-pointer hover:border-[#163832]/30 hover:shadow-md' : ''
       } ${className}`}
       style={{
         borderRadius: '24px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid #E5ECE8',
-        boxShadow: '0 4px 16px -2px rgba(15, 54, 56, 0.05)',
+        border: '1px solid #DAF1DE',
+        boxShadow: '0 4px 16px -2px rgba(5, 31, 32, 0.05)',
         minHeight: '110px',
         ...style,
       }}
@@ -87,7 +87,7 @@ export const StatTile: React.FC<StatTileProps> = ({
 
         {footnote && (
           <span
-            className="text-[11px] font-semibold text-[#52705E] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F8FAF9] border border-[#E5ECE8]"
+            className="text-[11px] font-semibold text-[#235347] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F6FBF7] border border-[#DAF1DE]"
           >
             {footnote}
           </span>
@@ -96,13 +96,13 @@ export const StatTile: React.FC<StatTileProps> = ({
 
       <div className="mt-3">
         <div
-          className="font-extrabold tracking-tight text-[#0F3638]"
+          className="font-extrabold tracking-tight text-[#051F20]"
           style={{ fontSize: '24px', lineHeight: '28px' }}
         >
           <AnimatedNumber value={value} />
         </div>
         <div
-          className="text-xs font-semibold text-[#52705E] mt-0.5 truncate"
+          className="text-xs font-semibold text-[#235347] mt-0.5 truncate"
         >
           {label}
         </div>

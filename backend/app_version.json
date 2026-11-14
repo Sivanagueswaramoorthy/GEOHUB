@@ -1,12 +1,12 @@
 {
-  "version": "1.6.1",
-  "version_code": 18,
+  "version": "1.6.2",
+  "version_code": 19,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Add student member by Roll No and Name with instant Roll No username & default password 'geohub'",
+  "release_notes": "Enforce strict 6-tone botanical color system across entire platform",
   "download_url": "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-14",
-  "file_size_bytes": 6862067,
+  "file_size_bytes": 6861335,
   "file_size_mb": "6.54 MB",
-  "sha256": "117E48193A6001931912A95471A1C79F730A4B52AAEA2965EE72848575403274"
+  "sha256": "282E74E8E9D3C33E67CB026769EFEAF0951B8011E5D9AE950564C8B1A0B18E81"
 }

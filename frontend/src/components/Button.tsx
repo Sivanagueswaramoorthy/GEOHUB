@@ -38,7 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
     height = '48px';
     bg = '#FFFFFF';
     color = '#051F20';
-    border = '1px solid #E2E8F0';
+    border = '1px solid #DAF1DE';
     boxShadow = '0 2px 8px rgba(15, 23, 42, 0.04)';
     padding = '0 20px';
   } else if (variant === 'small') {
@@ -68,7 +68,7 @@ export const Button: React.FC<ButtonProps> = ({
   } else if (variant === 'ghost') {
     height = '44px';
     bg = 'transparent';
-    color = '#64748B';
+    color = '#235347';
     border = 'none';
     boxShadow = 'none';
     padding = '0 16px';

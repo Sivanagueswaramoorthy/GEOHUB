@@ -41,11 +41,11 @@ export const HeroCard: React.FC<HeroCardProps> = ({
       style={{
         borderRadius: '32px',
         boxShadow: isDark
-          ? '0 18px 42px -8px rgba(15, 54, 56, 0.32), 0 8px 20px -4px rgba(15, 54, 56, 0.18)'
-          : '0 12px 32px -4px rgba(15, 54, 56, 0.08), 0 4px 12px rgba(15, 54, 56, 0.03)',
+          ? '0 18px 42px -8px rgba(5, 31, 32, 0.32), 0 8px 20px -4px rgba(5, 31, 32, 0.18)'
+          : '0 12px 32px -4px rgba(5, 31, 32, 0.08), 0 4px 12px rgba(5, 31, 32, 0.03)',
         border: isDark
           ? '1px solid rgba(255, 255, 255, 0.12)'
-          : '1px solid #E5ECE8',
+          : '1px solid #DAF1DE',
         ...style,
       }}
     >
@@ -57,7 +57,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
             <h1
               className="text-2xl font-bold tracking-tight"
               style={{
-                color: isDark ? '#FFFFFF' : '#0F3638',
+                color: isDark ? '#FFFFFF' : '#051F20',
                 lineHeight: 1.25,
                 fontFamily: 'var(--font-family)',
               }}
@@ -68,7 +68,7 @@ export const HeroCard: React.FC<HeroCardProps> = ({
               <p
                 className="text-xs font-semibold mt-1"
                 style={{
-                  color: isDark ? 'rgba(255, 255, 255, 0.85)' : '#52705E',
+                  color: isDark ? 'rgba(255, 255, 255, 0.85)' : '#235347',
                   opacity: isDark ? 0.9 : 1,
                 }}
               >

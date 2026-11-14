@@ -46,7 +46,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={{
           width: '48px',
           height: '48px',
-          color: '#94A3B8',
+          color: '#8EB69B',
           marginBottom: '16px',
         }}
       >
@@ -59,7 +59,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           fontSize: `${TYPOGRAPHY.scale.title.fontSize}px`,
           lineHeight: `${TYPOGRAPHY.scale.title.lineHeight}px`,
           fontWeight: TYPOGRAPHY.scale.title.fontWeight,
-          color: '#0F172A',
+          color: '#051F20',
           fontFamily: 'var(--font-family)',
           margin: '0 0 8px 0',
         }}
@@ -73,7 +73,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           fontSize: `${TYPOGRAPHY.scale.body.fontSize}px`,
           lineHeight: `${TYPOGRAPHY.scale.body.lineHeight}px`,
           fontWeight: TYPOGRAPHY.scale.body.fontWeight,
-          color: '#64748B',
+          color: '#235347',
           fontFamily: 'var(--font-family)',
           maxWidth: '360px',
           margin: '0 0 20px 0',

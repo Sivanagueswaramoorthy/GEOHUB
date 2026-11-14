@@ -41,9 +41,9 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="sheet-handle" />
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '18px', lineHeight: '24px', fontWeight: 700, color: '#0F172A', fontFamily: 'var(--font-family)' }}>{title}</h3>
+            <h3 style={{ fontSize: '18px', lineHeight: '24px', fontWeight: 700, color: '#051F20', fontFamily: 'var(--font-family)' }}>{title}</h3>
             {subtitle && (
-              <p style={{ fontSize: '13px', lineHeight: '18px', color: '#64748B', marginTop: '4px', fontFamily: 'var(--font-family)' }}>{subtitle}</p>
+              <p style={{ fontSize: '13px', lineHeight: '18px', color: '#235347', marginTop: '4px', fontFamily: 'var(--font-family)' }}>{subtitle}</p>
             )}
           </div>
           <button

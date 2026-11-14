@@ -32,12 +32,12 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({ role, team, isVolunteer, c
       case 'admin':
         return { bg: '#E0E7FF', color: '#4338CA', border: '#C7D2FE' };
       case 'team_admin':
-        return { bg: '#CCFBF1', color: '#0F766E', border: '#99F6E4' };
+        return { bg: '#DAF1DE', color: '#163832', border: '#8EB69B' };
       case 'volunteer':
         return { bg: '#FCE7F3', color: '#BE185D', border: '#FBCFE8' };
       case 'member':
       default:
-        return { bg: '#F1F5F9', color: '#475569', border: '#E2E8F0' };
+        return { bg: '#DAF1DE', color: '#235347', border: '#DAF1DE' };
     }
   };
 

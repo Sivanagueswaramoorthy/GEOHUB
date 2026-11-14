@@ -45,7 +45,7 @@ export const Field: React.FC<FieldProps> = ({
             fontSize: `${COMPONENTS.forms.labelFontSize}px`,
             lineHeight: `${COMPONENTS.forms.labelLineHeight}px`,
             fontWeight: COMPONENTS.forms.labelWeight,
-            color: '#0F172A',
+            color: '#051F20',
             marginBottom: `${COMPONENTS.forms.labelGap}px`,
             fontFamily: 'var(--font-family)',
           }}
@@ -61,7 +61,7 @@ export const Field: React.FC<FieldProps> = ({
           height: `${COMPONENTS.forms.inputHeight}px`,
           minHeight: `${COMPONENTS.forms.inputHeight}px`,
           borderRadius: `${COMPONENTS.forms.inputRadius}px`,
-          border: error ? '1px solid #EF4444' : '1px solid #E2E8F0',
+          border: error ? '1px solid #EF4444' : '1px solid #DAF1DE',
           backgroundColor: '#FFFFFF',
           paddingLeft: leadingIcon ? '12px' : '16px',
           paddingRight: trailingIcon ? '12px' : '16px',
@@ -98,7 +98,7 @@ export const Field: React.FC<FieldProps> = ({
             fontSize: `${COMPONENTS.forms.helperFontSize}px`,
             lineHeight: '16px',
             fontWeight: 500,
-            color: '#64748B',
+            color: '#235347',
             marginTop: `${COMPONENTS.forms.helperGap}px`,
             fontFamily: 'var(--font-family)',
           }}

@@ -23,7 +23,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
           style={{
             fontSize: '11px',
             fontWeight: 700,
-            color: '#0F766E',
+            color: '#163832',
             backgroundColor: '#F0FDFA',
             padding: '4px 8px',
             borderRadius: '999px',
@@ -61,7 +61,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
                 style={{
                   fontSize: '11px',
                   fontWeight: 600,
-                  color: '#0F766E',
+                  color: '#163832',
                   marginBottom: '4px',
                 }}
               >
@@ -72,7 +72,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
                   width: '100%',
                   maxWidth: '36px',
                   height: `${heightPercent}%`,
-                  background: 'linear-gradient(180deg, #14B8A6 0%, #0F766E 100%)',
+                  background: 'linear-gradient(180deg, #8EB69B 0%, #163832 100%)',
                   borderRadius: '6px 6px 0 0',
                   transition: 'height 400ms ease',
                 }}
@@ -81,7 +81,7 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
                 style={{
                   fontSize: '12px',
                   fontWeight: 500,
-                  color: '#64748B',
+                  color: '#235347',
                   marginTop: '8px',
                 }}
               >
@@ -123,8 +123,8 @@ export const TeamProgressChart: React.FC<TeamProgressChartProps> = ({ metrics })
                   marginBottom: '6px',
                 }}
               >
-                <span style={{ color: '#0F172A', fontWeight: 600 }}>{tm.teamName}</span>
-                <span style={{ color: '#64748B' }}>
+                <span style={{ color: '#051F20', fontWeight: 600 }}>{tm.teamName}</span>
+                <span style={{ color: '#235347' }}>
                   {tm.completedTasks} / {tm.totalTasks} ({rate}%)
                 </span>
               </div>
@@ -132,7 +132,7 @@ export const TeamProgressChart: React.FC<TeamProgressChartProps> = ({ metrics })
                 style={{
                   height: '8px',
                   width: '100%',
-                  background: '#F1F5F9',
+                  background: '#DAF1DE',
                   borderRadius: '999px',
                   overflow: 'hidden',
                 }}
@@ -141,7 +141,7 @@ export const TeamProgressChart: React.FC<TeamProgressChartProps> = ({ metrics })
                   style={{
                     height: '100%',
                     width: `${rate}%`,
-                    background: '#0F766E',
+                    background: '#163832',
                     borderRadius: '999px',
                     transition: 'width 500ms ease-out',
                   }}

@@ -30,8 +30,8 @@ export const StatCard: React.FC<StatCardProps> = ({
             style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: trendPositive ? '#16A34A' : '#64748B',
-              backgroundColor: trendPositive ? 'rgba(22, 163, 74, 0.1)' : '#F1F5F9',
+              color: trendPositive ? '#16A34A' : '#235347',
+              backgroundColor: trendPositive ? 'rgba(22, 163, 74, 0.1)' : '#DAF1DE',
               padding: '2px 6px',
               borderRadius: '999px',
             }}

@@ -188,7 +188,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           maxHeight: '58px',
           backgroundColor: '#FFFFFF',
           borderRadius: '9999px',
-          border: '1px solid var(--vanilla-latte-border, #E8D9BD)',
+          border: '1px solid var(--card-border, #DAF1DE)',
           boxShadow: '0 12px 36px rgba(15, 54, 56, 0.12)',
           padding: '0 6px',
           boxSizing: 'border-box',
@@ -217,9 +217,9 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
               style={{
                 height: '42px',
                 minHeight: '42px',
-                backgroundColor: active ? 'var(--teal-forest, #184E50)' : 'transparent',
-                color: active ? '#FFFFFF' : 'var(--warm-sage-dark, #52705E)',
-                boxShadow: active ? '0 4px 14px rgba(24, 78, 80, 0.28)' : 'none',
+                backgroundColor: active ? 'var(--pine-800, #163832)' : 'transparent',
+                color: active ? '#FFFFFF' : 'var(--pine-700, #235347)',
+                boxShadow: active ? '0 4px 14px rgba(22, 56, 50, 0.28)' : 'none',
                 boxSizing: 'border-box',
                 transition: 'all 260ms cubic-bezier(0.16, 1, 0.3, 1)',
               }}
@@ -229,7 +229,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
                   active ? 'animate-nav-pop' : ''
                 }`}
               >
-                {getLucideIcon(tab.iconName, active ? 18 : 20, active ? '#FFFFFF' : 'var(--warm-sage-dark, #52705E)')}
+                {getLucideIcon(tab.iconName, active ? 18 : 20, active ? '#FFFFFF' : 'var(--pine-700, #235347)')}
               </span>
 
               {/* Smooth expanding label text */}
@@ -258,7 +258,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
 
               {/* Notification update dot when inactive */}
               {!active && tab.hasUpdates && (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#184E50] animate-badge-pop" />
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#163832] animate-badge-pop" />
               )}
             </button>
           );
@@ -270,7 +270,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
         <button
           type="button"
           onClick={() => handleTabClick(scannerTab.key)}
-          className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6B8E78] focus-visible:ring-offset-2 active:scale-95 transition-all duration-200 ${
+          className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2 active:scale-95 transition-all duration-200 ${
             isScannerActive ? 'animate-scanner-ring' : ''
           }`}
           style={{
@@ -282,11 +282,11 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
             maxHeight: '56px',
             flexShrink: 0,
             flexGrow: 0,
-            backgroundColor: isScannerActive ? 'var(--teal-forest-dark, #0F3638)' : 'var(--teal-forest, #184E50)',
-            border: isScannerActive ? '2px solid var(--antique-gold, #D4A359)' : '2px solid var(--warm-sage, #6B8E78)',
+            backgroundColor: isScannerActive ? 'var(--pine-950, #051F20)' : 'var(--pine-800, #163832)',
+            border: isScannerActive ? '2px solid var(--antique-gold, #D4A359)' : '2px solid var(--sage-400, #8EB69B)',
             boxShadow: isScannerActive
-              ? '0 8px 24px rgba(15, 54, 56, 0.32)'
-              : '0 6px 20px rgba(15, 54, 56, 0.18)',
+              ? '0 8px 24px rgba(5, 31, 32, 0.32)'
+              : '0 6px 20px rgba(5, 31, 32, 0.18)',
             color: '#FFFFFF',
             boxSizing: 'border-box',
           }}

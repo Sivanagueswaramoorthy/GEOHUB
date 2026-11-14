@@ -114,15 +114,15 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
               {quickActionIcon}
             </div>
             <div>
-              <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: '#051F20', lineHeight: 1.2 }}>
                 {quickActionTitle}
               </div>
-              <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+              <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
                 {quickActionSubtitle}
               </div>
             </div>
           </div>
-          <ChevronRight size={20} strokeWidth={1.75} color="#94A3B8" />
+          <ChevronRight size={20} strokeWidth={1.75} color="#8EB69B" />
         </div>
       )}
 
@@ -137,7 +137,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
             padding: '0 4px',
           }}
         >
-          <span style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>
+          <span style={{ fontSize: '16px', fontWeight: 800, color: '#051F20' }}>
             May 2026
           </span>
           <div style={{ display: 'flex', gap: '4px' }}>
@@ -147,11 +147,11 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                backgroundColor: '#F8FAFC',
+                backgroundColor: '#F6FBF7',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#64748B',
+                color: '#235347',
               }}
             >
               <ChevronLeft size={16} />
@@ -162,11 +162,11 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 width: '28px',
                 height: '28px',
                 borderRadius: '50%',
-                backgroundColor: '#F8FAFC',
+                backgroundColor: '#F6FBF7',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#64748B',
+                color: '#235347',
               }}
             >
               <ChevronRight size={16} />
@@ -201,7 +201,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                   padding: '4px 0',
                 }}
               >
-                <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>
+                <span style={{ fontSize: '11px', color: '#235347', fontWeight: 500 }}>
                   {item.day}
                 </span>
                 <div
@@ -209,7 +209,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                     width: '36px',
                     height: '36px',
                     borderRadius: '50%',
-                    backgroundColor: isActive ? '#235347' : '#F8FAFC',
+                    backgroundColor: isActive ? '#235347' : '#F6FBF7',
                     color: isActive ? '#FFFFFF' : '#051F20',
                     display: 'flex',
                     alignItems: 'center',
@@ -316,7 +316,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 case 'active':
                   return { bg: '#DAF1DE', text: '#163832' };
                 default:
-                  return { bg: '#F1F5F9', text: '#475569' };
+                  return { bg: '#DAF1DE', text: '#235347' };
               }
             };
             const tagStyle = getTagStyle();
@@ -336,7 +336,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                     {item.title}
                   </div>
                   {item.subtitle && (
-                    <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: '#235347', marginTop: '2px' }}>
                       {item.subtitle}
                     </div>
                   )}
@@ -369,7 +369,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
             width: '100%',
             height: '42px',
             borderRadius: '999px',
-            backgroundColor: '#F8FAFC',
+            backgroundColor: '#F6FBF7',
             border: '1px solid #E8ECF2',
             color: '#051F20',
             fontWeight: 700,
@@ -405,7 +405,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#051F20', margin: 0 }}>
               {tasksHeader}
             </h3>
             <span
@@ -413,13 +413,13 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                backgroundColor: '#F1F5F9',
+                backgroundColor: '#DAF1DE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#475569',
+                color: '#235347',
               }}
             >
               {tasks.length}
@@ -457,7 +457,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <button
                     style={{
-                      color: isDone ? '#235347' : '#CBD5E1',
+                      color: isDone ? '#235347' : '#8EB69B',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -469,13 +469,13 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                       style={{
                         fontSize: '13px',
                         fontWeight: 700,
-                        color: isDone ? '#94A3B8' : '#051F20',
+                        color: isDone ? '#8EB69B' : '#051F20',
                         textDecoration: isDone ? 'line-through' : 'none',
                       }}
                     >
                       {t.title}
                     </div>
-                    <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                    <div style={{ fontSize: '11px', color: '#235347', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
                       <span>{t.team} Squad</span>
                       <span>•</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>

@@ -61,7 +61,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <h4 style={{ fontSize: '18px', fontWeight: 800, color: '#051F20', marginBottom: '8px' }}>
             Recovery Link Dispatched
           </h4>
-          <p style={{ fontSize: '13px', color: '#64748B', lineHeight: 1.5, marginBottom: '24px' }}>
+          <p style={{ fontSize: '13px', color: '#235347', lineHeight: 1.5, marginBottom: '24px' }}>
             We have transmitted an authorized password reset token to <strong style={{ color: '#051F20' }}>{email}</strong>. Please inspect your college inbox.
           </p>
 
@@ -89,10 +89,10 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             style={{
               padding: '12px 14px',
               borderRadius: '14px',
-              backgroundColor: '#F8FAFC',
+              backgroundColor: '#F6FBF7',
               border: '1px solid #EEF1F5',
               fontSize: '12px',
-              color: '#475569',
+              color: '#235347',
               lineHeight: 1.5,
               display: 'flex',
               alignItems: 'center',
@@ -104,7 +104,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#163832', marginBottom: '6px' }}>
               College Workspace Email
             </label>
             <div style={{ position: 'relative' }}>
@@ -118,13 +118,13 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                   width: '100%',
                   padding: '10px 14px 10px 38px',
                   borderRadius: '12px',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid #DAF1DE',
                   fontSize: '13px',
                   boxSizing: 'border-box',
                   outline: 'none',
                 }}
               />
-              <Mail size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '13px' }} />
+              <Mail size={16} color="#8EB69B" style={{ position: 'absolute', left: '12px', top: '13px' }} />
             </div>
           </div>
 

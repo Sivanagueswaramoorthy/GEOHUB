@@ -63,7 +63,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                   ? 'rgba(255, 255, 255, 0.95)'
                   : item.isToday
                   ? '#163832'
-                  : '#94A3B8',
+                  : '#8EB69B',
                 marginBottom: '2px',
               }}
             >

@@ -56,19 +56,19 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
           minWidth: visualDiameter,
           minHeight: visualDiameter,
           backgroundColor: isAvatar
-            ? 'var(--teal-forest-dark, #0F3638)'
+            ? 'var(--pine-950, #051F20)'
             : isBell
             ? '#FFFFFF'
-            : 'rgba(24, 78, 80, 0.08)',
+            : 'rgba(22, 56, 50, 0.08)',
           border: isAvatar
             ? '2px solid var(--antique-gold, #D4A359)'
             : isBell
-            ? '1.5px solid var(--vanilla-latte-border, #E8D9BD)'
+            ? '1.5px solid var(--card-border, #DAF1DE)'
             : 'none',
           boxShadow: isAvatar
-            ? '0 3px 8px rgba(15, 54, 56, 0.12)'
+            ? '0 3px 8px rgba(5, 31, 32, 0.12)'
             : isBell
-            ? '0 3px 8px rgba(15, 54, 56, 0.08), inset 0 1px 0 #FFFFFF'
+            ? '0 3px 8px rgba(5, 31, 32, 0.08), inset 0 1px 0 #FFFFFF'
             : 'none',
         }}
       >

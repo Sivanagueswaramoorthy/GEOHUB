@@ -388,7 +388,7 @@ export const NextEventSpotlight: React.FC<NextEventSpotlightProps> = ({
                   className="px-2 py-0.5 rounded-md capitalize cursor-pointer transition-all"
                   style={{
                     backgroundColor: activeTabFilter === tab ? '#FFFFFF' : 'transparent',
-                    color: activeTabFilter === tab ? '#0B2B26' : '#64748B',
+                    color: activeTabFilter === tab ? '#0B2B26' : '#235347',
                     boxShadow: activeTabFilter === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                   }}
                 >
@@ -418,9 +418,9 @@ export const NextEventSpotlight: React.FC<NextEventSpotlightProps> = ({
                     <div
                       className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
                       style={{
-                        backgroundColor: isComplete ? '#DAF1DE' : '#F1F5F9',
+                        backgroundColor: isComplete ? '#DAF1DE' : '#DAF1DE',
                         color: isComplete ? '#163832' : '#235347',
-                        border: isComplete ? '1px solid #8EB69B' : '1px solid #E2E8F0',
+                        border: isComplete ? '1px solid #8EB69B' : '1px solid #DAF1DE',
                       }}
                     >
                       {duty.icon}
@@ -440,9 +440,9 @@ export const NextEventSpotlight: React.FC<NextEventSpotlightProps> = ({
                     <span
                       className="text-[11px] font-extrabold px-2 py-0.5 rounded-full"
                       style={{
-                        backgroundColor: isComplete ? '#DAF1DE' : '#F8FAFC',
-                        color: isComplete ? '#163832' : '#475569',
-                        border: isComplete ? '1px solid #8EB69B' : '1px solid #E2E8F0',
+                        backgroundColor: isComplete ? '#DAF1DE' : '#F6FBF7',
+                        color: isComplete ? '#163832' : '#235347',
+                        border: isComplete ? '1px solid #8EB69B' : '1px solid #DAF1DE',
                       }}
                     >
                       {duty.status}

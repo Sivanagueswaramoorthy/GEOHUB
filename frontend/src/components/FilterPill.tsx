@@ -60,8 +60,8 @@ export const FilterPill: React.FC<FilterPillProps> = ({
         <span
           className="inline-flex items-center justify-center font-bold px-2 rounded-full"
           style={{
-            backgroundColor: isActive ? '#235347' : '#F1F5F9',
-            color: isActive ? '#FFFFFF' : '#64748B',
+            backgroundColor: isActive ? '#235347' : '#DAF1DE',
+            color: isActive ? '#FFFFFF' : '#235347',
             fontSize: `${SEARCH_AND_FILTER.filterPill.badgeFontSize}px`,
             minWidth: `${SEARCH_AND_FILTER.filterPill.badgePillSize}px`,
             height: `${SEARCH_AND_FILTER.filterPill.badgePillSize}px`,

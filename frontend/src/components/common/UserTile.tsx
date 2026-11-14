@@ -21,10 +21,10 @@ export const UserTile: React.FC<UserTileProps> = ({ user, onClick, action }) => 
         <AppAvatar name={user.name} avatarUrl={user.avatarUrl} size={48} strokeWidth={1.75} />
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: '14px', color: '#0F172A' }}>{user.name}</span>
+            <span style={{ fontWeight: 600, fontSize: '14px', color: '#051F20' }}>{user.name}</span>
             <RoleBadge role={user.role} team={user.team} isVolunteer={user.isVolunteer} />
           </div>
-          <div style={{ fontSize: '12px', color: '#64748B', marginTop: '2px' }}>
+          <div style={{ fontSize: '12px', color: '#235347', marginTop: '2px' }}>
             {user.email} {user.department ? `• ${user.department}` : ''}
           </div>
         </div>
@@ -32,7 +32,7 @@ export const UserTile: React.FC<UserTileProps> = ({ user, onClick, action }) => 
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {action}
-        {onClick && !action && <ChevronRight size={20} strokeWidth={1.75} color="#94A3B8" />}
+        {onClick && !action && <ChevronRight size={20} strokeWidth={1.75} color="#8EB69B" />}
       </div>
     </div>
   );

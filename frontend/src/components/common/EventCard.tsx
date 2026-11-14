@@ -48,7 +48,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
           height: '154px',
           width: '100%',
           position: 'relative',
-          backgroundColor: '#0F172A',
+          backgroundColor: '#051F20',
           overflow: 'hidden',
         }}
       >
@@ -201,7 +201,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
         <p
           style={{
             fontSize: '12px',
-            color: '#64748B',
+            color: '#235347',
             lineHeight: 1.45,
             margin: '0 0 12px 0',
             display: '-webkit-box',
@@ -219,13 +219,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
             display: 'flex',
             flexDirection: 'column',
             gap: '6px',
-            backgroundColor: '#F8FAFC',
+            backgroundColor: '#F6FBF7',
             borderRadius: '12px',
             padding: '10px 12px',
-            border: '1px solid #F1F5F9',
+            border: '1px solid #DAF1DE',
             marginBottom: '12px',
             fontSize: '11px',
-            color: '#475569',
+            color: '#235347',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
@@ -249,10 +249,10 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: '10px',
-            borderTop: '1px solid #F1F5F9',
+            borderTop: '1px solid #DAF1DE',
           }}
         >
-          <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '11px', color: '#235347', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
             {event.googleFormUrl ? (
               <span style={{ color: '#235347', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <ExternalLink size={16} strokeWidth={1.75} /> Google Form Sign-up

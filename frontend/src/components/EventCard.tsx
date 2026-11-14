@@ -63,7 +63,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           borderTopLeftRadius: '24px',
           borderTopRightRadius: '24px',
           overflow: 'hidden',
-          backgroundColor: '#F1F5F9',
+          backgroundColor: '#DAF1DE',
         }}
       >
         <img

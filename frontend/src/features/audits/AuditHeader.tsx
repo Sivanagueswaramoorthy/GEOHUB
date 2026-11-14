@@ -63,9 +63,9 @@ export const AuditHeader: React.FC<AuditHeaderProps> = ({
       default:
         return {
           label: audit.status || 'Active',
-          bg: '#F8FAFC',
-          border: '#E2E8F0',
-          text: '#475569',
+          bg: '#F6FBF7',
+          border: '#DAF1DE',
+          text: '#235347',
           icon: Clock,
         };
     }

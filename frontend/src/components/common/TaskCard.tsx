@@ -27,7 +27,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
         return { bg: 'rgba(217, 119, 6, 0.12)', color: '#D97706' };
       case 'low':
       default:
-        return { bg: 'rgba(100, 116, 139, 0.12)', color: '#475569' };
+        return { bg: 'rgba(100, 116, 139, 0.12)', color: '#235347' };
     }
   };
 
@@ -42,7 +42,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
         flexDirection: 'column',
         gap: '12px',
         marginBottom: '12px',
-        borderLeft: task.status === 'done' ? '4px solid #16A34A' : '4px solid #0F766E',
+        borderLeft: task.status === 'done' ? '4px solid #16A34A' : '4px solid #163832',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -61,7 +61,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
           >
             {task.priority}
           </span>
-          <span style={{ fontSize: '12px', lineHeight: '16px', color: '#64748B', fontWeight: 500 }}>
+          <span style={{ fontSize: '12px', lineHeight: '16px', color: '#235347', fontWeight: 500 }}>
             {task.team}
           </span>
         </div>
@@ -78,7 +78,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
             className="touch-target-44"
             style={{
               padding: 0,
-              color: task.status === 'done' ? '#16A34A' : '#CBD5E1',
+              color: task.status === 'done' ? '#16A34A' : '#8EB69B',
               marginTop: '2px',
             }}
           >
@@ -89,7 +89,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
           style={{
             fontSize: '14px',
             fontWeight: 600,
-            color: task.status === 'done' ? '#64748B' : '#0F172A',
+            color: task.status === 'done' ? '#235347' : '#051F20',
             lineHeight: '22px',
             textDecoration: task.status === 'done' ? 'line-through' : 'none',
           }}
@@ -104,10 +104,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onToggleDone 
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingTop: '8px',
-          borderTop: '1px solid #E2E8F0',
+          borderTop: '1px solid #DAF1DE',
           fontSize: '12px',
           lineHeight: '16px',
-          color: '#64748B',
+          color: '#235347',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

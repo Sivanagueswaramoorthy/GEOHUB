@@ -727,8 +727,8 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       desc: 'Enroll new scholar directly to a squad',
       icon: <UserPlus size={24} strokeWidth={1.75} />,
       bg: '#E8FBF8',
-      border: '#99F6E4',
-      color: '#0F766E',
+      border: '#8EB69B',
+      color: '#163832',
     },
   ].filter((act) => act.key !== 'assign_post' || perms.canAssignPosts);
 

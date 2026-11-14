@@ -73,8 +73,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 <span
                   className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
                   style={{
-                    backgroundColor: '#E2E8F0',
-                    color: '#334155',
+                    backgroundColor: '#DAF1DE',
+                    color: '#163832',
                   }}
                 >
                   {leadInfo.role}
