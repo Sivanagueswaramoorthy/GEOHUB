@@ -21,10 +21,10 @@ export const AttendanceChart: React.FC<AttendanceChartProps> = ({
         </div>
         <span
           style={{
-            fontSize: '11px',
+            fontSize: '12px',
             fontWeight: 700,
             color: '#163832',
-            backgroundColor: '#F0FDFA',
+            backgroundColor: '#DAF1DE',
             padding: '4px 8px',
             borderRadius: '999px',
           }}

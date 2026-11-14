@@ -1,12 +1,12 @@
 {
-  "version": "1.6.2",
-  "version_code": 19,
+  "version": "1.6.4",
+  "version_code": 21,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Enforce strict 6-tone botanical color system across entire platform",
+  "release_notes": "Fix cross-device real-time sync, clean action buttons, and universal backdrop blur",
   "download_url": "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-14",
-  "file_size_bytes": 6861335,
-  "file_size_mb": "6.54 MB",
-  "sha256": "282E74E8E9D3C33E67CB026769EFEAF0951B8011E5D9AE950564C8B1A0B18E81"
+  "file_size_bytes": 6844819,
+  "file_size_mb": "6.53 MB",
+  "sha256": "F4FEBFF0EC04D3CA0480BE5DD0B04DAECF7C3048480B14DA448A745A7942121F"
 }

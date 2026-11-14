@@ -271,7 +271,10 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
 
       {/* Preview Modal */}
       {previewMedia && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/70 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+        >
           <div className="w-full max-w-2xl bg-white rounded-3xl p-5 shadow-2xl border border-[#DAF1DE] space-y-3">
             <div className="flex items-center justify-between">
               <div>

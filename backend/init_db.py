@@ -7,6 +7,26 @@ import auth
 def init_database():
     print("[Init DB] Creating all relational database tables...")
     Base.metadata.create_all(bind=engine)
+
+    # Ensure SQLite schema is up to date with models
+    if engine.url.drivername.startswith("sqlite"):
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            existing_cols = [r[1] for r in conn.execute(text("PRAGMA table_info(users)")).fetchall()]
+            cols_to_add = [
+                ("roll_no", "VARCHAR(32)"),
+                ("post", "VARCHAR(64)"),
+                ("department", "VARCHAR(128)"),
+                ("year_of_study", "VARCHAR(64)"),
+                ("phone", "VARCHAR(32)"),
+                ("tenure_end", "DATETIME"),
+                ("squad_memberships", "TEXT"),
+            ]
+            for col_name, col_type in cols_to_add:
+                if col_name not in existing_cols:
+                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+            conn.commit()
+
     print("[Init DB] Tables verified successfully.")
 
     db = SessionLocal()

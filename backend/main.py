@@ -18,6 +18,7 @@ from routers import (
     finance_router,
     app_router,
     admin_router,
+    sync_router,
 )
 
 # Create database tables
@@ -78,6 +79,7 @@ app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)
 app.include_router(app_router.router, prefix=settings.API_V1_STR)
 app.include_router(admin_router.router, prefix=settings.API_V1_STR)
+app.include_router(sync_router.router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
 def health_check():

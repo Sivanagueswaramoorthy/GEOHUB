@@ -11,6 +11,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { AnimatedNumber, EmptyState } from '../../../components/shared';
+import { useApp } from '../../../context/AppContext';
 
 export interface StationVolunteer {
   id: string;
@@ -41,12 +42,14 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
   onLogAudit,
   currentUser,
 }) => {
+  const { users } = useApp();
   const [selectedEvent, setSelectedEvent] = useState('General Operations');
   const [selectedStation, setSelectedStation] = useState<DutyStation | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [newVolName, setNewVolName] = useState('');
-  const [newVolRoll, setNewVolRoll] = useState('');
-  const [newVolShift, setNewVolShift] = useState('Morning Shift');
+  const initialUser = (users && users.find((u) => u.rollNo)) || null;
+  const [newVolName, setNewVolName] = useState(initialUser?.name || '');
+  const [newVolRoll, setNewVolRoll] = useState(initialUser?.rollNo || '');
+  const [newVolShift, setNewVolShift] = useState('08:30 AM - 01:00 PM');
   const [notice, setNotice] = useState<string | null>(null);
 
   const [stations, setStations] = useState<DutyStation[]>([]);
@@ -210,11 +213,13 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
                         key={vol.id}
                         className="p-2 rounded-xl bg-white border border-[#DAF1DE] flex items-center justify-between gap-2 text-xs"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="px-1.5 py-0.5 rounded font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                            {vol.rollNo}
+                          </span>
                           <span className="font-bold text-[#051F20] truncate">{vol.name}</span>
-                          <span className="text-[#235347]">({vol.rollNo})</span>
                           {vol.isLead && (
-                            <span className="px-1.5 py-0.2 rounded text-[12px] font-bold bg-[#DAF1DE] text-[#051F20]">
+                            <span className="px-1.5 py-0.2 rounded text-xs font-bold bg-[#163832] text-white">
                               Officer
                             </span>
                           )}
@@ -268,7 +273,10 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
 
       {/* Assign Modal */}
       {showAssignModal && selectedStation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/50 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+        >
           <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-[#051F20] text-base">
@@ -286,45 +294,51 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
             <form onSubmit={handleAssignVolunteer} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                  Volunteer Full Name
+                  Select Volunteer by Roll Number *
                 </label>
-                <input
-                  type="text"
+                <select
                   required
-                  value={newVolName}
-                  onChange={(e) => setNewVolName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                />
+                  value={newVolRoll}
+                  onChange={(e) => {
+                    const roll = e.target.value;
+                    setNewVolRoll(roll);
+                    const found = (users || []).find((u) => u.rollNo === roll || u.email?.startsWith(roll.toLowerCase()));
+                    if (found) {
+                      setNewVolName(found.name);
+                    }
+                  }}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
+                >
+                  <option value="">Choose Roll Number...</option>
+                  {(users || [])
+                    .filter((u) => u.rollNo)
+                    .map((u) => (
+                      <option key={u.uid} value={u.rollNo}>
+                        {u.rollNo} — {u.name} ({u.team || 'Member'})
+                      </option>
+                    ))}
+                </select>
+                {newVolName && (
+                  <div className="mt-1.5 p-2 rounded-lg bg-[#DAF1DE]/60 border border-[#8EB69B]/50 flex items-center justify-between text-xs">
+                    <span className="text-[#235347]">Verified Volunteer:</span>
+                    <strong className="text-[#051F20] font-bold">{newVolName} ({newVolRoll})</strong>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                    Roll Number
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newVolRoll}
-                    onChange={(e) => setNewVolRoll(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                    Assigned Shift
-                  </label>
-                  <select
-                    value={newVolShift}
-                    onChange={(e) => setNewVolShift(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                  >
-                    <option value="08:30 AM - 01:00 PM">Morning Shift (08:30 - 13:00)</option>
-                    <option value="01:00 PM - 05:30 PM">Afternoon Shift (13:00 - 17:30)</option>
-                    <option value="Full Day (08:30 - 17:30)">Full Day (08:30 - 17:30)</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                  Assigned Shift
+                </label>
+                <select
+                  value={newVolShift}
+                  onChange={(e) => setNewVolShift(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                >
+                  <option value="08:30 AM - 01:00 PM">Morning Shift (08:30 - 13:00)</option>
+                  <option value="01:00 PM - 05:30 PM">Afternoon Shift (13:00 - 17:30)</option>
+                  <option value="Full Day (08:30 - 17:30)">Full Day (08:30 - 17:30)</option>
+                </select>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

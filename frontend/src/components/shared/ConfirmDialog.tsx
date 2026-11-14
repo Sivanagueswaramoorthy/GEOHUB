@@ -63,9 +63,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           <div
             className="flex items-center justify-center w-10 h-10 rounded-full shrink-0"
             style={{
-              backgroundColor: isDangerActive ? 'rgba(200, 109, 81, 0.12)' : '#DAF1DE',
-              color: isDangerActive ? '#C86D51' : '#163832',
-              border: isDangerActive ? '1px solid rgba(200, 109, 81, 0.3)' : '1px solid #DAF1DE',
+              backgroundColor: isDangerActive ? 'rgba(217, 83, 79, 0.12)' : '#DAF1DE',
+              color: isDangerActive ? '#D9534F' : '#163832',
+              border: isDangerActive ? '1px solid rgba(217, 83, 79, 0.3)' : '1px solid #DAF1DE',
             }}
           >
             <AlertTriangle size={18} strokeWidth={2.2} />
@@ -93,7 +93,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               style={{ borderRadius: '16px' }}
             />
             {error && (
-              <span className="text-xs font-semibold text-[#C86D51]">{error}</span>
+              <span className="text-xs font-semibold text-[#D9534F]">{error}</span>
             )}
           </div>
         )}

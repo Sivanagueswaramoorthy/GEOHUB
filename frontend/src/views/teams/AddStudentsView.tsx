@@ -5,7 +5,6 @@ import {
   PillButton,
   StatusChip,
   Avatar,
-  BottomSheet,
   EmptyState,
 } from '../../components/shared';
 
@@ -31,7 +30,6 @@ export const AddStudentsView: React.FC = () => {
       (!a.requestedTeam || a.requestedTeam.toLowerCase() === currentTeamName.toLowerCase())
   );
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [enrollMode, setEnrollMode] = useState<'single' | 'bulk'>('single');
 
   // Single Scholar Form State
@@ -39,14 +37,12 @@ export const AddStudentsView: React.FC = () => {
   const [singleName, setSingleName] = useState('');
   const [singleEmail, setSingleEmail] = useState('');
   const [singleDept, setSingleDept] = useState('Geosciences');
-  const [singleSquad, setSingleSquad] = useState(currentTeamName);
 
   // Bulk Range Form State
   const [bulkPrefix, setBulkPrefix] = useState('21GEO');
   const [bulkFrom, setBulkFrom] = useState('040');
   const [bulkTo, setBulkTo] = useState('065');
   const [bulkDept, setBulkDept] = useState('Geoinformatics');
-  const [bulkSquad, setBulkSquad] = useState(currentTeamName);
 
   // Computed Bulk Preview Count
   const bulkCount = useMemo(() => {
@@ -72,8 +68,8 @@ export const AddStudentsView: React.FC = () => {
       name: cleanName,
       email: singleEmail.trim() || `${rollUpper.toLowerCase()}@geohub.edu`,
       rollNo: rollUpper,
-      team: singleSquad,
-      teamRole: 'Contributor',
+      team: 'Member',
+      teamRole: 'Member',
       department: singleDept,
       yearOfStudy: '2nd Year',
       role: 'student',
@@ -82,8 +78,7 @@ export const AddStudentsView: React.FC = () => {
       mustChangePassword: false,
     });
 
-    showToast(`✓ Scholar ${cleanName} (${rollUpper}) enrolled. Login: ${rollUpper} | Password: geohub`);
-    setIsAddModalOpen(false);
+    showToast(`✓ Scholar ${cleanName} (${rollUpper}) enrolled as Member. Login: ${rollUpper} | Password: geohub`);
     setSingleRoll('');
     setSingleName('');
     setSingleEmail('');
@@ -106,8 +101,8 @@ export const AddStudentsView: React.FC = () => {
         name: `Scholar ${roll}`,
         email: `${roll.toLowerCase()}@geohub.edu`,
         rollNo: roll,
-        team: bulkSquad,
-        teamRole: 'Scholar',
+        team: 'Member',
+        teamRole: 'Member',
         department: bulkDept,
         yearOfStudy: '1st Year',
         role: 'student',
@@ -117,8 +112,7 @@ export const AddStudentsView: React.FC = () => {
       });
     }
 
-    showToast(`✓ Enrolled ${bulkCount} scholars. Default login credentials: Roll No | Password: geohub`);
-    setIsAddModalOpen(false);
+    showToast(`✓ Enrolled ${bulkCount} scholars as Members. Default login: Roll No | Password: geohub`);
   };
 
   return (
@@ -145,17 +139,160 @@ export const AddStudentsView: React.FC = () => {
             Add Students
           </h1>
           <p className="text-xs font-semibold text-[#235347] mt-1">
-            Enroll scholars to chapter registry
+            Enroll scholars to chapter registry directly as official Members
           </p>
         </div>
+        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
+          Full-Screen Enrollment
+        </span>
+      </div>
 
-        <PillButton
-          variant="primary"
-          icon={<UserPlus size={16} strokeWidth={1.75} />}
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          Enroll Scholars
-        </PillButton>
+      {/* Full-Screen Enrollment Card */}
+      <div
+        className="p-5 sm:p-6 bg-white border border-[#DAF1DE] shadow-[0_10px_30px_rgba(5,31,32,0.06)] flex flex-col gap-4 select-none"
+        style={{ borderRadius: '24px' }}
+      >
+        {/* Toggle Single vs Bulk */}
+        <div className="flex items-center gap-2 p-1 bg-[#DAF1DE] rounded-full border border-[#8EB69B]">
+          <button
+            type="button"
+            onClick={() => setEnrollMode('single')}
+            className={`flex-1 py-2 rounded-full text-xs font-bold transition-all touch-target-44 cursor-pointer ${
+              enrollMode === 'single'
+                ? 'bg-[#163832] text-white shadow-sm'
+                : 'text-[#163832] hover:bg-white/50'
+            }`}
+          >
+            Single Scholar
+          </button>
+          <button
+            type="button"
+            onClick={() => setEnrollMode('bulk')}
+            className={`flex-1 py-2 rounded-full text-xs font-bold transition-all touch-target-44 cursor-pointer ${
+              enrollMode === 'bulk'
+                ? 'bg-[#163832] text-white shadow-sm'
+                : 'text-[#163832] hover:bg-white/50'
+            }`}
+          >
+            Bulk Range (From - To)
+          </button>
+        </div>
+
+        {/* Mode 1: Single Scholar Form */}
+        {enrollMode === 'single' ? (
+          <form onSubmit={handleSingleAdd} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-[#051F20]">Roll Number *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. 21GEO045"
+                value={singleRoll}
+                onChange={(e) => setSingleRoll(e.target.value)}
+                className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none uppercase"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-[#051F20]">Full Name *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Maya Chen"
+                value={singleName}
+                onChange={(e) => setSingleName(e.target.value)}
+                className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-[#051F20]">College Email (optional)</label>
+              <input
+                type="email"
+                placeholder="e.g. 21geo045@college.edu"
+                value={singleEmail}
+                onChange={(e) => setSingleEmail(e.target.value)}
+                className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
+              />
+            </div>
+
+            <div className="pt-2">
+              <PillButton
+                variant="primary"
+                fullWidth
+                disabled={!singleRoll.trim() || !singleName.trim()}
+                onClick={handleSingleAdd}
+              >
+                Enroll Scholar
+              </PillButton>
+            </div>
+          </form>
+        ) : (
+          /* Mode 2: Bulk Range Form */
+          <form onSubmit={handleBulkAdd} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-[#051F20]">Roll Prefix *</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. 21GEO"
+                value={bulkPrefix}
+                onChange={(e) => setBulkPrefix(e.target.value)}
+                className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none uppercase"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-[#051F20]">From Number *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 040"
+                  value={bulkFrom}
+                  onChange={(e) => setBulkFrom(e.target.value)}
+                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-[#051F20]">To Number *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 065"
+                  value={bulkTo}
+                  onChange={(e) => setBulkTo(e.target.value)}
+                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Preview Count Card */}
+            <div className="p-3.5 rounded-2xl bg-[#DAF1DE] border border-[#8EB69B] flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-[#163832]">Preview Batch Count</span>
+                <span className="text-xs text-[#235347]">
+                  Range: {bulkPrefix}{bulkFrom} → {bulkPrefix}{bulkTo}
+                </span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#163832] text-white">
+                {bulkCount} Scholars
+              </span>
+            </div>
+
+            <div className="pt-2">
+              <PillButton
+                variant="primary"
+                fullWidth
+                disabled={bulkCount <= 0}
+                icon={<CheckCircle2 size={16} />}
+                onClick={handleBulkAdd}
+              >
+                Enroll {bulkCount} Scholars
+              </PillButton>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* Institutional Security Notice */}
@@ -250,230 +387,6 @@ export const AddStudentsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Enroll Modal (Single or Bulk Range with Preview Count) */}
-      <BottomSheet
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Enroll Scholars"
-        subtitle="Add individual student or bulk roll range"
-      >
-        <div className="flex flex-col gap-4 py-2 select-none">
-          {/* Toggle Single vs Bulk */}
-          <div className="flex items-center gap-2 p-1 bg-[#DAF1DE] rounded-full border border-[#8EB69B]">
-            <button
-              type="button"
-              onClick={() => setEnrollMode('single')}
-              className={`flex-1 py-2 rounded-full text-xs font-bold transition-all touch-target-44 cursor-pointer ${
-                enrollMode === 'single'
-                  ? 'bg-[#163832] text-white shadow-sm'
-                  : 'text-[#163832] hover:bg-white/50'
-              }`}
-            >
-              Single Scholar
-            </button>
-            <button
-              type="button"
-              onClick={() => setEnrollMode('bulk')}
-              className={`flex-1 py-2 rounded-full text-xs font-bold transition-all touch-target-44 cursor-pointer ${
-                enrollMode === 'bulk'
-                  ? 'bg-[#163832] text-white shadow-sm'
-                  : 'text-[#163832] hover:bg-white/50'
-              }`}
-            >
-              Bulk Range (From - To)
-            </button>
-          </div>
-
-          {/* Mode 1: Single Scholar Form */}
-          {enrollMode === 'single' ? (
-            <form onSubmit={handleSingleAdd} className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#051F20]">Roll Number</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 21GEO045"
-                  value={singleRoll}
-                  onChange={(e) => setSingleRoll(e.target.value)}
-                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#051F20]">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Maya Chen"
-                  value={singleName}
-                  onChange={(e) => setSingleName(e.target.value)}
-                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#051F20]">College Email (optional)</label>
-                <input
-                  type="email"
-                  placeholder="e.g. 21geo045@college.edu"
-                  value={singleEmail}
-                  onChange={(e) => setSingleEmail(e.target.value)}
-                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">Department</label>
-                  <input
-                    type="text"
-                    value={singleDept}
-                    onChange={(e) => setSingleDept(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">Squad</label>
-                  <select
-                    value={singleSquad}
-                    onChange={(e) => setSingleSquad(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-semibold text-[#051F20] outline-none"
-                  >
-                    <option value="Promotion">Promotion</option>
-                    <option value="Documentation">Documentation</option>
-                    <option value="Management">Management</option>
-                    <option value="Entertainment">Entertainment</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#0B2B26]">Default Login Credentials</div>
-                  <div className="text-[11px] text-[#235347]">
-                    Username: <strong>{singleRoll.trim().toUpperCase() || 'Roll Number'}</strong> • Password: <strong>geohub</strong>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
-                  geohub
-                </span>
-              </div>
-
-              <div className="pt-2">
-                <PillButton
-                  variant="primary"
-                  fullWidth
-                  disabled={!singleRoll.trim() || !singleName.trim()}
-                  onClick={handleSingleAdd}
-                >
-                  Enroll Scholar
-                </PillButton>
-              </div>
-            </form>
-          ) : (
-            /* Mode 2: Bulk Range Form */
-            <form onSubmit={handleBulkAdd} className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-[#051F20]">Roll Prefix</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. 21GEO"
-                  value={bulkPrefix}
-                  onChange={(e) => setBulkPrefix(e.target.value)}
-                  className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">From Number</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. 040"
-                    value={bulkFrom}
-                    onChange={(e) => setBulkFrom(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">To Number</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. 065"
-                    value={bulkTo}
-                    onChange={(e) => setBulkTo(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Preview Count Card */}
-              <div className="p-3.5 rounded-2xl bg-[#DAF1DE] border border-[#8EB69B] flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold text-[#163832]">Preview Batch Count</span>
-                  <span className="text-xs text-[#235347]">
-                    Range: {bulkPrefix}{bulkFrom} → {bulkPrefix}{bulkTo}
-                  </span>
-                </div>
-                <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#163832] text-white">
-                  {bulkCount} Scholars
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">Department</label>
-                  <input
-                    type="text"
-                    value={bulkDept}
-                    onChange={(e) => setBulkDept(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-[#051F20]">Squad</label>
-                  <select
-                    value={bulkSquad}
-                    onChange={(e) => setBulkSquad(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-semibold text-[#051F20] outline-none"
-                  >
-                    <option value="Promotion">Promotion</option>
-                    <option value="Documentation">Documentation</option>
-                    <option value="Management">Management</option>
-                    <option value="Entertainment">Entertainment</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#0B2B26]">Batch Login Credentials</div>
-                  <div className="text-[11px] text-[#235347]">
-                    All {bulkCount} scholars use their Roll No as Username • Default Password: <strong>geohub</strong>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
-                  geohub
-                </span>
-              </div>
-
-              <div className="pt-2">
-                <PillButton
-                  variant="primary"
-                  fullWidth
-                  disabled={bulkCount <= 0}
-                  onClick={handleBulkAdd}
-                >
-                  Enroll {bulkCount} Scholars in Bulk
-                </PillButton>
-              </div>
-            </form>
-          )}
-        </div>
-      </BottomSheet>
     </div>
   );
 };

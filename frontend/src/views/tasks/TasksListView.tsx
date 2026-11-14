@@ -145,7 +145,17 @@ export const TasksListView: React.FC = () => {
               <Avatar name={selectedTask.assigneeName} size={32} />
               <div>
                 <span style={{ color: '#235347', display: 'block' }}>Assigned Scholar</span>
-                <span style={{ fontWeight: 700, color: '#051F20' }}>{selectedTask.assigneeName}</span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {(() => {
+                    const assigneeUser = users.find((u) => u.uid === selectedTask.assigneeId || u.name === selectedTask.assigneeName);
+                    return assigneeUser?.rollNo ? (
+                      <span className="px-1.5 py-0.5 rounded font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                        {assigneeUser.rollNo}
+                      </span>
+                    ) : null;
+                  })()}
+                  <span style={{ fontWeight: 700, color: '#051F20' }}>{selectedTask.assigneeName}</span>
+                </div>
               </div>
             </div>
 
@@ -355,7 +365,7 @@ export const TasksListView: React.FC = () => {
             >
               {users.map((u) => (
                 <option key={u.uid} value={u.uid}>
-                  {u.name} ({u.department || 'Student'})
+                  {u.rollNo ? `${u.rollNo} — ` : ''}{u.name} ({u.team || 'Member'})
                 </option>
               ))}
             </select>

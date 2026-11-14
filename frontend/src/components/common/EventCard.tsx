@@ -23,7 +23,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
       style={{
         backgroundColor: '#FFFFFF',
         borderRadius: '20px',
-        border: '1px solid #E8ECF2',
+        border: '1px solid #DAF1DE',
         overflow: 'hidden',
         marginBottom: '16px',
         boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)',
@@ -39,7 +39,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onClick, isRegister
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = '0 4px 16px rgba(15, 23, 42, 0.03)';
-        e.currentTarget.style.borderColor = '#E8ECF2';
+        e.currentTarget.style.borderColor = '#DAF1DE';
       }}
     >
       {/* Poster Image / Cover */}

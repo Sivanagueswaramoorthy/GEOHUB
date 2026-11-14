@@ -172,6 +172,20 @@ def verify_attendance_qr(
         details=f"Verified attendance check-in for {attendee_name} at event {event.title}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("ATTENDANCE_MARKED", {
+            "id": att_id,
+            "event_id": event.id,
+            "event_title": event.title,
+            "attendee_id": qr.user_id,
+            "attendee_name": attendee_name,
+            "check_in_time": attendance.check_in_time.isoformat() if hasattr(attendance.check_in_time, 'isoformat') else str(attendance.check_in_time),
+            "attendance_count": event.attendance_count,
+        })
+    except Exception:
+        pass
+
     return schemas.QrVerifyResponse(
         success=True,
         message=f"Attendance confirmed for {attendee_name}",

@@ -263,7 +263,7 @@ export const ProfileView: React.FC = () => {
   // Password Strength Evaluation
   const getPasswordStrength = (pwd: string) => {
     if (!pwd || pwd.length < 8) {
-      return { label: 'Weak', score: 1, color: '#C86D51', width: '33%' };
+      return { label: 'Weak', score: 1, color: '#D9534F', width: '33%' };
     }
     const hasLetters = /[a-zA-Z]/.test(pwd);
     const hasNumbers = /[0-9]/.test(pwd);
@@ -272,9 +272,9 @@ export const ProfileView: React.FC = () => {
       return { label: 'Strong', score: 3, color: '#163832', width: '100%' };
     }
     if (hasLetters && hasNumbers) {
-      return { label: 'Fair', score: 2, color: '#D4A359', width: '66%' };
+      return { label: 'Fair', score: 2, color: '#F2B84B', width: '66%' };
     }
-    return { label: 'Weak', score: 1, color: '#C86D51', width: '33%' };
+    return { label: 'Weak', score: 1, color: '#D9534F', width: '33%' };
   };
 
   // Change Password Submission Handler
@@ -419,7 +419,7 @@ export const ProfileView: React.FC = () => {
         <div
           className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none opacity-40"
           style={{
-            background: 'radial-gradient(circle, #F3E4C3 0%, rgba(246, 251, 247, 0) 70%)',
+            background: 'radial-gradient(circle, #DAF1DE 0%, rgba(246, 251, 247, 0) 70%)',
           }}
         />
         <div
@@ -431,7 +431,7 @@ export const ProfileView: React.FC = () => {
 
         {/* Avatar with Gradient Status Ring */}
         <div className="relative mb-3">
-          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 bg-gradient-to-tr from-[#163832] via-[#D4A359] to-[#F3E4C3] shadow-[0_6px_20px_rgba(5,31,32,0.12)] flex items-center justify-center">
+          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full p-1 bg-gradient-to-tr from-[#163832] via-[#235347] to-[#8EB69B] shadow-[0_6px_20px_rgba(5,31,32,0.12)] flex items-center justify-center">
             {currentUser.avatarUrl ? (
               <img
                 src={currentUser.avatarUrl}
@@ -441,7 +441,7 @@ export const ProfileView: React.FC = () => {
             ) : (
               <div
                 className="w-full h-full rounded-full flex items-center justify-center font-extrabold text-2xl text-[#163832]"
-                style={{ backgroundColor: '#F3E4C3' }}
+                style={{ backgroundColor: '#DAF1DE' }}
               >
                 {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'G'}
               </div>
@@ -452,7 +452,7 @@ export const ProfileView: React.FC = () => {
             className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[#163832] border-2 border-white flex items-center justify-center shadow-xs"
             title="Institutional Verified Scholar"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-[#D4A359]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#8EB69B]" />
           </div>
         </div>
 
@@ -586,7 +586,7 @@ export const ProfileView: React.FC = () => {
               >
                 {userAttendanceCount}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">Verified Check-ins</span>
+              <span className="text-xs font-medium text-[#235347]">Verified Check-ins</span>
             </div>
 
             {/* Metric 2: Squad Duty */}
@@ -603,7 +603,7 @@ export const ProfileView: React.FC = () => {
               >
                 {currentUser.team || 'Leadership'}
               </span>
-              <span className="text-[11px] font-medium text-[#235347] truncate">
+              <span className="text-xs font-medium text-[#235347] truncate">
                 {currentUser.teamRole || badgeLabel}
               </span>
             </div>
@@ -622,7 +622,7 @@ export const ProfileView: React.FC = () => {
               >
                 {userTasksCount || (isFaculty ? 18 : 6)}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">Active Tasks</span>
+              <span className="text-xs font-medium text-[#235347]">Active Tasks</span>
             </div>
 
             {/* Metric 4: Clearance Tier */}
@@ -639,7 +639,7 @@ export const ProfileView: React.FC = () => {
               >
                 {isFaculty ? 'Tier 1' : isPresident ? 'Tier 1' : 'Tier 2'}
               </span>
-              <span className="text-[11px] font-medium text-[#235347]">
+              <span className="text-xs font-medium text-[#235347]">
                 {isFaculty ? 'Institutional' : 'Executive'}
               </span>
             </div>
@@ -660,7 +660,7 @@ export const ProfileView: React.FC = () => {
                   Academic & Club Dossier
                 </h3>
               </div>
-              <span className="text-[10px] font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full border border-[#8EB69B]">
+              <span className="text-xs font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full border border-[#8EB69B]">
                 Verified
               </span>
             </div>
@@ -709,7 +709,7 @@ export const ProfileView: React.FC = () => {
                     {currentUser.squadMemberships.map((m, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]"
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]"
                       >
                         <span>{m.squad}</span>
                         {m.isLead && <span className="opacity-75 font-semibold">(Lead)</span>}
@@ -876,7 +876,7 @@ export const ProfileView: React.FC = () => {
                   </span>
                   {serverHealth && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                      className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                         serverHealth.ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                       }`}
                     >
@@ -1298,7 +1298,7 @@ export const ProfileView: React.FC = () => {
                   </span>
                   {serverHealth && (
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                      className={`px-2 py-0.5 rounded-full text-xs font-bold ${
                         serverHealth.ok ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
                       }`}
                     >
@@ -1320,13 +1320,13 @@ export const ProfileView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsLogoutConfirmOpen(true)}
-          className="w-full h-11 rounded-2xl bg-white border border-[#C86D51] text-[#C86D51] font-bold text-xs flex items-center justify-center gap-2 hover:bg-rose-50 active:scale-[0.99] transition-all cursor-pointer touch-target-44 shadow-xs"
+          className="w-full h-11 rounded-2xl bg-white border border-[#D9534F] text-[#D9534F] font-bold text-xs flex items-center justify-center gap-2 hover:bg-rose-50 active:scale-[0.99] transition-all cursor-pointer touch-target-44 shadow-xs"
           aria-label="Log Out of GeoHub"
         >
           <LogOut size={16} strokeWidth={2.2} />
           <span>Log Out of GeoHub</span>
         </button>
-        <p className="text-center text-[11px] font-medium text-[#235347] opacity-75">
+        <p className="text-center text-xs font-medium text-[#235347] opacity-75">
           Safely conclude scholar session • GeoHub Institutional Chapter
         </p>
       </section>
@@ -1379,7 +1379,7 @@ export const ProfileView: React.FC = () => {
                   >
                     Change Password
                   </h3>
-                  <p className="text-[11px] font-semibold text-[#235347]">
+                  <p className="text-xs font-semibold text-[#235347]">
                     Update your scholar credentials securely
                   </p>
                 </div>
@@ -1403,7 +1403,7 @@ export const ProfileView: React.FC = () => {
             {passwordError && (
               <div
                 role="alert"
-                className="flex items-start gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-[#C86D51] text-xs font-semibold animate-in fade-in"
+                className="flex items-start gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-[#D9534F] text-xs font-semibold animate-in fade-in"
               >
                 <AlertCircle size={16} className="shrink-0 mt-0.5" />
                 <span>{passwordError}</span>
@@ -1475,7 +1475,7 @@ export const ProfileView: React.FC = () => {
                   </label>
                   {newPassword && (
                     <span
-                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
                       style={{
                         color: getPasswordStrength(newPassword).color,
                         backgroundColor: '#DAF1DE',
@@ -1529,7 +1529,7 @@ export const ProfileView: React.FC = () => {
                     />
                   </div>
                 )}
-                <span className="text-[11px] text-[#235347] font-medium pl-0.5">
+                <span className="text-xs text-[#235347] font-medium pl-0.5">
                   At least 8 characters with letters & numbers
                 </span>
               </div>
@@ -1544,7 +1544,7 @@ export const ProfileView: React.FC = () => {
                     Confirm New Password
                   </label>
                   {confirmPassword && newPassword === confirmPassword && (
-                    <span className="text-[10px] font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="text-xs font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Check size={11} strokeWidth={3} />
                       Passwords match
                     </span>
@@ -1692,7 +1692,7 @@ export const ProfileView: React.FC = () => {
             </button>
 
             {/* Ledger Disclaimer */}
-            <p className="text-[11px] font-medium text-[#235347] mt-3 px-2 leading-relaxed">
+            <p className="text-xs font-medium text-[#235347] mt-3 px-2 leading-relaxed">
               Dynamic cryptographic token verified against institutional ledger. Single-use gate clearance.
             </p>
 

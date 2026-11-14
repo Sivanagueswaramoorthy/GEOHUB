@@ -61,7 +61,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
             ? '#FFFFFF'
             : 'rgba(22, 56, 50, 0.08)',
           border: isAvatar
-            ? '2px solid var(--antique-gold, #D4A359)'
+            ? '2px solid var(--antique-gold, #F2B84B)'
             : isBell
             ? '1.5px solid var(--card-border, #DAF1DE)'
             : 'none',
@@ -88,7 +88,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
                 height: '8px',
                 minWidth: '8px',
                 minHeight: '8px',
-                backgroundColor: 'var(--spiced-terracotta, #C86D51)',
+                backgroundColor: 'var(--red-danger, #D9534F)',
                 boxShadow: '0 0 0 1.5px #FFFFFF',
               }}
             />
@@ -105,7 +105,7 @@ export const IconCircleButton: React.FC<IconCircleButtonProps> = ({
                 padding: '0 4px',
                 fontSize: '12px',
                 lineHeight: isCompact ? '16px' : '18px',
-                backgroundColor: 'var(--spiced-terracotta, #C86D51)',
+                backgroundColor: 'var(--red-danger, #D9534F)',
                 boxShadow: '0 0 0 2px #FFFFFF',
               }}
             >

@@ -207,7 +207,12 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                     {lead.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {lead.rollNo && (
+                        <span className="px-1.5 py-0.5 rounded font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                          {lead.rollNo}
+                        </span>
+                      )}
                       <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
                         {lead.name}
                       </span>
@@ -217,8 +222,6 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5 text-xs text-[#235347] truncate">
                       <span className="font-semibold text-[#163832] truncate">{lead.post}</span>
-                      <span>•</span>
-                      <span className="font-mono text-[#051F20]">{lead.rollNo}</span>
                     </div>
                   </div>
                 </div>
@@ -271,7 +274,10 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
 
       {/* Edit Lead Modal */}
       {editingLead && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/50 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+        >
           <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-[#051F20] text-base">
@@ -338,7 +344,10 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
 
       {/* Appoint Modal */}
       {showAppointModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/50 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+        >
           <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-[#051F20] text-base">
@@ -356,47 +365,59 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
             <form onSubmit={handleAppointSubmit} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                  Scholar Full Name
+                  Select Scholar by Roll Number *
                 </label>
-                <input
-                  type="text"
+                <select
                   required
-                  placeholder="e.g. Maya Patel"
-                  value={appointName}
-                  onChange={(e) => setAppointName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                />
+                  value={appointRoll}
+                  onChange={(e) => {
+                    const roll = e.target.value;
+                    setAppointRoll(roll);
+                    const found = (users || []).find((u) => u.rollNo === roll || u.email?.startsWith(roll.toLowerCase()));
+                    if (found) {
+                      setAppointName(found.name);
+                      if (found.team) {
+                        setAppointSquad(found.team);
+                        setAppointPost(`${found.team} Lead`);
+                      }
+                    }
+                  }}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
+                >
+                  <option value="">Choose Roll Number...</option>
+                  {(users || [])
+                    .filter((u) => u.rollNo)
+                    .map((u) => (
+                      <option key={u.uid} value={u.rollNo}>
+                        {u.rollNo} — {u.name} ({u.team || 'Member'})
+                      </option>
+                    ))}
+                </select>
+                {appointName && (
+                  <div className="mt-1.5 p-2 rounded-lg bg-[#DAF1DE]/60 border border-[#8EB69B]/50 flex items-center justify-between text-xs">
+                    <span className="text-[#235347]">Verified Scholar:</span>
+                    <strong className="text-[#051F20] font-bold">{appointName} ({appointRoll})</strong>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                    Squad
-                  </label>
-                  <select
-                    value={appointSquad}
-                    onChange={(e) => setAppointSquad(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                  >
-                    <option value="Promotion">Promotion</option>
-                    <option value="Management">Management</option>
-                    <option value="Treasury">Treasury</option>
-                    <option value="Documentation">Documentation</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
-                    Roll Number
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={appointRoll}
-                    onChange={(e) => setAppointRoll(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                  Squad
+                </label>
+                <select
+                  value={appointSquad}
+                  onChange={(e) => {
+                    setAppointSquad(e.target.value);
+                    setAppointPost(`${e.target.value} Lead`);
+                  }}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                >
+                  <option value="Promotion">Promotion</option>
+                  <option value="Management">Management</option>
+                  <option value="Treasury">Treasury</option>
+                  <option value="Documentation">Documentation</option>
+                </select>
               </div>
 
               <div>

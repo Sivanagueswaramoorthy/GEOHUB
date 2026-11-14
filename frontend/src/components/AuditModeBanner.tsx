@@ -27,7 +27,7 @@ export const AuditModeBanner: React.FC<AuditModeBannerProps> = ({
       <div className="flex items-start gap-3">
         <div
           className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
-          style={{ backgroundColor: '#EEF2FF', color: '#4F46E5' }}
+          style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
         >
           <ShieldCheck size={18} strokeWidth={2} />
         </div>
@@ -38,11 +38,11 @@ export const AuditModeBanner: React.FC<AuditModeBannerProps> = ({
               Institutional Audit Mode
             </span>
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+              className="text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
               style={{
-                backgroundColor: '#E0E7FF',
-                color: '#3730A3',
-                border: '1px solid #C7D2FE',
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                border: '1px solid #8EB69B',
               }}
             >
               Super Admin • Read-Only
@@ -60,7 +60,7 @@ export const AuditModeBanner: React.FC<AuditModeBannerProps> = ({
               <button
                 type="button"
                 onClick={onFacultyActionClick}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-700 hover:text-indigo-900 hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#163832] hover:text-[#0B2B26] hover:underline cursor-pointer"
               >
                 <span>{facultyActionLabel}</span>
                 <ArrowRight size={14} />
@@ -69,7 +69,7 @@ export const AuditModeBanner: React.FC<AuditModeBannerProps> = ({
           )}
         </div>
 
-        <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200/70 text-slate-700 text-[11px] font-bold shrink-0">
+        <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200/70 text-slate-700 text-xs font-bold shrink-0">
           <Eye size={12} strokeWidth={2} />
           <span>Auditor</span>
         </div>

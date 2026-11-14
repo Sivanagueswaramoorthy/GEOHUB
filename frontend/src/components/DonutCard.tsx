@@ -362,8 +362,8 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                   style={{
                     fontSize: '12.5px',
                     fontWeight: 800,
-                    color: isHovered ? '#0B2B26' : '#1E293B',
-                    backgroundColor: isHovered ? '#FFFFFF' : '#EDF2F7',
+                    color: isHovered ? '#0B2B26' : '#235347',
+                    backgroundColor: isHovered ? '#FFFFFF' : '#DAF1DE',
                     padding: '1px 6px',
                     borderRadius: '5px',
                     flexShrink: 0,
@@ -448,7 +448,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                     padding: '8px 12px',
                     borderRadius: '10px',
                     backgroundColor: '#F6FBF7',
-                    border: '1px solid #EDF2F7',
+                    border: '1px solid #DAF1DE',
                     transition: 'all 0.15s ease',
                   }}
                   onMouseEnter={(e) => {
@@ -457,7 +457,7 @@ export const DonutCard: React.FC<DonutCardProps> = ({
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = '#F6FBF7';
-                    e.currentTarget.style.borderColor = '#EDF2F7';
+                    e.currentTarget.style.borderColor = '#DAF1DE';
                   }}
                 >
                   {/* Name on Left */}

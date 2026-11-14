@@ -419,10 +419,10 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       email: cleanEmail,
       department: studentDept,
       yearOfStudy: studentYear,
-      squad: studentSquad,
+      squad: 'Member',
       role: 'student',
     });
-    showToast(`✓ Student ${cleanName} (${cleanRoll}) enrolled! Login: ${cleanRoll} | Password: geohub`);
+    showToast(`✓ Student ${cleanName} (${cleanRoll}) enrolled as Member! Login: ${cleanRoll} | Password: geohub`);
     setStudentRollNo('');
     setStudentName('');
     setStudentEmail('');
@@ -582,27 +582,27 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'Add Stock Item',
       desc: 'Catalog equipment, logistics gear, or supplies',
       icon: <PackagePlus size={24} strokeWidth={1.75} />,
-      bg: '#FFF8E6',
-      border: '#FDE68A',
-      color: '#92400E',
+      bg: '#F6FBF7',
+      border: '#DAF1DE',
+      color: '#235347',
     },
     {
       key: 'request_budget',
       title: 'Request Budget Change',
       desc: 'Petition faculty advisor for squad allocation rebalance',
       icon: <Layers size={24} strokeWidth={1.75} />,
-      bg: '#F3EEFF',
-      border: '#DDD1FF',
-      color: '#5B21B6',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#0B2B26',
     },
     {
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Verify delegate check-ins via turnstile QR scanner',
       icon: <Scan size={24} strokeWidth={1.75} />,
-      bg: '#EFF6FF',
-      border: '#BFDBFE',
-      color: '#1D4ED8',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#163832',
     },
   ];
 
@@ -621,27 +621,27 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'Upload Media',
       desc: 'Upload photos (geotagged/normal) & videos',
       icon: <Upload size={24} strokeWidth={1.75} />,
-      bg: '#F3EEFF',
-      border: '#DDD1FF',
-      color: '#5B21B6',
+      bg: '#F6FBF7',
+      border: '#DAF1DE',
+      color: '#235347',
     },
     {
       key: 'write_news',
       title: 'Write Daily News',
       desc: 'Publish daily chapter news bulletin & digest',
       icon: <Newspaper size={24} strokeWidth={1.75} />,
-      bg: '#FFF8E6',
-      border: '#FDE68A',
-      color: '#92400E',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#0B2B26',
     },
     {
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Gate attendance scanner for active session',
       icon: <Scan size={24} strokeWidth={1.75} />,
-      bg: '#EFF6FF',
-      border: '#BFDBFE',
-      color: '#1D4ED8',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#163832',
     },
   ];
 
@@ -651,9 +651,9 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'New Post',
       desc: 'Create post for Instagram, LinkedIn, WhatsApp',
       icon: <Send size={24} strokeWidth={1.75} />,
-      bg: '#F5F3FF',
-      border: '#DDD6FE',
-      color: '#6D28D9',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#163832',
     },
     {
       key: 'promo_campaign',
@@ -669,18 +669,18 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'AI Draft',
       desc: 'Generate viral copy with AI Studio',
       icon: <Sparkles size={24} strokeWidth={1.75} />,
-      bg: '#FFF8E6',
-      border: '#FDE68A',
-      color: '#92400E',
+      bg: '#F6FBF7',
+      border: '#DAF1DE',
+      color: '#235347',
     },
     {
       key: 'scan_attendance',
       title: 'Scan Attendance',
       desc: 'Gate attendance scanner for active session',
       icon: <Scan size={24} strokeWidth={1.75} />,
-      bg: '#EFF6FF',
-      border: '#BFDBFE',
-      color: '#1D4ED8',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#163832',
     },
   ];
 
@@ -699,34 +699,34 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'Schedule Meeting',
       desc: 'Core committee or advisory standup',
       icon: <Calendar size={24} strokeWidth={1.75} />,
-      bg: '#F3EEFF',
-      border: '#DDD1FF',
-      color: '#5B21B6',
+      bg: '#F6FBF7',
+      border: '#DAF1DE',
+      color: '#235347',
     },
     {
       key: 'assign_post',
       title: 'Assign Post',
       desc: 'Designate squad leads & officer positions',
       icon: <Award size={24} strokeWidth={1.75} />,
-      bg: '#FFF8E6',
-      border: '#FDE68A',
-      color: '#92400E',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#0B2B26',
     },
     {
       key: 'post_announcement',
       title: 'Post Announcement',
       desc: 'Broadcast chapter advisory to all scholars',
       icon: <Megaphone size={24} strokeWidth={1.75} />,
-      bg: '#FEF2F2',
-      border: '#FECACA',
-      color: '#DC2626',
+      bg: '#DAF1DE',
+      border: '#D9534F',
+      color: '#D9534F',
     },
     {
       key: 'add_student',
       title: 'Add Student',
       desc: 'Enroll new scholar directly to a squad',
       icon: <UserPlus size={24} strokeWidth={1.75} />,
-      bg: '#E8FBF8',
+      bg: '#DAF1DE',
       border: '#8EB69B',
       color: '#163832',
     },
@@ -738,9 +738,9 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'Show My Pass',
       desc: 'Dynamic 30-second turnstile QR pass',
       icon: <QrCode size={24} strokeWidth={1.75} />,
-      bg: '#F3EEFF',
-      border: '#DDD1FF',
-      color: '#7C3AED',
+      bg: '#DAF1DE',
+      border: '#8EB69B',
+      color: '#163832',
     },
     {
       key: 'student_register',
@@ -756,9 +756,9 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       title: 'Give Feedback',
       desc: 'Rate completed workshops & sessions',
       icon: <Sparkles size={24} strokeWidth={1.75} />,
-      bg: '#FFF8E6',
-      border: '#FDE68A',
-      color: '#92400E',
+      bg: '#F6FBF7',
+      border: '#DAF1DE',
+      color: '#235347',
     },
   ];
 
@@ -957,7 +957,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
               <option value="">Choose student...</option>
               {users.map((u) => (
                 <option key={u.uid} value={u.uid}>
-                  {u.name} ({u.department || 'Student'})
+                  {u.rollNo ? `${u.rollNo} — ` : ''}{u.name} ({u.team || 'Member'})
                 </option>
               ))}
             </select>
@@ -1054,59 +1054,35 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none focus:border-emerald-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Department</label>
-              <input
-                type="text"
-                value={studentDept}
-                onChange={(e) => setStudentDept(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Year of Study</label>
-              <select
-                value={studentYear}
-                onChange={(e) => setStudentYear(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white"
-              >
-                <option value="1st Year">1st Year</option>
-                <option value="2nd Year">2nd Year</option>
-                <option value="3rd Year">3rd Year</option>
-                <option value="4th Year">4th Year</option>
-              </select>
-            </div>
-          </div>
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Assign to Squad</label>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Year of Study</label>
             <select
-              value={studentSquad}
-              onChange={(e) => setStudentSquad(e.target.value)}
+              value={studentYear}
+              onChange={(e) => setStudentYear(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium outline-none bg-white"
             >
-              <option value="Management">Management Squad</option>
-              <option value="Promotion">Promotion Squad</option>
-              <option value="Documentation">Documentation Squad</option>
-              <option value="Entertainment">Entertainment Squad</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
             </select>
-          </div>
-          <div className="p-3 rounded-xl bg-[#DAF1DE] border border-[#8EB69B] text-xs text-[#051F20] flex items-center justify-between">
-            <div>
-              <div className="font-bold text-[#0B2B26]">Default Login Credentials</div>
-              <div className="text-[11px] text-[#235347]">
-                Username: <strong>{studentRollNo.trim().toUpperCase() || 'Roll Number'}</strong> • Password: <strong>geohub</strong>
-              </div>
-            </div>
-            <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] font-mono text-[10px] font-bold border border-[#8EB69B]">
-              geohub
-            </span>
           </div>
           <button
             type="submit"
-            className="w-full py-3 rounded-full font-bold text-xs bg-teal-600 text-white shadow-sm hover:bg-teal-700 transition-all mt-2"
+            className="w-full py-3 rounded-full font-bold text-xs bg-[#163832] text-white shadow-sm hover:bg-[#051F20] transition-all mt-2 cursor-pointer"
           >
             Complete Scholar Enrollment
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveModalAction(null);
+              onClose();
+              setActiveTab('add_students');
+            }}
+            className="w-full py-1 text-center text-xs font-bold text-[#163832] hover:underline cursor-pointer"
+          >
+            Open Full Screen Enrollment Page &rarr;
           </button>
         </form>
       </BottomSheet>

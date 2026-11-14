@@ -355,7 +355,7 @@ export const VolunteerScanView: React.FC = () => {
               style={{
                 fontSize: '13.5px',
                 fontWeight: 400,
-                color: '#5A7370',
+                color: '#235347',
                 marginTop: '6px',
                 lineHeight: 1.4,
               }}
@@ -385,8 +385,8 @@ export const VolunteerScanView: React.FC = () => {
                 let shadowStyle = 'none';
 
                 if (otpError) {
-                  borderStyle = '1.5px solid #F87171';
-                  bgStyle = '#FEF2F2';
+                  borderStyle = '1.5px solid #D9534F';
+                  bgStyle = 'rgba(217, 83, 79, 0.12)';
                 } else if (isEntered) {
                   borderStyle = '2px solid #163832';
                   bgStyle = '#FFFFFF';
@@ -394,7 +394,7 @@ export const VolunteerScanView: React.FC = () => {
                 } else if (isCurrent) {
                   borderStyle = '2px solid #235347';
                   bgStyle = '#FFFFFF';
-                  shadowStyle = '0 0 0 3.5px #DDF2E8';
+                  shadowStyle = '0 0 0 3.5px rgba(142, 182, 155, 0.45)';
                 }
 
                 return (
@@ -433,7 +433,7 @@ export const VolunteerScanView: React.FC = () => {
                   marginTop: '10px',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  color: '#5A7370',
+                  color: '#235347',
                   letterSpacing: '0.01em',
                 }}
               >
@@ -450,12 +450,12 @@ export const VolunteerScanView: React.FC = () => {
                   width: '100%',
                   padding: '11px 16px',
                   borderRadius: '16px',
-                  backgroundColor: '#FEF2F2',
-                  border: '1px solid #FECACA',
+                  backgroundColor: 'rgba(217, 83, 79, 0.12)',
+                  border: '1px solid rgba(217, 83, 79, 0.35)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  color: '#DC2626',
+                  color: '#D9534F',
                   fontSize: '14.5px',
                   fontWeight: 500,
                   boxSizing: 'border-box',
@@ -463,7 +463,7 @@ export const VolunteerScanView: React.FC = () => {
                 className="animate-fadeIn"
                 role="alert"
               >
-                <AlertCircle size={18} strokeWidth={2} className="text-[#DC2626] shrink-0" />
+                <AlertCircle size={18} strokeWidth={2} className="text-[#D9534F] shrink-0" />
                 <span>{otpError}</span>
               </div>
               <div style={{ textAlign: 'center', marginTop: '12px', marginBottom: '6px' }}>
@@ -515,7 +515,7 @@ export const VolunteerScanView: React.FC = () => {
                   minWidth: '76px',
                   minHeight: '76px',
                   borderRadius: '50%',
-                  backgroundColor: '#F3F7F5',
+                  backgroundColor: '#F6FBF7',
                   color: '#051F20',
                   fontSize: '28px',
                   fontWeight: 700,
@@ -543,7 +543,7 @@ export const VolunteerScanView: React.FC = () => {
                 minWidth: '76px',
                 minHeight: '76px',
                 borderRadius: '50%',
-                backgroundColor: '#F3F7F5',
+                backgroundColor: '#F6FBF7',
                 color: '#051F20',
                 display: 'flex',
                 alignItems: 'center',
@@ -569,7 +569,7 @@ export const VolunteerScanView: React.FC = () => {
                 minWidth: '76px',
                 minHeight: '76px',
                 borderRadius: '50%',
-                backgroundColor: '#F3F7F5',
+                backgroundColor: '#F6FBF7',
                 color: '#051F20',
                 fontSize: '28px',
                 fontWeight: 700,
@@ -598,8 +598,8 @@ export const VolunteerScanView: React.FC = () => {
                 minHeight: '76px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: otpDigits.length === 6 ? '#163832' : '#F3F7F5',
-                color: otpDigits.length === 6 ? '#FFFFFF' : '#B8C8C4',
+                backgroundColor: otpDigits.length === 6 ? '#163832' : '#F6FBF7',
+                color: otpDigits.length === 6 ? '#FFFFFF' : '#8EB69B',
                 boxShadow: otpDigits.length === 6 ? '0 8px 24px rgba(22, 56, 50, 0.35)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
@@ -679,7 +679,7 @@ export const VolunteerScanView: React.FC = () => {
         minHeight: '100vh',
         width: '100%',
         position: 'relative',
-        backgroundColor: '#000000',
+        backgroundColor: '#051F20',
       }}
     >
       {/* Live Video Camera Background */}
@@ -697,7 +697,7 @@ export const VolunteerScanView: React.FC = () => {
       <div
         className="absolute inset-0 pointer-events-none z-1"
         style={{
-          background: 'radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.7) 75%, #000000 100%)',
+          background: 'radial-gradient(circle at center, transparent 35%, rgba(5, 31, 32, 0.7) 75%, #051F20 100%)',
         }}
       />
 
@@ -819,7 +819,7 @@ export const VolunteerScanView: React.FC = () => {
               }}
             />
 
-            {/* Horizontal Animated Laser Scan Line (Bright Green #22C55E with Glow) */}
+            {/* Horizontal Animated Laser Scan Line (Sage Green #8EB69B with Glow) */}
             <div
               className="animate-scan-laser"
               style={{
@@ -827,8 +827,8 @@ export const VolunteerScanView: React.FC = () => {
                 left: '0px',
                 right: '0px',
                 height: '3px',
-                background: 'linear-gradient(90deg, rgba(34, 197, 94, 0) 0%, #22C55E 15%, #22C55E 85%, rgba(34, 197, 94, 0) 100%)',
-                boxShadow: '0 0 10px #22C55E, 0 0 20px #22C55E, 0 0 35px rgba(34, 197, 94, 0.7)',
+                background: 'linear-gradient(90deg, rgba(142, 182, 155, 0) 0%, #8EB69B 15%, #8EB69B 85%, rgba(142, 182, 155, 0) 100%)',
+                boxShadow: '0 0 10px #8EB69B, 0 0 20px #8EB69B, 0 0 35px rgba(142, 182, 155, 0.7)',
                 borderRadius: '999px',
                 pointerEvents: 'none',
                 zIndex: 10,
@@ -907,7 +907,8 @@ export const VolunteerScanView: React.FC = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="success-popup-title"
-          className="fixed inset-0 z-50 bg-[#051F20]/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 flex items-center justify-center p-4 animate-fadeIn"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
         >
           <div className="bg-white border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center text-center animate-scaleUp">
             {/* Green Success Check Icon */}
@@ -964,7 +965,8 @@ export const VolunteerScanView: React.FC = () => {
           role="dialog"
           aria-modal="true"
           aria-labelledby="error-popup-title"
-          className="fixed inset-0 z-50 bg-[#051F20]/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 flex items-center justify-center p-4 animate-fadeIn"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
         >
           <div className="bg-white border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl max-w-sm w-full flex flex-col items-center text-center animate-scaleUp">
             {/* Red Alert Icon */}

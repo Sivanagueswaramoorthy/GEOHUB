@@ -409,8 +409,8 @@ export const NextEventSpotlight: React.FC<NextEventSpotlightProps> = ({
                 key={duty.id}
                 className="p-3 rounded-2xl border transition-all hover:border-[#8EB69B] hover:shadow-2xs"
                 style={{
-                  backgroundColor: isComplete ? '#F8FBF9' : '#FFFFFF',
-                  borderColor: isComplete ? '#DAF1DE' : '#EEF2F6',
+                  backgroundColor: isComplete ? '#F6FBF7' : '#FFFFFF',
+                  borderColor: '#DAF1DE',
                 }}
               >
                 <div className="flex items-center justify-between gap-2 mb-2">

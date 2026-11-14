@@ -98,12 +98,16 @@ export const AttendanceView: React.FC = () => {
         return false;
       }
     }
-    if (
-      searchQuery &&
-      !rec.userName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !rec.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase().trim();
+      const userRoll = (users.find((u) => u.uid === rec.userId)?.rollNo || '').toLowerCase();
+      if (
+        !userRoll.includes(q) &&
+        !rec.userName.toLowerCase().includes(q) &&
+        !rec.userEmail.toLowerCase().includes(q)
+      ) {
+        return false;
+      }
     }
     return true;
   });
@@ -403,6 +407,7 @@ export const AttendanceView: React.FC = () => {
                 ? 'cancelled'
                 : 'draft';
 
+            const userRoll = users.find((u) => u.uid === rec.userId)?.rollNo;
             return (
               <div
                 key={rec.id}
@@ -413,6 +418,11 @@ export const AttendanceView: React.FC = () => {
                   <Avatar name={rec.userName} size={40} />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
+                      {userRoll && (
+                        <span className="px-2 py-0.5 rounded-md font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                          {userRoll}
+                        </span>
+                      )}
                       <span className="font-bold text-sm text-[#051F20]">
                         {rec.userName}
                       </span>
@@ -537,7 +547,12 @@ export const AttendanceView: React.FC = () => {
           isOpen={isAssignPickerOpen}
           onClose={() => setIsAssignPickerOpen(false)}
           title="Assign Gate Scanners"
-          people={users.map((u) => ({ id: u.uid, name: u.name, role: u.post || u.role }))}
+          people={users.map((u) => ({
+            id: u.uid,
+            rollNo: u.rollNo || u.email?.split('@')[0]?.toUpperCase(),
+            name: u.name,
+            role: u.post || u.role,
+          }))}
           selectedIds={assignedScanners}
           onConfirm={handleSaveScanners}
         />

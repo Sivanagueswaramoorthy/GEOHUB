@@ -368,9 +368,12 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
 
       {/* New Budget Request Modal */}
       {showNewModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+        >
           <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_12px_36px_rgba(5,31,32,0.15)] w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between p-4 border-b border-[#DAF1DE] bg-[#F7FBF8]">
+            <div className="flex items-center justify-between p-4 border-b border-[#DAF1DE] bg-[#F6FBF7]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#163832]">
                   <Coins size={16} />
@@ -395,7 +398,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. LiPo flight batteries & cables replacement"
-                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#F6FBF7]"
                 />
               </div>
 
@@ -409,7 +412,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
                     value={newAmount}
                     onChange={(e) => setNewAmount(e.target.value)}
                     placeholder="4500"
-                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#F6FBF7]"
                   />
                 </div>
                 <div>
@@ -417,7 +420,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                    className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#F6FBF7]"
                   >
                     <option value="Equipment">Equipment</option>
                     <option value="Refreshments">Refreshments</option>
@@ -433,7 +436,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
                 <select
                   value={newEvent}
                   onChange={(e) => setNewEvent(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB]"
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#F6FBF7]"
                 >
                   <option value="General Operations">General Club Operations</option>
                   {(events || []).map((ev) => (
@@ -449,7 +452,7 @@ export const TreasuryScreen: React.FC<TreasuryScreenProps> = ({
                   value={newReason}
                   onChange={(e) => setNewReason(e.target.value)}
                   placeholder="State the requirement justification for advisor approval..."
-                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#FBFDFB] resize-none"
+                  className="w-full px-3 py-2 rounded-xl border border-[#DAF1DE] text-xs font-medium outline-none focus:border-[#163832] bg-[#F6FBF7] resize-none"
                 />
               </div>
 

@@ -47,7 +47,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                 ? '1px solid #235347'
                 : item.isToday
                 ? '1.5px solid #8EB69B'
-                : '1px solid #EEF1F5',
+                : '1px solid #DAF1DE',
               boxShadow: isSelected
                 ? '0 6px 16px rgba(35, 83, 71, 0.35)'
                 : '0 2px 6px rgba(15, 23, 42, 0.02)',

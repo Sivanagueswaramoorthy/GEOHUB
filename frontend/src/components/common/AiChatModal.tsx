@@ -121,7 +121,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '16px 20px',
-          borderBottom: '1px solid #E8ECF2',
+          borderBottom: '1px solid #DAF1DE',
           backgroundColor: '#FFFFFF',
           position: 'sticky',
           top: 0,
@@ -220,7 +220,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                           : '18px 18px 18px 4px',
                       backgroundColor: msg.sender === 'user' ? '#FFFFFF' : '#DAF1DE',
                       color: msg.sender === 'user' ? '#051F20' : '#163832',
-                      border: msg.sender === 'user' ? '1px solid #E8ECF2' : '1px solid #8EB69B',
+                      border: msg.sender === 'user' ? '1px solid #DAF1DE' : '1px solid #8EB69B',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
                       fontSize: '14px',
                       lineHeight: 1.45,
@@ -236,7 +236,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
                     style={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '20px',
-                      border: '1px solid #E8ECF2',
+                      border: '1px solid #DAF1DE',
                       padding: '16px',
                       boxShadow: '0 4px 14px rgba(0, 0, 0, 0.04)',
                       display: 'flex',
@@ -351,7 +351,7 @@ export const AiChatModal: React.FC<AiChatModalProps> = ({ isOpen, onClose }) => 
           gap: '8px',
           padding: '12px 16px 20px',
           backgroundColor: '#FFFFFF',
-          borderTop: '1px solid #E8ECF2',
+          borderTop: '1px solid #DAF1DE',
         }}
       >
         <button

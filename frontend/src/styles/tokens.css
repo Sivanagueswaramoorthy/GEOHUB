@@ -27,13 +27,13 @@
   --vanilla-latte-cream: #F6FBF7;
   --vanilla-latte-border: #DAF1DE;
 
-  --spiced-terracotta: #C86D51;
-  --spiced-terracotta-soft: #FBF0EB;
-  --spiced-terracotta-border: #F2CFBE;
+  --spiced-terracotta: #D9534F;
+  --spiced-terracotta-soft: #F6FBF7;
+  --spiced-terracotta-border: #DAF1DE;
 
-  --antique-gold: #D4A359;
-  --antique-gold-soft: #FAF3E5;
-  --antique-gold-border: #E5CE9F;
+  --antique-gold: #F2B84B;
+  --antique-gold-soft: #F6FBF7;
+  --antique-gold-border: #DAF1DE;
 
   /* --------------------------------------------------------------------------
      2. Derived & Semantic Palette
@@ -52,14 +52,14 @@
   --text-muted: #235347;     /* Medium muted forest green */
 
   /* Semantic (chips, alerts, badges) */
-  --amber-warn: #D4A359;  /* Antique Gold: VIP badges, pending, review, standing */
-  --red-danger: #C86D51;  /* Spiced Terracotta: notification count, cancel, reject, delete */
+  --amber-warn: #F2B84B;  /* Semantic Amber: warnings, attention */
+  --red-danger: #D9534F;  /* Semantic Red: notification count, cancel, reject, delete */
 
   /* Semantic backgrounds (translucent) */
-  --amber-bg: rgba(212, 163, 89, 0.14);
-  --amber-border: rgba(212, 163, 89, 0.40);
-  --red-bg: rgba(200, 109, 81, 0.12);
-  --red-border: rgba(200, 109, 81, 0.35);
+  --amber-bg: rgba(242, 184, 75, 0.14);
+  --amber-border: rgba(242, 184, 75, 0.40);
+  --red-bg: rgba(217, 83, 79, 0.12);
+  --red-border: rgba(217, 83, 79, 0.35);
 
   /* Hairline and border tokens */
   --hairline-mint: 1px solid #DAF1DE;
@@ -81,8 +81,8 @@
   --primary-dark: #0B2B26;
   --primary-light: #DAF1DE;
   --text-main: #051F20;
-  --danger-red: #C86D51;
-  --warning-amber: #D4A359;
+  --danger-red: #D9534F;
+  --warning-amber: #F2B84B;
 
   /* --------------------------------------------------------------------------
      3. Radius (Strict Scale)

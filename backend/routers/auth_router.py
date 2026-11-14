@@ -377,5 +377,21 @@ def enroll_user(
         details=f"Enrolled new scholar {new_user.name} ({clean_roll}) with role {new_user.role}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("MEMBER_ENROLLED", {
+            "id": new_user.id,
+            "roll_no": new_user.roll_no,
+            "name": new_user.name,
+            "email": new_user.email,
+            "role": new_user.role,
+            "department": new_user.department,
+            "year_of_study": new_user.year_of_study,
+            "team": new_user.team,
+            "status": new_user.status,
+        })
+    except Exception:
+        pass
+
     return schemas.UserResponse.from_orm(new_user)
 

@@ -51,8 +51,9 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         flexDirection: 'column',
         justifyContent: fullScreen ? 'stretch' : 'flex-end',
         alignItems: 'center',
-        backgroundColor: fullScreen && !isPhoneFrame ? '#FFFFFF' : 'rgba(5, 31, 32, 0.45)',
-        backdropFilter: fullScreen && !isPhoneFrame ? 'none' : 'blur(6px)',
+        backgroundColor: fullScreen && !isPhoneFrame ? '#FFFFFF' : 'rgba(5, 31, 32, 0.60)',
+        backdropFilter: fullScreen && !isPhoneFrame ? 'none' : 'blur(16px)',
+        WebkitBackdropFilter: fullScreen && !isPhoneFrame ? 'none' : 'blur(16px)',
       }}
       onClick={fullScreen ? undefined : onClose}
     >

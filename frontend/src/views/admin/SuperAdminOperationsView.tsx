@@ -692,7 +692,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
                         {op.label}
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                        className={`px-1.5 py-0.5 rounded text-xs font-bold ${
                           isActive
                             ? 'bg-emerald-100 text-emerald-800'
                             : 'bg-gray-100 text-gray-500'

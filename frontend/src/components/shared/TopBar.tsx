@@ -208,13 +208,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="flex items-baseline min-w-0" style={{ gap: '6px' }}>
                     {/* Line 1: Custom Org Name in Astafine Luxury Serif */}
                     <span
-                      className="geohub-bar-title font-extrabold text-[#D4A359] truncate"
+                      className="geohub-bar-title font-extrabold text-[#051F20] truncate"
                       style={{
                         fontFamily: astafineSerifFamily,
                         fontSize: '20px',
                         lineHeight: '24px',
                         fontWeight: 900,
-                        color: '#D4A359',
+                        color: '#051F20',
                         letterSpacing: '-0.025em',
                         fontOpticalSizing: 'auto',
                         fontFeatureSettings: "'dlig' 1, 'liga' 1, 'swsh' 1, 'calt' 1",
@@ -227,13 +227,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                     {/* Line 2: Custom Org Subtitle in Astafine Luxury Serif */}
                     {displayOrgSubtitle && (
                       <span
-                        className="geohub-bar-subtitle font-bold text-[#D4A359] truncate"
+                        className="geohub-bar-subtitle font-bold text-[#235347] truncate"
                         style={{
                           fontFamily: astafineSerifFamily,
                           fontSize: '12px',
                           lineHeight: '14px',
                           fontWeight: 700,
-                          color: '#D4A359',
+                          color: '#235347',
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
                           fontOpticalSizing: 'auto',
@@ -253,6 +253,40 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* RIGHT GROUP: High-Contrast Bell, Avatar with Dropdown Arrow */}
           <div className="flex items-center shrink-0" style={{ gap: '10px' }}>
             {rightAction}
+
+            {/* Live Cloud Multi-Device Sync Indicator */}
+            {appContext && (
+              <button
+                type="button"
+                onClick={() => appContext.refreshCloudData()}
+                title={
+                  appContext.syncStatus === 'connected'
+                    ? 'Real-Time Cloud Synced • Tap to refresh'
+                    : appContext.syncStatus === 'syncing'
+                    ? 'Synchronizing across devices...'
+                    : 'Offline cache • Tap to reconnect'
+                }
+                aria-label="Cloud synchronization status"
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DAF1DE] bg-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs"
+              >
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    appContext.syncStatus === 'connected'
+                      ? 'bg-[#163832] animate-pulse'
+                      : appContext.syncStatus === 'syncing'
+                      ? 'bg-amber-500 animate-ping'
+                      : 'bg-rose-400'
+                  }`}
+                />
+                <span className="text-[#051F20] text-xs">
+                  {appContext.syncStatus === 'connected'
+                    ? 'Live'
+                    : appContext.syncStatus === 'syncing'
+                    ? 'Syncing'
+                    : 'Offline'}
+                </span>
+              </button>
+            )}
 
             {/* Notification Bell (High-contrast 3D raised white disc button) */}
             {showNotificationsInTopBar && (
@@ -278,17 +312,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                 type="button"
                 onClick={handleProfileClick}
                 aria-label="Open profile menu"
-                className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4A359] focus-visible:ring-offset-2"
+                className="flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] focus-visible:ring-offset-2"
                 style={{ minHeight: '44px', minWidth: '44px' }}
               >
-                {/* 38px Avatar Circle in Pine 950 with Antique Gold Ring */}
+                {/* 38px Avatar Circle in Pine 950 with Sage Ring */}
                 <div
                   className="flex items-center justify-center rounded-full shrink-0"
                   style={{
                     width: '38px',
                     height: '38px',
                     backgroundColor: 'var(--pine-950, #051F20)',
-                    border: '2px solid var(--antique-gold, #D4A359)',
+                    border: '2px solid var(--sage-400, #8EB69B)',
                     boxShadow: '0 2px 8px rgba(5, 31, 32, 0.15)',
                   }}
                 >

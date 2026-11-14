@@ -33,9 +33,9 @@ export const StatTile: React.FC<StatTileProps> = ({
         };
       case 'amber':
         return {
-          bg: 'rgba(212, 163, 89, 0.15)',
-          color: '#D4A359',
-          border: '1px solid rgba(212, 163, 89, 0.25)',
+          bg: 'rgba(242, 184, 75, 0.15)',
+          color: '#F2B84B',
+          border: '1px solid rgba(242, 184, 75, 0.25)',
         };
       case 'sage':
         return {
@@ -87,7 +87,7 @@ export const StatTile: React.FC<StatTileProps> = ({
 
         {footnote && (
           <span
-            className="text-[11px] font-semibold text-[#235347] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F6FBF7] border border-[#DAF1DE]"
+            className="text-xs font-semibold text-[#235347] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F6FBF7] border border-[#DAF1DE]"
           >
             {footnote}
           </span>

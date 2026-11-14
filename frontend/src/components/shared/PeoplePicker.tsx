@@ -8,6 +8,7 @@ import { PillButton } from './PillButton';
 export interface PersonItem {
   id?: string;
   uid?: string;
+  rollNo?: string;
   name: string;
   role?: string;
   department?: string;
@@ -46,6 +47,7 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredPeople = people.filter((p) =>
+    (p.rollNo && p.rollNo.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.role && p.role.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (p.department && p.department.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -89,7 +91,7 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
         <SearchField
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search by name or role..."
+          placeholder="Search by Roll Number (e.g. 24GEO002) or name..."
         />
 
         <div className="flex-1 flex flex-col gap-2 overflow-y-auto no-scrollbar min-h-0">
@@ -110,7 +112,14 @@ export const PeoplePicker: React.FC<PeoplePickerProps> = ({
                 <div className="flex items-center gap-3">
                   <Avatar name={person.name} src={person.avatarUrl} size={40} />
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#051F20]">{person.name}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {person.rollNo && (
+                        <span className="px-2 py-0.5 rounded-md text-xs font-mono font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/50">
+                          {person.rollNo}
+                        </span>
+                      )}
+                      <span className="text-sm font-bold text-[#051F20]">{person.name}</span>
+                    </div>
                     {person.role && (
                       <span className="text-xs font-medium text-[#235347]">{person.role}</span>
                     )}

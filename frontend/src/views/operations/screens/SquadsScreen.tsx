@@ -33,6 +33,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
   const { users, tasks, enrollScholar, showToast } = useApp();
   const [selectedSquadId, setSelectedSquadId] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [newMemberRoll, setNewMemberRoll] = useState('');
   const [newMemberName, setNewMemberName] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -109,18 +110,23 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
 
   const handleEnrollMember = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMemberName.trim() || !selectedSquadId) return;
+    const foundUser = (users || []).find((u) => u.rollNo === newMemberRoll || u.email?.startsWith(newMemberRoll.toLowerCase()));
+    const finalName = foundUser?.name || newMemberName.trim();
+    if (!finalName || !selectedSquadId) return;
 
     const enrolled = enrollScholar({
-      name: newMemberName.trim(),
+      name: finalName,
+      rollNo: newMemberRoll || foundUser?.rollNo,
+      email: foundUser?.email,
       role: 'student',
       squad: selectedSquadId,
       post: `${selectedSquadId} Associate`,
     });
 
-    onLogAudit('Squads', `Enrolled ${enrolled.name} into ${selectedSquadId} squad`);
+    onLogAudit('Squads', `Enrolled ${enrolled.name} (${newMemberRoll || enrolled.rollNo || ''}) into ${selectedSquadId} squad`);
 
     setShowAddModal(false);
+    setNewMemberRoll('');
     setNewMemberName('');
     setNotice(`Enrolled ${enrolled.name} into ${selectedSquadId} squad.`);
     if (showToast) {
@@ -192,18 +198,23 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
                   className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-3"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {m.rollNo && (
+                        <span className="px-2 py-0.5 rounded-md font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                          {m.rollNo}
+                        </span>
+                      )}
                       <span className="font-bold text-[#051F20] text-xs sm:text-sm truncate">
                         {m.name}
                       </span>
                       {m.isLead && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]">
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#163832] text-white">
                           Lead
                         </span>
                       )}
                     </div>
                     <span className="text-xs text-[#235347] font-semibold block truncate mt-0.5">
-                      {m.rollNo} • {m.post}
+                      {m.post}
                     </span>
                   </div>
                 </div>
@@ -220,20 +231,48 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
 
         {/* Modal: Enroll Member */}
         {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/50 backdrop-blur-xs">
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+            style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+          >
             <div className="w-full max-w-sm bg-white rounded-3xl p-5 border border-[#DAF1DE] shadow-xl space-y-4">
               <h3 className="font-bold text-[#051F20] text-base">
                 Enroll Member to {squadDef.name}
               </h3>
               <form onSubmit={handleEnrollMember} className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Scholar full name"
-                  value={newMemberName}
-                  onChange={(e) => setNewMemberName(e.target.value)}
-                  className="w-full h-11 px-3.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-semibold text-[#051F20] outline-none focus:border-[#163832]"
-                  autoFocus
-                />
+                <div>
+                  <label className="block text-xs font-semibold text-[#051F20] mb-1">
+                    Select Scholar by Roll Number *
+                  </label>
+                  <select
+                    required
+                    value={newMemberRoll}
+                    onChange={(e) => {
+                      const roll = e.target.value;
+                      setNewMemberRoll(roll);
+                      const u = (users || []).find((x) => x.rollNo === roll);
+                      if (u) setNewMemberName(u.name);
+                    }}
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-bold text-[#051F20] outline-none"
+                    autoFocus
+                  >
+                    <option value="">Choose Roll Number...</option>
+                    {(users || [])
+                      .filter((u) => u.rollNo)
+                      .map((u) => (
+                        <option key={u.uid} value={u.rollNo}>
+                          {u.rollNo} — {u.name} ({u.team || 'Member'})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {newMemberName && (
+                  <div className="p-2.5 rounded-xl bg-[#DAF1DE]/60 border border-[#8EB69B]/50 flex items-center justify-between text-xs">
+                    <span className="text-[#235347]">Assigning Scholar:</span>
+                    <strong className="text-[#051F20] font-bold">{newMemberName} ({newMemberRoll})</strong>
+                  </div>
+                )}
                 <div className="flex items-center justify-end gap-2 pt-2">
                   <button
                     type="button"

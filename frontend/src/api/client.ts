@@ -226,6 +226,24 @@ class ApiClient {
   }
 
   // ==========================================
+  // Real-Time Multi-Device Sync Stream
+  // ==========================================
+  public async getSyncStatus() {
+    return await this.request<{
+      status: string;
+      active_devices_connected: number;
+      timestamp: string;
+      capabilities: string[];
+    }>('/sync/status');
+  }
+
+  public getSyncStreamUrl(): string {
+    const baseUrl = this.getBaseUrl();
+    const clean = baseUrl.startsWith('/') ? baseUrl : baseUrl.replace(/\/+$/, '');
+    return `${clean}/sync/stream`;
+  }
+
+  // ==========================================
   // Squads, Membership & Tasks
   // ==========================================
   public async getTeams() {

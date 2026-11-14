@@ -169,6 +169,32 @@ def create_event(
         attendance_count=0
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_CREATED", {
+            "id": resp.id,
+            "title": resp.title,
+            "type": resp.type,
+            "date_time": resp.date_time.isoformat() if hasattr(resp.date_time, 'isoformat') else str(resp.date_time),
+            "venue": resp.venue,
+            "description": resp.description,
+            "budget": resp.budget,
+            "poster_url": resp.poster_url,
+            "status": resp.status,
+            "cancellation_reason": resp.cancellation_reason,
+            "academic_year": resp.academic_year,
+            "volunteer_user_ids": resp.volunteer_user_ids,
+            "assigned_scanner_user_ids": resp.assigned_scanner_user_ids,
+            "geofence_enabled": resp.geofence_enabled,
+            "created_by": resp.created_by,
+            "created_at": resp.created_at.isoformat() if hasattr(resp.created_at, 'isoformat') else str(resp.created_at),
+            "attendance_count": resp.attendance_count,
+        })
+    except Exception:
+        pass
+
+    return resp
+
 @router.patch("/{event_id}/status")
 def update_event_status(
     event_id: str,
@@ -233,6 +259,17 @@ def update_event_status(
         details=f"Status transitioned from {before_state} to {target_status}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_UPDATED", {
+            "id": event.id,
+            "title": event.title,
+            "status": target_status,
+            "before_status": before_state,
+        })
+    except Exception:
+        pass
+
     return {"success": True, "event_id": event.id, "status": target_status}
 
 @router.patch("/{event_id}/cancel")
@@ -269,6 +306,17 @@ def cancel_event(
         after_state="cancelled",
         details=f"Event cancelled. Reason: {clean_reason}"
     )
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_CANCELLED", {
+            "id": event.id,
+            "title": event.title,
+            "status": "cancelled",
+            "cancellation_reason": clean_reason,
+        })
+    except Exception:
+        pass
 
     return {"success": True, "event_id": event.id, "status": "cancelled", "reason": clean_reason}
 
@@ -326,6 +374,17 @@ def register_for_event(
     )
     db.add(reg)
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_REGISTERED", {
+            "event_id": event_id,
+            "user_id": current_user.id,
+            "user_name": current_user.name,
+        })
+    except Exception:
+        pass
+
     return {"success": True, "message": "Registration successful"}
 
 @router.get("/{event_id}/is-registered")

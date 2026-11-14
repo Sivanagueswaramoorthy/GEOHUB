@@ -41,7 +41,7 @@ export function DataTable<T>({
         }}
       >
         <thead>
-          <tr style={{ borderBottom: '1px solid #EEF1F5' }}>
+          <tr style={{ borderBottom: '1px solid #DAF1DE' }}>
             {columns.map((col) => (
               <th
                 key={col.key}
@@ -68,7 +68,7 @@ export function DataTable<T>({
               key={keyExtractor(row)}
               style={{
                 height: `${COMPONENTS.tables.rowHeight}px`,
-                borderBottom: '1px solid #EEF1F5',
+                borderBottom: '1px solid #DAF1DE',
               }}
             >
               {columns.map((col) => (

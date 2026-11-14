@@ -452,7 +452,8 @@ export const AttendanceOperationScreen: React.FC<AttendanceOperationScreenProps>
       {/* 4) Dynamic QR Code & OTP Modal Popup */}
       {isPopupOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/75 backdrop-blur-xs animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
+          style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           role="dialog"
           aria-modal="true"
           aria-label="Attendance QR Code and OTP"

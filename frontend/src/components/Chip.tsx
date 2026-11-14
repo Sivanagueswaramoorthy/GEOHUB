@@ -35,21 +35,21 @@ export const Chip: React.FC<ChipProps> = ({
 
   if (variant === 'squad') {
     if (lower.includes('management')) {
-      defaultBg = '#EFF6FF';
-      defaultBorder = '#BFDBFE';
-      defaultText = '#1D4ED8';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#8EB69B';
+      defaultText = '#163832';
     } else if (lower.includes('promotion') || lower.includes('media')) {
-      defaultBg = '#FDF4FF';
-      defaultBorder = '#F5D0FE';
-      defaultText = '#A21CAF';
+      defaultBg = '#F6FBF7';
+      defaultBorder = '#8EB69B';
+      defaultText = '#235347';
     } else if (lower.includes('documentation')) {
-      defaultBg = '#F5F3FF';
-      defaultBorder = '#DDD6FE';
-      defaultText = '#6D28D9';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#DAF1DE';
+      defaultText = '#0B2B26';
     } else if (lower.includes('entertainment')) {
-      defaultBg = '#FFFBEB';
-      defaultBorder = '#FDE68A';
-      defaultText = '#B45309';
+      defaultBg = '#F6FBF7';
+      defaultBorder = '#DAF1DE';
+      defaultText = '#163832';
     }
   } else if (variant === 'role') {
     if (lower.includes('admin') || lower.includes('lead') || lower.includes('advisor')) {
@@ -67,17 +67,17 @@ export const Chip: React.FC<ChipProps> = ({
     defaultText = '#235347';
   } else if (variant === 'status') {
     if (lower.includes('live') || lower.includes('happening')) {
-      defaultBg = '#FEF2F2';
-      defaultBorder = '#FECACA';
-      defaultText = '#DC2626';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#D9534F';
+      defaultText = '#D9534F';
     } else if (lower.includes('approved') || lower.includes('active') || lower.includes('completed')) {
       defaultBg = '#DAF1DE';
       defaultBorder = '#8EB69B';
       defaultText = '#163832';
     } else if (lower.includes('pending') || lower.includes('planned')) {
-      defaultBg = '#FFF8E6';
-      defaultBorder = '#FDE68A';
-      defaultText = '#92400E';
+      defaultBg = '#DAF1DE';
+      defaultBorder = '#F2B84B';
+      defaultText = '#163832';
     } else if (lower.includes('archived') || lower.includes('cancelled')) {
       defaultBg = '#DAF1DE';
       defaultBorder = '#DAF1DE';

@@ -90,7 +90,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               padding: '12px 14px',
               borderRadius: '14px',
               backgroundColor: '#F6FBF7',
-              border: '1px solid #EEF1F5',
+              border: '1px solid #DAF1DE',
               fontSize: '12px',
               color: '#235347',
               lineHeight: 1.5,

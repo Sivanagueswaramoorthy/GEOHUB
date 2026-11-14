@@ -54,9 +54,9 @@ export const PillButton: React.FC<PillButtonProps> = ({
         };
       case 'destructive':
         return {
-          backgroundColor: 'rgba(200, 109, 81, 0.12)',
-          color: '#C86D51',
-          border: '1px solid rgba(200, 109, 81, 0.30)',
+          backgroundColor: 'rgba(217, 83, 79, 0.12)',
+          color: '#D9534F',
+          border: '1px solid rgba(217, 83, 79, 0.30)',
         };
     }
   };

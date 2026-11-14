@@ -209,6 +209,23 @@ def main():
             shutil.copy2(src, dst)
     print(" ✓ Assets synchronized to android/app/src/main/assets/")
 
+    # Also synchronize to backend/static
+    backend_static_dir = os.path.join(BACKEND_DIR, "static")
+    if os.path.exists(backend_static_dir):
+        for item in os.listdir(dist_dir):
+            src = os.path.join(dist_dir, item)
+            dst = os.path.join(backend_static_dir, item)
+            try:
+                if os.path.isdir(src):
+                    if os.path.exists(dst):
+                        shutil.rmtree(dst)
+                    shutil.copytree(src, dst)
+                else:
+                    shutil.copy2(src, dst)
+            except Exception:
+                pass
+        print(" ✓ Assets synchronized to backend/static/")
+
     if args.no_apk:
         print("\n[Notice] --no-apk flag specified. Skipping Gradle APK build.")
         sys.exit(0)

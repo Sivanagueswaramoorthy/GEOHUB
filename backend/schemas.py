@@ -105,6 +105,7 @@ class EventCreate(BaseModel):
     description: Optional[str] = ""
     budget: Optional[float] = 0.0
     poster_url: Optional[str] = None
+    status: Optional[str] = "approved"
     academic_year: Optional[str] = "2025-26"
     geofence_enabled: Optional[bool] = False
     latitude: Optional[float] = None

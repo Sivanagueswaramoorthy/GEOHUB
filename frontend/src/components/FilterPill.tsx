@@ -33,7 +33,7 @@ export const FilterPill: React.FC<FilterPillProps> = ({
         height: `${SEARCH_AND_FILTER.filterPill.touchTargetHeight}px`,
         padding: '0 16px',
         backgroundColor: isActive ? '#DAF1DE' : '#FFFFFF',
-        border: isActive ? '1px solid #8EB69B' : '1px solid #EEF1F5',
+        border: isActive ? '1px solid #8EB69B' : '1px solid #DAF1DE',
         color: isActive ? '#163832' : '#051F20',
         boxShadow: isActive
           ? '0 2px 8px rgba(35, 83, 71, 0.16)'

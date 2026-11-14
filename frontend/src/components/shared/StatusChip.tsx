@@ -78,16 +78,16 @@ export const StatusChip: React.FC<StatusChipProps> = ({
       case 'cancelled':
       case 'rejected':
         return {
-          bg: 'rgba(200, 109, 81, 0.14)',
-          color: '#C86D51',
-          border: '1px solid rgba(200, 109, 81, 0.35)',
+          bg: 'rgba(217, 83, 79, 0.12)',
+          color: '#D9534F',
+          border: '1px solid rgba(217, 83, 79, 0.35)',
           text: label || (normStatus === 'rejected' ? 'Rejected' : 'Cancelled'),
         };
       case 'pending':
         return {
-          bg: 'rgba(212, 163, 89, 0.15)',
+          bg: 'rgba(242, 184, 75, 0.15)',
           color: '#051F20',
-          border: '1px solid rgba(212, 163, 89, 0.35)',
+          border: '1px solid rgba(242, 184, 75, 0.35)',
           text: label || 'Pending',
         };
       case 'low-stock':

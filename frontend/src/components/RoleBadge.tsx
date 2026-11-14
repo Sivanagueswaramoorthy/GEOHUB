@@ -35,25 +35,25 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   let text = '#163832';
 
   if (isSuperAdmin) {
-    bg = '#FFF8E6';
-    border = '#FDE68A';
-    text = '#92400E';
+    bg = '#051F20';
+    border = '#8EB69B';
+    text = '#DAF1DE';
   } else if (role === 'admin' || role === 'coordinator') {
     bg = '#DAF1DE';
     border = '#8EB69B';
     text = '#163832';
   } else if (role === 'treasurer') {
-    bg = '#FFF8E6';
-    border = '#FDE68A';
-    text = '#B45309';
+    bg = '#DAF1DE';
+    border = '#8EB69B';
+    text = '#163832';
   } else if (role === 'documentation') {
-    bg = '#F3EEFF';
-    border = '#DDD1FF';
-    text = '#5B21B6';
+    bg = '#F6FBF7';
+    border = '#DAF1DE';
+    text = '#235347';
   } else if (role === 'social_media' || role === 'team_admin' || (post && post.toLowerCase().includes('promotion'))) {
-    bg = '#F3EEFF';
-    border = '#DDD1FF';
-    text = '#5B21B6';
+    bg = '#F6FBF7';
+    border = '#8EB69B';
+    text = '#235347';
   }
 
   let displayName = friendlyName;
@@ -70,14 +70,14 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
         backgroundColor: bg,
         border: `1px solid ${border}`,
         color: text,
-        fontSize: isSmall ? '11px' : isLarge ? '13px' : '12px',
+        fontSize: isSmall ? '12px' : isLarge ? '13px' : '12px',
         padding: isSmall ? '2px 8px' : isLarge ? '4px 12px' : '4px 8px',
-        lineHeight: isSmall ? '14px' : isLarge ? '18px' : '16px',
+        lineHeight: isSmall ? '16px' : isLarge ? '18px' : '16px',
         ...style,
       }}
     >
       {isSuperAdmin && showCrown && (
-        <Crown size={16} strokeWidth={1.75} color="#D97706" className="shrink-0" />
+        <Crown size={16} strokeWidth={1.75} color="#8EB69B" className="shrink-0" />
       )}
       <span>{displayName}</span>
     </span>

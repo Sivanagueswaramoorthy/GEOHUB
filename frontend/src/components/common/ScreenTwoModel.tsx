@@ -87,7 +87,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
           style={{
             backgroundColor: '#FFFFFF',
             borderRadius: '20px',
-            border: '1px solid #E8ECF2',
+            border: '1px solid #DAF1DE',
             padding: '14px 16px',
             display: 'flex',
             alignItems: 'center',
@@ -276,7 +276,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
         style={{
           backgroundColor: '#FFFFFF',
           borderRadius: '20px',
-          border: '1px solid #E8ECF2',
+          border: '1px solid #DAF1DE',
           padding: '16px',
           boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
         }}
@@ -370,7 +370,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
             height: '42px',
             borderRadius: '999px',
             backgroundColor: '#F6FBF7',
-            border: '1px solid #E8ECF2',
+            border: '1px solid #DAF1DE',
             color: '#051F20',
             fontWeight: 700,
             fontSize: '13px',
@@ -449,7 +449,7 @@ export const ScreenTwoModel: React.FC<ScreenTwoModelProps> = ({
                   padding: '12px 14px',
                   backgroundColor: '#FFFFFF',
                   borderRadius: '16px',
-                  border: '1px solid #E8ECF2',
+                  border: '1px solid #DAF1DE',
                   cursor: onTaskToggle ? 'pointer' : 'default',
                   transition: 'all 150ms ease',
                 }}

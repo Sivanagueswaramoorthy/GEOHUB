@@ -120,9 +120,9 @@ export const DesignSystemView: React.FC = () => {
   const mascotSizes: ('sm' | 'md' | 'lg' | 'xl')[] = ['sm', 'md', 'lg', 'xl'];
 
   const peopleOptions = [
-    { uid: 'usr_01', name: 'Elena Rostova', department: 'Geoinformatics' },
-    { uid: 'usr_02', name: 'Alex Rivera', department: 'Computer Science' },
-    { uid: 'usr_03', name: 'Dr. Sarah Mitchell', department: 'Faculty Board' },
+    { uid: 'usr_01', rollNo: '24GEO001', name: 'Elena Rostova', department: 'Geoinformatics' },
+    { uid: 'usr_02', rollNo: '24GEO002', name: 'Alex Rivera', department: 'Computer Science' },
+    { uid: 'usr_03', rollNo: 'FAC001', name: 'Dr. Sarah Mitchell', department: 'Faculty Board' },
   ];
 
   return (

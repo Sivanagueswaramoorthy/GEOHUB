@@ -135,7 +135,7 @@ export const Image: React.FC<ImageProps> = ({
       padding: '12px',
       backgroundColor: '#FFFFFF',
       boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)',
-      border: '1px solid #EEF1F5',
+      border: '1px solid #DAF1DE',
     };
     imgStyle.objectFit = 'contain';
   } else if (variant === 'gallery') {

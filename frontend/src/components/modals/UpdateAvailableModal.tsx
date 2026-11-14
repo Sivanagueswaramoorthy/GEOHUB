@@ -60,7 +60,8 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="update-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md animate-fade-in"
+      style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
     >
       <div
         className="w-full max-w-md bg-[#F6FBF7] border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col gap-5 text-[#051F20]"

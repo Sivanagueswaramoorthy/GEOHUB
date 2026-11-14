@@ -97,6 +97,8 @@ interface AppContextType {
   isRoleSwitcherOpen: boolean;
   isPhoneFrame: boolean;
   isSyncing: boolean;
+  syncStatus: 'connected' | 'syncing' | 'offline';
+  lastSyncedAt: Date | null;
   refreshCloudData: () => Promise<void>;
   toast: { message: string; type?: 'success' | 'error' | 'info' } | null;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -448,10 +450,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser.role]);
 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncStatus, setSyncStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
 
   // Live Backend Data Synchronization with TiDB Cloud FastAPI
   const syncWithBackend = useCallback(async () => {
     setIsSyncing(true);
+    setSyncStatus((prev) => (prev === 'connected' ? 'syncing' : prev));
     try {
       // 1. Sync Events
       const liveEvents = await apiClient.getEvents().catch(() => null);
@@ -599,8 +604,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             timestamp: a.timestamp || new Date().toISOString(),
           })));
         }
+        setSyncStatus('connected');
+        setLastSyncedAt(new Date());
       } catch {
         // Resilient fallback keeps local cache when server is starting up or offline
+        setSyncStatus('offline');
       } finally {
         setIsSyncing(false);
       }
@@ -613,23 +621,213 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('✓ Synchronized with cloud server', 'success');
   }, [syncWithBackend, showToast]);
 
-  // Periodic and Event-Driven Cloud Synchronization
+  // 1. Real-Time Multi-Device SSE Event Stream
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
+
+    let eventSource: EventSource | null = null;
+    let reconnectTimeout: any = null;
+    let isMounted = true;
+
+    const connectSSE = () => {
+      try {
+        const streamUrl = apiClient.getSyncStreamUrl();
+        eventSource = new EventSource(streamUrl);
+
+        eventSource.onopen = () => {
+          if (!isMounted) return;
+          setSyncStatus('connected');
+          setLastSyncedAt(new Date());
+        };
+
+        eventSource.addEventListener('connected', () => {
+          if (!isMounted) return;
+          setSyncStatus('connected');
+          setLastSyncedAt(new Date());
+        });
+
+        eventSource.addEventListener('mutation', (e: MessageEvent) => {
+          if (!isMounted) return;
+          try {
+            const payload = JSON.parse(e.data);
+            const { type, data } = payload;
+
+            if (type === 'EVENT_CREATED' && data) {
+              setEvents((prev) => {
+                if (prev.some((ev) => ev.id === data.id)) return prev;
+                showToast(`✓ New event synchronized: ${data.title}`, 'info');
+                const mapped: EventModel = {
+                  id: data.id,
+                  title: data.title,
+                  description: data.description || '',
+                  category: data.type || 'Academic',
+                  venue: data.venue || 'Campus Auditorium',
+                  startDate: data.date_time || new Date().toISOString(),
+                  endDate: data.date_time || new Date().toISOString(),
+                  status: data.status || 'approved',
+                  capacity: 350,
+                  registeredUserIds: [],
+                  volunteerIds: data.volunteer_user_ids || [],
+                  assignedScannerUserIds: data.assigned_scanner_user_ids || [],
+                  posterUrl: data.poster_url || undefined,
+                  geofenceEnabled: Boolean(data.geofence_enabled),
+                  geofenceRadiusMeters: data.geofence_radius_meters || 100,
+                  cancellationReason: data.cancellation_reason || undefined,
+                  budget: Number(data.budget || 0),
+                  createdBy: data.created_by || 'u_admin_02',
+                };
+                return [mapped, ...prev];
+              });
+              setLastSyncedAt(new Date());
+            } else if (type === 'EVENT_UPDATED' && data) {
+              setEvents((prev) =>
+                prev.map((ev) =>
+                  ev.id === data.id
+                    ? {
+                        ...ev,
+                        status: data.status || ev.status,
+                        cancellationReason: data.cancellation_reason || ev.cancellationReason,
+                      }
+                    : ev
+                )
+              );
+              setLastSyncedAt(new Date());
+            } else if (type === 'EVENT_CANCELLED' && data) {
+              setEvents((prev) =>
+                prev.map((ev) =>
+                  ev.id === data.id
+                    ? {
+                        ...ev,
+                        status: 'cancelled',
+                        cancellationReason: data.cancellation_reason || 'Event cancelled by committee',
+                      }
+                    : ev
+                )
+              );
+              showToast(`Event cancelled: ${data.title}`, 'info');
+              setLastSyncedAt(new Date());
+            } else if (type === 'MEMBER_ENROLLED' && data) {
+              setUsers((prev) => {
+                if (
+                  prev.some(
+                    (u) =>
+                      u.uid === data.id ||
+                      (u.rollNo && u.rollNo.toUpperCase() === (data.roll_no || '').toUpperCase())
+                  )
+                ) {
+                  return prev;
+                }
+                showToast(`✓ New scholar enrolled: ${data.name} (${data.roll_no})`, 'info');
+                const mappedUser: UserModel = {
+                  uid: data.id,
+                  rollNo: data.roll_no,
+                  name: data.name,
+                  email: data.email,
+                  role: data.role || 'student',
+                  department: data.department || 'Geoinformatics Engineering',
+                  yearOfStudy: data.year_of_study || '3rd Year',
+                  team: data.team || 'General',
+                  teamRole: 'Member',
+                  isVolunteer: false,
+                  status: 'active',
+                  squadMemberships: [],
+                };
+                return [...prev, mappedUser];
+              });
+              setLastSyncedAt(new Date());
+            } else if (type === 'ATTENDANCE_MARKED' && data) {
+              setAttendance((prev) => {
+                if (prev.some((a) => a.id === data.id)) return prev;
+                return [
+                  {
+                    id: data.id,
+                    eventId: data.event_id,
+                    eventTitle: data.event_title,
+                    userId: data.attendee_id,
+                    userName: data.attendee_name,
+                    userEmail: data.attendee_email || `${data.attendee_id}@college.edu`,
+                    checkInTime: data.check_in_time,
+                    status: 'verified',
+                  },
+                  ...prev,
+                ];
+              });
+              setEvents((prev) =>
+                prev.map((ev) =>
+                  ev.id === data.event_id
+                    ? { ...ev, attendanceCount: data.attendance_count }
+                    : ev
+                )
+              );
+              setLastSyncedAt(new Date());
+            }
+          } catch (err) {
+            console.warn('[SSE] Failed to parse live sync payload:', err);
+          }
+        });
+
+        eventSource.onerror = () => {
+          if (!isMounted) return;
+          setSyncStatus('offline');
+          eventSource?.close();
+          // Auto-reconnect after 6 seconds
+          reconnectTimeout = setTimeout(connectSSE, 6000);
+        };
+      } catch {
+        if (isMounted) {
+          setSyncStatus('offline');
+          reconnectTimeout = setTimeout(connectSSE, 10000);
+        }
+      }
+    };
+
+    connectSSE();
+
+    return () => {
+      isMounted = false;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (eventSource) eventSource.close();
+    };
+  }, [showToast]);
+
+  // 2. Adaptive Polling & On-Focus Lifecycle Synchronization
   useEffect(() => {
     syncWithBackend();
 
-    // Auto-refresh events and data every 25 seconds
-    const interval = setInterval(() => {
-      syncWithBackend();
-    }, 25000);
+    // Fast foreground polling every 8s when active
+    const pollInterval = setInterval(() => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        syncWithBackend();
+      }
+    }, 8000);
+
+    // On-focus & visibility change: immediately pull updates when user unlocks phone or switches back
+    const handleVisibilityOrFocus = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncWithBackend();
+      }
+    };
 
     const handleOnline = () => {
       syncWithBackend();
+      setSyncStatus('connected');
     };
+
+    const handleOffline = () => {
+      setSyncStatus('offline');
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
     window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     return () => {
-      clearInterval(interval);
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
       window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
   }, [syncWithBackend]);
 
@@ -1857,6 +2055,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isRoleSwitcherOpen,
         isPhoneFrame,
         isSyncing,
+        syncStatus,
+        lastSyncedAt,
         refreshCloudData,
         setCurrentUser,
         switchRole,

@@ -55,6 +55,7 @@ export const ClubEventsView: React.FC = () => {
     showToast,
     refreshCloudData,
     isSyncing,
+    syncStatus,
   } = useApp();
 
   const perms = getRolePermissions(currentUser.role);
@@ -448,25 +449,34 @@ export const ClubEventsView: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-2.5 mt-1">
-                  {defaultDuties.map((duty, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-1"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-[#051F20]">
-                          {duty.squad} • {duty.assignedToName}
-                        </span>
-                        <StatusChip
-                          status={duty.status === 'completed' ? 'done' : duty.status === 'in_progress' ? 'live' : 'draft'}
-                          label={duty.status}
-                        />
+                  {defaultDuties.map((duty, idx) => {
+                    const volRoll = users.find((u) => u.name === duty.assignedToName)?.rollNo;
+                    return (
+                      <div
+                        key={idx}
+                        className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-bold text-[#051F20]">{duty.squad} •</span>
+                            {volRoll && (
+                              <span className="px-1.5 py-0.5 rounded font-mono font-bold text-xs bg-[#DAF1DE] text-[#051F20] border border-[#8EB69B]/40">
+                                {volRoll}
+                              </span>
+                            )}
+                            <span className="text-xs font-bold text-[#051F20]">{duty.assignedToName}</span>
+                          </div>
+                          <StatusChip
+                            status={duty.status === 'completed' ? 'done' : duty.status === 'in_progress' ? 'live' : 'draft'}
+                            label={duty.status}
+                          />
+                        </div>
+                        <p className="text-xs font-medium text-[#235347]">
+                          {duty.workDescription}
+                        </p>
                       </div>
-                      <p className="text-xs font-medium text-[#235347]">
-                        {duty.workDescription}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -640,16 +650,34 @@ export const ClubEventsView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Cloud Sync Refresh Button */}
+          {/* Live Cloud Multi-Device Sync Pill */}
           <button
             type="button"
             onClick={() => refreshCloudData()}
             disabled={isSyncing}
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] transition active:scale-95 disabled:opacity-50 cursor-pointer border border-[#8EB69B]/30"
-            title="Refresh events from cloud"
+            className="h-9 px-3 rounded-full flex items-center gap-1.5 bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] transition active:scale-95 disabled:opacity-50 cursor-pointer border border-[#8EB69B]/30 text-xs font-bold"
+            title={
+              syncStatus === 'connected'
+                ? 'Multi-device real-time sync active (SSE) • Tap to refresh'
+                : syncStatus === 'syncing'
+                ? 'Syncing across devices...'
+                : 'Offline cache • Tap to reconnect'
+            }
             aria-label="Refresh events from cloud"
           >
-            <RefreshCw size={15} className={isSyncing ? 'animate-spin' : ''} />
+            <span
+              className={`w-2 h-2 rounded-full ${
+                syncStatus === 'connected'
+                  ? 'bg-[#163832] animate-pulse'
+                  : syncStatus === 'syncing'
+                  ? 'bg-amber-500 animate-ping'
+                  : 'bg-rose-400'
+              }`}
+            />
+            <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
+            <span className="hidden xs:inline text-xs">
+              {syncStatus === 'connected' ? 'Live Synced' : syncStatus === 'syncing' ? 'Syncing...' : 'Reconnect'}
+            </span>
           </button>
 
           {/* Read-only screens HIDE create buttons */}
@@ -1070,7 +1098,12 @@ export const ClubEventsView: React.FC = () => {
           isOpen={Boolean(pickerTarget)}
           onClose={() => setPickerTarget(null)}
           title={`Assign ${pickerTarget.toUpperCase()} Squad`}
-          people={users.map((u) => ({ id: u.uid, name: u.name, role: u.post || u.role }))}
+          people={users.map((u) => ({
+            id: u.uid,
+            rollNo: u.rollNo || u.email?.split('@')[0]?.toUpperCase(),
+            name: u.name,
+            role: u.post || u.role,
+          }))}
           selectedIds={rosterAssignments[pickerTarget]}
           onConfirm={(selected) => {
             setRosterAssignments((prev) => ({

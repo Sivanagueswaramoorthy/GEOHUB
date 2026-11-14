@@ -38,7 +38,6 @@ import {
   Coins,
   FileText,
   ClipboardCheck,
-  Key,
   ChevronRight,
 } from 'lucide-react';
 
@@ -466,6 +465,10 @@ export const ExploreActivitiesView: React.FC = () => {
               readOnly={readOnly}
               onLogAudit={(event, action) => logAudit('member_directory', event, action)}
               currentUser={currentUser}
+              onSubViewChange={(title, onBack) => {
+                setSubViewTitle(title);
+                setSubViewBackHandler(onBack ? () => onBack : null);
+              }}
             />
           )}
 
@@ -538,46 +541,6 @@ export const ExploreActivitiesView: React.FC = () => {
           </span>
         </div>
       </div>
-
-      {/* SuperAdmin Authority Console Quick Link */}
-      {(currentUser?.role === 'super_admin' || currentUser?.role === 'faculty' || currentUser?.role === 'admin') && (
-        <div className="mb-3.5 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#163832] to-[#235347] text-white shadow-md border border-[#8EB69B]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#DAF1DE] shrink-0 border border-white/20">
-              <Key size={20} strokeWidth={2.4} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-heading font-extrabold text-sm text-white">
-                  Role Credentials & Operations Governance
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20]">
-                  SuperAdmin
-                </span>
-              </div>
-              <p className="text-xs text-[#DAF1DE]/90 mt-0.5">
-                Set usernames & passwords for all 8 roles • Master 26-operation access switches
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              if (setActiveTab) {
-                setActiveTab('role_governance');
-              } else {
-                window.location.hash = '#role_governance';
-              }
-              if (typeof window !== 'undefined') window.scrollTo(0, 0);
-            }}
-            className="px-3.5 py-2 rounded-xl bg-[#DAF1DE] hover:bg-white text-[#051F20] font-bold text-xs flex items-center gap-1.5 transition active:scale-95 shrink-0 cursor-pointer shadow-xs touch-target-44"
-          >
-            <span>Open Governance</span>
-            <ChevronRight size={14} strokeWidth={2.5} />
-          </button>
-        </div>
-      )}
 
       {/* Category Filter Pills (Rebuilt Modern UI) */}
       <div

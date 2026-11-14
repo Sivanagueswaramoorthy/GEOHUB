@@ -28,16 +28,16 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({ role, team, isVolunteer, c
   const getStyle = () => {
     switch (role) {
       case 'super_admin':
-        return { bg: '#FEF3C7', color: '#B45309', border: '#FDE68A' };
+        return { bg: '#051F20', color: '#DAF1DE', border: '#8EB69B' };
       case 'admin':
-        return { bg: '#E0E7FF', color: '#4338CA', border: '#C7D2FE' };
+        return { bg: '#DAF1DE', color: '#163832', border: '#8EB69B' };
       case 'team_admin':
         return { bg: '#DAF1DE', color: '#163832', border: '#8EB69B' };
       case 'volunteer':
-        return { bg: '#FCE7F3', color: '#BE185D', border: '#FBCFE8' };
+        return { bg: '#DAF1DE', color: '#235347', border: '#DAF1DE' };
       case 'member':
       default:
-        return { bg: '#DAF1DE', color: '#235347', border: '#DAF1DE' };
+        return { bg: '#F6FBF7', color: '#235347', border: '#DAF1DE' };
     }
   };
 
@@ -52,8 +52,8 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({ role, team, isVolunteer, c
         gap: '4px',
         padding: '2px 8px',
         borderRadius: '999px',
-        fontSize: '11px',
-        lineHeight: '14px',
+        fontSize: '12px',
+        lineHeight: '16px',
         fontWeight: 600,
         backgroundColor: style.bg,
         color: style.color,

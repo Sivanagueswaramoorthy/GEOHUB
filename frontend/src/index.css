@@ -529,7 +529,7 @@ a {
 }
 
 .top-bar-role-badge:hover {
-  background: #E6FFFA;
+  background: #DAF1DE;
   border-color: var(--primary);
 }
 
@@ -907,15 +907,21 @@ a {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: var(--bg-overlay);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background-color: rgba(5, 31, 32, 0.60);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 100;
   display: flex;
   align-items: flex-end; /* Mobile bottom sheet style by default */
   justify-content: center;
   padding: 0;
   animation: fadeIn 200ms ease-out;
+}
+
+.popup-backdrop,
+.backdrop-blur-xs {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 @media (min-width: 640px) {
@@ -1255,7 +1261,7 @@ a {
 
 .governance-header-ribbon {
   background: #FFFFFF;
-  border: 1px solid #E8ECF2;
+  border: 1px solid #DAF1DE;
   border-radius: 20px;
   padding: 22px 24px;
   box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.04);
@@ -1309,7 +1315,7 @@ a {
 
 .stat-card-premium {
   background: #FFFFFF;
-  border: 1px solid #E8ECF2;
+  border: 1px solid #DAF1DE;
   border-radius: 16px;
   padding: 18px 20px;
   box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.03);
@@ -1348,7 +1354,7 @@ a {
 .sanction-item-card {
   padding: 16px 18px;
   background: #FFFFFF;
-  border: 1px solid #E8ECF2;
+  border: 1px solid #DAF1DE;
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
   transition: all var(--trans-fast);
@@ -1448,18 +1454,18 @@ a {
 }
 
 .action-seal-btn:hover {
-  background: linear-gradient(135deg, #115E59 0%, #094F49 100%);
+  background: linear-gradient(135deg, #163832 0%, #0B2B26 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.35);
+  box-shadow: 0 6px 16px rgba(11, 43, 38, 0.35);
 }
 
 .badge-seal-certified {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #DCFCE7;
-  color: #15803D;
-  border: 1px solid #BBF7D0;
+  background: #DAF1DE;
+  color: #163832;
+  border: 1px solid #8EB69B;
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 11px;
@@ -2081,19 +2087,19 @@ a {
   border-radius: 12px;
   font-size: 12px;
   font-weight: 700;
-  color: #BE123C;
-  background-color: #FFF1F2;
-  border: 1px solid #FECDD3;
+  color: #D9534F;
+  background-color: rgba(217, 83, 79, 0.12);
+  border: 1px solid rgba(217, 83, 79, 0.35);
   cursor: pointer;
   transition: all 0.15s ease;
   min-height: 40px;
-  box-shadow: 0 1px 2px rgba(190, 18, 60, 0.05);
+  box-shadow: 0 1px 2px rgba(217, 83, 79, 0.05);
 }
 
 .btn-suspend-scholar:hover {
-  background-color: #FFE4E6;
-  border-color: #FDA4AF;
-  color: #9F1239;
+  background-color: rgba(217, 83, 79, 0.2);
+  border-color: #D9534F;
+  color: #D9534F;
   transform: translateY(-1px);
 }
 
@@ -2121,7 +2127,7 @@ a {
 
 /* Executive Officer Post Showcase Hub */
 .scholar-post-hub {
-  background: linear-gradient(135deg, #F6FBF7 0%, #DAF1DE 50%, #EEF2F6 100%);
+  background: linear-gradient(135deg, #F6FBF7 0%, #DAF1DE 100%);
   border: 1px solid #DAF1DE;
   border-radius: 20px;
   padding: 16px 20px;
@@ -2184,7 +2190,7 @@ a {
   padding: 9px 16px;
   border-radius: 12px;
   background: #FFFFFF;
-  border: 1px solid #99F6E4;
+  border: 1px solid #8EB69B;
   color: #163832;
   font-size: 12px;
   font-weight: 700;
@@ -2577,8 +2583,8 @@ a {
 
 .squad-option-card.is-selected {
   border-color: #163832;
-  background-color: #F0FDFA;
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  background-color: #DAF1DE;
+  box-shadow: 0 0 0 3px rgba(22, 56, 50, 0.12);
 }
 
 /* Live Card Preview Box */
@@ -2829,7 +2835,7 @@ a {
   gap: 14px;
   padding: 16px 18px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #DAF1DE 0%, #F4FAF5 50%, #FFFFFF 100%);
+  background: linear-gradient(135deg, #DAF1DE 0%, #F6FBF7 50%, #FFFFFF 100%);
   border: 1.5px solid #8EB69B;
 }
 
@@ -2907,7 +2913,7 @@ a {
   gap: 8px;
   padding: 4px 12px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #DAF1DE 0%, #F4FAF5 100%);
+  background: linear-gradient(135deg, #DAF1DE 0%, #F6FBF7 100%);
   border: 1px solid #8EB69B;
   box-shadow: 0 1px 3px rgba(35, 83, 71, 0.08);
   white-space: nowrap;

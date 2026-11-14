@@ -40,17 +40,17 @@ export const AuditDetailsCard: React.FC<AuditDetailsCardProps> = ({ audit }) => 
       case 'Synchronized':
         return {
           label: 'Synchronized',
-          bg: '#EFF6FF',
-          border: '#BFDBFE',
-          text: '#1D4ED8',
+          bg: '#DAF1DE',
+          border: '#8EB69B',
+          text: '#163832',
           icon: CheckCircle2,
         };
       case 'Action Required':
         return {
           label: 'Action Required',
-          bg: '#FEF3C7',
-          border: '#FDE68A',
-          text: '#92400E',
+          bg: '#DAF1DE',
+          border: '#D9534F',
+          text: '#D9534F',
           icon: AlertCircle,
         };
       default:

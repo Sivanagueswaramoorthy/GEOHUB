@@ -283,7 +283,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
             flexShrink: 0,
             flexGrow: 0,
             backgroundColor: isScannerActive ? 'var(--pine-950, #051F20)' : 'var(--pine-800, #163832)',
-            border: isScannerActive ? '2px solid var(--antique-gold, #D4A359)' : '2px solid var(--sage-400, #8EB69B)',
+            border: isScannerActive ? '2px solid var(--mint-100, #DAF1DE)' : '2px solid var(--sage-400, #8EB69B)',
             boxShadow: isScannerActive
               ? '0 8px 24px rgba(5, 31, 32, 0.32)'
               : '0 6px 20px rgba(5, 31, 32, 0.18)',
@@ -300,7 +300,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           {scannerTab.hasUpdates && (
             <span
               className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full animate-badge-pop"
-              style={{ backgroundColor: 'var(--spiced-terracotta, #C86D51)', border: '1.5px solid #FFFFFF' }}
+              style={{ backgroundColor: 'var(--red-danger, #D9534F)', border: '1.5px solid #FFFFFF' }}
             />
           )}
         </button>
