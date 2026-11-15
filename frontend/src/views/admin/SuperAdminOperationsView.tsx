@@ -485,7 +485,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         localStorage.removeItem('geohub_store_expenses');
         localStorage.removeItem('geohub_store_budgetRequests');
         localStorage.removeItem('geohub_store_auditLogs');
-      } catch { }
+      } catch {}
       await fetchData();
     } catch (err: any) {
       showToast(err?.message || 'Purge failed', 'error');
@@ -582,13 +582,13 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         prev.map((r) =>
           r.role === selectedRoleKey
             ? {
-              ...r,
-              name: nameInput.trim() || r.name,
-              roll_no: rollInput.trim().toUpperCase(),
-              email: emailInput.trim() || r.email,
-              status: statusInput,
-              is_registered: true,
-            }
+                ...r,
+                name: nameInput.trim() || r.name,
+                roll_no: rollInput.trim().toUpperCase(),
+                email: emailInput.trim() || r.email,
+                status: statusInput,
+                is_registered: true,
+              }
             : r
         )
       );
@@ -989,44 +989,44 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
 
       {/* Platform Module Switchboard */}
       {(activeDeck === 'all' || activeDeck === 'hub') && (
-        <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
-                <Sliders size={20} strokeWidth={2.4} />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-[#051F20] leading-tight">
-                    Platform Module Switchboard
-                  </h2>
-                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
-                    {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Active
-                  </span>
-                </div>
-                <p className="text-xs text-[#235347]">
-                  Toggle respective club modules online or pause them across the platform for scheduled maintenance
-                </p>
-              </div>
+      <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+              <Sliders size={20} strokeWidth={2.4} />
             </div>
-
-            <div className="flex items-center gap-1.5 self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => toggleAllModules(true)}
-                className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 transition cursor-pointer"
-              >
-                Enable All
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleAllModules(false)}
-                className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-[11px] font-bold border border-rose-200 transition cursor-pointer"
-              >
-                Disable All
-              </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                  Platform Module Switchboard
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+                  {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Active
+                </span>
+              </div>
+              <p className="text-xs text-[#235347]">
+                Toggle respective club modules online or pause them across the platform for scheduled maintenance
+              </p>
             </div>
           </div>
+
+          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => toggleAllModules(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 transition cursor-pointer"
+            >
+              Enable All
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleAllModules(false)}
+              className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-[11px] font-bold border border-rose-200 transition cursor-pointer"
+            >
+              Disable All
+            </button>
+          </div>
+        </div>
 
         {/* Module Cards Grid with Toggle Switches (Sleek Minimalist Controls) */}
         {Object.values(platformModules || {}).some((v) => v === false) && (
@@ -1110,56 +1110,47 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 </div>
               </div>
             );
-            })}
-          </div>
-
-          {/* Quick Action Shortcuts inside Command Hub */}
-          {activeDeck === 'hub' && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-[#DAF1DE]">
-              <button
-                type="button"
-                onClick={() => { setActiveDeck('faculty'); setIsAddFacultyModalOpen(true); }}
-                className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
-              >
-                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                  <GraduationCap size={18} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-[#051F20]">+ Provision Faculty</div>
-                  <div className="text-[11px] text-[#235347]">Onboard institutional advisors</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setActiveDeck('students'); setIsAddStudentModalOpen(true); }}
-                className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
-              >
-                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                  <UserPlus size={18} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-[#051F20]">+ Onboard Student</div>
-                  <div className="text-[11px] text-[#235347]">Register scholars with Reg No</div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveDeck('matrix')}
-                className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
-              >
-                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                  <Key size={18} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-[#051F20]">Role Permissions</div>
-                  <div className="text-[11px] text-[#235347]">Configure 26 operations matrix</div>
-                </div>
-              </button>
-            </div>
-          )}
+          })}
         </div>
+
+        {/* Quick Action Shortcuts inside Command Hub */}
+        {activeDeck === 'hub' && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3 pt-3 border-t border-[#DAF1DE]">
+            <button
+              type="button"
+              onClick={() => { setActiveDeck('faculty'); setIsAddFacultyModalOpen(true); }}
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <GraduationCap size={16} />
+              </div>
+              <span className="text-xs font-bold text-[#051F20]">+ Provision Faculty</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setActiveDeck('students'); setIsAddStudentModalOpen(true); }}
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <UserPlus size={16} />
+              </div>
+              <span className="text-xs font-bold text-[#051F20]">+ Onboard Student</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveDeck('matrix')}
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <Key size={16} />
+              </div>
+              <span className="text-xs font-bold text-[#051F20]">Role Permissions</span>
+            </button>
+          </div>
+        )}
+      </div>
       )}
 
       {/* Faculty Governance & Provisioning Suite */}
@@ -1334,10 +1325,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 key={rKey}
                 type="button"
                 onClick={() => setStudentRoleFilter(rKey)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition capitalize shrink-0 cursor-pointer ${studentRoleFilter === rKey
-                  ? 'bg-[#163832] text-white shadow-2xs'
-                  : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:border-[#8EB69B]'
-                  }`}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition capitalize shrink-0 cursor-pointer ${
+                  studentRoleFilter === rKey
+                    ? 'bg-[#163832] text-white shadow-2xs'
+                    : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:border-[#8EB69B]'
+                }`}
               >
                 {rKey}
               </button>
@@ -1419,370 +1411,377 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         )}
       </div>
-    )
-  }
+      )}
 
-  {/* Role Selection & Operations Authority Matrix */ }
-  {
-    (activeDeck === 'all' || activeDeck === 'matrix') && (
+      {/* Role Selection & Operations Authority Matrix */}
+      {(activeDeck === 'all' || activeDeck === 'matrix') && (
       <div>
         {/* Role Selection Horizontal Bar */}
         <div className="mb-4">
-          <label className="block text-xs font-bold text-[#163832] uppercase tracking-wider mb-2">
-            Select Official Chapter Role
-          </label>
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            {roles.map((r) => {
-              const isSelected = r.role === selectedRoleKey;
-              return (
-                <button
-                  key={r.role}
-                  type="button"
-                  onClick={() => setSelectedRoleKey(r.role)}
-                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 touch-target-44 active:scale-95 border ${isSelected
+        <label className="block text-xs font-bold text-[#163832] uppercase tracking-wider mb-2">
+          Select Official Chapter Role
+        </label>
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {roles.map((r) => {
+            const isSelected = r.role === selectedRoleKey;
+            return (
+              <button
+                key={r.role}
+                type="button"
+                onClick={() => setSelectedRoleKey(r.role)}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 touch-target-44 active:scale-95 border ${
+                  isSelected
                     ? 'bg-[#163832] text-white border-[#163832] shadow-sm'
                     : 'bg-white text-[#163832] border-[#DAF1DE] hover:border-[#8EB69B] hover:bg-[#F6FBF7]'
-                    }`}
+                }`}
+              >
+                <Shield size={14} className={isSelected ? 'text-[#8EB69B]' : 'text-[#235347]'} />
+                <span>{r.badge}</span>
+                {r.is_registered && (
+                  <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#8EB69B]' : 'bg-emerald-500'}`} />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Responsive Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        {/* Left Column: Role Credentials Card (5 cols) */}
+        <div className="md:col-span-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+                <Key size={16} strokeWidth={2.4} />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                  Role Credentials
+                </h2>
+                <p className="text-xs text-[#235347]">Account & login access</p>
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+              {activeRoleMeta.badge}
+            </span>
+          </div>
+
+          {/* Scholar Name */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
+              <User size={13} className="text-[#235347]" /> Scholar Name
+            </label>
+            <input
+              type="text"
+              value={nameInput}
+              onChange={(e) => setNameInput(e.target.value)}
+              placeholder="e.g. Alex Rivera"
+              className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
+            />
+          </div>
+
+          {/* Roll No / Username */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
+              <Shield size={13} className="text-[#235347]" /> Username / Roll Number
+            </label>
+            <input
+              type="text"
+              value={rollInput}
+              onChange={(e) => setRollInput(e.target.value)}
+              placeholder="e.g. 21GEO001 or FAC01"
+              className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#051F20] uppercase focus:outline-none focus:border-[#235347] transition"
+            />
+          </div>
+
+          {/* Email */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
+              <Mail size={13} className="text-[#235347]" /> Institutional Email
+            </label>
+            <input
+              type="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              placeholder="scholar@college.edu"
+              className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
+            />
+          </div>
+
+          {/* Password with Generator & Copy */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
+                <Lock size={13} className="text-[#235347]" /> Set / Change Password
+              </label>
+              <button
+                type="button"
+                onClick={handleGeneratePassword}
+                className="text-xs font-bold text-[#235347] hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <Sparkles size={12} /> Generate
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Leave blank to keep unchanged"
+                className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl pl-3 pr-10 py-2 text-xs font-mono font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
+              />
+              <button
+                type="button"
+                onClick={handleCopyPassword}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer p-1"
+                title="Copy password"
+              >
+                {copiedPass ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Account Status */}
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-[#163832]">Account Status</label>
+            <select
+              value={statusInput}
+              onChange={(e) => setStatusInput(e.target.value)}
+              className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-bold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
+            >
+              <option value="active">Active (Access Granted)</option>
+              <option value="pending">Pending Institutional Review</option>
+              <option value="disabled">Disabled / Suspended</option>
+            </select>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="button"
+            onClick={handleSaveCredentials}
+            disabled={savingCredentials}
+            className="w-full mt-2 py-3 px-4 rounded-xl bg-[#235347] hover:bg-[#163832] active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm cursor-pointer transition touch-target-44"
+          >
+            {savingCredentials ? (
+              <RefreshCw size={15} className="animate-spin" />
+            ) : (
+              <CheckCircle2 size={15} />
+            )}
+            <span>Save Role Credentials</span>
+          </button>
+
+          {/* SuperAdmin Master Role Action: Live Preview / Act as Role */}
+          <button
+            type="button"
+            onClick={() => {
+              switchRole(selectedRoleKey);
+              showToast(`Switched preview session to ${activeRoleMeta.badge}`, 'success');
+            }}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#DAF1DE] hover:bg-[#c6ebd0] text-[#163832] font-bold text-xs flex items-center justify-center gap-2 border border-[#8EB69B]/40 transition active:scale-98 cursor-pointer shadow-2xs"
+            title={`Preview application and controls as ${activeRoleMeta.badge}`}
+          >
+            <Repeat size={14} strokeWidth={2.4} />
+            <span>Act as {activeRoleMeta.badge} (Live Preview)</span>
+          </button>
+        </div>
+
+        {/* Right Column: Operations Authority & Master Switches (7 cols) */}
+        <div className="md:col-span-7 bg-white border border-[#DAF1DE] rounded-2xl p-4 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+          {/* Header & Master Action Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DAF1DE] pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+                <SlidersHorizontal size={16} strokeWidth={2.4} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                    Operation Authorities
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+                    {activeCount} / 26 Active
+                  </span>
+                </div>
+                <p className="text-xs text-[#235347]">
+                  Instant toggle switches for {activeRoleMeta.badge}
+                </p>
+              </div>
+            </div>
+
+            {/* Master Actions */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                type="button"
+                onClick={handleEnableAll}
+                disabled={togglingOperation}
+                className="px-2.5 py-1.5 rounded-xl bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#235347] font-bold text-xs border border-[#8EB69B]/40 flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44"
+              >
+                <Check size={13} strokeWidth={2.5} />
+                <span>Enable All</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDisableAll}
+                disabled={togglingOperation || selectedRoleKey === 'super_admin'}
+                className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs border border-rose-200 flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <X size={13} strokeWidth={2.5} />
+                <span>Disable All</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetToDefault}
+                disabled={togglingOperation}
+                className="px-2.5 py-1.5 rounded-xl bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#235347] font-bold text-xs border border-[#DAF1DE] flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44"
+                title="Restore default institutional baseline"
+              >
+                <RotateCcw size={13} />
+                <span>Default</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            <button
+              type="button"
+              onClick={() => setSelectedCat('all')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 ${
+                selectedCat === 'all'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              All (26)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCat('events')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${
+                selectedCat === 'events'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <Calendar size={12} /> Events (5)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCat('finance')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${
+                selectedCat === 'finance'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <Coins size={12} /> Finance (5)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCat('docs')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${
+                selectedCat === 'docs'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <FileText size={12} /> Docs (4)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCat('ops')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${
+                selectedCat === 'ops'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <Activity size={12} /> Activities (4)
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedCat('admin')}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${
+                selectedCat === 'admin'
+                  ? 'bg-[#235347] text-white shadow-xs'
+                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
+              }`}
+            >
+              <Shield size={12} /> Governance (8)
+            </button>
+          </div>
+
+          {/* Operations List */}
+          <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 no-scrollbar">
+            {filteredOperations.map((op) => {
+              const isActive = !!currentRolePermissions[op.key];
+              return (
+                <div
+                  key={op.key}
+                  className={`p-3 rounded-xl border transition flex items-center justify-between gap-3 ${
+                    isActive
+                      ? 'bg-[#F6FBF7] border-[#8EB69B]/50'
+                      : 'bg-white border-[#DAF1DE] opacity-80'
+                  }`}
                 >
-                  <Shield size={14} className={isSelected ? 'text-[#8EB69B]' : 'text-[#235347]'} />
-                  <span>{r.badge}</span>
-                  {r.is_registered && (
-                    <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#8EB69B]' : 'bg-emerald-500'}`} />
-                  )}
-                </button>
+                  <div className="min-w-0 pr-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-xs text-[#051F20] truncate">
+                        {op.label}
+                      </span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-xs font-bold ${
+                          isActive
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-gray-100 text-gray-500'
+                        }`}
+                      >
+                        {isActive ? 'ENABLED' : 'DISABLED'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#235347] truncate mt-0.5">
+                      {op.desc}
+                    </p>
+                  </div>
+
+                  {/* Toggle Switch */}
+                  <button
+                    type="button"
+                    onClick={() => handleToggleOperation(op.key)}
+                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 touch-target-44 p-0.5 ${
+                      isActive ? 'bg-[#235347]' : 'bg-gray-300'
+                    }`}
+                    aria-label={`Toggle ${op.label}`}
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                        isActive ? 'translate-x-6' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
               );
             })}
           </div>
-        </div>
 
-        {/* Main Responsive Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Left Column: Role Credentials Card (5 cols) */}
-          <div className="md:col-span-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
-            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2.5">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
-                  <Key size={16} strokeWidth={2.4} />
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-[#051F20] leading-tight">
-                    Role Credentials
-                  </h2>
-                  <p className="text-xs text-[#235347]">Account & login access</p>
-                </div>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
-                {activeRoleMeta.badge}
-              </span>
+          {/* Institutional Compliance Notice */}
+          <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-between text-xs text-[#235347]">
+            <div className="flex items-center gap-1.5">
+              <Shield size={13} className="text-[#8EB69B]" />
+              <span>Changes take effect immediately across all client devices.</span>
             </div>
-
-            {/* Scholar Name */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
-                <User size={13} className="text-[#235347]" /> Scholar Name
-              </label>
-              <input
-                type="text"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                placeholder="e.g. Alex Rivera"
-                className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
-              />
-            </div>
-
-            {/* Roll No / Username */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
-                <Shield size={13} className="text-[#235347]" /> Username / Roll Number
-              </label>
-              <input
-                type="text"
-                value={rollInput}
-                onChange={(e) => setRollInput(e.target.value)}
-                placeholder="e.g. 21GEO001 or FAC01"
-                className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-mono font-bold text-[#051F20] uppercase focus:outline-none focus:border-[#235347] transition"
-              />
-            </div>
-
-            {/* Email */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
-                <Mail size={13} className="text-[#235347]" /> Institutional Email
-              </label>
-              <input
-                type="email"
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="scholar@college.edu"
-                className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
-              />
-            </div>
-
-            {/* Password with Generator & Copy */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[#163832] flex items-center gap-1.5">
-                  <Lock size={13} className="text-[#235347]" /> Set / Change Password
-                </label>
-                <button
-                  type="button"
-                  onClick={handleGeneratePassword}
-                  className="text-xs font-bold text-[#235347] hover:underline cursor-pointer flex items-center gap-1"
-                >
-                  <Sparkles size={12} /> Generate
-                </button>
-              </div>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={passwordInput}
-                  onChange={(e) => setPasswordInput(e.target.value)}
-                  placeholder="Leave blank to keep unchanged"
-                  className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl pl-3 pr-10 py-2 text-xs font-mono font-semibold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
-                />
-                <button
-                  type="button"
-                  onClick={handleCopyPassword}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#235347] hover:text-[#051F20] cursor-pointer p-1"
-                  title="Copy password"
-                >
-                  {copiedPass ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Account Status */}
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#163832]">Account Status</label>
-              <select
-                value={statusInput}
-                onChange={(e) => setStatusInput(e.target.value)}
-                className="w-full bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl px-3 py-2 text-xs font-bold text-[#051F20] focus:outline-none focus:border-[#235347] transition"
-              >
-                <option value="active">Active (Access Granted)</option>
-                <option value="pending">Pending Institutional Review</option>
-                <option value="disabled">Disabled / Suspended</option>
-              </select>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="button"
-              onClick={handleSaveCredentials}
-              disabled={savingCredentials}
-              className="w-full mt-2 py-3 px-4 rounded-xl bg-[#235347] hover:bg-[#163832] active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm cursor-pointer transition touch-target-44"
-            >
-              {savingCredentials ? (
-                <RefreshCw size={15} className="animate-spin" />
-              ) : (
-                <CheckCircle2 size={15} />
-              )}
-              <span>Save Role Credentials</span>
-            </button>
-
-            {/* SuperAdmin Master Role Action: Live Preview / Act as Role */}
-            <button
-              type="button"
-              onClick={() => {
-                switchRole(selectedRoleKey);
-                showToast(`Switched preview session to ${activeRoleMeta.badge}`, 'success');
-              }}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#DAF1DE] hover:bg-[#c6ebd0] text-[#163832] font-bold text-xs flex items-center justify-center gap-2 border border-[#8EB69B]/40 transition active:scale-98 cursor-pointer shadow-2xs"
-              title={`Preview application and controls as ${activeRoleMeta.badge}`}
-            >
-              <Repeat size={14} strokeWidth={2.4} />
-              <span>Act as {activeRoleMeta.badge} (Live Preview)</span>
-            </button>
-          </div>
-
-          {/* Right Column: Operations Authority & Master Switches (7 cols) */}
-          <div className="md:col-span-7 bg-white border border-[#DAF1DE] rounded-2xl p-4 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
-            {/* Header & Master Action Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#DAF1DE] pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
-                  <SlidersHorizontal size={16} strokeWidth={2.4} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-bold text-[#051F20] leading-tight">
-                      Operation Authorities
-                    </h2>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
-                      {activeCount} / 26 Active
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#235347]">
-                    Instant toggle switches for {activeRoleMeta.badge}
-                  </p>
-                </div>
-              </div>
-
-              {/* Master Actions */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <button
-                  type="button"
-                  onClick={handleEnableAll}
-                  disabled={togglingOperation}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#235347] font-bold text-xs border border-[#8EB69B]/40 flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44"
-                >
-                  <Check size={13} strokeWidth={2.5} />
-                  <span>Enable All</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDisableAll}
-                  disabled={togglingOperation || selectedRoleKey === 'super_admin'}
-                  className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs border border-rose-200 flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <X size={13} strokeWidth={2.5} />
-                  <span>Disable All</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleResetToDefault}
-                  disabled={togglingOperation}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#235347] font-bold text-xs border border-[#DAF1DE] flex items-center gap-1 cursor-pointer transition active:scale-95 touch-target-44"
-                  title="Restore default institutional baseline"
-                >
-                  <RotateCcw size={13} />
-                  <span>Default</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-              <button
-                type="button"
-                onClick={() => setSelectedCat('all')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 ${selectedCat === 'all'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                All (26)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCat('events')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${selectedCat === 'events'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                <Calendar size={12} /> Events (5)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCat('finance')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${selectedCat === 'finance'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                <Coins size={12} /> Finance (5)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCat('docs')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${selectedCat === 'docs'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                <FileText size={12} /> Docs (4)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCat('ops')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${selectedCat === 'ops'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                <Activity size={12} /> Activities (4)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedCat('admin')}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer touch-target-44 flex items-center gap-1 ${selectedCat === 'admin'
-                  ? 'bg-[#235347] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE]'
-                  }`}
-              >
-                <Shield size={12} /> Governance (8)
-              </button>
-            </div>
-
-            {/* Operations List */}
-            <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1 no-scrollbar">
-              {filteredOperations.map((op) => {
-                const isActive = !!currentRolePermissions[op.key];
-                return (
-                  <div
-                    key={op.key}
-                    className={`p-3 rounded-xl border transition flex items-center justify-between gap-3 ${isActive
-                      ? 'bg-[#F6FBF7] border-[#8EB69B]/50'
-                      : 'bg-white border-[#DAF1DE] opacity-80'
-                      }`}
-                  >
-                    <div className="min-w-0 pr-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs text-[#051F20] truncate">
-                          {op.label}
-                        </span>
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-xs font-bold ${isActive
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-gray-100 text-gray-500'
-                            }`}
-                        >
-                          {isActive ? 'ENABLED' : 'DISABLED'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#235347] truncate mt-0.5">
-                        {op.desc}
-                      </p>
-                    </div>
-
-                    {/* Toggle Switch */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleOperation(op.key)}
-                      className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 touch-target-44 p-0.5 ${isActive ? 'bg-[#235347]' : 'bg-gray-300'
-                        }`}
-                      aria-label={`Toggle ${op.label}`}
-                    >
-                      <div
-                        className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${isActive ? 'translate-x-6' : 'translate-x-0'
-                          }`}
-                      />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Institutional Compliance Notice */}
-            <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-between text-xs text-[#235347]">
-              <div className="flex items-center gap-1.5">
-                <Shield size={13} className="text-[#8EB69B]" />
-                <span>Changes take effect immediately across all client devices.</span>
-              </div>
-              <span className="font-mono text-xs font-bold text-[#163832]">RBAC v2.4</span>
-            </div>
+            <span className="font-mono text-xs font-bold text-[#163832]">RBAC v2.4</span>
           </div>
         </div>
       </div>
-    )
-  }
+      </div>
+      )}
 
-  {/* Maintenance & Database Diagnostics */ }
-  {
-    (activeDeck === 'all' || activeDeck === 'maintenance') && (
+      {/* Maintenance & Database Diagnostics */}
+      {(activeDeck === 'all' || activeDeck === 'maintenance') && (
       <div className="mt-5 space-y-4">
         {/* Live Database Engine Diagnostics */}
         <div className="bg-[#051F20] text-white rounded-2xl p-4 sm:p-5 border border-[#163832] shadow-xl flex flex-col gap-3 font-mono">
@@ -1848,716 +1847,705 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </button>
         </div>
       </div>
-    )
-  }
+      )}
 
-  {/* Add Faculty Modal */ }
-  {
-    isAddFacultyModalOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-        <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 overflow-hidden max-h-[90vh] flex flex-col">
-          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3 mb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
-                <GraduationCap size={20} strokeWidth={2.4} />
+      {/* Add Faculty Modal */}
+      {isAddFacultyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+                  <GraduationCap size={20} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#051F20]">Provision Faculty Advisor</h3>
+                  <p className="text-xs text-[#235347]">Grant official faculty credentials & sanction authority</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-bold text-[#051F20]">Provision Faculty Advisor</h3>
-                <p className="text-xs text-[#235347]">Grant official faculty credentials & sanction authority</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsAddFacultyModalOpen(false)}
-              className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
-            >
-              <X size={16} />
-            </button>
-          </div>
-
-          <form onSubmit={handleCreateFaculty} className="flex-1 overflow-y-auto space-y-3.5 pr-1 no-scrollbar">
-            <div>
-              <label className="block text-xs font-bold text-[#163832] mb-1">
-                Full Name <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={facultyForm.name}
-                onChange={(e) => setFacultyForm({ ...facultyForm, name: e.target.value })}
-                placeholder="e.g. Dr. Sarah Jenkins"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Faculty ID / Username <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={facultyForm.roll_no}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, roll_no: e.target.value.toUpperCase() })}
-                  placeholder="e.g. FAC01"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Institutional Email <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={facultyForm.email}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, email: e.target.value })}
-                  placeholder="e.g. sarah.jenkins@college.edu"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Department
-                </label>
-                <input
-                  type="text"
-                  value={facultyForm.department}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, department: e.target.value })}
-                  placeholder="e.g. Geoinformatics Engineering"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Designation / Post
-                </label>
-                <input
-                  type="text"
-                  value={facultyForm.post}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, post: e.target.value })}
-                  placeholder="e.g. Faculty Advisor"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Contact Phone
-                </label>
-                <input
-                  type="tel"
-                  value={facultyForm.phone}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, phone: e.target.value })}
-                  placeholder="e.g. +91 94420 18820"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Initial Password
-                </label>
-                <input
-                  type="text"
-                  value={facultyForm.password}
-                  onChange={(e) => setFacultyForm({ ...facultyForm, password: e.target.value })}
-                  placeholder="GeoHub2026!"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsAddFacultyModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={facultySubmitting}
-                className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-              >
-                <UserPlus size={14} />
-                <span>{facultySubmitting ? 'Provisioning...' : 'Provision Faculty'}</span>
+                <X size={16} />
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
 
-  {/* Edit Faculty Modal */ }
-  {
-    isEditFacultyModalOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-        <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#235347] flex items-center justify-center">
-                <GraduationCap size={22} strokeWidth={2.4} />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-[#051F20]">Edit Faculty Advisor</h3>
-                <p className="text-xs text-[#235347]">Update advisor record, post title, credentials & status</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsEditFacultyModalOpen(false)}
-              className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 cursor-pointer"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <form onSubmit={handleUpdateFaculty} className="space-y-3.5">
-            <div>
-              <label className="block text-xs font-bold text-[#163832] mb-1">
-                Full Name & Salutation <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                value={editFacultyForm.name}
-                onChange={(e) => setEditFacultyForm({ ...editFacultyForm, name: e.target.value })}
-                placeholder="e.g. Dr. Sarah Jenkins"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <form onSubmit={handleCreateFaculty} className="flex-1 overflow-y-auto space-y-3.5 pr-1 no-scrollbar">
               <div>
                 <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Faculty ID / Username <span className="text-rose-500">*</span>
+                  Full Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  value={editFacultyForm.roll_no}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, roll_no: e.target.value.toUpperCase() })}
-                  placeholder="e.g. FAC01"
+                  value={facultyForm.name}
+                  onChange={(e) => setFacultyForm({ ...facultyForm, name: e.target.value })}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Faculty ID / Username <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={facultyForm.roll_no}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. FAC01"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Institutional Email <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={facultyForm.email}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, email: e.target.value })}
+                    placeholder="e.g. sarah.jenkins@college.edu"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.department}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, department: e.target.value })}
+                    placeholder="e.g. Geoinformatics Engineering"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Designation / Post
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.post}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, post: e.target.value })}
+                    placeholder="e.g. Faculty Advisor"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={facultyForm.phone}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, phone: e.target.value })}
+                    placeholder="e.g. +91 94420 18820"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Initial Password
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.password}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, password: e.target.value })}
+                    placeholder="GeoHub2026!"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddFacultyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={facultySubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <UserPlus size={14} />
+                  <span>{facultySubmitting ? 'Provisioning...' : 'Provision Faculty'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Faculty Modal */}
+      {isEditFacultyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#235347] flex items-center justify-center">
+                  <GraduationCap size={22} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Edit Faculty Advisor</h3>
+                  <p className="text-xs text-[#235347]">Update advisor record, post title, credentials & status</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditFacultyModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateFaculty} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">
+                  Full Name & Salutation <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFacultyForm.name}
+                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, name: e.target.value })}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Faculty ID / Username <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFacultyForm.roll_no}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. FAC01"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Institutional Email <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editFacultyForm.email}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, email: e.target.value })}
+                    placeholder="e.g. sarah.jenkins@college.edu"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={editFacultyForm.department}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, department: e.target.value })}
+                    placeholder="e.g. Geoinformatics Engineering"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Designation / Post
+                  </label>
+                  <input
+                    type="text"
+                    value={editFacultyForm.post}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, post: e.target.value })}
+                    placeholder="e.g. Faculty Advisor"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={editFacultyForm.phone}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, phone: e.target.value })}
+                    placeholder="e.g. +91 94420 18820"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={editFacultyForm.status}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, status: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">
+                  Reset Password <span className="text-[10px] text-gray-500 font-normal">(Optional, leave blank to retain current)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editFacultyForm.password}
+                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, password: e.target.value })}
+                  placeholder="Enter new password (optional)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Institutional Email <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={editFacultyForm.email}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, email: e.target.value })}
-                  placeholder="e.g. sarah.jenkins@college.edu"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Department
-                </label>
-                <input
-                  type="text"
-                  value={editFacultyForm.department}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, department: e.target.value })}
-                  placeholder="e.g. Geoinformatics Engineering"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Designation / Post
-                </label>
-                <input
-                  type="text"
-                  value={editFacultyForm.post}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, post: e.target.value })}
-                  placeholder="e.g. Faculty Advisor"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Contact Phone
-                </label>
-                <input
-                  type="tel"
-                  value={editFacultyForm.phone}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, phone: e.target.value })}
-                  placeholder="e.g. +91 94420 18820"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#163832] mb-1">
-                  Status
-                </label>
-                <select
-                  value={editFacultyForm.status}
-                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, status: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditFacultyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editFacultySubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>{editFacultySubmitting ? 'Saving...' : 'Save Changes'}</span>
+                </button>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-[#163832] mb-1">
-                Reset Password <span className="text-[10px] text-gray-500 font-normal">(Optional, leave blank to retain current)</span>
-              </label>
-              <input
-                type="text"
-                value={editFacultyForm.password}
-                onChange={(e) => setEditFacultyForm({ ...editFacultyForm, password: e.target.value })}
-                placeholder="Enter new password (optional)"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
-              />
-            </div>
-
-            <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsEditFacultyModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={editFacultySubmitting}
-                className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-              >
-                <CheckCircle2 size={14} />
-                <span>{editFacultySubmitting ? 'Saving...' : 'Save Changes'}</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  {/* Onboard Student / Officer Modal */ }
-  {
-    isAddStudentModalOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-        <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
-                <UserPlus size={20} strokeWidth={2.2} />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-[#051F20]">Onboard Student or Officer</h3>
-                <p className="text-xs text-[#235347]">Provision student scholar or club role</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsAddStudentModalOpen(false)}
-              className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
-            >
-              <X size={18} />
-            </button>
+            </form>
           </div>
+        </div>
+      )}
 
-          <form onSubmit={handleCreateStudent} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={studentForm.name}
-                  onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                  placeholder="e.g. Priya Sharma"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
+      {/* Onboard Student / Officer Modal */}
+      {isAddStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+                  <UserPlus size={20} strokeWidth={2.2} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Onboard Student or Officer</h3>
+                  <p className="text-xs text-[#235347]">Provision student scholar or club role</p>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
-                <input
-                  type="text"
-                  required
-                  value={studentForm.roll_no}
-                  onChange={(e) => setStudentForm({ ...studentForm, roll_no: e.target.value.toUpperCase() })}
-                  placeholder="e.g. 23GEO045"
-                  className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={studentForm.email}
-                  onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
-                  placeholder="student@college.edu"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
-                <select
-                  value={studentForm.role}
-                  onChange={(e) => setStudentForm({ ...studentForm, role: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
-                >
-                  <option value="student">Student Scholar</option>
-                  <option value="member">Club Member</option>
-                  <option value="volunteer">Volunteer (Gate Check-In)</option>
-                  <option value="coordinator">President / Coordinator</option>
-                  <option value="treasurer">Treasurer (Finance)</option>
-                  <option value="documentation">Documentation Lead</option>
-                  <option value="promotion">Promotion Lead</option>
-                  <option value="management">Management Lead</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
-                <select
-                  value={studentForm.year_of_study}
-                  onChange={(e) => setStudentForm({ ...studentForm, year_of_study: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
-                >
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="PG / Research">PG / Research</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
-                <input
-                  type="text"
-                  value={studentForm.team}
-                  onChange={(e) => setStudentForm({ ...studentForm, team: e.target.value })}
-                  placeholder="e.g. Field Mapping & GIS"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
-                <input
-                  type="text"
-                  value={studentForm.post}
-                  onChange={(e) => setStudentForm({ ...studentForm, post: e.target.value })}
-                  placeholder="e.g. Squad Lead / Member"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Department</label>
-                <input
-                  type="text"
-                  value={studentForm.department}
-                  onChange={(e) => setStudentForm({ ...studentForm, department: e.target.value })}
-                  placeholder="Geoinformatics Engineering"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={studentForm.phone}
-                  onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
-                  placeholder="+91 9876543210"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Initial Password</label>
-                <input
-                  type="text"
-                  value={studentForm.password}
-                  onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
-                  placeholder="Default: geohub"
-                  className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsAddStudentModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={studentSubmitting}
-                className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-              >
-                <UserPlus size={14} />
-                <span>{studentSubmitting ? 'Onboarding...' : 'Onboard Account'}</span>
+                <X size={18} />
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
 
-  {/* Edit Student / Officer Modal */ }
-  {
-    isEditStudentModalOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-        <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
-                <Pencil size={20} strokeWidth={2.2} />
+            <form onSubmit={handleCreateStudent} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={studentForm.name}
+                    onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                    placeholder="e.g. Priya Sharma"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
+                  <input
+                    type="text"
+                    required
+                    value={studentForm.roll_no}
+                    onChange={(e) => setStudentForm({ ...studentForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. 23GEO045"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
+                  />
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-[#051F20]">Edit Student or Officer Account</h3>
-                <p className="text-xs text-[#235347]">Update profile, role, or reset password</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={studentForm.email}
+                    onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
+                    placeholder="student@college.edu"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
+                  <select
+                    value={studentForm.role}
+                    onChange={(e) => setStudentForm({ ...studentForm, role: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="student">Student Scholar</option>
+                    <option value="member">Club Member</option>
+                    <option value="volunteer">Volunteer (Gate Check-In)</option>
+                    <option value="coordinator">President / Coordinator</option>
+                    <option value="treasurer">Treasurer (Finance)</option>
+                    <option value="documentation">Documentation Lead</option>
+                    <option value="promotion">Promotion Lead</option>
+                    <option value="management">Management Lead</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsEditStudentModalOpen(false)}
-              className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
-            >
-              <X size={18} />
-            </button>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
+                  <select
+                    value={studentForm.year_of_study}
+                    onChange={(e) => setStudentForm({ ...studentForm, year_of_study: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
+                  >
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="PG / Research">PG / Research</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
+                  <input
+                    type="text"
+                    value={studentForm.team}
+                    onChange={(e) => setStudentForm({ ...studentForm, team: e.target.value })}
+                    placeholder="e.g. Field Mapping & GIS"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
+                  <input
+                    type="text"
+                    value={studentForm.post}
+                    onChange={(e) => setStudentForm({ ...studentForm, post: e.target.value })}
+                    placeholder="e.g. Squad Lead / Member"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Department</label>
+                  <input
+                    type="text"
+                    value={studentForm.department}
+                    onChange={(e) => setStudentForm({ ...studentForm, department: e.target.value })}
+                    placeholder="Geoinformatics Engineering"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={studentForm.phone}
+                    onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                    placeholder="+91 9876543210"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Initial Password</label>
+                  <input
+                    type="text"
+                    value={studentForm.password}
+                    onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+                    placeholder="Default: geohub"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddStudentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={studentSubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <UserPlus size={14} />
+                  <span>{studentSubmitting ? 'Onboarding...' : 'Onboard Account'}</span>
+                </button>
+              </div>
+            </form>
           </div>
+        </div>
+      )}
 
-          <form onSubmit={handleUpdateStudent} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={editStudentForm.name}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, name: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
+      {/* Edit Student / Officer Modal */}
+      {isEditStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+                  <Pencil size={20} strokeWidth={2.2} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Edit Student or Officer Account</h3>
+                  <p className="text-xs text-[#235347]">Update profile, role, or reset password</p>
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
-                <input
-                  type="text"
-                  required
-                  value={editStudentForm.roll_no}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, roll_no: e.target.value.toUpperCase() })}
-                  className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={editStudentForm.email}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, email: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
-                <select
-                  value={editStudentForm.role}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, role: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
-                >
-                  <option value="student">Student Scholar</option>
-                  <option value="member">Club Member</option>
-                  <option value="volunteer">Volunteer (Gate Check-In)</option>
-                  <option value="coordinator">President / Coordinator</option>
-                  <option value="treasurer">Treasurer (Finance)</option>
-                  <option value="documentation">Documentation Lead</option>
-                  <option value="promotion">Promotion Lead</option>
-                  <option value="management">Management Lead</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
-                <select
-                  value={editStudentForm.year_of_study}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, year_of_study: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
-                >
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="PG / Research">PG / Research</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
-                <input
-                  type="text"
-                  value={editStudentForm.team}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, team: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
-                <input
-                  type="text"
-                  value={editStudentForm.post}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, post: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Account Status</label>
-                <select
-                  value={editStudentForm.status}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, status: e.target.value })}
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
-                >
-                  <option value="active">Active</option>
-                  <option value="disabled">Disabled</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={editStudentForm.phone}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, phone: e.target.value })}
-                  placeholder="+91 9876543210"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#163832] mb-1">Reset Password (Optional)</label>
-                <input
-                  type="password"
-                  value={editStudentForm.password}
-                  onChange={(e) => setEditStudentForm({ ...editStudentForm, password: e.target.value })}
-                  placeholder="Leave blank to keep current"
-                  className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setIsEditStudentModalOpen(false)}
+                className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStudent} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStudentForm.name}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, name: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStudentForm.roll_no}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, roll_no: e.target.value.toUpperCase() })}
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editStudentForm.email}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, email: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
+                  <select
+                    value={editStudentForm.role}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, role: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="student">Student Scholar</option>
+                    <option value="member">Club Member</option>
+                    <option value="volunteer">Volunteer (Gate Check-In)</option>
+                    <option value="coordinator">President / Coordinator</option>
+                    <option value="treasurer">Treasurer (Finance)</option>
+                    <option value="documentation">Documentation Lead</option>
+                    <option value="promotion">Promotion Lead</option>
+                    <option value="management">Management Lead</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
+                  <select
+                    value={editStudentForm.year_of_study}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, year_of_study: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
+                  >
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="PG / Research">PG / Research</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.team}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, team: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.post}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, post: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Account Status</label>
+                  <select
+                    value={editStudentForm.status}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, status: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="active">Active</option>
+                    <option value="disabled">Disabled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.phone}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, phone: e.target.value })}
+                    placeholder="+91 9876543210"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Reset Password (Optional)</label>
+                  <input
+                    type="password"
+                    value={editStudentForm.password}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, password: e.target.value })}
+                    placeholder="Leave blank to keep current"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditStudentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editStudentSubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>{editStudentSubmitting ? 'Saving...' : 'Save Changes'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Purge Modal */}
+      {isConfirmPurgeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-rose-300 shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <AlertTriangle size={24} strokeWidth={2.2} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Confirm Platform Data Purge</h3>
+                <p className="text-xs text-rose-600 font-semibold">Irreversible Action</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-600 leading-relaxed">
+              This will permanently delete all events, registrations, tasks, finances, expenses, and all user accounts except <strong>System SuperAdmin (SA01)</strong>. Squad shells will be emptied.
+            </p>
+
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1 font-medium">
+              <div>• Retains only SuperAdmin: <code>SA01</code> / <code>GeoHub2026!</code></div>
+              <div>• Clears all test feeds and old cached records.</div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmPurgeOpen(false)}
                 className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
-                type="submit"
-                disabled={editStudentSubmitting}
-                className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                type="button"
+                onClick={handlePurgeAllData}
+                disabled={isPurging}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
               >
-                <CheckCircle2 size={14} />
-                <span>{editStudentSubmitting ? 'Saving...' : 'Save Changes'}</span>
+                <Trash2 size={14} />
+                <span>{isPurging ? 'Purging...' : 'Yes, Purge Everything'}</span>
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  {/* Confirmation Purge Modal */ }
-  {
-    isConfirmPurgeOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
-        <div className="bg-white rounded-3xl border border-rose-300 shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-              <AlertTriangle size={24} strokeWidth={2.2} />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-gray-900">Confirm Platform Data Purge</h3>
-              <p className="text-xs text-rose-600 font-semibold">Irreversible Action</p>
-            </div>
-          </div>
-
-          <p className="text-xs text-gray-600 leading-relaxed">
-            This will permanently delete all events, registrations, tasks, finances, expenses, and all user accounts except <strong>System SuperAdmin (SA01)</strong>. Squad shells will be emptied.
-          </p>
-
-          <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1 font-medium">
-            <div>• Retains only SuperAdmin: <code>SA01</code> / <code>GeoHub2026!</code></div>
-            <div>• Clears all test feeds and old cached records.</div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setIsConfirmPurgeOpen(false)}
-              className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handlePurgeAllData}
-              disabled={isPurging}
-              className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-            >
-              <Trash2 size={14} />
-              <span>{isPurging ? 'Purging...' : 'Yes, Purge Everything'}</span>
-            </button>
           </div>
         </div>
-      </div>
-    )
-  }
-    </div >
+      )}
+    </div>
   );
 };
 

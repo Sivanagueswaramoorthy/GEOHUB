@@ -1,12 +1,12 @@
 {
-  "version": "1.6.23",
-  "version_code": 41,
+  "version": "1.6.24",
+  "version_code": 42,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Fix JSX tag balance in SuperAdminOperationsView",
+  "release_notes": "Restore clean SuperAdminOperationsView without duplicate JSX",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6864280,
+  "file_size_bytes": 6864176,
   "file_size_mb": "6.55 MB",
-  "sha256": "80F837CD28BC9C6C9B12345A39D3C63823A3008CB84FED52EA8FF699F3DEAE23"
+  "sha256": "81772E0F4878DBB8E780FC0950BA7BB78CAD1758C7E6A51C462B213EA13889D5"
 }
