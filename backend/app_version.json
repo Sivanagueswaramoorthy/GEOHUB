@@ -1,12 +1,12 @@
 {
-  "version": "1.6.22",
-  "version_code": 40,
+  "version": "1.6.23",
+  "version_code": 41,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "SuperAdmin home screen rebuilt with 2-row untruncated module switchboard, concise executive typography, and high-contrast botanical styling",
+  "release_notes": "Fix JSX tag balance in SuperAdminOperationsView",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6864176,
+  "file_size_bytes": 6864280,
   "file_size_mb": "6.55 MB",
-  "sha256": "C1FDD098B9A4F65948AC793DCFB2735242EA7FE1C994C10E9F5187847C23C77B"
+  "sha256": "80F837CD28BC9C6C9B12345A39D3C63823A3008CB84FED52EA8FF699F3DEAE23"
 }
