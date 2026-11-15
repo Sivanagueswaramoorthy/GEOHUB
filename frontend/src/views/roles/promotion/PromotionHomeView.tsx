@@ -76,7 +76,7 @@ export const PromotionHomeView: React.FC<PromotionHomeViewProps> = () => {
           icon={<Send size={20} strokeWidth={1.75} className="lucide" />}
           value={String(postedCount)}
           label="Posted"
-          footnote="Live"
+          footnote="Active"
           tint="mint"
           onClick={() => setActiveTab('campaigns')}
         />

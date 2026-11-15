@@ -79,7 +79,7 @@ export const FacultyHomeView: React.FC = () => {
         <StatTile
           icon={<Radio size={20} strokeWidth={1.75} className="lucide" />}
           value={String(liveEvents.length)}
-          label="Live"
+          label="Ongoing"
           tint="amber"
           onClick={() => setActiveTab('events')}
         />

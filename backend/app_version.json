@@ -1,12 +1,12 @@
 {
-  "version": "1.6.6",
-  "version_code": 24,
+  "version": "1.6.7",
+  "version_code": 25,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Fix in-app package installer FileProvider root",
+  "release_notes": "Clean UI: remove debug server sync cards and live badges",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6844835,
+  "file_size_bytes": 6843467,
   "file_size_mb": "6.53 MB",
-  "sha256": "1BBE0E41E5C45CE58CD947219118D7B0610B2680F78C3627E89BD06559B4A494"
+  "sha256": "2A34700279E3942600EB9B08259D4FE02C094554270A20027B11608AF2488855"
 }

@@ -254,40 +254,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           <div className="flex items-center shrink-0" style={{ gap: '10px' }}>
             {rightAction}
 
-            {/* Live Cloud Multi-Device Sync Indicator */}
-            {appContext && (
-              <button
-                type="button"
-                onClick={() => appContext.refreshCloudData()}
-                title={
-                  appContext.syncStatus === 'connected'
-                    ? 'Real-Time Cloud Synced • Tap to refresh'
-                    : appContext.syncStatus === 'syncing'
-                    ? 'Synchronizing across devices...'
-                    : 'Offline cache • Tap to reconnect'
-                }
-                aria-label="Cloud synchronization status"
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DAF1DE] bg-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-xs"
-              >
-                <span
-                  className={`w-2 h-2 rounded-full ${
-                    appContext.syncStatus === 'connected'
-                      ? 'bg-[#163832] animate-pulse'
-                      : appContext.syncStatus === 'syncing'
-                      ? 'bg-amber-500 animate-ping'
-                      : 'bg-rose-400'
-                  }`}
-                />
-                <span className="text-[#051F20] text-xs">
-                  {appContext.syncStatus === 'connected'
-                    ? 'Live'
-                    : appContext.syncStatus === 'syncing'
-                    ? 'Syncing'
-                    : 'Offline'}
-                </span>
-              </button>
-            )}
-
             {/* Notification Bell (High-contrast 3D raised white disc button) */}
             {showNotificationsInTopBar && (
               <IconCircleButton

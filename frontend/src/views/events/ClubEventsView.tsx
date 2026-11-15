@@ -650,36 +650,6 @@ export const ClubEventsView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Live Cloud Multi-Device Sync Pill */}
-          <button
-            type="button"
-            onClick={() => refreshCloudData()}
-            disabled={isSyncing}
-            className="h-9 px-3 rounded-full flex items-center gap-1.5 bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] transition active:scale-95 disabled:opacity-50 cursor-pointer border border-[#8EB69B]/30 text-xs font-bold"
-            title={
-              syncStatus === 'connected'
-                ? 'Multi-device real-time sync active (SSE) • Tap to refresh'
-                : syncStatus === 'syncing'
-                ? 'Syncing across devices...'
-                : 'Offline cache • Tap to reconnect'
-            }
-            aria-label="Refresh events from cloud"
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                syncStatus === 'connected'
-                  ? 'bg-[#163832] animate-pulse'
-                  : syncStatus === 'syncing'
-                  ? 'bg-amber-500 animate-ping'
-                  : 'bg-rose-400'
-              }`}
-            />
-            <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
-            <span className="hidden xs:inline text-xs">
-              {syncStatus === 'connected' ? 'Live Synced' : syncStatus === 'syncing' ? 'Syncing...' : 'Reconnect'}
-            </span>
-          </button>
-
           {/* Read-only screens HIDE create buttons */}
           {perms.canCreateEditEvents && (
             <PillButton
