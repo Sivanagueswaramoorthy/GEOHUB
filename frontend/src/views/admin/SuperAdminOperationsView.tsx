@@ -128,6 +128,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
   const [selectedCat, setSelectedCat] = useState<'all' | 'events' | 'finance' | 'docs' | 'ops' | 'admin'>('all');
   const [activeDeck, setActiveDeck] = useState<'all' | 'hub' | 'faculty' | 'students' | 'matrix' | 'maintenance'>('all');
   const [facultySearch, setFacultySearch] = useState<string>('');
+  const [dbLatencyMs, setDbLatencyMs] = useState<number>(24);
 
   // Matrix state
   const [matrixData, setMatrixData] = useState<Record<string, Record<string, boolean>>>({});
@@ -210,6 +211,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
   // Load backend data
   const fetchData = async () => {
     setLoading(true);
+    const start = Date.now();
     try {
       const [rolesRes, matrixRes, facultyRes, usersRes] = await Promise.all([
         apiClient.getAdminRolesCredentials().catch(() => DEFAULT_ROLES),
@@ -217,6 +219,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         apiClient.getAdminFaculty().catch(() => []),
         apiClient.getAdminUsers().catch(() => []),
       ]);
+      setDbLatencyMs(Math.max(16, Date.now() - start));
 
       if (rolesRes && Array.isArray(rolesRes) && rolesRes.length > 0) {
         setRoles(rolesRes);
@@ -733,7 +736,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg sm:text-xl font-heading font-extrabold text-white tracking-tight">
+                <h1 className="text-base sm:text-lg font-heading font-extrabold text-white tracking-tight">
                   SuperAdmin Master Command Cockpit
                 </h1>
                 <span
@@ -743,9 +746,15 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                   Master Authority
                 </span>
               </div>
-              <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(218, 241, 222, 0.9)' }}>
-                Universal operations governance, dynamic module switches, and institutional provisioning
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-100">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  TiDB Cloud:3306
+                </span>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-white/10 text-emerald-200 border border-white/10">
+                  {dbLatencyMs}ms
+                </span>
+              </div>
             </div>
           </div>
 
@@ -782,75 +791,83 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         </div>
 
-        {/* Live System Telemetry Chips (Dark Glassmorphic) */}
+        {/* Live System Telemetry Ribbon (Executive Minimalist KPIs) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-white/15 text-xs relative z-10">
           <div
-            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            className="p-3 rounded-2xl flex items-center justify-between gap-2.5"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(218, 241, 222, 0.18)',
               backdropFilter: 'blur(8px)',
             }}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-            <div className="min-w-0">
-              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+            <div>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
                 Database
               </span>
-              <span className="font-mono font-bold text-white truncate block text-[11px]">TiDB Cloud:3306</span>
+              <span className="font-mono text-base font-black text-white block mt-0.5">TiDB Live</span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
             </div>
           </div>
 
           <div
-            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            className="p-3 rounded-2xl flex items-center justify-between gap-2.5"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(218, 241, 222, 0.18)',
               backdropFilter: 'blur(8px)',
             }}
           >
-            <GraduationCap size={16} className="text-[#DAF1DE] shrink-0" />
-            <div className="min-w-0">
-              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+            <div>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
                 Faculty Advisors
               </span>
-              <span className="font-bold text-white text-[11px] block">{facultyList.length} Active</span>
+              <span className="font-mono text-base font-black text-white block mt-0.5">{facultyList.length}</span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#DAF1DE] shrink-0">
+              <GraduationCap size={16} />
             </div>
           </div>
 
           <div
-            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            className="p-3 rounded-2xl flex items-center justify-between gap-2.5"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(218, 241, 222, 0.18)',
               backdropFilter: 'blur(8px)',
             }}
           >
-            <Users size={16} className="text-[#DAF1DE] shrink-0" />
-            <div className="min-w-0">
-              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+            <div>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
                 Student Scholars
               </span>
-              <span className="font-bold text-white text-[11px] block">{studentList.length} Active</span>
+              <span className="font-mono text-base font-black text-white block mt-0.5">{studentList.length}</span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#DAF1DE] shrink-0">
+              <Users size={16} />
             </div>
           </div>
 
           <div
-            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            className="p-3 rounded-2xl flex items-center justify-between gap-2.5"
             style={{
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(218, 241, 222, 0.18)',
               backdropFilter: 'blur(8px)',
             }}
           >
-            <Sliders size={16} className="text-[#DAF1DE] shrink-0" />
-            <div className="min-w-0">
-              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+            <div>
+              <span className="text-[10px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
                 Module Status
               </span>
-              <span className="font-bold text-white text-[11px] block">
-                {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Online
+              <span className="font-mono text-base font-black text-white block mt-0.5">
+                {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length}
               </span>
+            </div>
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-[#DAF1DE] shrink-0">
+              <Sliders size={16} />
             </div>
           </div>
         </div>
@@ -1011,46 +1028,61 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         </div>
 
-        {/* Module Cards Grid with Toggle Switches */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {/* Module Cards Grid with Toggle Switches (Sleek Minimalist Controls) */}
+        {Object.values(platformModules || {}).some((v) => v === false) && (
+          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between text-xs font-semibold">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>
+                {MODULE_CONFIGS.length - Object.values(platformModules || {}).filter(Boolean).length} module(s) paused
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => toggleAllModules(true)}
+              className="text-[11px] font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer"
+            >
+              Resume All
+            </button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {MODULE_CONFIGS.map((mod) => {
             const isEnabled = platformModules?.[mod.id] !== false;
             const IconComponent = mod.icon;
             return (
               <div
                 key={mod.id}
-                className={`p-3.5 rounded-2xl border transition-all duration-200 flex flex-col justify-between gap-3 ${
+                className={`p-3.5 rounded-2xl border transition-all duration-150 flex flex-col justify-between gap-3 ${
                   isEnabled
-                    ? 'bg-[#F6FBF7] border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.03)] hover:border-[#8EB69B]'
-                    : 'bg-rose-50/50 border-rose-200/80 opacity-85'
+                    ? 'bg-[#F6FBF7] border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.02)] hover:border-[#8EB69B]'
+                    : 'bg-amber-50/60 border-amber-200/90 shadow-[0_2px_8px_rgba(217,119,6,0.04)]'
                 }`}
               >
-                <div className="flex items-start gap-3">
+                {/* Row 1: Icon Tile + Full Module Name (Untruncated) */}
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
                       isEnabled
                         ? 'bg-[#DAF1DE] text-[#163832] border-[#8EB69B]/40'
-                        : 'bg-rose-100 text-rose-800 border-rose-300/40'
+                        : 'bg-amber-100 text-amber-800 border-amber-300/40'
                     }`}
                   >
                     <IconComponent size={18} strokeWidth={2.2} />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs sm:text-sm font-bold text-[#051F20] leading-snug">
-                      {mod.name}
-                    </div>
-                    <p className="text-[11px] text-[#235347] mt-0.5 leading-tight">
-                      {mod.desc}
-                    </p>
-                  </div>
+                  <h3 className="text-xs sm:text-sm font-bold text-[#051F20] leading-snug break-words">
+                    {mod.name}
+                  </h3>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-[#DAF1DE]/70">
+                {/* Row 2: Status Chip on Left, Switch on Right */}
+                <div className="flex items-center justify-between pt-1.5 border-t border-[#DAF1DE]/70">
                   <span
                     className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
                       isEnabled
                         ? 'bg-emerald-100/90 text-emerald-800 border-emerald-300'
-                        : 'bg-rose-100/90 text-rose-800 border-rose-300'
+                        : 'bg-amber-100/90 text-amber-800 border-amber-300'
                     }`}
                   >
                     {isEnabled ? '● LIVE' : '⏸ PAUSED'}
@@ -1063,7 +1095,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                     aria-checked={isEnabled}
                     aria-label={`Toggle ${mod.name} ${isEnabled ? 'Off' : 'On'}`}
                     onClick={() => toggleModule(mod.id, !isEnabled)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none touch-target-44 items-center ${
                       isEnabled ? 'bg-[#163832]' : 'bg-gray-300'
                     }`}
                     title={`Click to turn ${mod.name} ${isEnabled ? 'OFF' : 'ON'}`}
@@ -1083,47 +1115,38 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
 
         {/* Quick Action Shortcuts inside Command Hub */}
         {activeDeck === 'hub' && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-[#DAF1DE]">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3 pt-3 border-t border-[#DAF1DE]">
             <button
               type="button"
               onClick={() => { setActiveDeck('faculty'); setIsAddFacultyModalOpen(true); }}
-              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                <GraduationCap size={18} />
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <GraduationCap size={16} />
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#051F20]">+ Provision Faculty</div>
-                <div className="text-[11px] text-[#235347]">Onboard institutional advisors</div>
-              </div>
+              <span className="text-xs font-bold text-[#051F20]">+ Provision Faculty</span>
             </button>
 
             <button
               type="button"
               onClick={() => { setActiveDeck('students'); setIsAddStudentModalOpen(true); }}
-              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                <UserPlus size={18} />
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <UserPlus size={16} />
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#051F20]">+ Onboard Student</div>
-                <div className="text-[11px] text-[#235347]">Register scholars with Reg No</div>
-              </div>
+              <span className="text-xs font-bold text-[#051F20]">+ Onboard Student</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveDeck('matrix')}
-              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+              className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-2.5 transition cursor-pointer text-left shadow-2xs hover:bg-[#DAF1DE]/40 touch-target-44"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
-                <Key size={18} />
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <Key size={16} />
               </div>
-              <div>
-                <div className="text-xs font-bold text-[#051F20]">Role Permissions</div>
-                <div className="text-[11px] text-[#235347]">Configure 26 operations matrix</div>
-              </div>
+              <span className="text-xs font-bold text-[#051F20]">Role Permissions</span>
             </button>
           </div>
         )}
@@ -1148,7 +1171,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 </span>
               </div>
               <p className="text-xs text-[#235347]">
-                SuperAdmin authority to onboard and sanction verified Faculty Advisors
+                Institutional faculty advisory board & credentials
               </p>
             </div>
           </div>
@@ -1179,11 +1202,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
 
         {/* Faculty Roster List */}
         {facultyList.length === 0 ? (
-          <div className="p-4 rounded-xl bg-[#F6FBF7] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-1.5 py-6">
-            <GraduationCap size={28} className="text-[#8EB69B]" />
-            <span className="text-xs font-bold text-[#051F20]">No Faculty Advisors Provisioned</span>
-            <p className="text-xs text-[#235347] max-w-sm">
-              All legacy demo accounts were purged. Click &quot;Add Faculty Advisor&quot; to onboard institutional faculty with login credentials.
+          <div className="p-4 rounded-xl bg-[#F6FBF7] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-1 py-5">
+            <GraduationCap size={24} className="text-[#8EB69B]" />
+            <span className="text-xs font-bold text-[#051F20]">No Faculty Advisors</span>
+            <p className="text-xs text-[#235347]">
+              Tap &quot;Add Faculty Advisor&quot; to provision verified advisors.
             </p>
           </div>
         ) : (
@@ -1268,7 +1291,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 </span>
               </div>
               <p className="text-xs text-[#235347]">
-                SuperAdmin master control to onboard students, appoint squad officers, and configure credentials
+                Student members, squad officers & access
               </p>
             </div>
           </div>

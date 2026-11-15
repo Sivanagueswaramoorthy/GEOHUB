@@ -1,12 +1,12 @@
 {
-  "version": "1.6.20",
-  "version_code": 38,
+  "version": "1.6.22",
+  "version_code": 40,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Restore original SuperAdmin Cockpit with executive 5-deck switchboard and full controls",
+  "release_notes": "SuperAdmin home screen rebuilt with 2-row untruncated module switchboard, concise executive typography, and high-contrast botanical styling",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6864012,
+  "file_size_bytes": 6864176,
   "file_size_mb": "6.55 MB",
-  "sha256": "AC9202D63F228FDC22C81A8DF6B58EFBC0775E5D8ABD3FBF95864FFD8E5021A6"
+  "sha256": "C1FDD098B9A4F65948AC793DCFB2735242EA7FE1C994C10E9F5187847C23C77B"
 }
