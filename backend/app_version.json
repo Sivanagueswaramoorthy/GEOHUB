@@ -1,12 +1,12 @@
 {
-  "version": "1.6.17",
-  "version_code": 35,
+  "version": "1.6.18",
+  "version_code": 36,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "SuperAdmin Executive 5-Deck Master Command Cockpit with real-time TiDB Cloud MySQL sync and diagnostics",
+  "release_notes": "SuperAdmin Executive Cockpit rebuilt with deep botanical luxury styling, untruncated module cards, bulletproof high-contrast typography, and zero floating-nav overlap",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6863672,
+  "file_size_bytes": 6864012,
   "file_size_mb": "6.55 MB",
-  "sha256": "9A2BFA3A61F54ECFBF3C63C85B684939C9124811ECDA91C0F507345C29C8275E"
+  "sha256": "025E929AABE034944F994FA66C6204E258388FBDE361E9D062ECA3F0B8F26D93"
 }

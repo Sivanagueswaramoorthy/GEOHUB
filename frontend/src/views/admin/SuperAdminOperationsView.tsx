@@ -701,12 +701,34 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 pb-32 animate-fadeIn select-none">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 pb-44 animate-fadeIn select-none">
       {/* Hero Cockpit Banner with Live Telemetry */}
-      <div className="mb-5 rounded-3xl bg-gradient-to-br from-[#051F20] via-[#0B2B26] to-[#163832] p-5 sm:p-6 text-white shadow-xl border border-[#163832]/60 flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div
+        className="mb-5 rounded-3xl p-5 sm:p-6 text-white shadow-xl flex flex-col gap-4 relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #051F20 0%, #0B2B26 50%, #163832 100%)',
+          boxShadow: '0 16px 36px rgba(5, 31, 32, 0.22)',
+          border: '1px solid rgba(218, 241, 222, 0.25)',
+        }}
+      >
+        {/* Ambient Top Glow */}
+        <div
+          className="absolute -right-16 -top-16 w-48 h-48 rounded-full pointer-events-none opacity-20"
+          style={{ background: 'radial-gradient(circle, #8EB69B 0%, transparent 70%)' }}
+        />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#051F20] flex items-center justify-center font-black text-lg shadow-md shrink-0">
+            <div
+              className="w-13 h-13 rounded-2xl flex items-center justify-center font-black text-xl shadow-lg shrink-0 border"
+              style={{
+                width: '52px',
+                height: '52px',
+                backgroundColor: '#DAF1DE',
+                color: '#051F20',
+                borderColor: '#8EB69B',
+              }}
+            >
               SA
             </div>
             <div>
@@ -714,23 +736,31 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 <h1 className="text-lg sm:text-xl font-heading font-extrabold text-white tracking-tight">
                   SuperAdmin Master Command Cockpit
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#051F20] uppercase tracking-wider">
+                <span
+                  className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-xs"
+                  style={{ backgroundColor: '#DAF1DE', color: '#051F20' }}
+                >
                   Master Authority
                 </span>
               </div>
-              <p className="text-xs text-[#DAF1DE]/80 mt-0.5">
+              <p className="text-xs mt-1 leading-relaxed" style={{ color: 'rgba(218, 241, 222, 0.9)' }}>
                 Universal operations governance, dynamic module switches, and institutional provisioning
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-2 self-start sm:self-auto relative z-10">
             <button
               type="button"
               onClick={fetchData}
               disabled={loading}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#DAF1DE] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-              title="Refresh telemetry"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs border"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                borderColor: 'rgba(218, 241, 222, 0.3)',
+                color: '#DAF1DE',
+              }}
+              title="Refresh telemetry & sync with TiDB Cloud"
             >
               <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
               <span>Refresh</span>
@@ -739,7 +769,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
               <button
                 type="button"
                 onClick={onBack}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl border text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                }}
               >
                 <ChevronLeft size={14} />
                 <span>Exit</span>
@@ -748,37 +782,73 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         </div>
 
-        {/* Live System Telemetry Chips */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-white/10 text-xs">
-          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+        {/* Live System Telemetry Chips (Dark Glassmorphic) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-white/15 text-xs relative z-10">
+          <div
+            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(218, 241, 222, 0.18)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
             <div className="min-w-0">
-              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Database</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+                Database
+              </span>
               <span className="font-mono font-bold text-white truncate block text-[11px]">TiDB Cloud:3306</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+          <div
+            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(218, 241, 222, 0.18)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
             <GraduationCap size={16} className="text-[#DAF1DE] shrink-0" />
             <div className="min-w-0">
-              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Faculty Advisors</span>
-              <span className="font-bold text-white text-[11px]">{facultyList.length} Active</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+                Faculty Advisors
+              </span>
+              <span className="font-bold text-white text-[11px] block">{facultyList.length} Active</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+          <div
+            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(218, 241, 222, 0.18)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
             <Users size={16} className="text-[#DAF1DE] shrink-0" />
             <div className="min-w-0">
-              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Student Scholars</span>
-              <span className="font-bold text-white text-[11px]">{studentList.length} Active</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+                Student Scholars
+              </span>
+              <span className="font-bold text-white text-[11px] block">{studentList.length} Active</span>
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+          <div
+            className="p-2.5 rounded-xl flex items-center gap-2.5"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(218, 241, 222, 0.18)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
             <Sliders size={16} className="text-[#DAF1DE] shrink-0" />
             <div className="min-w-0">
-              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Module Status</span>
-              <span className="font-bold text-white text-[11px]">
+              <span className="text-[9px] uppercase tracking-wider font-extrabold block" style={{ color: '#8EB69B' }}>
+                Module Status
+              </span>
+              <span className="font-bold text-white text-[11px] block">
                 {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Online
               </span>
             </div>
@@ -787,15 +857,21 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
       </div>
 
       {/* 5-Deck Executive Navigation Bar */}
-      <div className="sticky top-2 z-30 mb-5 p-1.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.06)] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <div
+        className="sticky top-2 z-30 mb-5 p-1.5 rounded-2xl backdrop-blur-md border shadow-[0_4px_16px_rgba(5,31,32,0.06)] flex items-center gap-1.5 overflow-x-auto no-scrollbar"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          borderColor: '#DAF1DE',
+        }}
+      >
         <button
           type="button"
           onClick={() => setActiveDeck('all')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'all'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'all' ? '#163832' : 'transparent',
+            color: activeDeck === 'all' ? '#FFFFFF' : '#235347',
+          }}
         >
           <Sparkles size={14} />
           <span>All Decks</span>
@@ -804,15 +880,21 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         <button
           type="button"
           onClick={() => setActiveDeck('hub')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'hub'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'hub' ? '#163832' : 'transparent',
+            color: activeDeck === 'hub' ? '#FFFFFF' : '#235347',
+          }}
         >
           <Sliders size={14} />
           <span>Command Hub</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+          <span
+            className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+            style={{
+              backgroundColor: '#DAF1DE',
+              color: '#163832',
+            }}
+          >
             {Object.values(platformModules || {}).filter(Boolean).length}/9
           </span>
         </button>
@@ -820,15 +902,21 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         <button
           type="button"
           onClick={() => setActiveDeck('faculty')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'faculty'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'faculty' ? '#163832' : 'transparent',
+            color: activeDeck === 'faculty' ? '#FFFFFF' : '#235347',
+          }}
         >
           <GraduationCap size={14} />
           <span>Faculty Oversight</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+          <span
+            className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+            style={{
+              backgroundColor: '#DAF1DE',
+              color: '#163832',
+            }}
+          >
             {facultyList.length}
           </span>
         </button>
@@ -836,15 +924,21 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         <button
           type="button"
           onClick={() => setActiveDeck('students')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'students'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'students' ? '#163832' : 'transparent',
+            color: activeDeck === 'students' ? '#FFFFFF' : '#235347',
+          }}
         >
           <Users size={14} />
           <span>Student Governance</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+          <span
+            className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+            style={{
+              backgroundColor: '#DAF1DE',
+              color: '#163832',
+            }}
+          >
             {studentList.length}
           </span>
         </button>
@@ -852,11 +946,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         <button
           type="button"
           onClick={() => setActiveDeck('matrix')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'matrix'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'matrix' ? '#163832' : 'transparent',
+            color: activeDeck === 'matrix' ? '#FFFFFF' : '#235347',
+          }}
         >
           <Key size={14} />
           <span>Role & Access Matrix</span>
@@ -865,11 +959,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         <button
           type="button"
           onClick={() => setActiveDeck('maintenance')}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
-            activeDeck === 'maintenance'
-              ? 'bg-[#163832] text-white shadow-xs'
-              : 'text-[#235347] hover:bg-[#DAF1DE]'
-          }`}
+          className="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 shadow-xs"
+          style={{
+            backgroundColor: activeDeck === 'maintenance' ? '#163832' : 'transparent',
+            color: activeDeck === 'maintenance' ? '#FFFFFF' : '#235347',
+          }}
         >
           <Database size={14} />
           <span>Maintenance & DB</span>
@@ -918,42 +1012,48 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         </div>
 
         {/* Module Cards Grid with Toggle Switches */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {MODULE_CONFIGS.map((mod) => {
             const isEnabled = platformModules?.[mod.id] !== false;
             const IconComponent = mod.icon;
             return (
               <div
                 key={mod.id}
-                className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
+                className={`p-3.5 rounded-2xl border transition-all duration-200 flex flex-col justify-between gap-3 ${
                   isEnabled
-                    ? 'bg-[#F6FBF7] border-[#DAF1DE] hover:border-[#8EB69B]'
-                    : 'bg-rose-50/40 border-rose-200/80 opacity-80'
+                    ? 'bg-[#F6FBF7] border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.03)] hover:border-[#8EB69B]'
+                    : 'bg-rose-50/50 border-rose-200/80 opacity-85'
                 }`}
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-start gap-3">
                   <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      isEnabled ? 'bg-[#DAF1DE] text-[#163832]' : 'bg-rose-100 text-rose-700'
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
+                      isEnabled
+                        ? 'bg-[#DAF1DE] text-[#163832] border-[#8EB69B]/40'
+                        : 'bg-rose-100 text-rose-800 border-rose-300/40'
                     }`}
                   >
-                    <IconComponent size={16} strokeWidth={2.2} />
+                    <IconComponent size={18} strokeWidth={2.2} />
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-[#051F20] truncate">{mod.name}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs sm:text-sm font-bold text-[#051F20] leading-snug">
+                      {mod.name}
                     </div>
-                    <p className="text-[10px] text-[#235347] truncate">{mod.desc}</p>
+                    <p className="text-[11px] text-[#235347] mt-0.5 leading-tight">
+                      {mod.desc}
+                    </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center justify-between pt-2 border-t border-[#DAF1DE]/70">
                   <span
-                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ${
-                      isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
+                      isEnabled
+                        ? 'bg-emerald-100/90 text-emerald-800 border-emerald-300'
+                        : 'bg-rose-100/90 text-rose-800 border-rose-300'
                     }`}
                   >
-                    {isEnabled ? 'LIVE' : 'PAUSED'}
+                    {isEnabled ? '● LIVE' : '⏸ PAUSED'}
                   </span>
 
                   {/* Accessible Animated Toggle Switch Button */}
