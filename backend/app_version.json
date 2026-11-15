@@ -1,12 +1,12 @@
 {
-  "version": "1.6.18",
-  "version_code": 36,
+  "version": "1.6.19",
+  "version_code": 37,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "SuperAdmin Executive Cockpit rebuilt with deep botanical luxury styling, untruncated module cards, bulletproof high-contrast typography, and zero floating-nav overlap",
+  "release_notes": "SuperAdmin mobile-first cockpit luxury rebuild with 5 dedicated screens, untruncated module cards, and accessible native bottom sheets",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6864012,
+  "file_size_bytes": 6868192,
   "file_size_mb": "6.55 MB",
-  "sha256": "025E929AABE034944F994FA66C6204E258388FBDE361E9D062ECA3F0B8F26D93"
+  "sha256": "F85DE7397684224FC38EA9B41BC39293CF2967604451133FA0D76D47B9067D4C"
 }
