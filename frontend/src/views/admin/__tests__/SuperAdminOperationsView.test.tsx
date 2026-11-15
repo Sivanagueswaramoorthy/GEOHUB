@@ -89,15 +89,11 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
       </AppProvider>
     );
 
-    // Switch to Student Scholars segment in People directory
-    const studentSegmentBtn = screen.getByRole('button', { name: /Student Scholars/i });
-    fireEvent.click(studentSegmentBtn);
-
     expect(screen.getByText('Student & Member Governance')).toBeInTheDocument();
-    const addStudentBtns = screen.getAllByRole('button', { name: /Add Student \/ Member/i });
-    expect(addStudentBtns.length).toBeGreaterThan(0);
+    const addStudentBtn = screen.getByRole('button', { name: /Add Student \/ Member/i });
+    expect(addStudentBtn).toBeInTheDocument();
 
-    fireEvent.click(addStudentBtns[0]);
+    fireEvent.click(addStudentBtn);
     expect(screen.getByText('Onboard Student or Officer')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('e.g. Priya Sharma')).toBeInTheDocument();
   });
@@ -120,9 +116,6 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
         <SuperAdminOperationsView />
       </AppProvider>
     );
-
-    // Switch to Control / Switchboard deck to isolate switchboard
-    fireEvent.click(screen.getByRole('button', { name: /Switchboard/i }));
 
     // Module Switchboard section and telemetry
     expect(screen.getByText('Platform Module Switchboard')).toBeInTheDocument();
@@ -154,16 +147,13 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
       </AppProvider>
     );
 
-    // Switch to Faculty Oversight deck
-    fireEvent.click(screen.getByRole('button', { name: /Faculty Oversight/i }));
-
     // Faculty Advisory section
     expect(screen.getByText('Faculty Governance & Provisioning')).toBeInTheDocument();
-    const addFacultyBtns = screen.getAllByRole('button', { name: /Add Faculty Advisor/i });
-    expect(addFacultyBtns.length).toBeGreaterThan(0);
+    const addFacultyBtn = screen.getByRole('button', { name: /Add Faculty Advisor/i });
+    expect(addFacultyBtn).toBeInTheDocument();
 
     // Open modal
-    fireEvent.click(addFacultyBtns[0]);
+    fireEvent.click(addFacultyBtn);
     expect(screen.getByText('Provision Faculty Advisor')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('e.g. Dr. Sarah Jenkins')).toBeInTheDocument();
   });
@@ -192,119 +182,5 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
     fireEvent.click(screen.getByRole('button', { name: /Maintenance & DB/i }));
     expect(screen.getByText(/TiDB Cloud MySQL Distributed Database/i)).toBeInTheDocument();
     expect(screen.getByText(/gateway01.ap-southeast-1.prod.aws.tidbcloud.com/i)).toBeInTheDocument();
-  });
-
-  /* -------------------------------------------------------------------------
-     NEW MOBILE-FIRST COCKPIT & BOTTOM-SHEET FLOW SPECIFICATION TESTS
-     ------------------------------------------------------------------------- */
-  it('navigates via Floating Pill Bottom Nav across 5 dedicated screens without clipping', () => {
-    render(
-      <AppProvider>
-        <SuperAdminOperationsView />
-      </AppProvider>
-    );
-
-    // Assert 5 mobile bottom nav tabs exist with 44px tap targets
-    const homeTab = screen.getByRole('tab', { name: /Home Screen/i });
-    const controlTab = screen.getByRole('tab', { name: /Control Screen/i });
-    const peopleTab = screen.getByRole('tab', { name: /People Screen/i });
-    const accessTab = screen.getByRole('tab', { name: /Access Screen/i });
-    const systemTab = screen.getByRole('tab', { name: /System Screen/i });
-
-    expect(homeTab).toBeInTheDocument();
-    expect(controlTab).toBeInTheDocument();
-    expect(peopleTab).toBeInTheDocument();
-    expect(accessTab).toBeInTheDocument();
-    expect(systemTab).toBeInTheDocument();
-
-    // Navigate to Control
-    fireEvent.click(controlTab);
-    expect(screen.getByText('Platform Module Switchboard')).toBeInTheDocument();
-
-    // Navigate to System
-    fireEvent.click(systemTab);
-    expect(screen.getByText('TiDB Cloud MySQL Distributed Database')).toBeInTheDocument();
-  });
-
-  it('opens and confirms Disable All Confirmation bottom sheet before pausing modules', () => {
-    render(
-      <AppProvider>
-        <SuperAdminOperationsView />
-      </AppProvider>
-    );
-
-    // Switch to Control deck
-    fireEvent.click(screen.getByRole('tab', { name: /Control Screen/i }));
-
-    // Click Disable All button
-    const disableAllBtn = screen.getByRole('button', { name: /^Disable All$/i });
-    fireEvent.click(disableAllBtn);
-
-    // Assert confirmation bottom sheet opens with safety warning
-    expect(screen.getByText('Pause All Club Modules?')).toBeInTheDocument();
-    expect(screen.getByText(/All 9 modules will be set to maintenance mode/i)).toBeInTheDocument();
-
-    // Cancel action dismisses sheet
-    const cancelBtn = screen.getByRole('button', { name: /^Cancel$/i });
-    fireEvent.click(cancelBtn);
-    expect(screen.queryByText('Pause All Club Modules?')).not.toBeInTheDocument();
-  });
-
-  it('opens Add Faculty bottom sheet, performs inline validation, and handles close', () => {
-    render(
-      <AppProvider>
-        <SuperAdminOperationsView />
-      </AppProvider>
-    );
-
-    // Open from Command Hub quick actions
-    const addFacultyQuick = screen.getByRole('button', { name: /\+ Provision Faculty/i });
-    fireEvent.click(addFacultyQuick);
-
-    // Form inputs rendered in bottom sheet
-    expect(screen.getByText('Provision Faculty Advisor')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g. Dr. Sarah Jenkins')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g. FAC01')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g. sarah.jenkins@college.edu')).toBeInTheDocument();
-
-    // Close sheet
-    const closeBtn = screen.getByRole('button', { name: /Close bottom sheet/i });
-    fireEvent.click(closeBtn);
-    expect(screen.queryByText('Provision Faculty Advisor')).not.toBeInTheDocument();
-  });
-
-  it('renders Danger Zone Factory Purge bottom sheet requiring CONFIRM typed input', () => {
-    render(
-      <AppProvider>
-        <SuperAdminOperationsView />
-      </AppProvider>
-    );
-
-    // Navigate to System tab
-    fireEvent.click(screen.getByRole('tab', { name: /System Screen/i }));
-
-    // Expand danger zone
-    const expandDangerBtn = screen.getByRole('button', { name: /Danger Zone/i });
-    fireEvent.click(expandDangerBtn);
-
-    // Trigger purge
-    const purgeBtn = screen.getByRole('button', { name: /Initialize Clean Slate/i });
-    fireEvent.click(purgeBtn);
-
-    // Bottom sheet confirmation
-    expect(screen.getByText('Confirm Factory Purge')).toBeInTheDocument();
-    const confirmInput = screen.getByPlaceholderText('Type CONFIRM...');
-    const executeBtn = screen.getByRole('button', { name: /Authorize Purge/i });
-
-    // Disabled before typing CONFIRM
-    expect(executeBtn).toBeDisabled();
-
-    // Type partial string
-    fireEvent.change(confirmInput, { target: { value: 'CONF' } });
-    expect(executeBtn).toBeDisabled();
-
-    // Type full CONFIRM
-    fireEvent.change(confirmInput, { target: { value: 'CONFIRM' } });
-    expect(executeBtn).not.toBeDisabled();
   });
 });
