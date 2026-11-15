@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -82,12 +82,14 @@ app.include_router(admin_router.router, prefix=settings.API_V1_STR)
 app.include_router(sync_router.router, prefix=settings.API_V1_STR)
 
 @app.get("/health")
+@app.get(f"{settings.API_V1_STR}/health")
 def health_check():
     return {
         "status": "healthy",
         "app": settings.PROJECT_NAME,
         "version": settings.VERSION,
-        "database": "connected"
+        "database": engine.name,
+        "database_connected": True,
     }
 
 @app.on_event("startup")

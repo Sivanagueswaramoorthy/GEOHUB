@@ -31,9 +31,10 @@ def create_db_engine():
             print(f"[Database Notice] TiDB Cloud / MySQL connection attempted ({e}).")
             print("[Database Notice] Activating resilient local database engine (geohub.db).")
 
-    # Fallback to local SQLite engine
+    # Fallback to local SQLite engine (guaranteed absolute path)
+    sqlite_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "geohub.db")
     return create_engine(
-        "sqlite:///./geohub.db",
+        f"sqlite:///{sqlite_path}",
         connect_args={"check_same_thread": False}
     )
 

@@ -133,8 +133,8 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    # Enforce short-lived token: default 15 minutes
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
+    default_expire = timedelta(minutes=getattr(settings, "ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
+    expire = datetime.utcnow() + (expires_delta or default_expire)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt

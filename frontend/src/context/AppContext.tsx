@@ -954,10 +954,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setEvents((prev) => [newEvent, ...prev]);
 
     try {
+      let resolvedDateTime = newEventData.startDate;
+      if (resolvedDateTime && !resolvedDateTime.includes('T')) {
+        resolvedDateTime = `${resolvedDateTime}T10:00:00Z`;
+      }
+      if (!resolvedDateTime) {
+        resolvedDateTime = new Date().toISOString();
+      }
+
       const serverEvent = await apiClient.createEvent({
         title: newEventData.title,
         type: newEventData.category,
-        date_time: newEventData.startDate,
+        date_time: resolvedDateTime,
         venue: newEventData.venue,
         description: newEventData.description,
         budget: newEventData.budget || 0,
@@ -1037,7 +1045,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       assigned_user_ids: newTaskData.assigneeId ? [newTaskData.assigneeId] : [],
       deadline: newTaskData.dueDate,
       status: newTaskData.status || 'todo',
-    }).catch(() => {});
+    }).then((created) => {
+      if (created && created.id) {
+        setTasks((prev) => prev.map((t) => (t.id === newId ? { ...t, id: created.id } : t)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Task Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const approveItem = (id: string) => {
@@ -1771,7 +1785,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       category: newExpense.category,
       event_title: newExpense.eventTitle || 'General Club Operations',
       receipt_url: newExpense.receiptUrl,
-    }).catch(() => {});
+    }).then((created) => {
+      if (created && created.id) {
+        setExpenses((prev) => prev.map((e) => (e.id === newExpense.id ? { ...e, id: created.id } : e)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Expense Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const updateExpenseItem = (id: string, updates: Partial<ExpenseItem>) => {
@@ -1829,7 +1849,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     // Persist budget request to TiDB Cloud backend
-    apiClient.submitBudgetRequest(teamName, requestedAmount, reason).catch(() => {});
+    apiClient.submitBudgetRequest(teamName, requestedAmount, reason).then((created) => {
+      if (created && created.id) {
+        setBudgetRequests((prev) => prev.map((b) => (b.id === newReq.id ? { ...b, id: created.id } : b)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Budget Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const updateUserRoleAndTeam = (uid: string, role: UserRole, team?: string, isVolunteer?: boolean, status?: UserStatus) => {

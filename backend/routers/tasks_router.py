@@ -56,8 +56,9 @@ def create_task(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
-    is_admin = current_user.role in ["admin", "super_admin"]
-    is_team_admin = current_user.role == "team_admin" and current_user.team == task_in.team_id
+    norm_role = auth.normalize_role(current_user.role)
+    is_admin = norm_role in ["admin", "super_admin", "coordinator", "faculty"] or current_user.role in ["admin", "super_admin"]
+    is_team_admin = (current_user.role == "team_admin" or "lead" in (current_user.post or "").lower()) and current_user.team == task_in.team_id
 
     if not is_admin and not is_team_admin:
         raise HTTPException(status_code=403, detail="Not authorized to assign tasks for this team.")

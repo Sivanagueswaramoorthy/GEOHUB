@@ -51,8 +51,19 @@ def init_database():
                 db.add(team)
                 print(f"[Init DB] Created squad: {name}")
 
-        # 2. Seed Exclusively the System SuperAdmin Account
+        # 2. Seed Exclusively the System SuperAdmin Account and purge legacy demo accounts
         default_pwd = auth.get_password_hash("GeoHub2026!")
+
+        demo_roll_nos = ["21GEO001", "21GEO010", "22GEO019", "22GEO014", "22GEO018", "23GEO042", "23GEO088", "21GEO000", "21GEO002", "21GEO003", "21GEO004", "21GEO006", "21GEO666", "21GEO777", "21GEO888", "21GEO999", "FAC999"]
+        stale_users = db.query(models.User).filter(
+            (models.User.roll_no.in_(demo_roll_nos)) | 
+            (models.User.email.in_(["president@college.edu", "treasurer@college.edu", "doc@college.edu", "promo@college.edu", "student@college.edu", "faculty@college.edu"]))
+        ).all()
+        if stale_users:
+            for su in stale_users:
+                db.delete(su)
+            db.commit()
+            print(f"[Init DB] Purged {len(stale_users)} legacy demo accounts from database.")
 
         superadmin_user = {
             "id": "u_super_admin_sa01",
