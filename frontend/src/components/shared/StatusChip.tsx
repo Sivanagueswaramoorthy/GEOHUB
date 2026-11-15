@@ -47,14 +47,14 @@ export const StatusChip: React.FC<StatusChipProps> = ({
         };
       case 'approved':
         return {
-          bg: '#163832',
+          bg: '#183A2B',
           color: '#FFFFFF',
           border: 'none',
           text: label || 'Approved',
         };
       case 'live':
         return {
-          bg: '#163832',
+          bg: '#183A2B',
           color: '#FFFFFF',
           border: 'none',
           text: label || 'Live',
@@ -85,9 +85,9 @@ export const StatusChip: React.FC<StatusChipProps> = ({
         };
       case 'pending':
         return {
-          bg: 'rgba(242, 184, 75, 0.15)',
-          color: '#051F20',
-          border: '1px solid rgba(242, 184, 75, 0.35)',
+          bg: 'rgba(217, 155, 38, 0.15)',
+          color: '#D99B26',
+          border: '1px solid rgba(217, 155, 38, 0.35)',
           text: label || 'Pending',
         };
       case 'low-stock':

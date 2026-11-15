@@ -188,7 +188,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           maxHeight: '58px',
           backgroundColor: '#FFFFFF',
           borderRadius: '9999px',
-          border: '1px solid var(--card-border, #DAF1DE)',
+          border: '1px solid #DCE6E0',
           boxShadow: '0 12px 36px rgba(15, 54, 56, 0.12)',
           padding: '0 6px',
           boxSizing: 'border-box',
@@ -211,17 +211,23 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
               title={tab.label}
               aria-label={tab.label}
               aria-current={active ? 'page' : undefined}
-              className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8EB69B] transition-all duration-260 ${
-                active ? 'px-3.5 py-1.5' : 'w-10 h-10'
+              className={`relative flex items-center justify-center rounded-full cursor-pointer pressable touch-target-44 shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183A2B] transition-all duration-260 ${
+                active ? 'px-3.5 py-1.5' : 'w-10 h-10 hover:text-[#183A2B]'
               }`}
               style={{
                 height: '42px',
                 minHeight: '42px',
-                backgroundColor: active ? 'var(--pine-800, #163832)' : 'transparent',
-                color: active ? '#FFFFFF' : 'var(--pine-700, #235347)',
-                boxShadow: active ? '0 4px 14px rgba(22, 56, 50, 0.28)' : 'none',
+                backgroundColor: active ? '#183A2B' : 'transparent',
+                color: active ? '#FFFFFF' : '#7D8F86',
+                boxShadow: active ? '0 4px 14px rgba(24, 58, 43, 0.28)' : 'none',
                 boxSizing: 'border-box',
                 transition: 'all 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+              onMouseOver={(e) => {
+                if (active) (e.currentTarget as HTMLElement).style.backgroundColor = '#23523D';
+              }}
+              onMouseOut={(e) => {
+                if (active) (e.currentTarget as HTMLElement).style.backgroundColor = '#183A2B';
               }}
             >
               <span
@@ -282,13 +288,17 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
             maxHeight: '56px',
             flexShrink: 0,
             flexGrow: 0,
-            backgroundColor: isScannerActive ? 'var(--pine-950, #051F20)' : 'var(--pine-800, #163832)',
-            border: isScannerActive ? '2px solid var(--mint-100, #DAF1DE)' : '2px solid var(--sage-400, #8EB69B)',
-            boxShadow: isScannerActive
-              ? '0 8px 24px rgba(5, 31, 32, 0.32)'
-              : '0 6px 20px rgba(5, 31, 32, 0.18)',
+            backgroundColor: '#183A2B',
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 8px 24px rgba(24, 58, 43, 0.28)',
             color: '#FFFFFF',
             boxSizing: 'border-box',
+          }}
+          onMouseOver={(e) => {
+            (e.currentTarget as HTMLElement).style.backgroundColor = '#23523D';
+          }}
+          onMouseOut={(e) => {
+            (e.currentTarget as HTMLElement).style.backgroundColor = '#183A2B';
           }}
           title={scannerTab.label}
           aria-label={scannerTab.label}
@@ -300,7 +310,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({ className = '', style 
           {scannerTab.hasUpdates && (
             <span
               className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full animate-badge-pop"
-              style={{ backgroundColor: 'var(--red-danger, #D9534F)', border: '1.5px solid #FFFFFF' }}
+              style={{ backgroundColor: '#D97736', border: '1.5px solid #FFFFFF' }}
             />
           )}
         </button>

@@ -50,7 +50,7 @@ export const FacultyHomeView: React.FC = () => {
             >
               <span>Approvals</span>
               {pendingApprovals.length > 0 && (
-                <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]">
+                <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs font-extrabold bg-[#D97736] text-white shadow-2xs">
                   {pendingApprovals.length}
                 </span>
               )}
@@ -79,8 +79,8 @@ export const FacultyHomeView: React.FC = () => {
         <StatTile
           icon={<Radio size={20} strokeWidth={1.75} className="lucide" />}
           value={String(liveEvents.length)}
-          label="Ongoing"
-          tint="amber"
+          label="Live"
+          tint={liveEvents.length > 0 ? 'emerald' : 'amber'}
           onClick={() => setActiveTab('events')}
         />
         <StatTile
@@ -88,7 +88,7 @@ export const FacultyHomeView: React.FC = () => {
           value={formattedCorpus}
           label="Budget"
           footnote="Corpus"
-          tint="sage"
+          tint="teal"
           onClick={() => setActiveTab('ledger')}
         />
       </div>
@@ -107,20 +107,20 @@ export const FacultyHomeView: React.FC = () => {
               <div
                 key={audit.id}
                 onClick={() => setActiveTab('audit_logs')}
-                className="flex items-center justify-between p-3.5 bg-white border border-[#DAF1DE] shadow-[0_4px_14px_rgba(5,31,32,0.04)] hover:border-[#8EB69B] transition-all cursor-pointer pressable"
+                className="flex items-center justify-between p-3.5 bg-white border border-[#DCE6E0] shadow-[0_4px_14px_rgba(5,31,32,0.04)] hover:border-[#183A2B]/40 transition-all cursor-pointer pressable"
                 style={{ borderRadius: '24px', minHeight: '60px' }}
               >
                 <div className="flex flex-col min-w-0 pr-2">
-                  <span className="text-sm font-bold text-[#051F20] truncate">
+                  <span className="text-sm font-bold text-[#11241B] truncate">
                     {audit.action || 'Sanction logged'}
                   </span>
-                  <span className="text-xs font-medium text-[#235347] truncate">
+                  <span className="text-xs font-medium text-[#52665C] truncate">
                     {audit.targetName || audit.targetType || 'Institutional record'}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-xs font-semibold text-[#235347]">
+                  <span className="text-xs font-semibold text-[#52665C]">
                     {audit.timestamp ? new Date(audit.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Today'}
                   </span>
                   <StatusChip status="approved" label="Audited" />

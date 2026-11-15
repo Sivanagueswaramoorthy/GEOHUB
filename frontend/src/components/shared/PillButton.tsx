@@ -34,16 +34,16 @@ export const PillButton: React.FC<PillButtonProps> = ({
     switch (variant) {
       case 'primary':
         return {
-          backgroundColor: '#163832',
+          backgroundColor: '#183A2B',
           color: '#FFFFFF',
           border: 'none',
-          boxShadow: '0 4px 14px rgba(22, 56, 50, 0.25)',
+          boxShadow: '0 4px 14px rgba(24, 58, 43, 0.22)',
         };
       case 'secondary':
         return {
           backgroundColor: '#FFFFFF',
-          color: '#051F20',
-          border: '1px solid #DAF1DE',
+          color: '#11241B',
+          border: '1px solid #DCE6E0',
           boxShadow: '0 2px 8px rgba(5, 31, 32, 0.04)',
         };
       case 'ghost':
@@ -94,6 +94,7 @@ export const PillButton: React.FC<PillButtonProps> = ({
   return (
     <button
       {...props}
+      data-variant={variant}
       disabled={disabled || loading}
       className={`pill-button-pressable inline-flex items-center justify-center gap-2 select-none cursor-pointer transition-all duration-150 ${className}`}
       style={{

@@ -6,7 +6,7 @@ export interface StatTileProps {
   value: string | number;
   label: string;
   footnote?: string;
-  tint?: 'mint' | 'amber' | 'sage' | 'white' | 'lavender' | 'teal';
+  tint?: 'mint' | 'amber' | 'sage' | 'white' | 'lavender' | 'teal' | 'emerald';
   onClick?: () => void;
   className?: string;
   style?: React.CSSProperties;
@@ -24,31 +24,51 @@ export const StatTile: React.FC<StatTileProps> = ({
 }) => {
   const getBadgeStyles = () => {
     switch (tint) {
-      case 'mint':
+      case 'emerald':
+        return {
+          bg: '#E3F1E8',
+          color: '#1E9E63',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#1E9E63',
+          valueColor: '#1E9E63',
+        };
       case 'teal':
         return {
-          bg: 'rgba(22, 56, 50, 0.08)',
-          color: '#163832',
-          border: '1px solid rgba(22, 56, 50, 0.12)',
+          bg: '#E3F1E8',
+          color: '#1B6B7A',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#1B6B7A',
+          valueColor: '#11241B',
         };
       case 'amber':
         return {
-          bg: 'rgba(242, 184, 75, 0.15)',
-          color: '#F2B84B',
-          border: '1px solid rgba(242, 184, 75, 0.25)',
+          bg: '#E3F1E8',
+          color: '#D99B26',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#D99B26',
+          valueColor: '#11241B',
+        };
+      case 'mint':
+        return {
+          bg: '#E3F1E8',
+          color: '#183A2B',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#183A2B',
         };
       case 'sage':
         return {
-          bg: 'rgba(142, 182, 155, 0.15)',
-          color: '#235347',
-          border: '1px solid rgba(142, 182, 155, 0.25)',
+          bg: '#E3F1E8',
+          color: '#183A2B',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#52665C',
         };
       case 'white':
       default:
         return {
-          bg: '#F6FBF7',
-          color: '#163832',
-          border: '1px solid #DAF1DE',
+          bg: '#E3F1E8',
+          color: '#183A2B',
+          border: '1px solid #DCE6E0',
+          footnoteColor: '#52665C',
         };
     }
   };
@@ -61,19 +81,19 @@ export const StatTile: React.FC<StatTileProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       className={`p-4 flex flex-col justify-between select-none transition-all ${
-        onClick ? 'pressable cursor-pointer hover:border-[#163832]/30 hover:shadow-md' : ''
+        onClick ? 'pressable cursor-pointer hover:border-[#183A2B]/40 hover:shadow-md' : ''
       } ${className}`}
       style={{
         borderRadius: '24px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid #DAF1DE',
+        border: '1px solid #DCE6E0',
         boxShadow: '0 4px 16px -2px rgba(5, 31, 32, 0.05)',
         minHeight: '110px',
         ...style,
       }}
     >
       <div className="flex items-center justify-between">
-        {/* 40px Circular Icon Container with Botanical Badge Accent */}
+        {/* 40px Circular Icon Container with Mint Wash Background */}
         <div
           className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-transform"
           style={{
@@ -87,7 +107,11 @@ export const StatTile: React.FC<StatTileProps> = ({
 
         {footnote && (
           <span
-            className="text-xs font-semibold text-[#235347] max-w-[90px] truncate text-right px-2 py-0.5 rounded-full bg-[#F6FBF7] border border-[#DAF1DE]"
+            className="text-xs font-semibold max-w-[90px] truncate text-right px-2 py-0.5 rounded-full border border-[#DCE6E0]"
+            style={{
+              backgroundColor: '#F6F9F7',
+              color: badgeStyles.footnoteColor || '#52665C',
+            }}
           >
             {footnote}
           </span>
@@ -96,13 +120,17 @@ export const StatTile: React.FC<StatTileProps> = ({
 
       <div className="mt-3">
         <div
-          className="font-extrabold tracking-tight text-[#051F20]"
-          style={{ fontSize: '24px', lineHeight: '28px' }}
+          className="font-extrabold tracking-tight"
+          style={{
+            fontSize: '24px',
+            lineHeight: '28px',
+            color: badgeStyles.valueColor || '#11241B',
+          }}
         >
           <AnimatedNumber value={value} />
         </div>
         <div
-          className="text-xs font-semibold text-[#235347] mt-0.5 truncate"
+          className="text-xs font-semibold text-[#52665C] mt-0.5 truncate"
         >
           {label}
         </div>
