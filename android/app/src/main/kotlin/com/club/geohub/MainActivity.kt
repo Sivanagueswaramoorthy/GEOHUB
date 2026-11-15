@@ -112,11 +112,11 @@ class AndroidNetworkBridge(private val context: Context, private val webView: We
     @JavascriptInterface
     fun downloadAndInstallApk(apkUrl: String) {
         thread(start = true) {
-            val cdnFallbackUrl = "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main/geohub-app.apk"
+            val cdnFallbackUrl = "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk"
             val initialUrl = if (apkUrl.startsWith("http://") || apkUrl.startsWith("https://")) {
                 apkUrl
             } else {
-                "https://cdn.jsdelivr.net/gh/Sivanagueswaramoorthy/GEOHUB@main" + if (apkUrl.startsWith("/")) apkUrl else "/$apkUrl"
+                "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main" + if (apkUrl.startsWith("/")) apkUrl else "/$apkUrl"
             }
 
             var downloadSuccess = false
@@ -143,7 +143,7 @@ class AndroidNetworkBridge(private val context: Context, private val webView: We
                     }
 
                     val fileLength = connection.contentLength
-                    val saveDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
+                    val saveDir = File(context.cacheDir, "updates").apply { mkdirs() }
                     val apkFile = File(saveDir, "geohub-update.apk")
                     if (apkFile.exists()) {
                         apkFile.delete()
@@ -217,11 +217,13 @@ class AndroidNetworkBridge(private val context: Context, private val webView: We
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 if (!context.packageManager.canRequestPackageInstalls()) {
+                    postProgressToWeb(90, "Please enable Install Unknown Apps permission in Settings, then tap Install again.")
                     val manageIntent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
                         data = Uri.parse("package:${context.packageName}")
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
                     context.startActivity(manageIntent)
+                    return
                 }
             }
 
