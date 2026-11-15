@@ -5,6 +5,7 @@ import {
   Shield,
   Key,
   User,
+  Users,
   Mail,
   Lock,
   RefreshCw,
@@ -28,6 +29,8 @@ import {
   Pencil,
   GraduationCap,
   Database,
+  Repeat,
+  Search,
 } from 'lucide-react';
 
 interface RoleMeta {
@@ -104,7 +107,7 @@ interface Props {
 }
 
 export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
-  const { showToast, currentUser } = useApp();
+  const { showToast, currentUser, switchRole, syncWithBackend } = useApp();
 
   const [roles, setRoles] = useState<RoleMeta[]>(DEFAULT_ROLES);
   const [selectedRoleKey, setSelectedRoleKey] = useState<string>('coordinator');
@@ -145,6 +148,41 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
     password: '',
   });
 
+  // Student & Officer Management State
+  const [studentList, setStudentList] = useState<any[]>([]);
+  const [studentSearch, setStudentSearch] = useState<string>('');
+  const [studentRoleFilter, setStudentRoleFilter] = useState<string>('all');
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState<boolean>(false);
+  const [isEditStudentModalOpen, setIsEditStudentModalOpen] = useState<boolean>(false);
+  const [studentSubmitting, setStudentSubmitting] = useState<boolean>(false);
+  const [editStudentSubmitting, setEditStudentSubmitting] = useState<boolean>(false);
+  const [studentForm, setStudentForm] = useState({
+    name: '',
+    roll_no: '',
+    email: '',
+    role: 'student',
+    department: 'Geoinformatics Engineering',
+    year_of_study: '1st Year',
+    post: 'Student Member',
+    team: 'General',
+    phone: '',
+    password: 'geohub',
+  });
+  const [editStudentForm, setEditStudentForm] = useState({
+    id: '',
+    name: '',
+    roll_no: '',
+    email: '',
+    role: 'student',
+    department: 'Geoinformatics Engineering',
+    year_of_study: '1st Year',
+    post: 'Student Member',
+    team: 'General',
+    status: 'active',
+    phone: '',
+    password: '',
+  });
+
   // Form credentials for currently selected role
   const [nameInput, setNameInput] = useState<string>('');
   const [rollInput, setRollInput] = useState<string>('');
@@ -157,10 +195,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [rolesRes, matrixRes, facultyRes] = await Promise.all([
+      const [rolesRes, matrixRes, facultyRes, usersRes] = await Promise.all([
         apiClient.getAdminRolesCredentials().catch(() => DEFAULT_ROLES),
         apiClient.getAdminPermissionsMatrix().catch(() => null),
         apiClient.getAdminFaculty().catch(() => []),
+        apiClient.getAdminUsers().catch(() => []),
       ]);
 
       if (rolesRes && Array.isArray(rolesRes) && rolesRes.length > 0) {
@@ -173,6 +212,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
 
       if (Array.isArray(facultyRes)) {
         setFacultyList(facultyRes);
+      }
+
+      if (Array.isArray(usersRes)) {
+        const nonFaculty = usersRes.filter((u: any) => u.role !== 'faculty' && u.role !== 'super_admin');
+        setStudentList(nonFaculty);
       }
     } catch {
       // Graceful fallback
@@ -262,8 +306,137 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
       showToast(`✓ Removed faculty account for ${facName}`, 'info');
       setFacultyList((prev) => prev.filter((f) => f.id !== facId));
       await fetchData();
+      await syncWithBackend();
     } catch (err: any) {
       showToast(err?.message || 'Failed to remove faculty account', 'error');
+    }
+  };
+
+  const filteredStudents = useMemo(() => {
+    return studentList.filter((s) => {
+      const q = studentSearch.trim().toLowerCase();
+      const matchSearch =
+        !q ||
+        (s.name && s.name.toLowerCase().includes(q)) ||
+        (s.roll_no && s.roll_no.toLowerCase().includes(q)) ||
+        (s.rollNo && s.rollNo.toLowerCase().includes(q)) ||
+        (s.email && s.email.toLowerCase().includes(q)) ||
+        (s.role && s.role.toLowerCase().includes(q));
+
+      const matchRole =
+        studentRoleFilter === 'all' ||
+        (s.role && s.role.toLowerCase() === studentRoleFilter.toLowerCase());
+
+      return matchSearch && matchRole;
+    });
+  }, [studentList, studentSearch, studentRoleFilter]);
+
+  const handleCreateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!studentForm.name.trim() || !studentForm.roll_no.trim() || !studentForm.email.trim()) {
+      showToast('Please fill in Student Name, Register Number (Reg No), and Email', 'error');
+      return;
+    }
+    setStudentSubmitting(true);
+    try {
+      const payload = {
+        name: studentForm.name.trim(),
+        roll_no: studentForm.roll_no.trim().toUpperCase(),
+        email: studentForm.email.trim().toLowerCase(),
+        role: studentForm.role,
+        department: studentForm.department.trim(),
+        year_of_study: studentForm.year_of_study.trim(),
+        post: studentForm.post.trim(),
+        team: studentForm.team.trim(),
+        phone: studentForm.phone.trim(),
+        password: studentForm.password.trim() || 'geohub',
+      };
+      const created = await apiClient.createAdminUser(payload);
+      showToast(`✓ Account "${created.name}" onboarded as ${created.role.toUpperCase()}`, 'success');
+      setIsAddStudentModalOpen(false);
+      setStudentForm({
+        name: '',
+        roll_no: '',
+        email: '',
+        role: 'student',
+        department: 'Geoinformatics Engineering',
+        year_of_study: '1st Year',
+        post: 'Student Member',
+        team: 'General',
+        phone: '',
+        password: 'geohub',
+      });
+      await fetchData();
+      await syncWithBackend();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to onboard student', 'error');
+    } finally {
+      setStudentSubmitting(false);
+    }
+  };
+
+  const handleOpenEditStudent = (st: any) => {
+    setEditStudentForm({
+      id: st.id || st.uid,
+      name: st.name || '',
+      roll_no: (st.roll_no || st.rollNo || '').toUpperCase(),
+      email: st.email || '',
+      role: st.role || 'student',
+      department: st.department || 'Geoinformatics Engineering',
+      year_of_study: st.year_of_study || st.yearOfStudy || '1st Year',
+      post: st.post || 'Student Member',
+      team: st.team || 'General',
+      status: st.status || 'active',
+      phone: st.phone || '',
+      password: '',
+    });
+    setIsEditStudentModalOpen(true);
+  };
+
+  const handleUpdateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editStudentForm.name.trim() || !editStudentForm.roll_no.trim() || !editStudentForm.email.trim()) {
+      showToast('Please fill in Student Name, Register Number, and Email', 'error');
+      return;
+    }
+    setEditStudentSubmitting(true);
+    try {
+      const payload: any = {
+        name: editStudentForm.name.trim(),
+        roll_no: editStudentForm.roll_no.trim().toUpperCase(),
+        email: editStudentForm.email.trim().toLowerCase(),
+        role: editStudentForm.role,
+        department: editStudentForm.department.trim(),
+        year_of_study: editStudentForm.year_of_study.trim(),
+        post: editStudentForm.post.trim(),
+        team: editStudentForm.team.trim(),
+        phone: editStudentForm.phone.trim(),
+        status: editStudentForm.status,
+      };
+      if (editStudentForm.password && editStudentForm.password.trim()) {
+        payload.password = editStudentForm.password.trim();
+      }
+      await apiClient.updateAdminUser(editStudentForm.id, payload);
+      showToast(`✓ Account "${editStudentForm.name}" updated successfully`, 'success');
+      setIsEditStudentModalOpen(false);
+      await fetchData();
+      await syncWithBackend();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to update account', 'error');
+    } finally {
+      setEditStudentSubmitting(false);
+    }
+  };
+
+  const handleDeleteStudent = async (stId: string, stName: string) => {
+    if (!window.confirm(`Are you sure you want to remove account "${stName}"?\n\nAs SuperAdmin, this will remove this account completely.`)) return;
+    try {
+      await apiClient.deleteAdminUser(stId);
+      showToast(`✓ Account "${stName}" successfully removed`, 'success');
+      await fetchData();
+      await syncWithBackend();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to remove account', 'error');
     }
   };
 
@@ -641,6 +814,144 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
         )}
       </div>
 
+      {/* Student & Member Governance Suite */}
+      <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+              <Users size={20} strokeWidth={2.4} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                  Student & Member Governance
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+                  {studentList.length} Registered
+                </span>
+              </div>
+              <p className="text-xs text-[#235347]">
+                SuperAdmin master control to onboard students, appoint squad officers, and configure credentials
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsAddStudentModalOpen(true)}
+            className="px-3 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto"
+          >
+            <Plus size={15} strokeWidth={2.5} />
+            <span>Add Student / Member</span>
+          </button>
+        </div>
+
+        {/* Filter & Search Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+            <input
+              type="text"
+              placeholder="Search by name, roll number, or role..."
+              value={studentSearch}
+              onChange={(e) => setStudentSearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-medium text-[#051F20] placeholder-[#8EB69B] focus:outline-none focus:border-[#235347] transition"
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+            {['all', 'student', 'volunteer', 'coordinator', 'management', 'treasurer', 'documentation', 'promotion'].map((rKey) => (
+              <button
+                key={rKey}
+                type="button"
+                onClick={() => setStudentRoleFilter(rKey)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition capitalize shrink-0 cursor-pointer ${
+                  studentRoleFilter === rKey
+                    ? 'bg-[#163832] text-white shadow-2xs'
+                    : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:border-[#8EB69B]'
+                }`}
+              >
+                {rKey}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Student Roster Cards */}
+        {filteredStudents.length === 0 ? (
+          <div className="p-4 rounded-xl bg-[#F6FBF7] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-1.5 py-6">
+            <Users size={28} className="text-[#8EB69B]" />
+            <span className="text-xs font-bold text-[#051F20]">No Students Matching Criteria</span>
+            <p className="text-xs text-[#235347] max-w-sm">
+              Click &quot;Add Student / Member&quot; above to onboard student scholars or officers into the club directory.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[380px] overflow-y-auto pr-1">
+            {filteredStudents.map((st) => (
+              <div
+                key={st.id || st.uid}
+                className="p-3.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] flex flex-col justify-between gap-3 shadow-2xs hover:border-[#8EB69B] transition"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-[#163832] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        {st.name ? st.name.charAt(0).toUpperCase() : 'S'}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-xs font-bold text-[#051F20] truncate">{st.name}</h3>
+                        <span className="font-mono text-xs text-[#235347] font-semibold">{st.roll_no || st.rollNo}</span>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DAF1DE] text-[#163832] uppercase shrink-0">
+                      {st.role || 'Student'}
+                    </span>
+                  </div>
+
+                  <div className="mt-2.5 space-y-1 text-xs text-[#235347]">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Mail size={12} className="text-[#8EB69B] shrink-0" />
+                      <span className="truncate">{st.email}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Shield size={12} className="text-[#8EB69B] shrink-0" />
+                      <span className="truncate">{st.post || 'Student Member'} • {st.team || 'General'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-between">
+                  <span className={`text-[11px] font-semibold capitalize ${st.status === 'disabled' ? 'text-rose-600' : 'text-emerald-700'}`}>
+                    {st.status || 'Active'}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditStudent(st)}
+                      className="p-1 rounded-lg text-[#235347] hover:bg-[#DAF1DE] transition cursor-pointer"
+                      title="Edit student details & role"
+                      aria-label={`Edit details for ${st.name}`}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStudent(st.id || st.uid, st.name)}
+                      className="p-1 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                      title="Remove student account"
+                      aria-label={`Remove account for ${st.name}`}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Role Selection Horizontal Bar */}
       <div className="mb-4">
         <label className="block text-xs font-bold text-[#163832] uppercase tracking-wider mb-2">
@@ -794,6 +1105,20 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
               <CheckCircle2 size={15} />
             )}
             <span>Save Role Credentials</span>
+          </button>
+
+          {/* SuperAdmin Master Role Action: Live Preview / Act as Role */}
+          <button
+            type="button"
+            onClick={() => {
+              switchRole(selectedRoleKey);
+              showToast(`Switched preview session to ${activeRoleMeta.badge}`, 'success');
+            }}
+            className="w-full py-2.5 px-4 rounded-xl bg-[#DAF1DE] hover:bg-[#c6ebd0] text-[#163832] font-bold text-xs flex items-center justify-center gap-2 border border-[#8EB69B]/40 transition active:scale-98 cursor-pointer shadow-2xs"
+            title={`Preview application and controls as ${activeRoleMeta.badge}`}
+          >
+            <Repeat size={14} strokeWidth={2.4} />
+            <span>Act as {activeRoleMeta.badge} (Live Preview)</span>
           </button>
         </div>
 
@@ -1320,6 +1645,352 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
                 >
                   <CheckCircle2 size={14} />
                   <span>{editFacultySubmitting ? 'Saving...' : 'Save Changes'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Onboard Student / Officer Modal */}
+      {isAddStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+                  <UserPlus size={20} strokeWidth={2.2} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Onboard Student or Officer</h3>
+                  <p className="text-xs text-[#235347]">Provision student scholar or club role</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddStudentModalOpen(false)}
+                className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateStudent} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={studentForm.name}
+                    onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
+                    placeholder="e.g. Priya Sharma"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
+                  <input
+                    type="text"
+                    required
+                    value={studentForm.roll_no}
+                    onChange={(e) => setStudentForm({ ...studentForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. 23GEO045"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={studentForm.email}
+                    onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })}
+                    placeholder="student@college.edu"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
+                  <select
+                    value={studentForm.role}
+                    onChange={(e) => setStudentForm({ ...studentForm, role: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="student">Student Scholar</option>
+                    <option value="member">Club Member</option>
+                    <option value="volunteer">Volunteer (Gate Check-In)</option>
+                    <option value="coordinator">President / Coordinator</option>
+                    <option value="treasurer">Treasurer (Finance)</option>
+                    <option value="documentation">Documentation Lead</option>
+                    <option value="promotion">Promotion Lead</option>
+                    <option value="management">Management Lead</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
+                  <select
+                    value={studentForm.year_of_study}
+                    onChange={(e) => setStudentForm({ ...studentForm, year_of_study: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
+                  >
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="PG / Research">PG / Research</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
+                  <input
+                    type="text"
+                    value={studentForm.team}
+                    onChange={(e) => setStudentForm({ ...studentForm, team: e.target.value })}
+                    placeholder="e.g. Field Mapping & GIS"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
+                  <input
+                    type="text"
+                    value={studentForm.post}
+                    onChange={(e) => setStudentForm({ ...studentForm, post: e.target.value })}
+                    placeholder="e.g. Squad Lead / Member"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Department</label>
+                  <input
+                    type="text"
+                    value={studentForm.department}
+                    onChange={(e) => setStudentForm({ ...studentForm, department: e.target.value })}
+                    placeholder="Geoinformatics Engineering"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={studentForm.phone}
+                    onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })}
+                    placeholder="+91 9876543210"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Initial Password</label>
+                  <input
+                    type="text"
+                    value={studentForm.password}
+                    onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })}
+                    placeholder="Default: geohub"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddStudentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={studentSubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <UserPlus size={14} />
+                  <span>{studentSubmitting ? 'Onboarding...' : 'Onboard Account'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Student / Officer Modal */}
+      {isEditStudentModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+                  <Pencil size={20} strokeWidth={2.2} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Edit Student or Officer Account</h3>
+                  <p className="text-xs text-[#235347]">Update profile, role, or reset password</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditStudentModalOpen(false)}
+                className="p-1 rounded-xl hover:bg-gray-100 text-gray-500 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStudent} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStudentForm.name}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, name: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Roll / Reg No *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editStudentForm.roll_no}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, roll_no: e.target.value.toUpperCase() })}
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none uppercase"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editStudentForm.email}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, email: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Role Type *</label>
+                  <select
+                    value={editStudentForm.role}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, role: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="student">Student Scholar</option>
+                    <option value="member">Club Member</option>
+                    <option value="volunteer">Volunteer (Gate Check-In)</option>
+                    <option value="coordinator">President / Coordinator</option>
+                    <option value="treasurer">Treasurer (Finance)</option>
+                    <option value="documentation">Documentation Lead</option>
+                    <option value="promotion">Promotion Lead</option>
+                    <option value="management">Management Lead</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Year of Study</label>
+                  <select
+                    value={editStudentForm.year_of_study}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, year_of_study: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer"
+                  >
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="PG / Research">PG / Research</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Squad / Team</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.team}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, team: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Post / Title</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.post}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, post: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Account Status</label>
+                  <select
+                    value={editStudentForm.status}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, status: e.target.value })}
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none bg-white cursor-pointer font-semibold"
+                  >
+                    <option value="active">Active</option>
+                    <option value="disabled">Disabled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    value={editStudentForm.phone}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, phone: e.target.value })}
+                    placeholder="+91 9876543210"
+                    className="w-full text-xs px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#163832] mb-1">Reset Password (Optional)</label>
+                  <input
+                    type="password"
+                    value={editStudentForm.password}
+                    onChange={(e) => setEditStudentForm({ ...editStudentForm, password: e.target.value })}
+                    placeholder="Leave blank to keep current"
+                    className="w-full text-xs font-mono px-3 py-2 rounded-xl border border-[#DAF1DE] focus:border-[#163832] outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditStudentModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editStudentSubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>{editStudentSubmitting ? 'Saving...' : 'Save Changes'}</span>
                 </button>
               </div>
             </form>

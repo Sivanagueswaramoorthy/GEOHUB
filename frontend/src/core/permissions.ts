@@ -263,7 +263,7 @@ export const canAccessSquadOperations = (
 ): boolean => {
   if (!user) return false;
   const role = normalizeRole(user.role);
-  if (role === 'faculty' || role === 'coordinator') return true;
+  if (role === 'super_admin' || role === 'faculty' || role === 'coordinator') return true;
 
   const targetSquad = squad.toLowerCase().trim();
 
@@ -338,7 +338,7 @@ export const canAddSquadMember = (
 ): boolean => {
   if (!actor) return false;
   const role = normalizeRole(actor.role);
-  if (role === 'faculty' || role === 'coordinator') return true;
+  if (role === 'super_admin' || role === 'faculty' || role === 'coordinator') return true;
 
   const sq = targetSquad.toLowerCase().trim();
   const isLead =
@@ -361,7 +361,7 @@ export const canAddSquadMember = (
 export const canAssignSquadLead = (actor: UserModel | null | undefined): boolean => {
   if (!actor) return false;
   const role = normalizeRole(actor.role);
-  return role === 'faculty' || role === 'coordinator';
+  return role === 'super_admin' || role === 'faculty' || role === 'coordinator';
 };
 
 /**
@@ -1305,19 +1305,23 @@ export const moduleAccess = (
  */
 export const canRemoveMember = (actor: UserModel | null | undefined): boolean => {
   if (!actor) return false;
+  const role = normalizeRole(actor.role);
   const hubRole = normalizeHubRole(actor.role);
-  return hubRole === 'faculty';
+  return role === 'super_admin' || hubRole === 'faculty';
 };
 
 /**
  * President cannot edit Faculty accounts.
  * Faculty can edit all accounts.
+ * SuperAdmin has unconditional master authority over all accounts.
  */
 export const canEditMember = (
   actor: UserModel | null | undefined,
   target: UserModel | null | undefined
 ): boolean => {
   if (!actor || !target) return false;
+  const role = normalizeRole(actor.role);
+  if (role === 'super_admin') return true;
   const actorRole = normalizeHubRole(actor.role);
   const targetRole = normalizeHubRole(target.role);
 

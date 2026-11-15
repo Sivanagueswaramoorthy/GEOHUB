@@ -54,8 +54,9 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
       </AppProvider>
     );
 
-    const treasurerButton = screen.getByRole('button', { name: /Treasurer/i });
-    fireEvent.click(treasurerButton);
+    const treasurerButtons = screen.getAllByRole('button', { name: /Treasurer/i });
+    const roleBarTreasurer = treasurerButtons[treasurerButtons.length - 1];
+    fireEvent.click(roleBarTreasurer);
 
     // Username input should update to treasurer default
     const rollInput = screen.getByPlaceholderText('e.g. 21GEO001 or FAC01') as HTMLInputElement;
@@ -79,5 +80,33 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
 
     // Events operation should be hidden
     expect(screen.queryByText('Create & Edit Events')).not.toBeInTheDocument();
+  });
+
+  it('renders Student & Member Governance section and allows opening Add Student modal', async () => {
+    render(
+      <AppProvider>
+        <SuperAdminOperationsView />
+      </AppProvider>
+    );
+
+    expect(screen.getByText('Student & Member Governance')).toBeInTheDocument();
+    const addStudentBtn = screen.getByRole('button', { name: /Add Student \/ Member/i });
+    expect(addStudentBtn).toBeInTheDocument();
+
+    fireEvent.click(addStudentBtn);
+    expect(screen.getByText('Onboard Student or Officer')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g. Priya Sharma')).toBeInTheDocument();
+  });
+
+  it('renders Act as Role (Live Preview) button for SuperAdmin master control', async () => {
+    render(
+      <AppProvider>
+        <SuperAdminOperationsView />
+      </AppProvider>
+    );
+
+    const actAsBtn = screen.getByRole('button', { name: /Act as .* \(Live Preview\)/i });
+    expect(actAsBtn).toBeInTheDocument();
+    fireEvent.click(actAsBtn);
   });
 });

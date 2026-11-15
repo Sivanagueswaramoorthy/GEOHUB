@@ -1,12 +1,12 @@
 {
-  "version": "1.6.13",
-  "version_code": 31,
+  "version": "1.6.14",
+  "version_code": 32,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Removed hardcoded demo roles and credentials, keeping only SuperAdmin",
+  "release_notes": "SuperAdmin Student and Member Onboarding and Master Governance Control",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6857764,
+  "file_size_bytes": 6860072,
   "file_size_mb": "6.54 MB",
-  "sha256": "83000B103999A603227D95FA1C5B1181814CD9C581E34E4AF5CF38698716E363"
+  "sha256": "7937522FDB30B740CEB94BCB1683EDCFA3AA1759200DC0FB69ACEFE5999EDF3F"
 }

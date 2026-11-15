@@ -604,6 +604,10 @@ class ApiClient {
     role?: string;
     department?: string;
     post?: string;
+    year_of_study?: string;
+    team?: string;
+    team_role?: string;
+    is_volunteer?: boolean;
     phone?: string;
     password?: string;
   }) {
@@ -622,6 +626,10 @@ class ApiClient {
       role?: string;
       department?: string;
       post?: string;
+      year_of_study?: string;
+      team?: string;
+      team_role?: string;
+      is_volunteer?: boolean;
       phone?: string;
       status?: string;
       password?: string;

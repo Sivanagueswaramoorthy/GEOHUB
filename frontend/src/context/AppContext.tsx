@@ -91,6 +91,7 @@ interface AppContextType {
   syncStatus: 'connected' | 'syncing' | 'offline';
   lastSyncedAt: Date | null;
   refreshCloudData: () => Promise<void>;
+  syncWithBackend: () => Promise<void>;
   toast: { message: string; type?: 'success' | 'error' | 'info' } | null;
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   hideToast: () => void;
@@ -1985,6 +1986,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         syncStatus,
         lastSyncedAt,
         refreshCloudData,
+        syncWithBackend,
         setCurrentUser,
         switchRole,
         setActiveTab,
