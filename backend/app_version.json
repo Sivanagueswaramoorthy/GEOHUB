@@ -1,12 +1,12 @@
 {
-  "version": "1.6.12",
-  "version_code": 30,
+  "version": "1.6.13",
+  "version_code": 31,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Rectified cross-device real-time sync engine, fetch-based SSE stream, tunnel bypass, and server connection diagnostics",
+  "release_notes": "Removed hardcoded demo roles and credentials, keeping only SuperAdmin",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6859148,
+  "file_size_bytes": 6857764,
   "file_size_mb": "6.54 MB",
-  "sha256": "6A360C361E59134D1478C492124C9505FB28AFD3BEBF33CA731BFDF074151356"
+  "sha256": "83000B103999A603227D95FA1C5B1181814CD9C581E34E4AF5CF38698716E363"
 }

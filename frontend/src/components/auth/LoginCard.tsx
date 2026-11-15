@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, ArrowRight, AlertCircle, ShieldCheck, KeyRound } from 'lucide-react';
+import { User, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { PasswordField } from './PasswordField';
 import { BottomSheet } from '../shared/BottomSheet';
 import { PillButton } from '../shared/PillButton';
@@ -12,15 +12,7 @@ export interface DemoRoleCredential {
 }
 
 export const ALL_DEMO_CREDENTIALS: DemoRoleCredential[] = [
-  { role: 'Super Admin', rollNo: 'SA01', password: 'admin123', description: 'System Administrator · Master Operations' },
-  { role: 'Faculty', rollNo: 'FAC01', password: 'admin123', description: 'Faculty Advisor · Institutional Oversight' },
-  { role: 'President', rollNo: '21GEO001', password: 'admin123', description: 'Club President / Coordinator' },
-  { role: 'Management', rollNo: '21GEO010', password: 'admin123', description: 'Management Lead · Logistics' },
-  { role: 'Treasurer', rollNo: '22GEO019', password: 'admin123', description: 'Treasury & Expense Ledger' },
-  { role: 'Promotion', rollNo: '22GEO014', password: 'admin123', description: 'Social, Media & Campaigns' },
-  { role: 'Documentation', rollNo: '22GEO018', password: 'admin123', description: 'Meetings, Minutes & MOM' },
-  { role: 'Volunteer', rollNo: '23GEO042', password: 'admin123', description: 'Gate Check-In & Attendance' },
-  { role: 'Member', rollNo: '23GEO088', password: 'admin123', description: 'Student Scholar & Pass' },
+  { role: 'Super Admin', rollNo: 'SA01', password: 'GeoHub2026!', description: 'System Administrator · Master Operations' },
 ];
 
 export interface LoginCardProps {
@@ -70,8 +62,6 @@ export const LoginCard: React.FC<LoginCardProps> = ({
 
   // Forgot password BottomSheet
   const [isForgotOpen, setIsForgotOpen] = useState(false);
-  // All Roles Credentials Sheet
-  const [isCredentialsSheetOpen, setIsCredentialsSheetOpen] = useState(false);
 
   const rollNoInputRef = useRef<HTMLInputElement>(null);
   const passwordInputRef = useRef<HTMLInputElement>(null);
@@ -217,40 +207,36 @@ export const LoginCard: React.FC<LoginCardProps> = ({
           isShaking ? 'card-shake-active' : ''
         } ${className}`}
       >
-        {/* Roll numbers & passwords quick preset row */}
+        {/* SuperAdmin quick preset row */}
         <div className="pb-3 border-b border-[#DAF1DE]/70 flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-bold text-[#8EB69B] uppercase tracking-wider shrink-0 bg-white">
-              ROLL NOS & PASSWORDS:
+              SUPERADMIN CREDENTIALS:
             </span>
-            <button
-              type="button"
-              onClick={() => setIsCredentialsSheetOpen(true)}
-              className="text-xs font-bold text-[#163832] hover:text-[#235347] underline cursor-pointer shrink-0 flex items-center gap-1"
-            >
-              <KeyRound size={13} strokeWidth={2.4} />
-              <span>All 8 Roles</span>
-            </button>
+            <span className="text-[11px] font-semibold text-[#163832]/70">
+              Master Access
+            </span>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <div className="flex items-center gap-2 py-0.5">
             {ALL_DEMO_CREDENTIALS.map((item) => (
               <button
                 key={item.rollNo}
                 type="button"
                 onClick={() => handleQuickDemoFill(item.rollNo, item.password)}
-                className="px-3 py-1.5 rounded-full bg-[#DAF1DE]/75 hover:bg-[#DAF1DE] active:scale-95 text-[#051F20] text-xs font-semibold border border-[#8EB69B]/40 shrink-0 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-2xs"
+                className="px-3.5 py-1.5 rounded-full bg-[#DAF1DE]/80 hover:bg-[#DAF1DE] active:scale-95 text-[#051F20] text-xs font-semibold border border-[#8EB69B]/40 shrink-0 transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 shadow-2xs"
                 title={`Click to fill: Roll No: ${item.rollNo}, Password: ${item.password}`}
               >
+                <ShieldCheck size={14} className="text-[#163832]" />
                 <strong>{item.rollNo}</strong> ({item.role})
-                <span className="text-[12px] text-[#235347] font-mono bg-white/80 px-1.5 py-0.5 rounded-md border border-[#8EB69B]/30 font-medium">
+                <span className="text-[12px] text-[#235347] font-mono bg-white/90 px-2 py-0.5 rounded-md border border-[#8EB69B]/30 font-medium">
                   {item.password}
                 </span>
               </button>
             ))}
           </div>
 
-          {/* Subtle accent bar matching screenshot */}
+          {/* Subtle accent bar */}
           <div className="h-1 w-20 bg-[#163832]/25 rounded-full" />
         </div>
 
@@ -426,57 +412,6 @@ export const LoginCard: React.FC<LoginCardProps> = ({
           >
             Understood
           </PillButton>
-        </div>
-      </BottomSheet>
-
-      {/* All Roles & Credentials Sheet */}
-      <BottomSheet
-        isOpen={isCredentialsSheetOpen}
-        onClose={() => setIsCredentialsSheetOpen(false)}
-        title="All Roles & Passwords"
-      >
-        <div className="flex flex-col gap-3 p-4 select-none max-h-[70vh] overflow-y-auto">
-          <p className="text-xs text-[#235347] font-medium leading-relaxed">
-            Select any role below to auto-fill its Roll Number and Password into the login form.
-          </p>
-
-          <div className="flex flex-col gap-2">
-            {ALL_DEMO_CREDENTIALS.map((cred) => (
-              <div
-                key={cred.rollNo}
-                className="p-3 rounded-2xl bg-white border border-[#DAF1DE] shadow-[0_2px_8px_rgba(5,31,32,0.03)] flex items-center justify-between gap-3 hover:border-[#8EB69B] transition-all"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#051F20]">{cred.role}</span>
-                    <span className="text-[12px] font-mono font-bold bg-[#DAF1DE] text-[#051F20] px-2 py-0.5 rounded-full border border-[#8EB69B]/30">
-                      {cred.rollNo}
-                    </span>
-                  </div>
-                  <div className="text-[12px] text-[#235347] mt-0.5 truncate">
-                    {cred.description}
-                  </div>
-                  <div className="text-[12px] text-[#163832] font-mono mt-1 font-semibold flex items-center gap-1.5">
-                    <span>Password:</span>
-                    <span className="bg-[#F6FBF7] border border-[#DAF1DE] px-2 py-0.5 rounded-md text-[#051F20]">
-                      {cred.password}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleQuickDemoFill(cred.rollNo, cred.password);
-                    setIsCredentialsSheetOpen(false);
-                  }}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#163832] hover:bg-[#0B2B26] text-white text-xs font-bold transition-all shrink-0 cursor-pointer shadow-xs active:scale-95"
-                >
-                  Use Role
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       </BottomSheet>
     </>

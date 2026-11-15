@@ -6,72 +6,74 @@ import { BottomSheet } from '../shared/BottomSheet';
 import { Avatar } from '../shared/Avatar';
 
 export const RoleSwitcherModal: React.FC = () => {
-  const { currentUser, switchRole, isRoleSwitcherOpen, setIsRoleSwitcherOpen } = useApp();
+  const { currentUser, switchRole, isRoleSwitcherOpen, setIsRoleSwitcherOpen, users } = useApp();
 
-  const roleOptions: {
+  const baseRoles: {
     role: UserRole;
-    name: string;
-    title: string;
-    dept: string;
+    defaultTitle: string;
     icon: React.ReactNode;
   }[] = [
     {
       role: 'super_admin',
-      name: 'System SuperAdmin',
-      title: 'Super Admin • System Administrator',
-      dept: 'Platform Governance & IT',
+      defaultTitle: 'Super Admin • System Administrator',
       icon: <ShieldCheck size={18} color="#051F20" />,
     },
     {
       role: 'faculty',
-      name: 'Dr. Sarah Jenkins',
-      title: 'Faculty • Faculty Advisor',
-      dept: 'Geography & Geomatics',
+      defaultTitle: 'Faculty • Faculty Advisor',
       icon: <ShieldCheck size={18} color="#163832" />,
     },
     {
       role: 'coordinator',
-      name: 'Alex Rivera',
-      title: 'Coordinator • Club President',
-      dept: 'Geoinformatics (4th Year)',
+      defaultTitle: 'Coordinator • Club President',
       icon: <Shield size={18} color="#163832" />,
     },
     {
       role: 'management',
-      name: 'Elena Rostova',
-      title: 'Management • Management Squad Lead',
-      dept: 'Geology & Environment (4th Year)',
+      defaultTitle: 'Management • Management Squad Lead',
       icon: <Users size={18} color="#163832" />,
     },
     {
       role: 'documentation',
-      name: 'Aarav Patel',
-      title: 'Documentation Lead • Documentation Squad',
-      dept: 'Geoinformatics & Archival Science (3rd Year)',
+      defaultTitle: 'Documentation Lead • Documentation Squad',
       icon: <FileText size={18} color="#163832" />,
     },
     {
       role: 'treasurer',
-      name: 'Ananya Iyer',
-      title: 'Treasurer • Management Squad',
-      dept: 'Economics & Financial Analytics (3rd Year)',
+      defaultTitle: 'Treasurer • Management Squad',
       icon: <DollarSign size={18} color="#163832" />,
     },
     {
       role: 'promotion',
-      name: 'David Chen',
-      title: 'Promotion Lead • Promotion Squad',
-      dept: 'Earth Science & Media (3rd Year)',
+      defaultTitle: 'Promotion Lead • Promotion Squad',
       icon: <Megaphone size={18} color="#163832" />,
     },
     {
       role: 'student',
-      name: 'Maya Patel',
-      title: 'Student • Active Member & QR Scanner',
-      dept: 'Cartography & Geography (2nd Year)',
+      defaultTitle: 'Student • Active Member & QR Scanner',
       icon: <User size={18} color="#163832" />,
     },
   ];
+
+  const roleOptions = baseRoles.map((br) => {
+    if (br.role === 'super_admin') {
+      return {
+        role: br.role,
+        name: 'System SuperAdmin (SA01)',
+        title: br.defaultTitle,
+        dept: 'Platform Governance & IT',
+        icon: br.icon,
+      };
+    }
+    const matchedUser = (users || []).find((u) => u.role === br.role && u.status === 'active');
+    return {
+      role: br.role,
+      name: matchedUser ? `${matchedUser.name} (${matchedUser.rollNo || matchedUser.email})` : `Provisioned ${br.role.replace('_', ' ').toUpperCase()}`,
+      title: matchedUser?.post || br.defaultTitle,
+      dept: matchedUser?.department || (matchedUser ? 'Active Roster' : 'Not yet provisioned'),
+      icon: br.icon,
+    };
+  });
 
   return (
     <BottomSheet

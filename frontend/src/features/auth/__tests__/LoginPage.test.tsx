@@ -305,8 +305,8 @@ describe('LoginPage Integration and E2E Auth Behavior', () => {
     const rollNoInput = screen.getByPlaceholderText(/enter your reg no/i);
     const passwordInput = screen.getByPlaceholderText(/enter your password/i);
 
-    fireEvent.change(rollNoInput, { target: { value: '21GEO001' } });
-    fireEvent.change(passwordInput, { target: { value: 'admin123' } });
+    fireEvent.change(rollNoInput, { target: { value: 'SA01' } });
+    fireEvent.change(passwordInput, { target: { value: 'GeoHub2026!' } });
 
     fireEvent.click(screen.getByRole('button', { name: /sign in with reg no/i }));
 
@@ -318,22 +318,25 @@ describe('LoginPage Integration and E2E Auth Behavior', () => {
     );
   });
 
-  it('renders all role roll numbers and passwords on the login page', () => {
+  it('renders SuperAdmin credentials preset and excludes hardcoded demo roles', () => {
     render(
       <AppProvider>
         <LoginPage />
       </AppProvider>
     );
 
-    // Roll number pills with passwords for all 8 roles must be rendered
-    expect(screen.getByRole('button', { name: /FAC01/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /21GEO001/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /21GEO010/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /22GEO019/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /22GEO014/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /22GEO018/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /23GEO042/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /23GEO088/i })).toBeInTheDocument();
+    // SuperAdmin SA01 must be rendered
+    expect(screen.getByRole('button', { name: /SA01/i })).toBeInTheDocument();
+
+    // All other demo roles must NOT be rendered
+    expect(screen.queryByRole('button', { name: /FAC01/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /21GEO001/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /21GEO010/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /22GEO019/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /22GEO014/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /22GEO018/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /23GEO042/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /23GEO088/i })).not.toBeInTheDocument();
 
     // Official images must be rendered
     expect(screen.getByAltText(/green eco sprout mascot/i)).toBeInTheDocument();

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { UserModel, UserRole, UserStatus } from '../../types';
 import { useApp } from '../../context/AppContext';
 import { canAccessRoute } from '../../core/permissions';
-import { demoUsersList, demoSuperAdmin, demoFaculty, demoAdmin, demoManagement, demoDocLead, demoTreasurer, demoTeamAdmin, demoVolunteer, demoMember } from '../../data/mockData';
+import { demoUsersList, demoSuperAdmin } from '../../data/mockData';
 import { LoginFormData } from './auth.schema';
 import { apiClient } from '../../api/client';
 
@@ -174,7 +174,6 @@ export const useLogin = (options?: UseLoginOptions) => {
         const normalizedPass = (password || '').trim();
         const isAuthorizedMasterPass =
           normalizedPass.toLowerCase() === 'geohub' ||
-          normalizedPass === 'admin123' ||
           normalizedPass === 'GeoHub2026!' ||
           normalizedPass === 'SecretPass2026!';
 

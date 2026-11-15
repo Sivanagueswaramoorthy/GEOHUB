@@ -188,14 +188,6 @@ export const demoManagement: UserModel = {
 
 export const demoUsersList: UserModel[] = [
   demoSuperAdmin,
-  demoFaculty,
-  demoAdmin,
-  demoManagement,
-  demoTeamAdmin,
-  demoDocLead,
-  demoTreasurer,
-  demoMember,
-  demoVolunteer,
 ];
 
 export const initialTeams: TeamModel[] = [

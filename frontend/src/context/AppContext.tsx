@@ -32,15 +32,6 @@ import {
 } from '../types';
 import {
   demoSuperAdmin,
-  demoFaculty,
-  demoAdmin,
-  demoTeamAdmin,
-  demoDocLead,
-  demoTreasurer,
-  demoMember,
-  demoVolunteer,
-  demoManagement,
-  demoUsersList,
   initialUsers,
   initialTeams,
   initialEvents,
@@ -835,39 +826,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const loginWithRole = (role: UserRole | string) => {
-    let targetUser: UserModel = demoSuperAdmin;
     const norm = normalizeRole(role);
-    switch (norm) {
-      case 'super_admin':
-        targetUser = demoSuperAdmin;
-        break;
-      case 'faculty':
-        targetUser = demoFaculty;
-        break;
-      case 'coordinator':
-        targetUser = demoAdmin;
-        break;
-      case 'management':
-        targetUser = demoManagement;
-        break;
-      case 'promotion':
-        targetUser = demoTeamAdmin;
-        break;
-      case 'documentation':
-        targetUser = demoDocLead;
-        break;
-      case 'treasurer':
-        targetUser = demoTreasurer;
-        break;
-      case 'volunteer':
-        targetUser = demoVolunteer;
-        break;
-      case 'student':
-      default:
-        targetUser = demoMember;
-        break;
+    if (norm === 'super_admin') {
+      loginWithUser(demoSuperAdmin);
+      return;
     }
-    loginWithUser(targetUser);
+    const existing = users.find((u) => normalizeRole(u.role) === norm && u.status === 'active');
+    if (existing) {
+      loginWithUser(existing);
+    } else {
+      loginWithUser(demoSuperAdmin);
+    }
   };
 
   const switchRole = (role: UserRole | string) => {
