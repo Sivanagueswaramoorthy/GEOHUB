@@ -157,4 +157,30 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
     expect(screen.getByText('Provision Faculty Advisor')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('e.g. Dr. Sarah Jenkins')).toBeInTheDocument();
   });
+
+  it('renders 5-Deck Executive Navigation bar and allows filtering to focused decks', async () => {
+    render(
+      <AppProvider>
+        <SuperAdminOperationsView />
+      </AppProvider>
+    );
+
+    // Assert all 5 decks + All Decks are present
+    expect(screen.getByRole('button', { name: /All Decks/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Command Hub/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Faculty Oversight/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Student Governance/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Role & Access Matrix/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Maintenance & DB/i })).toBeInTheDocument();
+
+    // Switch to Command Hub
+    fireEvent.click(screen.getByRole('button', { name: /Command Hub/i }));
+    expect(screen.getByText('+ Provision Faculty')).toBeInTheDocument();
+    expect(screen.getByText('+ Onboard Student')).toBeInTheDocument();
+
+    // Switch to Maintenance & DB
+    fireEvent.click(screen.getByRole('button', { name: /Maintenance & DB/i }));
+    expect(screen.getByText(/TiDB Cloud MySQL Distributed Database/i)).toBeInTheDocument();
+    expect(screen.getByText(/gateway01.ap-southeast-1.prod.aws.tidbcloud.com/i)).toBeInTheDocument();
+  });
 });

@@ -19,13 +19,6 @@ import {
 import { UserModel } from '../../types';
 import {
   demoSuperAdmin,
-  demoAdmin,
-  demoManagement,
-  demoTreasurer,
-  demoTeamAdmin,
-  demoDocLead,
-  demoMember,
-  demoVolunteer,
 } from '../../data/mockData';
 
 export interface DemoAccountEntry {
@@ -131,14 +124,14 @@ export const DemoCredentialsCard: React.FC<DemoCredentialsCardProps> = ({
               className="text-base font-bold text-[#051F20]"
               style={{ fontSize: '17px', lineHeight: '22px' }}
             >
-              All Role Logins & Passwords
+              SuperAdmin Master Credentials
             </h2>
             <p className="text-xs font-semibold text-[#235347] mt-0.5">
               Default password:{' '}
               <span className="font-bold text-[#051F20] bg-[#DAF1DE] px-1.5 py-0.5 rounded-md border border-[#8EB69B]">
-                admin123
+                GeoHub2026!
               </span>{' '}
-              for all accounts
+              for master account
             </p>
           </div>
         </div>

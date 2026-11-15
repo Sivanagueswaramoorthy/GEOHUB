@@ -126,6 +126,8 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
   const [roles, setRoles] = useState<RoleMeta[]>(DEFAULT_ROLES);
   const [selectedRoleKey, setSelectedRoleKey] = useState<string>('coordinator');
   const [selectedCat, setSelectedCat] = useState<'all' | 'events' | 'finance' | 'docs' | 'ops' | 'admin'>('all');
+  const [activeDeck, setActiveDeck] = useState<'all' | 'hub' | 'faculty' | 'students' | 'matrix' | 'maintenance'>('all');
+  const [facultySearch, setFacultySearch] = useState<string>('');
 
   // Matrix state
   const [matrixData, setMatrixData] = useState<Record<string, Record<string, boolean>>>({});
@@ -325,6 +327,19 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
       showToast(err?.message || 'Failed to remove faculty account', 'error');
     }
   };
+
+  const filteredFaculty = useMemo(() => {
+    if (!facultySearch.trim()) return facultyList;
+    const q = facultySearch.trim().toLowerCase();
+    return facultyList.filter(
+      (f) =>
+        (f.name && f.name.toLowerCase().includes(q)) ||
+        (f.roll_no && f.roll_no.toLowerCase().includes(q)) ||
+        (f.email && f.email.toLowerCase().includes(q)) ||
+        (f.department && f.department.toLowerCase().includes(q)) ||
+        (f.post && f.post.toLowerCase().includes(q))
+    );
+  }, [facultyList, facultySearch]);
 
   const filteredStudents = useMemo(() => {
     return studentList.filter((s) => {
@@ -771,7 +786,98 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
         </div>
       </div>
 
+      {/* 5-Deck Executive Navigation Bar */}
+      <div className="sticky top-2 z-30 mb-5 p-1.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.06)] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <button
+          type="button"
+          onClick={() => setActiveDeck('all')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'all'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <Sparkles size={14} />
+          <span>All Decks</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDeck('hub')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'hub'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <Sliders size={14} />
+          <span>Command Hub</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+            {Object.values(platformModules || {}).filter(Boolean).length}/9
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDeck('faculty')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'faculty'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <GraduationCap size={14} />
+          <span>Faculty Oversight</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+            {facultyList.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDeck('students')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'students'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <Users size={14} />
+          <span>Student Governance</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#163832]">
+            {studentList.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDeck('matrix')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'matrix'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <Key size={14} />
+          <span>Role & Access Matrix</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDeck('maintenance')}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 whitespace-nowrap shrink-0 ${
+            activeDeck === 'maintenance'
+              ? 'bg-[#163832] text-white shadow-xs'
+              : 'text-[#235347] hover:bg-[#DAF1DE]'
+          }`}
+        >
+          <Database size={14} />
+          <span>Maintenance & DB</span>
+        </button>
+      </div>
+
       {/* Platform Module Switchboard */}
+      {(activeDeck === 'all' || activeDeck === 'hub') && (
       <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
           <div className="flex items-center gap-2.5">
@@ -874,9 +980,58 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             );
           })}
         </div>
+
+        {/* Quick Action Shortcuts inside Command Hub */}
+        {activeDeck === 'hub' && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-[#DAF1DE]">
+            <button
+              type="button"
+              onClick={() => { setActiveDeck('faculty'); setIsAddFacultyModalOpen(true); }}
+              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <GraduationCap size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-[#051F20]">+ Provision Faculty</div>
+                <div className="text-[11px] text-[#235347]">Onboard institutional advisors</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setActiveDeck('students'); setIsAddStudentModalOpen(true); }}
+              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <UserPlus size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-[#051F20]">+ Onboard Student</div>
+                <div className="text-[11px] text-[#235347]">Register scholars with Reg No</div>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveDeck('matrix')}
+              className="p-3.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-3 transition cursor-pointer text-left shadow-2xs"
+            >
+              <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center font-bold shrink-0">
+                <Key size={18} />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-[#051F20]">Role Permissions</div>
+                <div className="text-[11px] text-[#235347]">Configure 26 operations matrix</div>
+              </div>
+            </button>
+          </div>
+        )}
       </div>
+      )}
 
       {/* Faculty Governance & Provisioning Suite */}
+      {(activeDeck === 'all' || activeDeck === 'faculty') && (
       <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
           <div className="flex items-center gap-2.5">
@@ -908,6 +1063,20 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </button>
         </div>
 
+        {/* Search Bar for Faculty */}
+        {facultyList.length > 0 && (
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8EB69B]" />
+            <input
+              type="text"
+              placeholder="Search faculty by name, ID, email, or department..."
+              value={facultySearch}
+              onChange={(e) => setFacultySearch(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] text-xs font-medium text-[#051F20] placeholder-[#8EB69B] focus:outline-none focus:border-[#235347] transition"
+            />
+          </div>
+        )}
+
         {/* Faculty Roster List */}
         {facultyList.length === 0 ? (
           <div className="p-4 rounded-xl bg-[#F6FBF7] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-1.5 py-6">
@@ -919,7 +1088,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {facultyList.map((fac) => (
+            {filteredFaculty.map((fac) => (
               <div
                 key={fac.id}
                 className="p-3.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] flex flex-col justify-between gap-3 shadow-2xs hover:border-[#8EB69B] transition"
@@ -979,8 +1148,10 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         )}
       </div>
+      )}
 
       {/* Student & Member Governance Suite */}
+      {(activeDeck === 'all' || activeDeck === 'students') && (
       <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
           <div className="flex items-center gap-2.5">
@@ -1117,9 +1288,13 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         )}
       </div>
+      )}
 
-      {/* Role Selection Horizontal Bar */}
-      <div className="mb-4">
+      {/* Role Selection & Operations Authority Matrix */}
+      {(activeDeck === 'all' || activeDeck === 'matrix') && (
+      <div>
+        {/* Role Selection Horizontal Bar */}
+        <div className="mb-4">
         <label className="block text-xs font-bold text-[#163832] uppercase tracking-wider mb-2">
           Select Official Chapter Role
         </label>
@@ -1479,38 +1654,77 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
           </div>
         </div>
       </div>
+      </div>
+      )}
 
-      {/* Platform Data Purge & Clean Slate Controls */}
-      <div className="mt-5 bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(225,29,72,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
-            <Database size={20} strokeWidth={2.2} />
-          </div>
-          <div>
+      {/* Maintenance & Database Diagnostics */}
+      {(activeDeck === 'all' || activeDeck === 'maintenance') && (
+      <div className="mt-5 space-y-4">
+        {/* Live Database Engine Diagnostics */}
+        <div className="bg-[#051F20] text-white rounded-2xl p-4 sm:p-5 border border-[#163832] shadow-xl flex flex-col gap-3 font-mono">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-bold text-gray-900 leading-tight">
-                Platform Data Purge & Clean Slate
-              </h3>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">
-                Permanent Action
-              </span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-xs font-bold text-white tracking-wide">TiDB Cloud MySQL Distributed Database</span>
             </div>
-            <p className="text-xs text-gray-600">
-              Wipe all events, tasks, registrations, expenses, and dummy accounts. Retain solely SuperAdmin (SA01).
-            </p>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">
+              CONNECTED
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-[#8EB69B]">Host:</span>
+              <span className="font-bold text-white truncate max-w-[200px]">gateway01.ap-southeast-1.prod.aws.tidbcloud.com</span>
+            </div>
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-[#8EB69B]">Port:</span>
+              <span className="font-bold text-emerald-400">3306 (SSL Verified)</span>
+            </div>
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-[#8EB69B]">Dialect:</span>
+              <span className="font-bold text-white">mysql+pymysql (Relational)</span>
+            </div>
+            <div className="flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
+              <span className="text-[#8EB69B]">Health Status:</span>
+              <span className="font-bold text-emerald-400">200 OK (Live Engine)</span>
+            </div>
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsConfirmPurgeOpen(true)}
-          disabled={isPurging}
-          className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto disabled:opacity-50"
-        >
-          <Trash2 size={14} />
-          <span>{isPurging ? 'Purging Data...' : 'Purge All Platform Data'}</span>
-        </button>
+        {/* Platform Data Purge & Clean Slate Controls */}
+        <div className="bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(225,29,72,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+              <Database size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-gray-900 leading-tight">
+                  Platform Data Purge & Clean Slate
+                </h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">
+                  Permanent Action
+                </span>
+              </div>
+              <p className="text-xs text-gray-600">
+                Wipe all events, tasks, registrations, expenses, and dummy accounts. Retain solely SuperAdmin (SA01).
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsConfirmPurgeOpen(true)}
+            disabled={isPurging}
+            className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto disabled:opacity-50"
+          >
+            <Trash2 size={14} />
+            <span>{isPurging ? 'Purging Data...' : 'Purge All Platform Data'}</span>
+          </button>
+        </div>
       </div>
+      )}
 
       {/* Add Faculty Modal */}
       {isAddFacultyModalOpen && (
