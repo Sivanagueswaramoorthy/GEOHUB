@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Body
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -62,6 +62,78 @@ def load_overrides_into_cache():
 
 # Load overrides on module load
 load_overrides_into_cache()
+
+DEFAULT_PLATFORM_MODULES = {
+    "events": True,
+    "members": True,
+    "squads": True,
+    "finance": True,
+    "qr_attendance": True,
+    "archives": True,
+    "campaigns": True,
+    "forum": True,
+    "documents": True,
+}
+
+@router.get("/modules")
+def get_platform_modules(db: Session = Depends(get_db)):
+    """Returns the enabled/paused state of all platform modules."""
+    override = db.query(models.RolePermissionOverride).filter(
+        models.RolePermissionOverride.role == "platform_modules"
+    ).first()
+    if not override:
+        return DEFAULT_PLATFORM_MODULES
+    try:
+        data = json.loads(override.overrides_json)
+        merged = DEFAULT_PLATFORM_MODULES.copy()
+        merged.update(data)
+        return merged
+    except Exception:
+        return DEFAULT_PLATFORM_MODULES
+
+@router.post("/modules")
+def update_platform_modules(
+    payload: Dict[str, Any] = Body(...),
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """Allows SuperAdmin to toggle platform modules on or off."""
+    # Support both flat {"events": false} and nested {"modules": {"events": false}}
+    modules_to_update: Dict[str, bool] = {}
+    if "modules" in payload and isinstance(payload["modules"], dict):
+        modules_to_update = {str(k): bool(v) for k, v in payload["modules"].items()}
+    else:
+        modules_to_update = {str(k): bool(v) for k, v in payload.items() if isinstance(v, (bool, int))}
+
+    override = db.query(models.RolePermissionOverride).filter(
+        models.RolePermissionOverride.role == "platform_modules"
+    ).first()
+    if not override:
+        override = models.RolePermissionOverride(
+            role="platform_modules",
+            overrides_json=json.dumps(modules_to_update)
+        )
+        db.add(override)
+        modules = modules_to_update
+    else:
+        existing = {}
+        try:
+            existing = json.loads(override.overrides_json)
+        except Exception:
+            pass
+        existing.update(modules_to_update)
+        override.overrides_json = json.dumps(existing)
+        modules = existing
+
+    db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("MODULE_STATUS_CHANGED", modules)
+    except Exception:
+        pass
+
+    return {"status": "success", "modules": modules}
 
 @router.get("/roles-credentials")
 def get_roles_credentials(db: Session = Depends(get_db)):

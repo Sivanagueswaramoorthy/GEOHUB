@@ -31,6 +31,7 @@ import {
   Database,
   Repeat,
   Search,
+  MessageSquare,
 } from 'lucide-react';
 
 interface RoleMeta {
@@ -102,12 +103,25 @@ const DEFAULT_ROLES: RoleMeta[] = [
   { role: 'student', badge: 'Student Member', name: 'Maya Patel', roll_no: '23GEO088', email: 'maya.patel@college.edu', post: 'Club Member', status: 'active' },
 ];
 
+const MODULE_CONFIGS = [
+  { id: 'events', name: 'Events & Hackathons Hub', desc: 'Calendar, Proposals & Speaker Management', icon: Calendar },
+  { id: 'members', name: 'Member & Student Directory', desc: 'Scholar Roster, Verification & KYC', icon: Users },
+  { id: 'squads', name: 'Squads & Duty Workspaces', desc: 'Management, Promotion, Doc, Entertainment', icon: Shield },
+  { id: 'finance', name: 'Treasury & Financial Ledger', desc: 'Expenditure Logs & Budget Petitions', icon: Coins },
+  { id: 'qr_attendance', name: 'Smart QR & Attendance Gate', desc: 'Geofenced OTP & High-Speed Entry Scan', icon: Activity },
+  { id: 'archives', name: 'Archives & Media Gallery', desc: 'Photo Archival & Event Coverage Media', icon: FileText },
+  { id: 'campaigns', name: 'Campaigns & AI Social Studio', desc: 'Digital Posters, Announcements & Outreach', icon: Sparkles },
+  { id: 'forum', name: 'Campus Forum & Community', desc: 'Broadcast Channels & Peer Discussions', icon: MessageSquare },
+  { id: 'documents', name: 'Document Studio & MOM Archival', desc: 'Minutes of Meeting & Institutional Policies', icon: Database },
+];
+
 interface Props {
   onBack?: () => void;
+  isHomeCockpit?: boolean;
 }
 
-export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
-  const { showToast, currentUser, switchRole, syncWithBackend } = useApp();
+export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpit = false }) => {
+  const { showToast, currentUser, switchRole, syncWithBackend, platformModules, toggleModule, toggleAllModules } = useApp();
 
   const [roles, setRoles] = useState<RoleMeta[]>(DEFAULT_ROLES);
   const [selectedRoleKey, setSelectedRoleKey] = useState<string>('coordinator');
@@ -673,41 +687,193 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 pb-32 animate-fadeIn select-none">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onBack || (() => { window.location.hash = '#operations'; })}
-            className="w-10 h-10 rounded-xl bg-white border border-[#DAF1DE] flex items-center justify-center text-[#051F20] hover:bg-[#F6FBF7] active:scale-95 transition cursor-pointer touch-target-44 shadow-xs"
-            aria-label="Back"
-          >
-            <ChevronLeft size={20} strokeWidth={2.5} />
-          </button>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-lg sm:text-xl font-heading font-extrabold text-[#051F20] leading-tight">
-                Role Credentials & Operations
-              </h1>
-              <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B]/30">
-                SuperAdmin
-              </span>
+      {/* Hero Cockpit Banner with Live Telemetry */}
+      <div className="mb-5 rounded-3xl bg-gradient-to-br from-[#051F20] via-[#0B2B26] to-[#163832] p-5 sm:p-6 text-white shadow-xl border border-[#163832]/60 flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#051F20] flex items-center justify-center font-black text-lg shadow-md shrink-0">
+              SA
             </div>
-            <p className="text-xs text-[#235347]">
-              Manage authentication credentials and master 26-operation access switches
-            </p>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-xl font-heading font-extrabold text-white tracking-tight">
+                  SuperAdmin Master Command Cockpit
+                </h1>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#DAF1DE] text-[#051F20] uppercase tracking-wider">
+                  Master Authority
+                </span>
+              </div>
+              <p className="text-xs text-[#DAF1DE]/80 mt-0.5">
+                Universal operations governance, dynamic module switches, and institutional provisioning
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={fetchData}
+              disabled={loading}
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-[#DAF1DE] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+              title="Refresh telemetry"
+            >
+              <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              <span>Refresh</span>
+            </button>
+            {!isHomeCockpit && onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+              >
+                <ChevronLeft size={14} />
+                <span>Exit</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={fetchData}
-          disabled={loading}
-          className="w-10 h-10 rounded-xl bg-white border border-[#DAF1DE] flex items-center justify-center text-[#235347] hover:bg-[#F6FBF7] active:scale-95 transition cursor-pointer touch-target-44 shadow-xs"
-          title="Refresh matrix"
-        >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-        </button>
+        {/* Live System Telemetry Chips */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-white/10 text-xs">
+          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+            <div className="min-w-0">
+              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Database</span>
+              <span className="font-mono font-bold text-white truncate block text-[11px]">TiDB Cloud:3306</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+            <GraduationCap size={16} className="text-[#DAF1DE] shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Faculty Advisors</span>
+              <span className="font-bold text-white text-[11px]">{facultyList.length} Active</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+            <Users size={16} className="text-[#DAF1DE] shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Student Scholars</span>
+              <span className="font-bold text-white text-[11px]">{studentList.length} Active</span>
+            </div>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+            <Sliders size={16} className="text-[#DAF1DE] shrink-0" />
+            <div className="min-w-0">
+              <span className="text-[10px] text-[#8EB69B] uppercase font-bold block">Module Status</span>
+              <span className="font-bold text-white text-[11px]">
+                {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Online
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Platform Module Switchboard */}
+      <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+              <Sliders size={20} strokeWidth={2.4} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                  Platform Module Switchboard
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+                  {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Active
+                </span>
+              </div>
+              <p className="text-xs text-[#235347]">
+                Toggle respective club modules online or pause them across the platform for scheduled maintenance
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() => toggleAllModules(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200 transition cursor-pointer"
+            >
+              Enable All
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleAllModules(false)}
+              className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-[11px] font-bold border border-rose-200 transition cursor-pointer"
+            >
+              Disable All
+            </button>
+          </div>
+        </div>
+
+        {/* Module Cards Grid with Toggle Switches */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {MODULE_CONFIGS.map((mod) => {
+            const isEnabled = platformModules?.[mod.id] !== false;
+            const IconComponent = mod.icon;
+            return (
+              <div
+                key={mod.id}
+                className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition ${
+                  isEnabled
+                    ? 'bg-[#F6FBF7] border-[#DAF1DE] hover:border-[#8EB69B]'
+                    : 'bg-rose-50/40 border-rose-200/80 opacity-80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      isEnabled ? 'bg-[#DAF1DE] text-[#163832]' : 'bg-rose-100 text-rose-700'
+                    }`}
+                  >
+                    <IconComponent size={16} strokeWidth={2.2} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-[#051F20] truncate">{mod.name}</span>
+                    </div>
+                    <p className="text-[10px] text-[#235347] truncate">{mod.desc}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ${
+                      isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                    }`}
+                  >
+                    {isEnabled ? 'LIVE' : 'PAUSED'}
+                  </span>
+
+                  {/* Accessible Animated Toggle Switch Button */}
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={isEnabled}
+                    aria-label={`Toggle ${mod.name} ${isEnabled ? 'Off' : 'On'}`}
+                    onClick={() => toggleModule(mod.id, !isEnabled)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      isEnabled ? 'bg-[#163832]' : 'bg-gray-300'
+                    }`}
+                    title={`Click to turn ${mod.name} ${isEnabled ? 'OFF' : 'ON'}`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        isEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Faculty Governance & Provisioning Suite */}

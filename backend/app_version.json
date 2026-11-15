@@ -1,12 +1,12 @@
 {
-  "version": "1.6.15",
-  "version_code": 33,
+  "version": "1.6.16",
+  "version_code": 34,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Fix TiDB Cloud database connection on port 3306 and ensure full data persistence",
+  "release_notes": "SuperAdmin Master Command Cockpit with distinct UI/UX, real-time Platform Module Switchboard, and prominent Faculty Advisor Onboarding",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6860180,
+  "file_size_bytes": 6862596,
   "file_size_mb": "6.54 MB",
-  "sha256": "932F18192C0CA0AB9649B02635373C6F114B8601C3D30E8FAFE89A177A863AA4"
+  "sha256": "535180F173CEBF271A45F53BD3DC0F7E659954F670C6A69907764306614D2151"
 }

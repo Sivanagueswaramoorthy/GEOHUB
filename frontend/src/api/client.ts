@@ -656,6 +656,17 @@ class ApiClient {
       method: 'POST',
     });
   }
+
+  public async getPlatformModules(): Promise<Record<string, boolean>> {
+    return await this.request<Record<string, boolean>>('/admin/modules');
+  }
+
+  public async updatePlatformModules(modules: Record<string, boolean>): Promise<{ status: string; modules: Record<string, boolean> }> {
+    return await this.request<{ status: string; modules: Record<string, boolean> }>('/admin/modules', {
+      method: 'POST',
+      body: JSON.stringify(modules),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

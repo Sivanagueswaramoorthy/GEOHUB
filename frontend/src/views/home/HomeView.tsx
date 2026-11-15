@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { SuperAdminOperationsView } from '../admin/SuperAdminOperationsView';
 import {
   StudentHomeView,
   CoordinatorHomeView,
@@ -13,7 +14,12 @@ import {
 export const HomeView: React.FC = () => {
   const { currentUser, showToast, setSelectedEventId, registerForEvent } = useApp();
 
-  const isFaculty = currentUser.role === 'super_admin' || currentUser.role === 'faculty';
+  // SuperAdmin Master Command Cockpit
+  if (currentUser.role === 'super_admin') {
+    return <SuperAdminOperationsView onBack={() => {}} isHomeCockpit={true} />;
+  }
+
+  const isFaculty = currentUser.role === 'faculty';
   const isCoordinator =
     currentUser.role === 'admin' ||
     currentUser.role === 'coordinator' ||

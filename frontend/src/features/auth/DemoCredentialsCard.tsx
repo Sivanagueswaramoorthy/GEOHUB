@@ -145,7 +145,7 @@ export const DemoCredentialsCard: React.FC<DemoCredentialsCardProps> = ({
 
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DAF1DE] border border-[#8EB69B] text-xs font-bold text-[#163832]">
           <Sparkles size={14} />
-          <span>8 Active Roles</span>
+          <span>SuperAdmin Master Access</span>
         </div>
       </div>
 
@@ -154,10 +154,7 @@ export const DemoCredentialsCard: React.FC<DemoCredentialsCardProps> = ({
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1" style={{ WebkitOverflowScrolling: 'touch' }}>
           {[
-            { id: 'all', label: 'All Roles (8)' },
-            { id: 'executive', label: 'Executive (3)' },
-            { id: 'leads', label: 'Squad Leads (3)' },
-            { id: 'members', label: 'Members (2)' },
+            { id: 'all', label: 'SuperAdmin' },
           ].map((cat) => {
             const isActive = activeCategory === cat.id;
             return (

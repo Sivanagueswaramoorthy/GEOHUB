@@ -44,6 +44,7 @@ import { AuditDetailPage } from './features/audits/AuditDetailPage';
 import { AuditLogView } from './views/audit/AuditLogView';
 import { DesignSystemView } from './views/design/DesignSystemView';
 import { SuperAdminOperationsView } from './views/admin/SuperAdminOperationsView';
+import { ModulePausedNotice } from './components/shared/ModulePausedNotice';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -57,6 +58,7 @@ const MainAppContent: React.FC = () => {
     showToast,
     hideToast,
     isPhoneFrame,
+    platformModules,
   } = useApp();
 
   React.useEffect(() => {
@@ -208,6 +210,38 @@ const MainAppContent: React.FC = () => {
   ];
 
   const renderActiveScreen = () => {
+    // Platform Module Gatekeeper: If SuperAdmin toggled a module OFF, non-superadmins see the elegant paused notice
+    const isSuperAdmin = currentUser?.role === 'super_admin';
+    if (!isSuperAdmin && platformModules) {
+      if (activeTab === 'events' && platformModules.events === false) {
+        return <ModulePausedNotice moduleName="Events & Hackathons Hub" />;
+      }
+      if (activeTab === 'members' && platformModules.members === false) {
+        return <ModulePausedNotice moduleName="Member & Student Directory" />;
+      }
+      if ((activeTab === 'teams' || activeTab === 'team_home') && platformModules.squads === false) {
+        return <ModulePausedNotice moduleName="Squads & Duty Workspaces" />;
+      }
+      if ((activeTab === 'finance' || activeTab === 'treasurer' || activeTab === 'ledger') && platformModules.finance === false) {
+        return <ModulePausedNotice moduleName="Treasury & Financial Ledger" />;
+      }
+      if ((activeTab === 'scan_qr' || activeTab === 'attendance') && platformModules.qr_attendance === false) {
+        return <ModulePausedNotice moduleName="Smart QR & Attendance Gate" />;
+      }
+      if ((activeTab === 'archives' || activeTab === 'gallery' || activeTab === 'memories') && platformModules.archives === false) {
+        return <ModulePausedNotice moduleName="Archives & Media Gallery" />;
+      }
+      if ((activeTab === 'campaigns' || activeTab === 'ai_social') && platformModules.campaigns === false) {
+        return <ModulePausedNotice moduleName="Social Campaigns & AI Studio" />;
+      }
+      if ((activeTab === 'forum' || activeTab === 'community') && platformModules.forum === false) {
+        return <ModulePausedNotice moduleName="Campus Forum & Community" />;
+      }
+      if ((activeTab === 'documents' || activeTab === 'doc_studio') && platformModules.documents === false) {
+        return <ModulePausedNotice moduleName="Document Studio & MOM Archival" />;
+      }
+    }
+
     switch (activeTab) {
       // 1) Home template
       case 'home':

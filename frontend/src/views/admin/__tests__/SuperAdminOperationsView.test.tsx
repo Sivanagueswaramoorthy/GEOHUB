@@ -27,8 +27,8 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
     );
 
     // Title and badge
-    expect(screen.getByText('Role Credentials & Operations')).toBeInTheDocument();
-    expect(screen.getByText('SuperAdmin')).toBeInTheDocument();
+    expect(screen.getByText('SuperAdmin Master Command Cockpit')).toBeInTheDocument();
+    expect(screen.getByText('Master Authority')).toBeInTheDocument();
 
     // Canonical role pills rendered
     expect(screen.getAllByText('Coordinator').length).toBeGreaterThan(0);
@@ -42,8 +42,8 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
     expect(screen.getByText('Save Role Credentials')).toBeInTheDocument();
 
     // Master Authority Buttons
-    expect(screen.getByText('Enable All')).toBeInTheDocument();
-    expect(screen.getByText('Disable All')).toBeInTheDocument();
+    expect(screen.getAllByText('Enable All').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Disable All').length).toBeGreaterThan(0);
     expect(screen.getByText('Default')).toBeInTheDocument();
   });
 
@@ -108,5 +108,53 @@ describe('SuperAdminOperationsView & Governance Security Tests', () => {
     const actAsBtn = screen.getByRole('button', { name: /Act as .* \(Live Preview\)/i });
     expect(actAsBtn).toBeInTheDocument();
     fireEvent.click(actAsBtn);
+  });
+
+  it('renders Platform Module Switchboard with interactive toggle buttons', async () => {
+    render(
+      <AppProvider>
+        <SuperAdminOperationsView />
+      </AppProvider>
+    );
+
+    // Module Switchboard section and telemetry
+    expect(screen.getByText('Platform Module Switchboard')).toBeInTheDocument();
+    expect(screen.getByText(/Toggle respective club modules online or pause them/i)).toBeInTheDocument();
+
+    // Specific module titles
+    expect(screen.getByText('Events & Hackathons Hub')).toBeInTheDocument();
+    expect(screen.getByText('Smart QR & Attendance Gate')).toBeInTheDocument();
+    expect(screen.getByText('Treasury & Financial Ledger')).toBeInTheDocument();
+    expect(screen.getByText('Archives & Media Gallery')).toBeInTheDocument();
+
+    // Toggle switch buttons
+    const eventSwitch = screen.getByRole('switch', { name: /Toggle Events & Hackathons Hub/i });
+    expect(eventSwitch).toBeInTheDocument();
+    expect(eventSwitch).toHaveAttribute('aria-checked', 'true');
+
+    // Click toggle to turn OFF
+    fireEvent.click(eventSwitch);
+
+    // Bulk buttons
+    expect(screen.getAllByRole('button', { name: /^Enable All$/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: /^Disable All$/i }).length).toBeGreaterThan(0);
+  });
+
+  it('renders Faculty Management section and opens Add Faculty modal', async () => {
+    render(
+      <AppProvider>
+        <SuperAdminOperationsView />
+      </AppProvider>
+    );
+
+    // Faculty Advisory section
+    expect(screen.getByText('Faculty Governance & Provisioning')).toBeInTheDocument();
+    const addFacultyBtn = screen.getByRole('button', { name: /Add Faculty Advisor/i });
+    expect(addFacultyBtn).toBeInTheDocument();
+
+    // Open modal
+    fireEvent.click(addFacultyBtn);
+    expect(screen.getByText('Provision Faculty Advisor')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g. Dr. Sarah Jenkins')).toBeInTheDocument();
   });
 });

@@ -90,6 +90,9 @@ interface AppContextType {
   isSyncing: boolean;
   syncStatus: 'connected' | 'syncing' | 'offline';
   lastSyncedAt: Date | null;
+  platformModules: Record<string, boolean>;
+  toggleModule: (moduleId: string, enabled: boolean) => Promise<void>;
+  toggleAllModules: (enabled: boolean) => Promise<void>;
   refreshCloudData: () => Promise<void>;
   syncWithBackend: () => Promise<void>;
   toast: { message: string; type?: 'success' | 'error' | 'info' } | null;
@@ -202,6 +205,18 @@ interface AppContextType {
   setBudgetRequests: React.Dispatch<React.SetStateAction<BudgetChangeRequest[]>>;
   setAuditLogs: React.Dispatch<React.SetStateAction<AuditLogItem[]>>;
 }
+
+export const DEFAULT_PLATFORM_MODULES: Record<string, boolean> = {
+  events: true,
+  members: true,
+  squads: true,
+  finance: true,
+  qr_attendance: true,
+  archives: true,
+  campaigns: true,
+  forum: true,
+  documents: true,
+};
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -481,6 +496,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('hashchange', handleUrlRoute);
   }, [currentUser.role]);
 
+  const [platformModules, setPlatformModules] = useState<Record<string, boolean>>(() =>
+    loadPersistedState('geohub_platform_modules', DEFAULT_PLATFORM_MODULES)
+  );
+
+  useEffect(() => {
+    savePersistedState('geohub_platform_modules', platformModules);
+  }, [platformModules]);
+
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
@@ -627,6 +650,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           timestamp: a.timestamp || new Date().toISOString(),
         })));
       }
+
+      // 8. Sync Platform Module Toggles
+      const liveModules = await apiClient.getPlatformModules().catch(() => null);
+      if (liveModules && typeof liveModules === 'object' && !Array.isArray(liveModules)) {
+        setPlatformModules((prev) => ({ ...prev, ...liveModules }));
+      }
         setSyncStatus('connected');
         setLastSyncedAt(new Date());
       } catch {
@@ -707,6 +736,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               showToast(`✓ Faculty Advisor provisioned: ${data.name}`, 'info');
             } else if (type === 'FACULTY_DELETED') {
               showToast('Faculty account updated', 'info');
+            } else if (type === 'MODULE_STATUS_CHANGED' && data) {
+              setPlatformModules((prev) => ({ ...prev, ...data }));
+              showToast('Platform module configuration updated', 'info');
             }
 
             // Always synchronize latest full authoritative state from backend
@@ -844,6 +876,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     loginWithRole(role);
     setIsRoleSwitcherOpen(false);
   };
+
+  const toggleModule = useCallback(
+    async (moduleId: string, enabled: boolean) => {
+      const updated = { ...platformModules, [moduleId]: enabled };
+      setPlatformModules(updated);
+      try {
+        await apiClient.updatePlatformModules({ [moduleId]: enabled });
+        showToast(`Module "${moduleId}" is now ${enabled ? 'ACTIVE' : 'PAUSED'}`, 'info');
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to update module state', 'error');
+      }
+    },
+    [platformModules, showToast]
+  );
+
+  const toggleAllModules = useCallback(
+    async (enabled: boolean) => {
+      const updated: Record<string, boolean> = {};
+      Object.keys(platformModules).forEach((k) => {
+        updated[k] = enabled;
+      });
+      setPlatformModules(updated);
+      try {
+        await apiClient.updatePlatformModules(updated);
+        showToast(`All platform modules set to ${enabled ? 'ACTIVE' : 'PAUSED'}`, 'info');
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to update modules', 'error');
+      }
+    },
+    [platformModules, showToast]
+  );
 
   const logout = () => {
     try {
@@ -2011,6 +2074,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isSyncing,
         syncStatus,
         lastSyncedAt,
+        platformModules,
+        toggleModule,
+        toggleAllModules,
         refreshCloudData,
         syncWithBackend,
         setCurrentUser,
