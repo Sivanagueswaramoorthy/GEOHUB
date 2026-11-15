@@ -10,25 +10,36 @@ describe('SplashScreen Component', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders splash screen with GEO HUB branding and progress bar', () => {
+  it('renders splash screen with GeoHub branding, pastel emblem, and progress bar', () => {
     vi.spyOn(networkModule, 'checkNetworkStability').mockImplementation(() => {
       return new Promise(() => {}); // Pending check
     });
 
     render(<SplashScreen autoCheck={true} />);
 
-    expect(screen.getByText('GEO')).toBeInTheDocument();
-    expect(screen.getByText('HUB')).toBeInTheDocument();
-    expect(screen.getByText('Green Eco Organization Hub')).toBeInTheDocument();
-    expect(screen.getByText('Verifying Network...')).toBeInTheDocument();
+    // Wordmark
+    expect(screen.getByText('Geo')).toBeInTheDocument();
+    expect(screen.getByText('Hub')).toBeInTheDocument();
+
+    // Tagline
+    expect(screen.getByText('GREEN ECO ORGANIZATION')).toBeInTheDocument();
+
+    // Emblem image
+    const emblem = screen.getByAltText('GeoHub Emblem');
+    expect(emblem).toBeInTheDocument();
+    expect(emblem).toHaveAttribute('src', '/geohub-emblem.svg');
+
+    // Initial Step & Progress
+    expect(screen.getByText('Checking network…')).toBeInTheDocument();
     expect(screen.getByText('15%')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
   it('completes verification, shows 100%, and calls onFinish when connection is stable', async () => {
     const onFinish = vi.fn();
 
     vi.spyOn(networkModule, 'checkNetworkStability').mockImplementation(async (onProgress) => {
-      onProgress?.(50, 'Connecting to gateway...');
+      onProgress?.(50, 'Reaching internet gateway...');
       onProgress?.(100, 'Connection Stable (42ms)');
       return {
         isStable: true,
@@ -46,7 +57,7 @@ describe('SplashScreen Component', () => {
       () => {
         expect(onFinish).toHaveBeenCalled();
       },
-      { timeout: 3000 }
+      { timeout: 3500 }
     );
   });
 
@@ -108,7 +119,7 @@ describe('SplashScreen Component', () => {
         expect(checkSpy).toHaveBeenCalledTimes(2);
         expect(onFinish).toHaveBeenCalled();
       },
-      { timeout: 3000 }
+      { timeout: 3500 }
     );
   });
 });

@@ -1,12 +1,12 @@
 {
-  "version": "1.6.8",
-  "version_code": 26,
+  "version": "1.6.9",
+  "version_code": 27,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Refined 4-tier botanical palette: Alabaster Mist, Deep Forest Green, Mint Wash & Sage Border",
+  "release_notes": "Redesign premium splash screen with unique pastel emblem and emerald tokens",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6843775,
-  "file_size_mb": "6.53 MB",
-  "sha256": "B05603244F4F6CCB66FD201DDFE22AC2C8EA4297594890D7FC274CE56A5F7CD1"
+  "file_size_bytes": 6853700,
+  "file_size_mb": "6.54 MB",
+  "sha256": "AE59B213031FD796689944772D7769883D74968D4E0CF61D91D13A5D0C399E69"
 }

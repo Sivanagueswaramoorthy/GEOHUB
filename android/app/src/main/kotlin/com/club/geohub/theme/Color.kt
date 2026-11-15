@@ -2,20 +2,26 @@ package com.club.geohub.theme
 
 import android.graphics.Color
 
-// GeoHub 6-Tone Forest & Mint Spec (Single Source of Truth)
+// GeoHub Botanical & Pastel Tokens (Single Source of Truth)
 object GeoHubColors {
-    val Pine950 = Color.parseColor("#051F20") // Deep dark forest/teal-green
-    val Pine900 = Color.parseColor("#0B2B26") // Dark deep green
-    val Pine800 = Color.parseColor("#163832") // Deep emerald-slate green
-    val Pine700 = Color.parseColor("#235347") // Medium muted forest green
-    val Sage400 = Color.parseColor("#8EB69B") // Soft sage green
-    val Mint100 = Color.parseColor("#DAF1DE") // Pale mint
+    val Pine950 = Color.parseColor("#051F20")
+    val Pine900 = Color.parseColor("#0B2B26")
+    val Pine800 = Color.parseColor("#143527")
+    val Pine700 = Color.parseColor("#0F6B47")
+    val Emerald700 = Color.parseColor("#0F6B47")
+    val Emerald400 = Color.parseColor("#5EAF80")
+    val Sage400 = Color.parseColor("#80C79E")
+    val Mint100 = Color.parseColor("#D7EFE3")
+    val FurrowMint = Color.parseColor("#DCF0E5")
+    val DawnSun = Color.parseColor("#F7C85C")
 
     // Derived Neutrals & Semantics
-    val AppBg = Color.parseColor("#F6FBF7")
+    val AppBg = Color.parseColor("#FFFFFF")
     val CardWhite = Color.parseColor("#FFFFFF")
-    val TextPrimary = Color.parseColor("#051F20")
-    val TextSecondary = Color.parseColor("#235347")
-    val AmberWarn = Color.parseColor("#F2B84B")
+    val CardAlabaster = Color.parseColor("#F6FAF7")
+    val BorderSage = Color.parseColor("#DFECE4")
+    val TextPrimary = Color.parseColor("#0B2A1F")
+    val TextSecondary = Color.parseColor("#6B7F75")
+    val AmberWarn = Color.parseColor("#F7C85C")
     val RedDanger = Color.parseColor("#D9534F")
 }

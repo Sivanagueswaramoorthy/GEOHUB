@@ -1,8 +1,21 @@
 /* ==========================================================================
-   GeoHub - Flagship Premium Splash Screen & Network Verification
-   Soft Pastel 3D + Frosted Glassmorphism Theme
+   GeoHub - Premium Splash Screen & Pastel Emblem Styles
+   Single Source of Truth Design Tokens & Elevation Hierarchy
    ========================================================================== */
 
+:root {
+  --color-emerald-900: #143527;
+  --color-emerald-700: #0F6B47;
+  --color-emerald-400: #5EAF80;
+  --color-mint-tint: #E7F6EE;
+  --color-ink: #0B2A1F;
+  --color-muted: #6B7F75;
+  --color-border: #E3EBE6;
+  --color-track: #E7F1EC;
+  --color-canvas: #FFFFFF;
+}
+
+/* Splash Viewport Overlay: Pure White Background */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -10,75 +23,102 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 50% 38%, rgba(218, 241, 222, 0.95) 0%, rgba(246, 251, 247, 1) 60%, #F6FBF7 100%);
+  justify-content: space-between;
+  background-color: #FFFFFF;
   overflow: hidden;
   user-select: none;
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 48px 16px 28px;
+  transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
 }
 
 .splash-overlay.splash-closing {
   opacity: 0;
-  transform: scale(1.03);
+  transform: scale(1.02);
   pointer-events: none;
 }
 
-/* Ambient Radial Aura Lights */
+/* Ambient Breathing Radial Emerald Glow (16% Opacity Behind Emblem) */
 .splash-glow-disc {
   position: absolute;
-  top: 36%;
+  top: 96px;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 340px;
-  height: 340px;
+  width: 320px;
+  height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(142, 182, 155, 0.35) 0%, rgba(218, 241, 222, 0.22) 50%, transparent 75%);
-  filter: blur(32px);
+  background: radial-gradient(circle, rgba(94, 175, 128, 0.20) 0%, rgba(215, 239, 227, 0.10) 45%, transparent 70%);
+  filter: blur(28px);
   pointer-events: none;
-  animation: splash-glow-breathe 3.4s ease-in-out infinite alternate;
+  animation: splash-glow-breathe 4s ease-in-out infinite alternate;
 }
 
 @keyframes splash-glow-breathe {
   0% {
-    transform: translate(-50%, -50%) scale(0.92);
-    opacity: 0.65;
+    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0.75;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
   }
 }
 
-/* Glassmorphism Lower Dock Card */
-.splash-glass-dock {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 20px 48px -12px rgba(5, 31, 32, 0.14),
-              0 0 0 1px rgba(142, 182, 155, 0.25);
-  transition: all 0.3s ease;
+/* 4s Float Animation (6dp up/down) */
+@keyframes emblem-float {
+  0%, 100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
 }
 
-.splash-glass-dock-error {
-  background: rgba(255, 250, 250, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(217, 83, 79, 0.38);
-  box-shadow: 0 20px 48px -12px rgba(217, 83, 79, 0.22);
+.animate-float {
+  animation: emblem-float 4s ease-in-out infinite;
 }
 
-/* Shimmering Progress Bar */
+/* Soft Green Elevation Shadow */
+.emblem-shadow {
+  filter: drop-shadow(0 14px 28px rgba(20, 53, 39, 0.16)) drop-shadow(0 4px 10px rgba(20, 53, 39, 0.08));
+}
+
+/* Bottom Status Sheet (16dp side margins, 28dp from bottom, 22dp radius, white, 1dp border, soft shadow) */
+.splash-status-sheet {
+  width: 100%;
+  max-width: 380px;
+  background-color: #FFFFFF;
+  border-radius: 22px;
+  padding: 16px;
+  border: 1px solid #E3EBE6;
+  box-shadow: 0 16px 36px -8px rgba(20, 53, 39, 0.08),
+              0 2px 6px rgba(20, 53, 39, 0.03);
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.splash-status-sheet-error {
+  width: 100%;
+  max-width: 380px;
+  background-color: #FFFFFF;
+  border-radius: 22px;
+  padding: 16px;
+  border: 1px solid rgba(217, 83, 79, 0.3);
+  box-shadow: 0 16px 36px -8px rgba(217, 83, 79, 0.12),
+              0 2px 6px rgba(217, 83, 79, 0.04);
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 6dp Rounded Progress Bar */
 .splash-progress-track {
   width: 100%;
-  height: 9px;
-  background-color: #DAF1DE;
+  height: 6px;
+  background-color: #E7F1EC;
   border-radius: 9999px;
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(5, 31, 32, 0.08);
 }
 
 .splash-progress-fill {
@@ -87,11 +127,7 @@
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-}
-
-.splash-progress-fill-active {
-  background: linear-gradient(90deg, #163832 0%, #235347 50%, #8EB69B 100%);
-  box-shadow: 0 0 12px rgba(142, 182, 155, 0.6);
+  background: linear-gradient(90deg, #0F6B47 0%, #5EAF80 100%);
 }
 
 .splash-progress-fill-active::after {
@@ -101,7 +137,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
   animation: splash-shimmer-sweep 1.8s infinite;
 }
 
@@ -112,36 +148,28 @@
 
 .splash-progress-fill-error {
   background-color: #D9534F;
-  box-shadow: 0 0 12px rgba(217, 83, 79, 0.45);
 }
 
 .splash-progress-fill-success {
-  background: linear-gradient(90deg, #163832 0%, #235347 60%, #8EB69B 100%);
-  box-shadow: 0 0 12px rgba(35, 83, 71, 0.45);
+  background: linear-gradient(90deg, #0F6B47 0%, #34B27B 100%);
 }
 
-.splash-pulse-dot {
-  animation: splash-dot-pulse 1.3s ease-in-out infinite;
+.pressable {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.pressable:active {
+  transform: scale(0.97);
 }
 
-@keyframes splash-dot-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
-}
-
+/* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .splash-overlay,
   .splash-glow-disc,
+  .animate-float,
   .splash-progress-fill,
-  .splash-progress-fill-active::after,
-  .splash-pulse-dot {
+  .splash-progress-fill-active::after {
     animation: none !important;
     transition: none !important;
+    transform: none !important;
   }
 }
