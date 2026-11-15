@@ -240,7 +240,7 @@ def update_event_status(
 
     elif target_status in ["live", "done", "completed"]:
         norm_role = auth.normalize_role(actor.role)
-        if norm_role not in ["faculty", "coordinator"]:
+        if norm_role not in ["faculty", "coordinator", "super_admin"]:
             raise HTTPException(status_code=403, detail="Permission denied: Faculty or Coordinator role required.")
 
     before_state = event.status
@@ -396,3 +396,94 @@ def is_registered(
     reg_id = f"{event_id}_{current_user.id}"
     existing = db.query(models.EventRegistration).filter(models.EventRegistration.id == reg_id).first()
     return {"is_registered": existing is not None}
+
+@router.put("/{event_id}", response_model=schemas.EventResponse)
+def update_event(
+    event_id: str,
+    event_in: schemas.EventUpdate,
+    db: Session = Depends(get_db),
+    actor: models.User = Depends(auth.get_current_active_user)
+):
+    event = db.query(models.Event).filter(models.Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    if not auth.has_permission(actor, "canCreateEditEvents") and auth.normalize_role(actor.role) != "super_admin":
+        raise HTTPException(status_code=403, detail="Permission denied to modify event.")
+
+    if event_in.title is not None:
+        event.title = event_in.title
+    if event_in.type is not None:
+        event.type = event_in.type
+    if event_in.date_time is not None:
+        event.date_time = event_in.date_time
+    if event_in.venue is not None:
+        event.venue = event_in.venue
+    if event_in.description is not None:
+        event.description = event_in.description
+    if event_in.budget is not None:
+        event.budget = event_in.budget
+    if event_in.poster_url is not None:
+        event.poster_url = event_in.poster_url
+    if event_in.status is not None:
+        event.status = event_in.status
+    if event_in.academic_year is not None:
+        event.academic_year = event_in.academic_year
+
+    db.commit()
+    db.refresh(event)
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_UPDATED", {"id": event.id, "title": event.title, "status": event.status})
+    except Exception:
+        pass
+
+    return schemas.EventResponse(
+        id=event.id,
+        title=event.title,
+        type=event.type,
+        date_time=event.date_time,
+        venue=event.venue,
+        description=event.description,
+        budget=event.budget,
+        poster_url=event.poster_url,
+        status=event.status,
+        cancellation_reason=event.cancellation_reason,
+        academic_year=event.academic_year,
+        volunteer_user_ids=json.loads(event.volunteer_user_ids or "[]"),
+        assigned_scanner_user_ids=json.loads(event.assigned_scanner_user_ids or "[]"),
+        geofence_enabled=event.geofence_enabled or False,
+        latitude=event.latitude,
+        longitude=event.longitude,
+        geofence_radius_meters=event.geofence_radius_meters or 100.0,
+        created_by=event.created_by,
+        created_at=event.created_at,
+        attendance_count=event.attendance_count
+    )
+
+@router.delete("/{event_id}")
+def delete_event(
+    event_id: str,
+    db: Session = Depends(get_db),
+    actor: models.User = Depends(auth.get_current_active_user)
+):
+    event = db.query(models.Event).filter(models.Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found.")
+
+    if not auth.has_permission(actor, "canCancelEvents") and auth.normalize_role(actor.role) != "super_admin":
+        raise HTTPException(status_code=403, detail="Permission denied to delete event.")
+
+    # Delete registrations
+    db.query(models.EventRegistration).filter(models.EventRegistration.event_id == event_id).delete()
+    db.delete(event)
+    db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EVENT_DELETED", {"id": event_id})
+    except Exception:
+        pass
+
+    return {"status": "success", "message": f"Event '{event_id}' successfully deleted."}

@@ -25,6 +25,7 @@ import {
   UserPlus,
   Trash2,
   Plus,
+  Pencil,
   GraduationCap,
   Database,
 } from 'lucide-react';
@@ -118,9 +119,11 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
   // Faculty Provisioning & Data Purge State
   const [facultyList, setFacultyList] = useState<any[]>([]);
   const [isAddFacultyModalOpen, setIsAddFacultyModalOpen] = useState(false);
+  const [isEditFacultyModalOpen, setIsEditFacultyModalOpen] = useState(false);
   const [isPurging, setIsPurging] = useState(false);
   const [isConfirmPurgeOpen, setIsConfirmPurgeOpen] = useState(false);
   const [facultySubmitting, setFacultySubmitting] = useState(false);
+  const [editFacultySubmitting, setEditFacultySubmitting] = useState(false);
   const [facultyForm, setFacultyForm] = useState({
     name: '',
     roll_no: '',
@@ -129,6 +132,17 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
     post: 'Faculty Advisor',
     phone: '',
     password: 'GeoHub2026!',
+  });
+  const [editFacultyForm, setEditFacultyForm] = useState({
+    id: '',
+    name: '',
+    roll_no: '',
+    email: '',
+    department: 'Geoinformatics Engineering',
+    post: 'Faculty Advisor',
+    phone: '',
+    status: 'active',
+    password: '',
   });
 
   // Form credentials for currently selected role
@@ -195,8 +209,54 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
     }
   };
 
+  const handleOpenEditFaculty = (fac: any) => {
+    setEditFacultyForm({
+      id: fac.id,
+      name: fac.name || '',
+      roll_no: fac.roll_no || '',
+      email: fac.email || '',
+      department: fac.department || 'Geoinformatics Engineering',
+      post: fac.post || 'Faculty Advisor',
+      phone: fac.phone || '',
+      status: fac.status || 'active',
+      password: '',
+    });
+    setIsEditFacultyModalOpen(true);
+  };
+
+  const handleUpdateFaculty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editFacultyForm.name.trim() || !editFacultyForm.roll_no.trim() || !editFacultyForm.email.trim()) {
+      showToast('Please fill in Name, Faculty ID, and Institutional Email', 'error');
+      return;
+    }
+    setEditFacultySubmitting(true);
+    try {
+      const payload: any = {
+        name: editFacultyForm.name.trim(),
+        roll_no: editFacultyForm.roll_no.trim().toUpperCase(),
+        email: editFacultyForm.email.trim(),
+        department: editFacultyForm.department.trim(),
+        post: editFacultyForm.post.trim(),
+        phone: editFacultyForm.phone.trim(),
+        status: editFacultyForm.status,
+      };
+      if (editFacultyForm.password && editFacultyForm.password.trim()) {
+        payload.password = editFacultyForm.password.trim();
+      }
+      await apiClient.updateAdminFaculty(editFacultyForm.id, payload);
+      showToast(`✓ Faculty Advisor "${editFacultyForm.name}" updated successfully`, 'success');
+      setIsEditFacultyModalOpen(false);
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to update faculty details', 'error');
+    } finally {
+      setEditFacultySubmitting(false);
+    }
+  };
+
   const handleDeleteFaculty = async (facId: string, facName: string) => {
-    if (!window.confirm(`Revoke Faculty Advisor credentials for "${facName}"?`)) return;
+    if (!window.confirm(`Revoke and remove Faculty Advisor credentials for "${facName}"?\n\nAs SuperAdmin, this will remove this faculty member unconditionally.`)) return;
     try {
       await apiClient.deleteAdminFaculty(facId);
       showToast(`✓ Removed faculty account for ${facName}`, 'info');
@@ -553,16 +613,27 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
                 </div>
 
                 <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-between">
-                  <span className="text-[11px] text-[#52665C]">Institutional Faculty</span>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteFaculty(fac.id, fac.name)}
-                    className="p-1 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                    title="Remove faculty account"
-                    aria-label={`Remove faculty account for ${fac.name}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <span className="text-[11px] text-[#52665C] capitalize">{fac.status || 'Active'}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditFaculty(fac)}
+                      className="p-1 rounded-lg text-[#235347] hover:bg-[#DAF1DE] transition cursor-pointer"
+                      title="Edit faculty details & password"
+                      aria-label={`Edit faculty details for ${fac.name}`}
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteFaculty(fac.id, fac.name)}
+                      className="p-1 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                      title="Remove faculty account"
+                      aria-label={`Remove faculty account for ${fac.name}`}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1089,6 +1160,166 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
                 >
                   <UserPlus size={14} />
                   <span>{facultySubmitting ? 'Provisioning...' : 'Provision Faculty'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Faculty Modal */}
+      {isEditFacultyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#235347] flex items-center justify-center">
+                  <GraduationCap size={22} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#051F20]">Edit Faculty Advisor</h3>
+                  <p className="text-xs text-[#235347]">Update advisor record, post title, credentials & status</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditFacultyModalOpen(false)}
+                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateFaculty} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">
+                  Full Name & Salutation <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFacultyForm.name}
+                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, name: e.target.value })}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Faculty ID / Username <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editFacultyForm.roll_no}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. FAC01"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Institutional Email <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editFacultyForm.email}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, email: e.target.value })}
+                    placeholder="e.g. sarah.jenkins@college.edu"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={editFacultyForm.department}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, department: e.target.value })}
+                    placeholder="e.g. Geoinformatics Engineering"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Designation / Post
+                  </label>
+                  <input
+                    type="text"
+                    value={editFacultyForm.post}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, post: e.target.value })}
+                    placeholder="e.g. Faculty Advisor"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={editFacultyForm.phone}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, phone: e.target.value })}
+                    placeholder="e.g. +91 94420 18820"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={editFacultyForm.status}
+                    onChange={(e) => setEditFacultyForm({ ...editFacultyForm, status: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">
+                  Reset Password <span className="text-[10px] text-gray-500 font-normal">(Optional, leave blank to retain current)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editFacultyForm.password}
+                  onChange={(e) => setEditFacultyForm({ ...editFacultyForm, password: e.target.value })}
+                  placeholder="Enter new password (optional)"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditFacultyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={editFacultySubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>{editFacultySubmitting ? 'Saving...' : 'Save Changes'}</span>
                 </button>
               </div>
             </form>

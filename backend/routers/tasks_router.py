@@ -27,7 +27,7 @@ def get_tasks(
         proofs = json.loads(t.proof_urls or "[]")
 
         include = False
-        if scope == "all" and current_user.role in ["admin", "super_admin"]:
+        if scope == "all" and auth.normalize_role(current_user.role) in ["coordinator", "super_admin", "faculty"]:
             include = True
         elif scope == "team" and current_user.team == t.team_id:
             include = True
@@ -123,3 +123,56 @@ def submit_proof(
     db.commit()
 
     return {"success": True, "proof_urls": proofs}
+
+@router.put("/{task_id}", response_model=schemas.TaskResponse)
+def update_task(
+    task_id: str,
+    task_in: schemas.TaskUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+
+    if task_in.title is not None:
+        task.title = task_in.title
+    if task_in.description is not None:
+        task.description = task_in.description
+    if task_in.team_id is not None:
+        task.team_id = task_in.team_id
+    if task_in.assigned_user_ids is not None:
+        task.assigned_user_ids = json.dumps(task_in.assigned_user_ids)
+    if task_in.deadline is not None:
+        task.deadline = task_in.deadline
+
+    db.commit()
+    db.refresh(task)
+
+    return schemas.TaskResponse(
+        id=task.id,
+        title=task.title,
+        description=task.description,
+        team_id=task.team_id,
+        assigned_user_ids=json.loads(task.assigned_user_ids or "[]"),
+        deadline=task.deadline,
+        status=task.status,
+        proof_urls=json.loads(task.proof_urls or "[]"),
+        created_by=task.created_by,
+        created_at=task.created_at
+    )
+
+@router.delete("/{task_id}")
+def delete_task(
+    task_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+
+    db.delete(task)
+    db.commit()
+
+    return {"status": "success", "message": f"Task '{task_id}' successfully deleted."}

@@ -77,6 +77,10 @@ def has_permission(user, flag: str, context: Optional[Dict[str, Any]] = None, re
     role = user.role if hasattr(user, "role") else user.get("role")
     norm_role = normalize_role(role)
 
+    # Master SuperAdmin Bypass: SuperAdmin can execute all 26+ operations unconditionally
+    if norm_role == "super_admin":
+        return True
+
     # SuperAdmin dynamic overrides precedence
     if norm_role in DYNAMIC_OVERRIDES and flag in DYNAMIC_OVERRIDES[norm_role]:
         return bool(DYNAMIC_OVERRIDES[norm_role][flag])
@@ -247,16 +251,23 @@ def require_event_scanner(event_id: str, db: Session, scanner: models.User) -> m
     return scanner
 
 def verify_no_self_escalation(actor, target_id: str):
-    """Protection rule: A user can never change their own role or posts."""
+    """Protection rule: A user can never change their own role or posts (except SuperAdmin)."""
     actor_id = actor.id if hasattr(actor, "id") else (actor.get("id") if isinstance(actor, dict) else str(actor))
+    actor_role = actor.role if hasattr(actor, "role") else (actor.get("role") if isinstance(actor, dict) else "")
+    if normalize_role(actor_role) == "super_admin":
+        return
     if actor_id == target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Protection Rule: Self-escalation rejected. You cannot modify your own role or posts."
         )
 
-def verify_last_faculty_protection(db: Session, target_user: models.User, new_role: str):
-    """Protection rule: The last remaining faculty account cannot be removed or demoted."""
+def verify_last_faculty_protection(db: Session, target_user: models.User, new_role: str, actor: Optional[Any] = None):
+    """Protection rule: The last remaining faculty account cannot be removed or demoted (unless authorized by SuperAdmin)."""
+    if actor:
+        actor_role = actor.role if hasattr(actor, "role") else (actor.get("role") if isinstance(actor, dict) else "")
+        if normalize_role(actor_role) == "super_admin":
+            return
     if normalize_role(target_user.role) == "faculty" and normalize_role(new_role) != "faculty":
         faculty_count = db.query(models.User).filter(
             models.User.role.in_(["faculty", "super_admin"]),

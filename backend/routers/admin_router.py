@@ -394,7 +394,7 @@ def delete_faculty_account(
     current_user: Optional[models.User] = Depends(auth.get_optional_user)
 ):
     """
-    Deactivates or deletes a faculty member account.
+    Deactivates or deletes a faculty member account. Unconditionally allowed for SuperAdmin.
     """
     user = db.query(models.User).filter(
         models.User.id == faculty_id,
@@ -430,6 +430,234 @@ def delete_faculty_account(
         pass
 
     return {"status": "success", "message": f"Faculty account '{faculty_id}' successfully removed."}
+
+@router.put("/faculty/{faculty_id}", response_model=schemas.FacultyResponse)
+def update_faculty_account(
+    faculty_id: str,
+    payload: schemas.FacultyUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Allows SuperAdmin to modify and update all details of a Faculty Advisor account.
+    """
+    user = db.query(models.User).filter(
+        models.User.id == faculty_id,
+        models.User.role == "faculty"
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Faculty account '{faculty_id}' not found."
+        )
+
+    # Validate uniqueness if roll_no or email changed
+    if payload.roll_no and payload.roll_no.strip().upper() != user.roll_no:
+        clean_roll = payload.roll_no.strip().upper()
+        existing = db.query(models.User).filter(models.User.roll_no == clean_roll, models.User.id != faculty_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Roll number '{clean_roll}' already in use.")
+        user.roll_no = clean_roll
+
+    if payload.email and payload.email.strip().lower() != user.email:
+        clean_email = payload.email.strip().lower()
+        existing = db.query(models.User).filter(models.User.email == clean_email, models.User.id != faculty_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Email '{clean_email}' already in use.")
+        user.email = clean_email
+
+    if payload.name is not None and payload.name.strip():
+        user.name = payload.name.strip()
+    if payload.department is not None:
+        user.department = payload.department.strip()
+    if payload.post is not None:
+        user.post = payload.post.strip()
+        user.team_role = payload.post.strip()
+    if payload.phone is not None:
+        user.phone = payload.phone.strip()
+    if payload.status is not None:
+        user.status = payload.status.strip().lower()
+    if payload.password and payload.password.strip():
+        user.hashed_password = auth.get_password_hash(payload.password.strip())
+
+    user.updated_at = datetime.utcnow()
+
+    actor_id = current_user.id if current_user else "u_super_admin_sa01"
+    actor_name = current_user.name if current_user else "System SuperAdmin"
+
+    audit = models.AuditLog(
+        actor_id=actor_id,
+        actor_name=actor_name,
+        action="FACULTY_UPDATED",
+        target_type="user",
+        target_id=user.id,
+        target_name=user.name,
+        details=f"SuperAdmin updated details for Faculty {user.name} ({user.roll_no}).",
+    )
+    db.add(audit)
+    db.commit()
+    db.refresh(user)
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("FACULTY_UPDATED", {
+            "id": user.id,
+            "roll_no": user.roll_no,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "department": user.department,
+            "post": user.post,
+            "status": user.status,
+        })
+    except Exception:
+        pass
+
+    return user
+
+# ==========================================
+# SuperAdmin Universal User Management CRUD
+# ==========================================
+
+@router.get("/users", response_model=List[schemas.UserResponse])
+def get_admin_users(db: Session = Depends(get_db)):
+    """Returns all users across all roles."""
+    return db.query(models.User).order_by(models.User.created_at.desc()).all()
+
+@router.post("/users", response_model=schemas.UserResponse)
+def create_admin_user(
+    payload: schemas.UserAdminCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """Allows SuperAdmin to provision any user into any role."""
+    clean_roll = payload.roll_no.strip().upper()
+    clean_email = payload.email.strip().lower()
+
+    existing = db.query(models.User).filter(
+        (models.User.roll_no == clean_roll) | (models.User.email == clean_email)
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail=f"User with roll number '{clean_roll}' or email '{clean_email}' already exists.")
+
+    norm_role = auth.normalize_role(payload.role)
+    pwd = (payload.password or "GeoHub2026!").strip()
+    hashed = auth.get_password_hash(pwd)
+
+    new_user = models.User(
+        roll_no=clean_roll,
+        email=clean_email,
+        name=payload.name.strip(),
+        hashed_password=hashed,
+        role=norm_role,
+        post=payload.post,
+        department=payload.department or "Geoinformatics Engineering",
+        year_of_study=payload.year_of_study or "1st Year",
+        phone=payload.phone or "+91 94420 18820",
+        team=payload.team or "General",
+        team_role=payload.team_role or "Member",
+        is_volunteer=bool(payload.is_volunteer),
+        status="active"
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("MEMBER_ENROLLED", {"id": new_user.id, "name": new_user.name, "role": new_user.role})
+    except Exception:
+        pass
+
+    return schemas.UserResponse.from_orm(new_user)
+
+@router.put("/users/{user_id}", response_model=schemas.UserResponse)
+def update_admin_user(
+    user_id: str,
+    payload: schemas.UserAdminUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """Allows SuperAdmin to update any details of any user account."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    if payload.roll_no and payload.roll_no.strip().upper() != user.roll_no:
+        clean_roll = payload.roll_no.strip().upper()
+        existing = db.query(models.User).filter(models.User.roll_no == clean_roll, models.User.id != user_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Roll number '{clean_roll}' already in use.")
+        user.roll_no = clean_roll
+
+    if payload.email and payload.email.strip().lower() != user.email:
+        clean_email = payload.email.strip().lower()
+        existing = db.query(models.User).filter(models.User.email == clean_email, models.User.id != user_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail=f"Email '{clean_email}' already in use.")
+        user.email = clean_email
+
+    if payload.name is not None and payload.name.strip():
+        user.name = payload.name.strip()
+    if payload.role is not None:
+        user.role = auth.normalize_role(payload.role)
+    if payload.post is not None:
+        user.post = payload.post.strip()
+    if payload.department is not None:
+        user.department = payload.department.strip()
+    if payload.year_of_study is not None:
+        user.year_of_study = payload.year_of_study.strip()
+    if payload.phone is not None:
+        user.phone = payload.phone.strip()
+    if payload.team is not None:
+        user.team = payload.team.strip()
+    if payload.team_role is not None:
+        user.team_role = payload.team_role.strip()
+    if payload.is_volunteer is not None:
+        user.is_volunteer = payload.is_volunteer
+    if payload.status is not None:
+        user.status = payload.status.strip().lower()
+    if payload.password and payload.password.strip():
+        user.hashed_password = auth.get_password_hash(payload.password.strip())
+
+    user.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+
+    return schemas.UserResponse.from_orm(user)
+
+@router.delete("/users/{user_id}")
+def delete_admin_user(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """Allows SuperAdmin to delete any user account (except SA01)."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    if user.roll_no == "SA01" or user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Cannot delete root System SuperAdmin account.")
+
+    actor_id = current_user.id if current_user else "u_super_admin_sa01"
+    actor_name = current_user.name if current_user else "System SuperAdmin"
+
+    audit = models.AuditLog(
+        actor_id=actor_id,
+        actor_name=actor_name,
+        action="USER_DELETED",
+        target_type="user",
+        target_id=user.id,
+        target_name=user.name,
+        details=f"SuperAdmin deleted user account {user.name} ({user.roll_no}).",
+    )
+    db.add(audit)
+    db.delete(user)
+    db.commit()
+
+    return {"status": "success", "message": f"User '{user.name}' ({user_id}) successfully deleted."}
 
 @router.post("/purge-data")
 def purge_platform_data(

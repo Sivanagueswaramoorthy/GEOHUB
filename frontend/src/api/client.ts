@@ -199,6 +199,19 @@ class ApiClient {
     });
   }
 
+  public async updateEvent(eventId: string, eventData: any) {
+    return await this.request<any>(`/events/${encodeURIComponent(eventId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(eventData),
+    });
+  }
+
+  public async deleteEvent(eventId: string) {
+    return await this.request<{ status: string; message: string }>(`/events/${encodeURIComponent(eventId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   public async updateEventStatus(eventId: string, newStatus: string) {
     return await this.request<any>(`/events/${eventId}/status?status_in=${encodeURIComponent(newStatus)}`, {
       method: 'PATCH',
@@ -270,6 +283,19 @@ class ApiClient {
     });
   }
 
+  public async updateTask(taskId: string, taskData: any) {
+    return await this.request<any>(`/tasks/${encodeURIComponent(taskId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(taskData),
+    });
+  }
+
+  public async deleteTask(taskId: string) {
+    return await this.request<{ status: string; message: string }>(`/tasks/${encodeURIComponent(taskId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   public async updateTaskStatus(taskId: string, status: string) {
     return await this.request<any>(`/tasks/${taskId}/status?status=${encodeURIComponent(status)}`, {
       method: 'PATCH',
@@ -329,6 +355,12 @@ class ApiClient {
     });
   }
 
+  public async deleteBudgetRequest(requestId: string) {
+    return await this.request<{ status: string; message: string }>(`/finance/budget-requests/${encodeURIComponent(requestId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   public async getExpenses() {
     return await this.request<any[]>('/finance/expenses');
   }
@@ -337,6 +369,19 @@ class ApiClient {
     return await this.request<any>('/finance/expenses', {
       method: 'POST',
       body: JSON.stringify(expenseData),
+    });
+  }
+
+  public async updateExpense(expenseId: string, expenseData: any) {
+    return await this.request<any>(`/finance/expenses/${encodeURIComponent(expenseId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(expenseData),
+    });
+  }
+
+  public async deleteExpense(expenseId: string) {
+    return await this.request<{ status: string; message: string }>(`/finance/expenses/${encodeURIComponent(expenseId)}`, {
+      method: 'DELETE',
     });
   }
 
@@ -434,8 +479,76 @@ class ApiClient {
     });
   }
 
+  public async updateAdminFaculty(
+    facultyId: string,
+    payload: {
+      name?: string;
+      roll_no?: string;
+      email?: string;
+      department?: string;
+      post?: string;
+      phone?: string;
+      status?: string;
+      password?: string;
+    }
+  ) {
+    return await this.request<any>(`/admin/faculty/${encodeURIComponent(facultyId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   public async deleteAdminFaculty(facultyId: string) {
     return await this.request<{ status: string; message: string }>(`/admin/faculty/${encodeURIComponent(facultyId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // SuperAdmin User Management (Scholars & Officers)
+  // ==========================================
+  public async getAdminUsers() {
+    return await this.request<any[]>('/admin/users');
+  }
+
+  public async createAdminUser(payload: {
+    name: string;
+    roll_no: string;
+    email: string;
+    role?: string;
+    department?: string;
+    post?: string;
+    phone?: string;
+    password?: string;
+  }) {
+    return await this.request<any>('/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async updateAdminUser(
+    userId: string,
+    payload: {
+      name?: string;
+      roll_no?: string;
+      email?: string;
+      role?: string;
+      department?: string;
+      post?: string;
+      phone?: string;
+      status?: string;
+      password?: string;
+    }
+  ) {
+    return await this.request<any>(`/admin/users/${encodeURIComponent(userId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteAdminUser(userId: string) {
+    return await this.request<{ status: string; message: string }>(`/admin/users/${encodeURIComponent(userId)}`, {
       method: 'DELETE',
     });
   }

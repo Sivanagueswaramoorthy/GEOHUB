@@ -11,8 +11,8 @@ android {
         applicationId 'com.club.geohub'
         minSdk 24
         targetSdk 34
-        versionCode 28
-        versionName '1.6.10'
+        versionCode 29
+        versionName '1.6.11'
     }
 
     buildTypes {

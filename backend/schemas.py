@@ -162,6 +162,14 @@ class TaskCreate(BaseModel):
     assigned_user_ids: Optional[List[str]] = []
     deadline: datetime
 
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    team_id: Optional[str] = None
+    assigned_user_ids: Optional[List[str]] = None
+    deadline: Optional[datetime] = None
+    status: Optional[str] = None
+
 class TaskResponse(BaseModel):
     id: str
     title: str
@@ -275,6 +283,15 @@ class ExpenseCreate(BaseModel):
     date: Optional[datetime] = None
     receipt_url: Optional[str] = None
 
+class ExpenseUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
+    amount: Optional[float] = None
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    date: Optional[datetime] = None
+    receipt_url: Optional[str] = None
+
 class ExpenseResponse(BaseModel):
     id: str
     title: str
@@ -329,4 +346,44 @@ class FacultyResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class FacultyUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    roll_no: Optional[str] = None
+    email: Optional[str] = None
+    department: Optional[str] = None
+    post: Optional[str] = None
+    phone: Optional[str] = None
+    status: Optional[str] = None
+    password: Optional[str] = None
+
+# SuperAdmin Universal User Management Schemas
+class UserAdminCreateRequest(BaseModel):
+    name: str
+    roll_no: str
+    email: str
+    role: str = "student"
+    post: Optional[str] = "Student Member"
+    department: Optional[str] = "Geoinformatics Engineering"
+    year_of_study: Optional[str] = "1st Year"
+    phone: Optional[str] = None
+    team: Optional[str] = "General"
+    team_role: Optional[str] = "Member"
+    is_volunteer: Optional[bool] = False
+    password: Optional[str] = "GeoHub2026!"
+
+class UserAdminUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    roll_no: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    post: Optional[str] = None
+    department: Optional[str] = None
+    year_of_study: Optional[str] = None
+    phone: Optional[str] = None
+    team: Optional[str] = None
+    team_role: Optional[str] = None
+    is_volunteer: Optional[bool] = None
+    status: Optional[str] = None
+    password: Optional[str] = None
 

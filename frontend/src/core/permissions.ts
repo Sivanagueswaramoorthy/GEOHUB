@@ -384,6 +384,11 @@ export const hasPermission = (
 ): boolean => {
   if (!user) return false;
 
+  // Layer 0: SuperAdmin master bypass
+  if (normalizeRole(user.role) === 'super_admin') {
+    return true;
+  }
+
   // Layer 1: Long-lived Role
   const rolePerms = getRolePermissions(user.role || 'student');
   if (rolePerms[flag]) {
@@ -603,8 +608,14 @@ export const canAccessRoute = (
   role: UserRole | string
 ): { allowed: boolean; redirect?: string; message?: string } => {
   const normalizedRoute = route.toLowerCase().replace(/^[#/]+/, '');
-  const perms = getRolePermissions(role);
   const normRole = normalizeRole(role);
+
+  // SuperAdmin has unrestricted access to all routes
+  if (normRole === 'super_admin') {
+    return { allowed: true };
+  }
+
+  const perms = getRolePermissions(role);
 
   // Settings: Faculty only
   if (normalizedRoute === 'settings') {
@@ -667,13 +678,11 @@ export const canAccessRoute = (
     normalizedRoute === 'role_credentials' ||
     normalizedRoute === 'super_admin_governance'
   ) {
-    if (normRole !== 'super_admin') {
-      return {
-        allowed: false,
-        redirect: 'home',
-        message: "You don't have access - SuperAdmin clearance required",
-      };
-    }
+    return {
+      allowed: false,
+      redirect: 'home',
+      message: "You don't have access - SuperAdmin clearance required",
+    };
   }
 
   // Finance & Ledger: faculty, treasurer, coordinator
@@ -1034,8 +1043,31 @@ export const MODULE_ACCESS: Record<string, Record<ModuleId, AccessLevel>> = {
   },
 };
 
-// Aliases for legacy role strings
-MODULE_ACCESS.super_admin = MODULE_ACCESS.faculty;
+// Unrestricted access for super_admin
+MODULE_ACCESS.super_admin = {
+  squads: 'write',
+  member_directory: 'write',
+  attendance_desk: 'write',
+  duties_stations: 'write',
+  lead_activity_review: 'write',
+  event_permissions: 'write',
+  treasury: 'write',
+  expenditure_ledger: 'write',
+  add_expense: 'write',
+  financial_audit_export: 'write',
+  release_calendar: 'write',
+  event_media_upload: 'write',
+  bulletins_daily_report: 'write',
+  studio_templates: 'write',
+  pre_event_upload: 'write',
+  meetings_mom: 'write',
+  daily_news_bulletins: 'write',
+  attendance_operation: 'write',
+  squad_leads: 'write',
+  approvals: 'write',
+  duties_assignment: 'write',
+  campaign_post: 'write',
+};
 MODULE_ACCESS.admin = MODULE_ACCESS.coordinator;
 MODULE_ACCESS.social_media = MODULE_ACCESS.promotion;
 MODULE_ACCESS.member = MODULE_ACCESS.student;
@@ -1050,6 +1082,7 @@ export const can = (
   action: 'approve' | 'grant'
 ): boolean => {
   if (!role) return false;
+  if (role.toLowerCase().trim() === 'super_admin') return true;
   const hubRole = normalizeHubRole(role);
 
   if (action === 'approve') {
@@ -1181,6 +1214,7 @@ export const moduleAccess = (
   event?: EventModel | null
 ): AccessLevel => {
   if (!user) return 'hidden';
+  if (user.role && user.role.toLowerCase().trim() === 'super_admin') return 'write';
 
   const hubRole = normalizeHubRole(user.role);
   let bestAccess: AccessLevel = MODULE_ACCESS[hubRole]?.[moduleId] || 'hidden';

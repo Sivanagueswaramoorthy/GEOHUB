@@ -1,12 +1,12 @@
 {
-  "version": "1.6.10",
-  "version_code": 28,
+  "version": "1.6.11",
+  "version_code": 29,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Purge all data, isolate SuperAdmin, enable faculty provisioning, and remove Live badges and debug sync cards",
+  "release_notes": "SuperAdmin full operational authority, faculty details & password editing, unconditional faculty deletion, and entity CRUD suite",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6856052,
+  "file_size_bytes": 6856984,
   "file_size_mb": "6.54 MB",
-  "sha256": "70DFBDFBCEE089587F29DA88B614F902137D4667D95B0766BF8A5BB44ADDC4C8"
+  "sha256": "863F6E083C62B747F2A8E8CA46A631D9BA4E468A046B4A4E8B43A93CE8C07624"
 }

@@ -70,8 +70,8 @@ def approve_budget_request(
     if not budget_req:
         raise HTTPException(status_code=404, detail="Budget request not found.")
 
-    # Defense in depth: Cannot approve self-submitted request
-    if budget_req.requested_by == faculty.id:
+    # Defense in depth: Cannot approve self-submitted request unless super_admin
+    if budget_req.requested_by == faculty.id and auth.normalize_role(faculty.role) != "super_admin":
         raise HTTPException(
             status_code=400,
             detail="Protection Rule: Cannot approve your own budget request."
@@ -163,3 +163,61 @@ def create_expense(
     )
 
     return new_exp
+
+@router.put("/expenses/{expense_id}", response_model=schemas.ExpenseResponse)
+def update_expense(
+    expense_id: str,
+    exp_in: schemas.ExpenseUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    exp = db.query(models.Expense).filter(models.Expense.id == expense_id).first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Expense not found.")
+
+    if exp_in.title is not None:
+        exp.title = exp_in.title
+    if exp_in.category is not None:
+        exp.category = exp_in.category
+    if exp_in.amount is not None:
+        exp.amount = exp_in.amount
+    if exp_in.event_id is not None:
+        exp.event_id = exp_in.event_id
+    if exp_in.event_title is not None:
+        exp.event_title = exp_in.event_title
+    if exp_in.date is not None:
+        exp.date = exp_in.date
+    if exp_in.receipt_url is not None:
+        exp.receipt_url = exp_in.receipt_url
+
+    db.commit()
+    db.refresh(exp)
+    return exp
+
+@router.delete("/expenses/{expense_id}")
+def delete_expense(
+    expense_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    exp = db.query(models.Expense).filter(models.Expense.id == expense_id).first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Expense not found.")
+
+    db.delete(exp)
+    db.commit()
+    return {"status": "success", "message": f"Expense '{expense_id}' successfully deleted."}
+
+@router.delete("/budget-requests/{request_id}")
+def delete_budget_request(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    req = db.query(models.BudgetRequest).filter(models.BudgetRequest.id == request_id).first()
+    if not req:
+        raise HTTPException(status_code=404, detail="Budget request not found.")
+
+    db.delete(req)
+    db.commit()
+    return {"status": "success", "message": f"Budget request '{request_id}' successfully deleted."}

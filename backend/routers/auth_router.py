@@ -178,7 +178,7 @@ def set_user_role(
     auth.verify_no_self_escalation(actor, target_user.id)
 
     # Protection Rule 2: Last faculty protection
-    auth.verify_last_faculty_protection(db, target_user, req.role)
+    auth.verify_last_faculty_protection(db, target_user, req.role, actor=actor)
 
     before_role = target_user.role
     before_post = target_user.post
