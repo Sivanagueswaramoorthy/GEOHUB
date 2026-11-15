@@ -138,3 +138,29 @@ def serve_frontend():
         "app": settings.PROJECT_NAME,
         "docs_url": "/docs",
     }
+
+@app.get("/{full_path:path}")
+def serve_spa_fallback(full_path: str):
+    """
+    SPA catch-all route: serves index.html for React client-side routing on any device,
+    avoiding 404 errors when reloading pages or navigating directly to subroutes.
+    """
+    # Exclude API endpoints and static mounted directories
+    if (
+        full_path.startswith("api")
+        or full_path.startswith("static")
+        or full_path.startswith("downloads")
+        or full_path.startswith("uploads")
+        or full_path.startswith("docs")
+        or full_path.startswith("redoc")
+        or full_path == "openapi.json"
+        or "." in full_path.split("/")[-1]
+    ):
+        raise HTTPException(status_code=404, detail="Resource not found.")
+
+    index_file = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(index_file) and os.path.exists(FRONTEND_DIST):
+        index_file = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    raise HTTPException(status_code=404, detail="SPA index.html not found.")

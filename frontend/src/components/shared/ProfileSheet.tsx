@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Bell, Repeat, Smartphone, Monitor, LogOut, Settings } from 'lucide-react';
+import { User, Bell, Repeat, Smartphone, Monitor, LogOut, Settings, Radio } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserModel } from '../../types';
 import { BottomSheet } from './BottomSheet';
@@ -50,6 +50,8 @@ export const ProfileSheet: React.FC<ProfileSheetProps> = ({
     setIsRoleSwitcherOpen,
     logout,
     updateInfo,
+    syncStatus,
+    setIsServerModalOpen,
   } = useApp();
 
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -152,6 +154,34 @@ export const ProfileSheet: React.FC<ProfileSheetProps> = ({
                 if (typeof window !== 'undefined') {
                   window.location.hash = '#profile?tab=settings';
                 }
+              }}
+            />
+
+            {/* Server Connection & Live Multi-Device Sync */}
+            <ListRow
+              icon={<Radio size={20} strokeWidth={1.75} className="lucide text-[#163832]" />}
+              title="Server & Device Sync"
+              subtitle={
+                syncStatus === 'connected'
+                  ? 'Real-Time Sync Connected'
+                  : syncStatus === 'syncing'
+                  ? 'Synchronizing data...'
+                  : 'Cloud Disconnected • Tap to configure'
+              }
+              meta={
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    syncStatus === 'connected'
+                      ? 'bg-emerald-500'
+                      : syncStatus === 'syncing'
+                      ? 'bg-amber-500 animate-spin'
+                      : 'bg-rose-500'
+                  }`}
+                />
+              }
+              onClick={() => {
+                onClose();
+                setIsServerModalOpen(true);
               }}
             />
 

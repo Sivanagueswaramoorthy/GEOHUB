@@ -1,7 +1,7 @@
 import asyncio
 import json
 from datetime import datetime
-from typing import Set
+from typing import Set, Optional
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
@@ -9,11 +9,13 @@ router = APIRouter(prefix="/sync", tags=["Sync"])
 
 # In-memory pub/sub registry for live multi-device synchronization
 _subscribers: Set[asyncio.Queue] = set()
+_main_loop: Optional[asyncio.AbstractEventLoop] = None
 
 def broadcast_sync_event(event_type: str, data: dict):
     """
-    Broadcasts a mutation event (e.g. EVENT_CREATED, EVENT_UPDATED, ATTENDANCE_MARKED)
+    Broadcasts a mutation event (e.g. EVENT_CREATED, TASK_UPDATED, ATTENDANCE_MARKED)
     to all active mobile and desktop clients subscribed to the SSE stream.
+    Thread-safe: safely puts messages into asyncio queues from AnyIO threadpool worker threads.
     """
     if not _subscribers:
         return
@@ -27,7 +29,10 @@ def broadcast_sync_event(event_type: str, data: dict):
 
     for queue in list(_subscribers):
         try:
-            queue.put_nowait(msg)
+            if _main_loop and _main_loop.is_running():
+                _main_loop.call_soon_threadsafe(queue.put_nowait, msg)
+            else:
+                queue.put_nowait(msg)
         except Exception:
             # Handle disconnected or full queues safely
             pass
@@ -51,6 +56,9 @@ async def sync_stream(request: Request):
     Mobile devices connect to this stream to receive instant updates when another phone
     adds an event, marks attendance, or updates operational records.
     """
+    global _main_loop
+    _main_loop = asyncio.get_running_loop()
+
     queue: asyncio.Queue = asyncio.Queue(maxsize=100)
     _subscribers.add(queue)
 
@@ -70,8 +78,8 @@ async def sync_stream(request: Request):
                     break
 
                 try:
-                    # Wait up to 15s for an event, then send keep-alive heartbeat
-                    msg = await asyncio.wait_for(queue.get(), timeout=15.0)
+                    # Wait up to 10s for an event, then send keep-alive heartbeat
+                    msg = await asyncio.wait_for(queue.get(), timeout=10.0)
                     yield msg
                 except asyncio.TimeoutError:
                     # Heartbeat comment to keep carrier / cellular connections active
@@ -88,6 +96,8 @@ async def sync_stream(request: Request):
             "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
         }
     )
 

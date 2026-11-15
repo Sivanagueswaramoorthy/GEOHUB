@@ -181,6 +181,7 @@ export interface EventModel {
   actionLogs?: EventActionLog[];
   budget: number;
   createdBy: string;
+  attendanceCount?: number;
   qrToken?: string;
   googleFormUrl?: string;
   volunteerAssignments?: VolunteerAssignments;

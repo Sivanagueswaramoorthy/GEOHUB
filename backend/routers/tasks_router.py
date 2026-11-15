@@ -75,6 +75,17 @@ def create_task(
     db.commit()
     db.refresh(new_task)
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("TASK_CREATED", {
+            "id": new_task.id,
+            "title": new_task.title,
+            "status": new_task.status,
+            "team_id": new_task.team_id,
+        })
+    except Exception:
+        pass
+
     return schemas.TaskResponse(
         id=new_task.id,
         title=new_task.title,
@@ -101,6 +112,18 @@ def update_task_status(
 
     task.status = status
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("TASK_UPDATED", {
+            "id": task.id,
+            "title": task.title,
+            "status": task.status,
+            "team_id": task.team_id,
+        })
+    except Exception:
+        pass
+
     return {"success": True, "status": status}
 
 @router.post("/{task_id}/proof")
@@ -121,6 +144,17 @@ def submit_proof(
     task.proof_urls = json.dumps(proofs)
     task.status = "done"  # Auto mark completed upon proof submission
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("TASK_UPDATED", {
+            "id": task.id,
+            "title": task.title,
+            "status": task.status,
+            "team_id": task.team_id,
+        })
+    except Exception:
+        pass
 
     return {"success": True, "proof_urls": proofs}
 
@@ -145,9 +179,22 @@ def update_task(
         task.assigned_user_ids = json.dumps(task_in.assigned_user_ids)
     if task_in.deadline is not None:
         task.deadline = task_in.deadline
+    if task_in.status is not None:
+        task.status = task_in.status
 
     db.commit()
     db.refresh(task)
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("TASK_UPDATED", {
+            "id": task.id,
+            "title": task.title,
+            "status": task.status,
+            "team_id": task.team_id,
+        })
+    except Exception:
+        pass
 
     return schemas.TaskResponse(
         id=task.id,
@@ -174,5 +221,11 @@ def delete_task(
 
     db.delete(task)
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("TASK_DELETED", {"id": task_id})
+    except Exception:
+        pass
 
     return {"status": "success", "message": f"Task '{task_id}' successfully deleted."}

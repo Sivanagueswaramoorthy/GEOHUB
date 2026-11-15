@@ -657,6 +657,12 @@ def delete_admin_user(
     db.delete(user)
     db.commit()
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("MEMBER_DELETED", {"id": user_id, "name": user.name})
+    except Exception:
+        pass
+
     return {"status": "success", "message": f"User '{user.name}' ({user_id}) successfully deleted."}
 
 @router.post("/purge-data")
@@ -670,5 +676,12 @@ def purge_platform_data(
     """
     from purge_all_data import run_purge
     res = run_purge()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("PLATFORM_PURGED", {"timestamp": datetime.utcnow().isoformat()})
+    except Exception:
+        pass
+
     return {"status": "success", "message": "All dummy records and user accounts purged successfully.", "summary": res}
 

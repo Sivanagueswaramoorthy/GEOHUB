@@ -146,7 +146,7 @@ def create_event(
         details="Event created in draft status"
     )
 
-    return schemas.EventResponse(
+    resp = schemas.EventResponse(
         id=new_event.id,
         title=new_event.title,
         type=new_event.type,

@@ -7,6 +7,7 @@ import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
 import { UpdateAvailableModal } from './components/modals/UpdateAvailableModal';
+import { ServerConnectionModal } from './components/modals/ServerConnectionModal';
 import { checkForAppUpdate, registerDeviceTelemetry, AppVersionManifest } from './core/versionChecker';
 
 // Five Primary Screens
@@ -363,6 +364,16 @@ const GlobalUpdateModal: React.FC = () => {
   );
 };
 
+const GlobalServerModal: React.FC = () => {
+  const { isServerModalOpen, setIsServerModalOpen } = useApp();
+  return (
+    <ServerConnectionModal
+      isOpen={isServerModalOpen}
+      onClose={() => setIsServerModalOpen(false)}
+    />
+  );
+};
+
 const AppContentWithSplash: React.FC = () => {
   const { checkForUpdates } = useApp();
   const [showSplash, setShowSplash] = React.useState(() => {
@@ -410,6 +421,7 @@ const AppContentWithSplash: React.FC = () => {
         />
       )}
       <GlobalUpdateModal />
+      <GlobalServerModal />
       <MainAppContent />
     </>
   );

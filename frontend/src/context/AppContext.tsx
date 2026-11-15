@@ -104,6 +104,13 @@ interface AppContextType {
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   hideToast: () => void;
 
+  // Server Diagnostics & Connection Switcher
+  isServerModalOpen: boolean;
+  setIsServerModalOpen: (open: boolean) => void;
+  serverUrl: string;
+  setServerUrl: (url: string) => void;
+  testServerConnection: () => Promise<{ ok: boolean; latencyMs?: number; message?: string }>;
+
   // OTA Push Updates
   updateInfo: AppVersionManifest | null;
   isUpdateModalOpen: boolean;
@@ -485,6 +492,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+  const [isServerModalOpen, setIsServerModalOpen] = useState<boolean>(false);
+  const [serverUrl, setServerUrlState] = useState<string>(() => apiClient.getBaseUrl());
 
   // Live Backend Data Synchronization with TiDB Cloud FastAPI
   const syncWithBackend = useCallback(async () => {
@@ -504,15 +513,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           endDate: e.date_time || new Date().toISOString(),
           status: e.status || 'approved',
           capacity: 350,
-          registeredUserIds: [],
-          volunteerIds: e.volunteer_user_ids || [],
-          assignedScannerUserIds: e.assigned_scanner_user_ids || [],
+          registeredUserIds: Array.isArray(e.registered_user_ids) ? e.registered_user_ids : [],
+          volunteerIds: Array.isArray(e.volunteer_user_ids) ? e.volunteer_user_ids : [],
+          assignedScannerUserIds: Array.isArray(e.assigned_scanner_user_ids) ? e.assigned_scanner_user_ids : [],
           posterUrl: e.poster_url || undefined,
           geofenceEnabled: Boolean(e.geofence_enabled),
           geofenceRadiusMeters: e.geofence_radius_meters || 100,
           cancellationReason: e.cancellation_reason || undefined,
           budget: Number(e.budget || 0),
           createdBy: e.created_by || 'SA01',
+          attendanceCount: Number(e.attendance_count || 0),
         }));
         setEvents(mappedEvents);
       }
@@ -642,162 +652,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('✓ Synchronized with cloud server', 'success');
   }, [syncWithBackend, showToast]);
 
+  const setServerUrl = useCallback((newUrl: string) => {
+    apiClient.setBaseUrl(newUrl);
+    setServerUrlState(apiClient.getBaseUrl());
+    syncWithBackend();
+    showToast('Server connection URL updated', 'info');
+  }, [syncWithBackend, showToast]);
+
+  const testServerConnection = useCallback(async () => {
+    return await apiClient.testServerHealth();
+  }, []);
+
   // 1. Real-Time Multi-Device SSE Event Stream
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
+    if (typeof window === 'undefined') return;
 
-    let eventSource: EventSource | null = null;
+    let unsubscribe: (() => void) | null = null;
     let reconnectTimeout: any = null;
     let isMounted = true;
 
     const connectSSE = () => {
       try {
-        const streamUrl = apiClient.getSyncStreamUrl();
-        eventSource = new EventSource(streamUrl);
-
-        eventSource.onopen = () => {
-          if (!isMounted) return;
-          setSyncStatus('connected');
-          setLastSyncedAt(new Date());
-        };
-
-        eventSource.addEventListener('connected', () => {
-          if (!isMounted) return;
-          setSyncStatus('connected');
-          setLastSyncedAt(new Date());
-        });
-
-        eventSource.addEventListener('mutation', (e: MessageEvent) => {
-          if (!isMounted) return;
-          try {
-            const payload = JSON.parse(e.data);
+        unsubscribe = apiClient.subscribeToSyncStream(
+          (payload) => {
+            if (!isMounted) return;
             const { type, data } = payload;
 
-            if (type === 'EVENT_CREATED' && data) {
-              setEvents((prev) => {
-                if (prev.some((ev) => ev.id === data.id)) return prev;
-                showToast(`✓ New event synchronized: ${data.title}`, 'info');
-                const mapped: EventModel = {
-                  id: data.id,
-                  title: data.title,
-                  description: data.description || '',
-                  category: data.type || 'Academic',
-                  venue: data.venue || 'Campus Auditorium',
-                  startDate: data.date_time || new Date().toISOString(),
-                  endDate: data.date_time || new Date().toISOString(),
-                  status: data.status || 'approved',
-                  capacity: 350,
-                  registeredUserIds: [],
-                  volunteerIds: data.volunteer_user_ids || [],
-                  assignedScannerUserIds: data.assigned_scanner_user_ids || [],
-                  posterUrl: data.poster_url || undefined,
-                  geofenceEnabled: Boolean(data.geofence_enabled),
-                  geofenceRadiusMeters: data.geofence_radius_meters || 100,
-                  cancellationReason: data.cancellation_reason || undefined,
-                  budget: Number(data.budget || 0),
-                  createdBy: data.created_by || 'u_admin_02',
-                };
-                return [mapped, ...prev];
-              });
+            if (type === 'SYNC_CONNECTED') {
+              setSyncStatus('connected');
               setLastSyncedAt(new Date());
-            } else if (type === 'EVENT_UPDATED' && data) {
-              setEvents((prev) =>
-                prev.map((ev) =>
-                  ev.id === data.id
-                    ? {
-                        ...ev,
-                        status: data.status || ev.status,
-                        cancellationReason: data.cancellation_reason || ev.cancellationReason,
-                      }
-                    : ev
-                )
-              );
-              setLastSyncedAt(new Date());
-            } else if (type === 'EVENT_CANCELLED' && data) {
-              setEvents((prev) =>
-                prev.map((ev) =>
-                  ev.id === data.id
-                    ? {
-                        ...ev,
-                        status: 'cancelled',
-                        cancellationReason: data.cancellation_reason || 'Event cancelled by committee',
-                      }
-                    : ev
-                )
-              );
-              showToast(`Event cancelled: ${data.title}`, 'info');
-              setLastSyncedAt(new Date());
-            } else if (type === 'MEMBER_ENROLLED' && data) {
-              setUsers((prev) => {
-                if (
-                  prev.some(
-                    (u) =>
-                      u.uid === data.id ||
-                      (u.rollNo && u.rollNo.toUpperCase() === (data.roll_no || '').toUpperCase())
-                  )
-                ) {
-                  return prev;
-                }
-                showToast(`✓ New scholar enrolled: ${data.name} (${data.roll_no})`, 'info');
-                const mappedUser: UserModel = {
-                  uid: data.id,
-                  rollNo: data.roll_no,
-                  name: data.name,
-                  email: data.email,
-                  role: data.role || 'student',
-                  department: data.department || 'Geoinformatics Engineering',
-                  yearOfStudy: data.year_of_study || '3rd Year',
-                  team: data.team || 'General',
-                  teamRole: 'Member',
-                  isVolunteer: false,
-                  status: 'active',
-                  squadMemberships: [],
-                };
-                return [...prev, mappedUser];
-              });
-              setLastSyncedAt(new Date());
-            } else if (type === 'ATTENDANCE_MARKED' && data) {
-              setAttendance((prev) => {
-                if (prev.some((a) => a.id === data.id)) return prev;
-                return [
-                  {
-                    id: data.id,
-                    eventId: data.event_id,
-                    eventTitle: data.event_title,
-                    userId: data.attendee_id,
-                    userName: data.attendee_name,
-                    userEmail: data.attendee_email || `${data.attendee_id}@college.edu`,
-                    checkInTime: data.check_in_time,
-                    status: 'verified',
-                  },
-                  ...prev,
-                ];
-              });
-              setEvents((prev) =>
-                prev.map((ev) =>
-                  ev.id === data.event_id
-                    ? { ...ev, attendanceCount: data.attendance_count }
-                    : ev
-                )
-              );
-              setLastSyncedAt(new Date());
+              return;
             }
-          } catch (err) {
-            console.warn('[SSE] Failed to parse live sync payload:', err);
-          }
-        });
 
-        eventSource.onerror = () => {
-          if (!isMounted) return;
-          setSyncStatus('offline');
-          eventSource?.close();
-          // Auto-reconnect after 6 seconds
-          reconnectTimeout = setTimeout(connectSSE, 6000);
-        };
+            if (type === 'PLATFORM_PURGED') {
+              try {
+                localStorage.removeItem('geohub_store_events');
+                localStorage.removeItem('geohub_store_tasks');
+                localStorage.removeItem('geohub_store_expenses');
+                localStorage.removeItem('geohub_store_budgetRequests');
+                localStorage.removeItem('geohub_store_auditLogs');
+              } catch {}
+              setEvents([]);
+              setTasks([]);
+              setExpenses([]);
+              setBudgetRequests([]);
+              setAuditLogs([]);
+              syncWithBackend();
+              showToast('Platform clean slate synchronized across devices', 'info');
+              return;
+            }
+
+            if (type === 'EVENT_CREATED' && data?.title) {
+              showToast(`✓ New event synchronized: ${data.title}`, 'info');
+            } else if (type === 'EVENT_DELETED' && data?.id) {
+              setEvents((prev) => prev.filter((ev) => ev.id !== data.id));
+              showToast('Event removed by administrator', 'info');
+            } else if (type === 'EVENT_CANCELLED' && data?.title) {
+              showToast(`Event cancelled: ${data.title}`, 'info');
+            } else if (type === 'MEMBER_ENROLLED' && data?.name) {
+              showToast(`✓ New scholar enrolled: ${data.name}`, 'info');
+            } else if (type === 'FACULTY_PROVISIONED' && data?.name) {
+              showToast(`✓ Faculty Advisor provisioned: ${data.name}`, 'info');
+            } else if (type === 'FACULTY_DELETED') {
+              showToast('Faculty account updated', 'info');
+            }
+
+            // Always synchronize latest full authoritative state from backend
+            syncWithBackend();
+            setLastSyncedAt(new Date());
+            setSyncStatus('connected');
+          },
+          () => {
+            if (!isMounted) return;
+            setSyncStatus('offline');
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+            reconnectTimeout = setTimeout(connectSSE, 5000);
+          }
+        );
+        setSyncStatus('connected');
       } catch {
         if (isMounted) {
           setSyncStatus('offline');
-          reconnectTimeout = setTimeout(connectSSE, 10000);
+          reconnectTimeout = setTimeout(connectSSE, 6000);
         }
       }
     };
@@ -807,9 +743,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => {
       isMounted = false;
       if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      if (eventSource) eventSource.close();
+      if (unsubscribe) unsubscribe();
     };
-  }, [showToast]);
+  }, [syncWithBackend, showToast]);
 
   // 2. Adaptive Polling & On-Focus Lifecycle Synchronization
   useEffect(() => {
@@ -2154,6 +2090,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toast,
         showToast,
         hideToast,
+        isServerModalOpen,
+        setIsServerModalOpen,
+        serverUrl,
+        setServerUrl,
+        testServerConnection,
         updateInfo,
         isUpdateModalOpen,
         setIsUpdateModalOpen,

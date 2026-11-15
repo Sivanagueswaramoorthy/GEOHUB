@@ -4,7 +4,7 @@
  * automatic token management, and resilient fallback across all 17 operations.
  */
 
-export const DEFAULT_CLOUD_API = 'https://geohub-backend.onrender.com/api';
+export const DEFAULT_CLOUD_API = 'https://roping-udder-unsaid.ngrok-free.dev/api';
 
 export function resolveApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
@@ -27,7 +27,7 @@ export function resolveApiBaseUrl(): string {
 
   if (isApk) {
     // In APK, relative '/api' resolves to Android local assets which 404s.
-    // Fall back to default cloud API.
+    // Fall back to active default cloud API tunnel.
     return DEFAULT_CLOUD_API;
   }
 
@@ -68,7 +68,13 @@ class ApiClient {
       const testUrl = baseUrl.endsWith('/api')
         ? `${baseUrl.slice(0, -4)}/health`
         : `${baseUrl}/health`;
-      const res = await fetch(testUrl, { method: 'GET', cache: 'no-store' });
+      const res = await fetch(testUrl, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+        },
+      });
       const latencyMs = Math.round(performance.now() - startTime);
       return { ok: res.ok, latencyMs, message: res.ok ? 'Connected' : `HTTP ${res.status}` };
     } catch (e: any) {
@@ -101,6 +107,7 @@ class ApiClient {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...((options.headers as Record<string, string>) || {}),
     };
 
@@ -254,6 +261,85 @@ class ApiClient {
     const baseUrl = this.getBaseUrl();
     const clean = baseUrl.startsWith('/') ? baseUrl : baseUrl.replace(/\/+$/, '');
     return `${clean}/sync/stream`;
+  }
+
+  /**
+   * Resilient, multi-device SSE sync stream subscriber.
+   * Utilizes fetch ReadableStream with 'ngrok-skip-browser-warning' header
+   * to ensure tunnel and proxy compatibility across all mobile devices and browsers.
+   */
+  public subscribeToSyncStream(
+    onMessage: (event: { type: string; data: any; raw?: string }) => void,
+    onError?: (err: any) => void
+  ): () => void {
+    const streamUrl = this.getSyncStreamUrl();
+    const controller = new AbortController();
+    let isAborted = false;
+
+    const readStream = async () => {
+      try {
+        const response = await fetch(streamUrl, {
+          method: 'GET',
+          headers: {
+            Accept: 'text/event-stream',
+            'ngrok-skip-browser-warning': 'true',
+            'Cache-Control': 'no-cache',
+          },
+          signal: controller.signal,
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(`SSE stream connection failed: HTTP ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (!isAborted) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const messages = buffer.split('\n\n');
+          buffer = messages.pop() || '';
+
+          for (const rawMsg of messages) {
+            const lines = rawMsg.split('\n');
+            let eventType = 'message';
+            let dataStr = '';
+
+            for (const line of lines) {
+              if (line.startsWith('event:')) {
+                eventType = line.slice(6).trim();
+              } else if (line.startsWith('data:')) {
+                dataStr = line.slice(5).trim();
+              }
+            }
+
+            if (dataStr) {
+              try {
+                const parsed = JSON.parse(dataStr);
+                onMessage(parsed);
+              } catch {
+                onMessage({ type: eventType, data: dataStr, raw: dataStr });
+              }
+            }
+          }
+        }
+      } catch (err: any) {
+        if (!isAborted) {
+          onError?.(err);
+        }
+      }
+    };
+
+    readStream();
+
+    return () => {
+      isAborted = true;
+      controller.abort();
+    };
   }
 
   // ==========================================

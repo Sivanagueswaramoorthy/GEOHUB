@@ -55,6 +55,16 @@ def submit_budget_request(
         details=f"Submitted budget request for ₹{req.requested_amount:.2f} for {req.team_name}. Reason: {req.reason}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("BUDGET_REQUEST_SUBMITTED", {
+            "id": budget_req.id,
+            "team_name": budget_req.team_name,
+            "amount": budget_req.requested_amount,
+        })
+    except Exception:
+        pass
+
     return budget_req
 
 @router.post("/budget-requests/{request_id}/approve", response_model=schemas.BudgetResponse)
@@ -93,6 +103,16 @@ def approve_budget_request(
         details=f"Faculty approved budget of ₹{budget_req.requested_amount:.2f} for {budget_req.team_name}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("BUDGET_REQUEST_APPROVED", {
+            "id": budget_req.id,
+            "team_name": budget_req.team_name,
+            "amount": budget_req.requested_amount,
+        })
+    except Exception:
+        pass
+
     return budget_req
 
 @router.post("/budget-requests/{request_id}/reject", response_model=schemas.BudgetResponse)
@@ -108,6 +128,15 @@ def reject_budget_request(
     budget_req.status = "rejected"
     budget_req.reviewed_by = faculty.id
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("BUDGET_REQUEST_REJECTED", {
+            "id": budget_req.id,
+            "team_name": budget_req.team_name,
+        })
+    except Exception:
+        pass
 
     auth.log_audit(
         db=db,
@@ -162,6 +191,16 @@ def create_expense(
         details=f"Logged expense of ₹{new_exp.amount:.2f} under {new_exp.category} for {new_exp.event_title or 'General Operations'}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EXPENSE_CREATED", {
+            "id": new_exp.id,
+            "title": new_exp.title,
+            "amount": new_exp.amount,
+        })
+    except Exception:
+        pass
+
     return new_exp
 
 @router.put("/expenses/{expense_id}", response_model=schemas.ExpenseResponse)
@@ -192,6 +231,17 @@ def update_expense(
 
     db.commit()
     db.refresh(exp)
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EXPENSE_UPDATED", {
+            "id": exp.id,
+            "title": exp.title,
+            "amount": exp.amount,
+        })
+    except Exception:
+        pass
+
     return exp
 
 @router.delete("/expenses/{expense_id}")
@@ -206,6 +256,13 @@ def delete_expense(
 
     db.delete(exp)
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("EXPENSE_DELETED", {"id": expense_id})
+    except Exception:
+        pass
+
     return {"status": "success", "message": f"Expense '{expense_id}' successfully deleted."}
 
 @router.delete("/budget-requests/{request_id}")
@@ -220,4 +277,11 @@ def delete_budget_request(
 
     db.delete(req)
     db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("BUDGET_REQUEST_DELETED", {"id": request_id})
+    except Exception:
+        pass
+
     return {"status": "success", "message": f"Budget request '{request_id}' successfully deleted."}
