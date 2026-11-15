@@ -22,6 +22,11 @@ import {
   FileText,
   Activity,
   SlidersHorizontal,
+  UserPlus,
+  Trash2,
+  Plus,
+  GraduationCap,
+  Database,
 } from 'lucide-react';
 
 interface RoleMeta {
@@ -110,6 +115,22 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
   const [savingCredentials, setSavingCredentials] = useState<boolean>(false);
   const [togglingOperation, setTogglingOperation] = useState<boolean>(false);
 
+  // Faculty Provisioning & Data Purge State
+  const [facultyList, setFacultyList] = useState<any[]>([]);
+  const [isAddFacultyModalOpen, setIsAddFacultyModalOpen] = useState(false);
+  const [isPurging, setIsPurging] = useState(false);
+  const [isConfirmPurgeOpen, setIsConfirmPurgeOpen] = useState(false);
+  const [facultySubmitting, setFacultySubmitting] = useState(false);
+  const [facultyForm, setFacultyForm] = useState({
+    name: '',
+    roll_no: '',
+    email: '',
+    department: 'Geoinformatics Engineering',
+    post: 'Faculty Advisor',
+    phone: '',
+    password: 'GeoHub2026!',
+  });
+
   // Form credentials for currently selected role
   const [nameInput, setNameInput] = useState<string>('');
   const [rollInput, setRollInput] = useState<string>('');
@@ -122,9 +143,10 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [rolesRes, matrixRes] = await Promise.all([
+      const [rolesRes, matrixRes, facultyRes] = await Promise.all([
         apiClient.getAdminRolesCredentials().catch(() => DEFAULT_ROLES),
         apiClient.getAdminPermissionsMatrix().catch(() => null),
+        apiClient.getAdminFaculty().catch(() => []),
       ]);
 
       if (rolesRes && Array.isArray(rolesRes) && rolesRes.length > 0) {
@@ -134,10 +156,76 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
       if (matrixRes && matrixRes.matrix) {
         setMatrixData(matrixRes.matrix);
       }
+
+      if (Array.isArray(facultyRes)) {
+        setFacultyList(facultyRes);
+      }
     } catch {
       // Graceful fallback
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateFaculty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!facultyForm.name.trim() || !facultyForm.roll_no.trim() || !facultyForm.email.trim()) {
+      showToast('Please fill in Name, Faculty ID, and Institutional Email', 'error');
+      return;
+    }
+    setFacultySubmitting(true);
+    try {
+      const created = await apiClient.addAdminFaculty(facultyForm);
+      showToast(`✓ Faculty Advisor "${created.name}" provisioned successfully`, 'success');
+      setIsAddFacultyModalOpen(false);
+      setFacultyForm({
+        name: '',
+        roll_no: '',
+        email: '',
+        department: 'Geoinformatics Engineering',
+        post: 'Faculty Advisor',
+        phone: '',
+        password: 'GeoHub2026!',
+      });
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to provision faculty account', 'error');
+    } finally {
+      setFacultySubmitting(false);
+    }
+  };
+
+  const handleDeleteFaculty = async (facId: string, facName: string) => {
+    if (!window.confirm(`Revoke Faculty Advisor credentials for "${facName}"?`)) return;
+    try {
+      await apiClient.deleteAdminFaculty(facId);
+      showToast(`✓ Removed faculty account for ${facName}`, 'info');
+      setFacultyList((prev) => prev.filter((f) => f.id !== facId));
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to remove faculty account', 'error');
+    }
+  };
+
+  const handlePurgeAllData = async () => {
+    setIsPurging(true);
+    try {
+      await apiClient.purgePlatformData();
+      showToast('✓ All dummy data and user records purged. Clean slate initialized.', 'success');
+      setIsConfirmPurgeOpen(false);
+      try {
+        localStorage.setItem('geohub_db_epoch', `purged_${Date.now()}`);
+        localStorage.removeItem('geohub_store_events');
+        localStorage.removeItem('geohub_store_tasks');
+        localStorage.removeItem('geohub_store_expenses');
+        localStorage.removeItem('geohub_store_budgetRequests');
+        localStorage.removeItem('geohub_store_auditLogs');
+      } catch {}
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Purge failed', 'error');
+    } finally {
+      setIsPurging(false);
     }
   };
 
@@ -387,6 +475,99 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
         >
           <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
         </button>
+      </div>
+
+      {/* Faculty Governance & Provisioning Suite */}
+      <div className="mb-5 bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#DAF1DE] pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+              <GraduationCap size={20} strokeWidth={2.4} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-bold text-[#051F20] leading-tight">
+                  Faculty Governance & Provisioning
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
+                  {facultyList.length} Active
+                </span>
+              </div>
+              <p className="text-xs text-[#235347]">
+                SuperAdmin authority to onboard and sanction verified Faculty Advisors
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsAddFacultyModalOpen(true)}
+            className="px-3 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto"
+          >
+            <Plus size={15} strokeWidth={2.5} />
+            <span>Add Faculty Advisor</span>
+          </button>
+        </div>
+
+        {/* Faculty Roster List */}
+        {facultyList.length === 0 ? (
+          <div className="p-4 rounded-xl bg-[#F6FBF7] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-1.5 py-6">
+            <GraduationCap size={28} className="text-[#8EB69B]" />
+            <span className="text-xs font-bold text-[#051F20]">No Faculty Advisors Provisioned</span>
+            <p className="text-xs text-[#235347] max-w-sm">
+              All legacy demo accounts were purged. Click &quot;Add Faculty Advisor&quot; to onboard institutional faculty with login credentials.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {facultyList.map((fac) => (
+              <div
+                key={fac.id}
+                className="p-3.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] flex flex-col justify-between gap-3 shadow-2xs hover:border-[#8EB69B] transition"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-[#163832] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                        {fac.name ? fac.name.charAt(0).toUpperCase() : 'F'}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="text-xs font-bold text-[#051F20] truncate">{fac.name}</h3>
+                        <span className="font-mono text-xs text-[#235347] font-semibold">{fac.roll_no}</span>
+                      </div>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                      Active
+                    </span>
+                  </div>
+                  <div className="mt-2.5 space-y-1 text-xs text-[#235347]">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Mail size={12} className="text-[#8EB69B] shrink-0" />
+                      <span className="truncate">{fac.email}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Shield size={12} className="text-[#8EB69B] shrink-0" />
+                      <span className="truncate">{fac.post || 'Faculty Advisor'} • {fac.department}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#DAF1DE] flex items-center justify-between">
+                  <span className="text-[11px] text-[#52665C]">Institutional Faculty</span>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteFaculty(fac.id, fac.name)}
+                    className="p-1 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                    title="Remove faculty account"
+                    aria-label={`Remove faculty account for ${fac.name}`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Role Selection Horizontal Bar */}
@@ -736,6 +917,229 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack }) => {
           </div>
         </div>
       </div>
+
+      {/* Platform Data Purge & Clean Slate Controls */}
+      <div className="mt-5 bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(225,29,72,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+            <Database size={20} strokeWidth={2.2} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-gray-900 leading-tight">
+                Platform Data Purge & Clean Slate
+              </h3>
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">
+                Permanent Action
+              </span>
+            </div>
+            <p className="text-xs text-gray-600">
+              Wipe all events, tasks, registrations, expenses, and dummy accounts. Retain solely SuperAdmin (SA01).
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsConfirmPurgeOpen(true)}
+          disabled={isPurging}
+          className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto disabled:opacity-50"
+        >
+          <Trash2 size={14} />
+          <span>{isPurging ? 'Purging Data...' : 'Purge All Platform Data'}</span>
+        </button>
+      </div>
+
+      {/* Add Faculty Modal */}
+      {isAddFacultyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-lg p-5 sm:p-6 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3 mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+                  <GraduationCap size={20} strokeWidth={2.4} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#051F20]">Provision Faculty Advisor</h3>
+                  <p className="text-xs text-[#235347]">Grant official faculty credentials & sanction authority</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddFacultyModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateFaculty} className="flex-1 overflow-y-auto space-y-3.5 pr-1 no-scrollbar">
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">
+                  Full Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={facultyForm.name}
+                  onChange={(e) => setFacultyForm({ ...facultyForm, name: e.target.value })}
+                  placeholder="e.g. Dr. Sarah Jenkins"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Faculty ID / Username <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={facultyForm.roll_no}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, roll_no: e.target.value.toUpperCase() })}
+                    placeholder="e.g. FAC01"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Institutional Email <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={facultyForm.email}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, email: e.target.value })}
+                    placeholder="e.g. sarah.jenkins@college.edu"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Department
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.department}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, department: e.target.value })}
+                    placeholder="e.g. Geoinformatics Engineering"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Designation / Post
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.post}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, post: e.target.value })}
+                    placeholder="e.g. Faculty Advisor"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={facultyForm.phone}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, phone: e.target.value })}
+                    placeholder="e.g. +91 94420 18820"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Initial Password
+                  </label>
+                  <input
+                    type="text"
+                    value={facultyForm.password}
+                    onChange={(e) => setFacultyForm({ ...facultyForm, password: e.target.value })}
+                    placeholder="GeoHub2026!"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-mono font-medium focus:outline-none focus:ring-2 focus:ring-[#163832]/20"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#DAF1DE] flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddFacultyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={facultySubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <UserPlus size={14} />
+                  <span>{facultySubmitting ? 'Provisioning...' : 'Provision Faculty'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Purge Modal */}
+      {isConfirmPurgeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-rose-300 shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <AlertTriangle size={24} strokeWidth={2.2} />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-gray-900">Confirm Platform Data Purge</h3>
+                <p className="text-xs text-rose-600 font-semibold">Irreversible Action</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-600 leading-relaxed">
+              This will permanently delete all events, registrations, tasks, finances, expenses, and all user accounts except <strong>System SuperAdmin (SA01)</strong>. Squad shells will be emptied.
+            </p>
+
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1 font-medium">
+              <div>• Retains only SuperAdmin: <code>SA01</code> / <code>GeoHub2026!</code></div>
+              <div>• Clears all test feeds and old cached records.</div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmPurgeOpen(false)}
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handlePurgeAllData}
+                disabled={isPurging}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              >
+                <Trash2 size={14} />
+                <span>{isPurging ? 'Purging...' : 'Yes, Purge Everything'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

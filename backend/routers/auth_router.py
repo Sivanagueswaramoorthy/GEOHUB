@@ -73,105 +73,36 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
         (models.User.email == ident_lower) | (models.User.roll_no == ident_upper)
     ).first()
 
-    # 2. Canonical alias match (e.g. SA01, FAC01, superadmin, faculty, president)
+    # 2. Canonical SuperAdmin alias match (SA01, superadmin, sa01)
     if not user:
-        alias_map = {
-            "super_admin": "SA01",
-            "superadmin": "SA01",
-            "sa01": "SA01",
-            "super": "SA01",
-            "faculty": "FAC01",
-            "fac01": "FAC01",
-            "advisor": "FAC01",
-            "coordinator": "21GEO001",
-            "president": "21GEO001",
-            "admin": "21GEO001",
-            "pres": "21GEO001",
-            "21geo001": "21GEO001",
-            "management": "21GEO010",
-            "mgmt": "21GEO010",
-            "vicepresident": "21GEO010",
-            "vp": "21GEO010",
-            "21geo010": "21GEO010",
-            "documentation": "22GEO018",
-            "doc": "22GEO018",
-            "docs": "22GEO018",
-            "22geo018": "22GEO018",
-            "treasurer": "22GEO019",
-            "treasury": "22GEO019",
-            "finance": "22GEO019",
-            "22geo019": "22GEO019",
-            "promotion": "22GEO014",
-            "promo": "22GEO014",
-            "social": "22GEO014",
-            "22geo014": "22GEO014",
-            "volunteer": "23GEO042",
-            "vol": "23GEO042",
-            "23geo042": "23GEO042",
-            "student": "23GEO088",
-            "member": "23GEO088",
-            "scholar": "23GEO088",
-            "23geo088": "23GEO088",
-        }
-        target_roll = alias_map.get(ident_lower)
-        if target_roll:
-            user = db.query(models.User).filter(models.User.roll_no == target_roll).first()
+        sa_aliases = {"super_admin", "superadmin", "sa01", "super"}
+        if ident_lower in sa_aliases:
+            user = db.query(models.User).filter(models.User.roll_no == "SA01").first()
 
-    # 3. Dynamic auto-seed for any canonical role if missing from database
-    if not user:
-        canonical_templates = {
-            "SA01": ("u_super_admin_sa01", "superadmin@college.edu", "System SuperAdmin", "super_admin", "System Administrator", "Platform Governance & IT"),
-            "FAC01": ("u_faculty_fac01", "sarah.jenkins@college.edu", "Dr. Sarah Jenkins", "faculty", "Faculty Advisor", "Geography & Geomatics"),
-            "21GEO001": ("u_admin_02", "alex.rivera@college.edu", "Alex Rivera", "coordinator", "Club President", "Geoinformatics Engineering"),
-            "21GEO010": ("u_mgmt_06", "elena.rostova@college.edu", "Elena Rostova", "management", "Vice President", "Geology & Environmental Management"),
-            "22GEO018": ("u_doc_lead_08", "aarav.patel@college.edu", "Aarav Patel", "documentation", "Documentation Lead", "Geoinformatics & Archival Science"),
-            "22GEO019": ("u_treasurer_07", "ananya.iyer@college.edu", "Ananya Iyer", "treasurer", "Treasurer", "Economics & Financial Analytics"),
-            "22GEO014": ("u_promo_03", "david.chen@college.edu", "David Chen", "promotion", "Promotion Lead", "Earth Science & Media"),
-            "23GEO042": ("u_volunteer_05", "liam.vance@college.edu", "Liam Vance", "volunteer", "Lead Volunteer", "Environmental Studies"),
-            "23GEO088": ("u_member_04", "maya.patel@college.edu", "Maya Patel", "student", "Club Member", "Cartography & Geography"),
-        }
-        matched_roll = alias_map.get(ident_lower, ident_upper)
-        if matched_roll in canonical_templates:
-            uid, email, name, role, post, dept = canonical_templates[matched_roll]
-            user = models.User(
-                id=uid,
-                roll_no=matched_roll,
-                name=name,
-                email=email,
-                role=role,
-                post=post,
-                department=dept,
-                hashed_password=auth.get_password_hash("geohub"),
-                is_volunteer=(1 if role == "volunteer" else 0),
-                status="active",
-                created_at=datetime.utcnow()
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        elif auth.verify_password(login_data.password, "") or (login_data.password and login_data.password.strip().lower() == "geohub"):
-            # Auto-provision student account for any valid student roll number logging in with default password
-            clean_ident = ident_upper
-            if any(clean_ident.startswith(prefix) for prefix in ["21GEO", "22GEO", "23GEO", "24GEO", "25GEO", "GEO"]) or len(clean_ident) >= 6:
-                user = models.User(
-                    id=f"u_{uuid.uuid4().hex[:12]}",
-                    roll_no=clean_ident,
-                    name=f"Student {clean_ident}",
-                    email=f"{ident_lower}@geohub.edu",
-                    role="student",
-                    post="Student Member",
-                    department="Geoinformatics Engineering",
-                    hashed_password=auth.get_password_hash("geohub"),
-                    is_volunteer=0,
-                    status="active",
-                    created_at=datetime.utcnow()
-                )
-                db.add(user)
-                db.commit()
-                db.refresh(user)
+    # 3. Fail-safe SuperAdmin self-healing: if SA01 is missing from database, provision it
+    if not user and ident_upper == "SA01":
+        user = models.User(
+            id="u_super_admin_sa01",
+            roll_no="SA01",
+            name="System SuperAdmin",
+            email="superadmin@college.edu",
+            role="super_admin",
+            post="System Administrator",
+            department="Platform Governance & IT",
+            hashed_password=auth.get_password_hash("GeoHub2026!"),
+            is_volunteer=0,
+            status="active",
+            created_at=datetime.utcnow()
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
     if not user or not auth.verify_password(login_data.password, user.hashed_password):
-        raise HTTPException(status_code=400, detail="Incorrect credentials. Please verify your roll number/email and password.")
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect credentials. Please verify your roll number/email and password."
+        )
 
     if user.status == "disabled":
         raise HTTPException(status_code=403, detail="Your account has been disabled by an administrator.")

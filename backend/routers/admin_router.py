@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from database import get_db, SessionLocal, engine, Base
 import models
 import auth
+import schemas
 
 router = APIRouter(prefix="/admin", tags=["SuperAdmin Governance & Operation Controls"])
 
@@ -94,12 +95,12 @@ def get_roles_credentials(db: Session = Depends(get_db)):
             results.append({
                 "role": role_key,
                 "badge": meta["badge"],
-                "user_id": f"u_{role_key}_default",
-                "name": meta["default_name"],
+                "user_id": f"u_{role_key}_unassigned",
+                "name": "Unassigned",
                 "roll_no": meta["default_roll"],
                 "email": meta["default_email"],
                 "post": meta["default_post"],
-                "status": "active",
+                "status": "unassigned",
                 "is_registered": False,
             })
     return results
@@ -294,3 +295,152 @@ def reset_permissions_matrix(payload: MatrixResetPayload, db: Session = Depends(
         "message": f"Reset permissions matrix to default institutional baseline for {target}",
         "effective_matrix": auth.get_effective_matrix(),
     }
+
+# ==========================================
+# SuperAdmin Faculty Provisioning & Governance
+# ==========================================
+
+@router.get("/faculty", response_model=List[schemas.FacultyResponse])
+def get_faculty_roster(db: Session = Depends(get_db)):
+    """
+    Returns all officially provisioned Faculty members.
+    """
+    faculty_users = db.query(models.User).filter(
+        models.User.role == "faculty"
+    ).order_by(models.User.created_at.desc()).all()
+    return faculty_users
+
+@router.post("/faculty", response_model=schemas.FacultyResponse)
+def provision_faculty_account(
+    payload: schemas.FacultyCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Allows SuperAdmin to provision a new Faculty Advisor with verified credentials.
+    """
+    clean_roll = payload.roll_no.strip().upper()
+    clean_email = payload.email.strip().lower()
+
+    # Check for existing account by roll number or email
+    existing_user = db.query(models.User).filter(
+        (models.User.roll_no == clean_roll) | (models.User.email == clean_email)
+    ).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"An account with roll number '{clean_roll}' or email '{clean_email}' already exists."
+        )
+
+    pwd = (payload.password or "GeoHub2026!").strip()
+    hashed_pwd = auth.get_password_hash(pwd)
+
+    new_faculty = models.User(
+        roll_no=clean_roll,
+        email=clean_email,
+        name=payload.name.strip(),
+        hashed_password=hashed_pwd,
+        role="faculty",
+        post=payload.post or "Faculty Advisor",
+        department=payload.department or "Geoinformatics Engineering",
+        year_of_study="Faculty Staff",
+        phone=payload.phone or "+91 94420 18820",
+        team="Management",
+        team_role="Faculty Advisor",
+        squad_memberships=json.dumps([{"squad": "Management", "isLead": True}]),
+        is_volunteer=False,
+        status="active"
+    )
+    db.add(new_faculty)
+
+    # Log audit entry
+    actor_id = current_user.id if current_user else "u_super_admin_sa01"
+    actor_name = current_user.name if current_user else "System SuperAdmin"
+    audit = models.AuditLog(
+        actor_id=actor_id,
+        actor_name=actor_name,
+        action="FACULTY_PROVISIONED",
+        target_type="user",
+        target_id=clean_roll,
+        target_name=payload.name.strip(),
+        details=f"SuperAdmin provisioned Faculty account for {payload.name} ({clean_roll}) in {payload.department}.",
+    )
+    db.add(audit)
+    db.commit()
+    db.refresh(new_faculty)
+
+    # Real-time multi-device sync
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("FACULTY_PROVISIONED", {
+            "id": new_faculty.id,
+            "roll_no": new_faculty.roll_no,
+            "name": new_faculty.name,
+            "email": new_faculty.email,
+            "role": new_faculty.role,
+            "department": new_faculty.department,
+            "post": new_faculty.post,
+        })
+    except Exception:
+        pass
+
+    return new_faculty
+
+@router.delete("/faculty/{faculty_id}")
+def delete_faculty_account(
+    faculty_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Deactivates or deletes a faculty member account.
+    """
+    user = db.query(models.User).filter(
+        models.User.id == faculty_id,
+        models.User.role == "faculty"
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Faculty account '{faculty_id}' not found."
+        )
+
+    actor_id = current_user.id if current_user else "u_super_admin_sa01"
+    actor_name = current_user.name if current_user else "System SuperAdmin"
+
+    audit = models.AuditLog(
+        actor_id=actor_id,
+        actor_name=actor_name,
+        action="FACULTY_DELETED",
+        target_type="user",
+        target_id=user.id,
+        target_name=user.name,
+        details=f"SuperAdmin removed Faculty account {user.name} ({user.roll_no}).",
+    )
+    db.add(audit)
+    db.delete(user)
+    db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("FACULTY_DELETED", {"id": faculty_id})
+    except Exception:
+        pass
+
+    return {"status": "success", "message": f"Faculty account '{faculty_id}' successfully removed."}
+
+@router.post("/purge-data")
+def purge_platform_data(
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Purges all dummy and operational data across events, tasks, finance, logs,
+    and removes all users except the sole System SuperAdmin (SA01).
+    """
+    from purge_all_data import run_purge
+    res = run_purge()
+    return {"status": "success", "message": "All dummy records and user accounts purged successfully.", "summary": res}
+

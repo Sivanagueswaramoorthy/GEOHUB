@@ -266,83 +266,16 @@ export const useLogin = (options?: UseLoginOptions) => {
             id.includes('superadmin')
           ) {
             found = demoSuperAdmin;
-          } else if (
-            id === 'fac01' ||
-            id === 'faculty' ||
-            id.includes('advisor') ||
-            trimmedIdentifier.includes('sarah')
-          ) {
-            found = demoFaculty;
-          } else if (
-            id === '21geo001' ||
-            id === 'admin' ||
-            id.includes('coordinator') ||
-            id.includes('president') ||
-            id === 'pres' ||
-            trimmedIdentifier.includes('alex')
-          ) {
-            found = demoAdmin;
-          } else if (
-            id === '21geo010' ||
-            id === 'mgmt' ||
-            id === 'management' ||
-            id.includes('mgmt') ||
-            id.includes('management') ||
-            trimmedIdentifier.includes('elena') ||
-            trimmedIdentifier.includes('rostova')
-          ) {
-            found = demoManagement;
-          } else if (
-            id === '22geo018' ||
-            id === 'doc' ||
-            id.startsWith('doc') ||
-            id.includes('documentation') ||
-            trimmedIdentifier.includes('aarav')
-          ) {
-            found = demoDocLead;
-          } else if (
-            id === '22geo019' ||
-            id === 'tres' ||
-            id === 'treas' ||
-            id.startsWith('tres') ||
-            id.startsWith('treas') ||
-            id.includes('treasurer') ||
-            trimmedIdentifier.includes('ananya')
-          ) {
-            found = demoTreasurer;
-          } else if (
-            id === '22geo014' ||
-            id === 'promo' ||
-            id.startsWith('promo') ||
-            id.includes('promotion') ||
-            trimmedIdentifier.includes('david')
-          ) {
-            found = demoTeamAdmin;
-          } else if (
-            id === '23geo042' ||
-            id === 'volunteer' ||
-            id.startsWith('volunt') ||
-            trimmedIdentifier.includes('volunteer') ||
-            trimmedIdentifier.includes('liam')
-          ) {
-            found = demoVolunteer;
-          } else if (
-            id === '23geo088' ||
-            id === 'member' ||
-            id === 'student' ||
-            trimmedIdentifier.includes('maya')
-          ) {
-            found = demoMember;
-          } else {
-            // General valid student scholar account
-            found = {
-              ...demoMember,
-              uid: `u_${Date.now().toString(36)}`,
-              rollNo: rawIdentifier.toUpperCase(),
-              email: trimmedIdentifier.includes('@') ? trimmedIdentifier : `${trimmedIdentifier}@college.edu`,
-              name: `Student (${rawIdentifier.toUpperCase()})`,
-            };
           }
+        }
+
+        if (!found) {
+          setErrorState({
+            code: '401',
+            message: 'Invalid credentials. Only provisioned accounts can sign in.',
+          });
+          setIsLoading(false);
+          return false;
         }
 
         authResult = {

@@ -254,19 +254,14 @@ describe('ForgotPasswordSheet Component', () => {
 });
 
 describe('DemoRolesSheet Component', () => {
-  it('renders all 6 required demo personas', () => {
+  it('renders required demo persona for SuperAdmin', () => {
     const handleSelect = vi.fn();
     render(<DemoRolesSheet isOpen={true} onClose={vi.fn()} onSelectPersona={handleSelect} />);
 
-    expect(screen.getByText('Dr. Sarah Jenkins')).toBeInTheDocument();
-    expect(screen.getByText('Alex Rivera')).toBeInTheDocument();
-    expect(screen.getByText('Aarav Patel')).toBeInTheDocument();
-    expect(screen.getByText('Ananya Iyer')).toBeInTheDocument();
-    expect(screen.getByText('David Chen')).toBeInTheDocument();
-    expect(screen.getByText('Liam Vance')).toBeInTheDocument();
+    expect(screen.getByText('System SuperAdmin')).toBeInTheDocument();
 
     // Selecting persona triggers callback
-    fireEvent.click(screen.getByText('Dr. Sarah Jenkins'));
+    fireEvent.click(screen.getByText('System SuperAdmin'));
     expect(handleSelect).toHaveBeenCalledTimes(1);
   });
 });

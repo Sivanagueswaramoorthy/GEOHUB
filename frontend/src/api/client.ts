@@ -411,6 +411,44 @@ class ApiClient {
       body: JSON.stringify({ role }),
     });
   }
+
+  // ==========================================
+  // SuperAdmin Faculty Governance & Provisioning
+  // ==========================================
+  public async getAdminFaculty() {
+    return await this.request<any[]>('/admin/faculty');
+  }
+
+  public async addAdminFaculty(payload: {
+    name: string;
+    roll_no: string;
+    email: string;
+    department?: string;
+    post?: string;
+    phone?: string;
+    password?: string;
+  }) {
+    return await this.request<any>('/admin/faculty', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteAdminFaculty(facultyId: string) {
+    return await this.request<{ status: string; message: string }>(`/admin/faculty/${encodeURIComponent(facultyId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async purgePlatformData() {
+    return await this.request<{
+      status: string;
+      message: string;
+      summary: any;
+    }>('/admin/purge-data', {
+      method: 'POST',
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

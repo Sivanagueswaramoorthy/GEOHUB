@@ -20,8 +20,8 @@ describe('ProfileView Component', () => {
     // Header & identity
     expect(screen.getByText('Account & Profile')).toBeInTheDocument();
     expect(screen.getByText(/Verified Scholar Credentials & Academic Standing/i)).toBeInTheDocument();
-    expect(screen.getByText('Dr. Sarah Jenkins')).toBeInTheDocument();
-    expect(screen.getAllByText(/FACULTY ADVISOR/i).length).toBeGreaterThan(0);
+    expect(screen.getByText('System SuperAdmin')).toBeInTheDocument();
+    expect(screen.getAllByText(/SYSTEM ADMINISTRATOR/i).length).toBeGreaterThan(0);
 
     // Key metrics
     expect(screen.getByText('Attendance')).toBeInTheDocument();

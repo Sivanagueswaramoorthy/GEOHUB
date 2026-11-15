@@ -1,10 +1,10 @@
 import React from 'react';
 import {
   AlertCircle,
-  Radio,
   Coins,
   QrCode,
   Calendar,
+  CheckCircle2,
 } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import {
@@ -20,7 +20,6 @@ export const FacultyHomeView: React.FC = () => {
   const { approvals, events, auditLogs, setActiveTab } = useApp();
 
   const pendingApprovals = approvals.filter((a) => a.status === 'pending');
-  const liveEvents = events.filter((e) => e.status === 'live');
   const recentAudits = (auditLogs || []).slice(0, 3);
 
   const totalCorpus = events.reduce((sum, e) => sum + (e.budget || 0), 0);
@@ -40,7 +39,7 @@ export const FacultyHomeView: React.FC = () => {
         subtitle="Institutional governance & sanction authority"
         mascot="shield"
         mascotSize="md"
-        chip={<StatusChip status="live" label="Advisor Desk" />}
+        chip={<StatusChip status="approved" label="Advisor Desk" />}
         action={
           <div className="flex items-center gap-2 w-full">
             <PillButton
@@ -67,7 +66,7 @@ export const FacultyHomeView: React.FC = () => {
         }
       />
 
-      {/* 2) StatTiles: Total events, Live, Budget */}
+      {/* 2) StatTiles: Total events, Approvals, Budget */}
       <div className="grid grid-cols-3 gap-2.5">
         <StatTile
           icon={<Calendar size={20} strokeWidth={1.75} className="lucide" />}
@@ -77,11 +76,12 @@ export const FacultyHomeView: React.FC = () => {
           onClick={() => setActiveTab('events')}
         />
         <StatTile
-          icon={<Radio size={20} strokeWidth={1.75} className="lucide" />}
-          value={String(liveEvents.length)}
-          label="Live"
-          tint={liveEvents.length > 0 ? 'emerald' : 'amber'}
-          onClick={() => setActiveTab('events')}
+          icon={<CheckCircle2 size={20} strokeWidth={1.75} className="lucide" />}
+          value={String(pendingApprovals.length)}
+          label="Approvals"
+          footnote="Pending"
+          tint={pendingApprovals.length > 0 ? 'amber' : 'emerald'}
+          onClick={() => setActiveTab('approvals')}
         />
         <StatTile
           icon={<Coins size={20} strokeWidth={1.75} className="lucide" />}

@@ -1,12 +1,12 @@
 {
-  "version": "1.6.9",
-  "version_code": 27,
+  "version": "1.6.10",
+  "version_code": 28,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Redesign premium splash screen with unique pastel emblem and emerald tokens",
+  "release_notes": "Purge all data, isolate SuperAdmin, enable faculty provisioning, and remove Live badges and debug sync cards",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-15",
-  "file_size_bytes": 6853700,
+  "file_size_bytes": 6856052,
   "file_size_mb": "6.54 MB",
-  "sha256": "AE59B213031FD796689944772D7769883D74968D4E0CF61D91D13A5D0C399E69"
+  "sha256": "70DFBDFBCEE089587F29DA88B614F902137D4667D95B0766BF8A5BB44ADDC4C8"
 }

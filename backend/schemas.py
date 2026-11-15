@@ -305,3 +305,28 @@ class UserEnrollRequest(BaseModel):
     is_volunteer: Optional[bool] = False
     password: Optional[str] = "geohub"
 
+# Faculty Management Schemas
+class FacultyCreateRequest(BaseModel):
+    name: str
+    roll_no: str
+    email: str
+    department: Optional[str] = "Geoinformatics Engineering"
+    post: Optional[str] = "Faculty Advisor"
+    phone: Optional[str] = None
+    password: Optional[str] = "GeoHub2026!"
+
+class FacultyResponse(BaseModel):
+    id: str
+    name: str
+    roll_no: str
+    email: str
+    role: str
+    post: Optional[str] = None
+    department: Optional[str] = None
+    phone: Optional[str] = None
+    status: str
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+

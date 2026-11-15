@@ -31,7 +31,7 @@ def init_database():
 
     db = SessionLocal()
     try:
-        # 1. Seed Teams / Squads
+        # 1. Seed Teams / Squads (Clean Containers)
         squads = [
             ("Management", "Responsible for club planning, coordination, and administrative operations."),
             ("Promotion", "Responsible for social media outreach, campaigns, posters, and campus engagement."),
@@ -51,135 +51,53 @@ def init_database():
                 db.add(team)
                 print(f"[Init DB] Created squad: {name}")
 
-        # 2. Seed Core Chapter Roles & Accounts
+        # 2. Seed Exclusively the System SuperAdmin Account
         default_pwd = auth.get_password_hash("GeoHub2026!")
 
-        seed_users = [
-            {
-                "id": "u_fac_01",
-                "roll_no": "21GEO000",
-                "name": "Dr. Robert Vance",
-                "email": "faculty@college.edu",
-                "role": "faculty",
-                "post": "Faculty Advisor",
-                "department": "Geoinformatics Engineering",
-                "year_of_study": "Faculty Board",
-                "phone": "+91 94420 18800",
-                "team": "Management",
-                "team_role": "Advisor",
-                "is_volunteer": False,
-                "status": "active",
-                "squad_memberships": json.dumps([{"squad": "Management", "isLead": True}]),
-            },
-            {
-                "id": "u_admin_02",
-                "roll_no": "21GEO001",
-                "name": "Alex Rivera",
-                "email": "president@college.edu",
-                "role": "coordinator",
-                "post": "Club President",
-                "department": "Geoinformatics Engineering",
-                "year_of_study": "4th Year (Senior)",
-                "phone": "+91 94420 18820",
-                "team": "Management",
-                "team_role": "Squad Lead",
-                "is_volunteer": True,
-                "status": "active",
-                "squad_memberships": json.dumps([{"squad": "Management", "isLead": True}]),
-            },
-            {
-                "id": "u_treasurer_03",
-                "roll_no": "21GEO002",
-                "name": "Marcus Chen",
-                "email": "treasurer@college.edu",
-                "role": "treasurer",
-                "post": "Treasurer",
-                "department": "Geoinformatics Engineering",
-                "year_of_study": "3rd Year",
-                "phone": "+91 94420 18822",
-                "team": "Management",
-                "team_role": "Finance Officer",
-                "is_volunteer": False,
-                "status": "active",
-                "squad_memberships": json.dumps([{"squad": "Management", "isLead": False}]),
-            },
-            {
-                "id": "u_doc_04",
-                "roll_no": "21GEO003",
-                "name": "Sarah Jenkins",
-                "email": "doc@college.edu",
-                "role": "documentation",
-                "post": "Documentation Lead",
-                "department": "Cartography & Surveying",
-                "year_of_study": "3rd Year",
-                "phone": "+91 94420 18823",
-                "team": "Documentation",
-                "team_role": "Lead Archivist",
-                "is_volunteer": False,
-                "status": "active",
-                "squad_memberships": json.dumps([{"squad": "Documentation", "isLead": True}]),
-            },
-            {
-                "id": "u_promo_05",
-                "roll_no": "21GEO004",
-                "name": "David Kim",
-                "email": "promo@college.edu",
-                "role": "promotion",
-                "post": "Promotion Lead",
-                "department": "Geoinformatics Engineering",
-                "year_of_study": "2nd Year",
-                "phone": "+91 94420 18824",
-                "team": "Promotion",
-                "team_role": "Creative Lead",
-                "is_volunteer": False,
-                "status": "active",
-                "squad_memberships": json.dumps([{"squad": "Promotion", "isLead": True}]),
-            },
-            {
-                "id": "u_student_06",
-                "roll_no": "21GEO006",
-                "name": "Fatima Zahra",
-                "email": "student@college.edu",
-                "role": "student",
-                "post": "Chapter Member",
-                "department": "Geoinformatics Engineering",
-                "year_of_study": "2nd Year",
-                "phone": "+91 94420 18826",
-                "team": None,
-                "team_role": None,
-                "is_volunteer": True,
-                "status": "active",
-                "squad_memberships": json.dumps([]),
-            },
-        ]
+        superadmin_user = {
+            "id": "u_super_admin_sa01",
+            "roll_no": "SA01",
+            "name": "System SuperAdmin",
+            "email": "superadmin@college.edu",
+            "role": "super_admin",
+            "post": "System Administrator",
+            "department": "Platform Governance & IT",
+            "year_of_study": "Executive Staff",
+            "phone": "+91 94420 18800",
+            "team": "Platform Governance",
+            "team_role": "Master Admin",
+            "is_volunteer": False,
+            "status": "active",
+            "squad_memberships": json.dumps([{"squad": "Platform Governance", "isLead": True}]),
+        }
 
-        for u in seed_users:
-            existing = db.query(models.User).filter(
-                (models.User.email == u["email"]) | (models.User.roll_no == u["roll_no"])
-            ).first()
-            if not existing:
-                user = models.User(
-                    id=u["id"],
-                    roll_no=u["roll_no"],
-                    name=u["name"],
-                    email=u["email"],
-                    hashed_password=default_pwd,
-                    role=u["role"],
-                    post=u["post"],
-                    department=u["department"],
-                    year_of_study=u["year_of_study"],
-                    phone=u["phone"],
-                    team=u["team"],
-                    team_role=u["team_role"],
-                    squad_memberships=u["squad_memberships"],
-                    is_volunteer=u["is_volunteer"],
-                    status=u["status"],
-                )
-                db.add(user)
-                print(f"[Init DB] Seeded user: {u['name']} ({u['roll_no']}) - {u['role']}")
+        existing_sa = db.query(models.User).filter(
+            (models.User.email == superadmin_user["email"]) | (models.User.roll_no == superadmin_user["roll_no"])
+        ).first()
+
+        if not existing_sa:
+            user = models.User(
+                id=superadmin_user["id"],
+                roll_no=superadmin_user["roll_no"],
+                name=superadmin_user["name"],
+                email=superadmin_user["email"],
+                hashed_password=default_pwd,
+                role=superadmin_user["role"],
+                post=superadmin_user["post"],
+                department=superadmin_user["department"],
+                year_of_study=superadmin_user["year_of_study"],
+                phone=superadmin_user["phone"],
+                team=superadmin_user["team"],
+                team_role=superadmin_user["team_role"],
+                squad_memberships=superadmin_user["squad_memberships"],
+                is_volunteer=superadmin_user["is_volunteer"],
+                status=superadmin_user["status"],
+            )
+            db.add(user)
+            print(f"[Init DB] Seeded sole SuperAdmin: {superadmin_user['name']} ({superadmin_user['roll_no']})")
 
         db.commit()
-        print("[Init DB] Database successfully initialized with core squads and official role accounts!")
+        print("[Init DB] Database initialized cleanly with sole System SuperAdmin!")
     except Exception as e:
         db.rollback()
         print(f"[Init DB Error] {e}")
@@ -189,4 +107,3 @@ def init_database():
 
 if __name__ == "__main__":
     init_database()
-

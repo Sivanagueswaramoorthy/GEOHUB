@@ -229,6 +229,39 @@ function savePersistedState<T>(key: string, data: T): void {
   }
 }
 
+// Wipe legacy cached data if local storage was created prior to clean slate epoch
+try {
+  if (typeof window !== 'undefined') {
+    const epoch = localStorage.getItem('geohub_db_epoch');
+    if (epoch !== '2026-11-15-clean-v3') {
+      localStorage.removeItem('geohub_store_events');
+      localStorage.removeItem('geohub_store_tasks');
+      localStorage.removeItem('geohub_store_expenses');
+      localStorage.removeItem('geohub_store_budgetRequests');
+      localStorage.removeItem('geohub_store_auditLogs');
+      localStorage.removeItem('geohub_store_users');
+      localStorage.removeItem('geohub_store_approvals');
+      localStorage.removeItem('geohub_store_attendance');
+      localStorage.removeItem('geohub_store_gallery');
+      // If auth session is for a deleted demo user (not SA01 and not a provisioned user), clear it
+      const rawSession = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
+      if (rawSession) {
+        try {
+          const s = JSON.parse(rawSession);
+          if (s?.user?.rollNo && s.user.rollNo !== 'SA01' && !s.user.rollNo.startsWith('FAC')) {
+            localStorage.removeItem('geohub_auth_session');
+            sessionStorage.removeItem('geohub_auth_session');
+            localStorage.removeItem('geohub_access_token');
+          }
+        } catch {}
+      }
+      localStorage.setItem('geohub_db_epoch', '2026-11-15-clean-v3');
+    }
+  }
+} catch {
+  // ignore
+}
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserModel>(() => {
     try {
@@ -242,7 +275,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
-    return demoFaculty;
+    return demoSuperAdmin;
   });
   const [users, setUsers] = useState<UserModel[]>(() => loadPersistedState('geohub_store_users', initialUsers));
   const [teams, setTeams] = useState<TeamModel[]>(() => loadPersistedState('geohub_store_teams', initialTeams));
@@ -460,7 +493,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       // 1. Sync Events
       const liveEvents = await apiClient.getEvents().catch(() => null);
-      if (Array.isArray(liveEvents) && liveEvents.length > 0) {
+      if (Array.isArray(liveEvents)) {
         const mappedEvents: EventModel[] = liveEvents.map((e: any): EventModel => ({
           id: e.id,
           title: e.title,
@@ -479,131 +512,119 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           geofenceRadiusMeters: e.geofence_radius_meters || 100,
           cancellationReason: e.cancellation_reason || undefined,
           budget: Number(e.budget || 0),
-          createdBy: e.created_by || 'u_admin_02',
+          createdBy: e.created_by || 'SA01',
         }));
-
-        setEvents((prev) => {
-          const serverEventIds = new Set(mappedEvents.map((m) => m.id));
-          const localOnly = prev.filter(
-            (p) => !serverEventIds.has(p.id) && p.id.startsWith('event_')
-          );
-          return [...mappedEvents, ...localOnly];
-        });
+        setEvents(mappedEvents);
       }
 
-        // 2. Sync Users & Official Chapter Roster
-        const liveUsers = await apiClient.getUsers().catch(() => null);
-        if (Array.isArray(liveUsers) && liveUsers.length > 0) {
-          const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
-            uid: u.id,
-            rollNo: u.roll_no,
-            name: u.name,
-            email: u.email,
-            role: u.role || 'student',
-            post: u.post || undefined,
-            department: u.department || 'Geoinformatics Engineering',
-            yearOfStudy: u.year_of_study || '3rd Year',
-            phone: u.phone || undefined,
-            team: u.team || undefined,
-            teamRole: u.team_role || undefined,
-            isVolunteer: Boolean(u.is_volunteer),
-            status: u.status || 'active',
-            squadMemberships: u.squad_memberships
-              ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
-              : [],
-          }));
-          setUsers((prev) => {
-            const backendIds = new Set(mappedUsers.map((m) => m.uid));
-            const backendRolls = new Set(mappedUsers.map((m) => (m.rollNo || '').toUpperCase()));
-            const localOnly = prev.filter((p) => !backendIds.has(p.uid) && !backendRolls.has((p.rollNo || '').toUpperCase()));
-            return [...mappedUsers, ...localOnly];
-          });
-        }
+      // 2. Sync Users & Official Chapter Roster
+      const liveUsers = await apiClient.getUsers().catch(() => null);
+      if (Array.isArray(liveUsers)) {
+        const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
+          uid: u.id,
+          rollNo: u.roll_no,
+          name: u.name,
+          email: u.email,
+          role: u.role || 'student',
+          post: u.post || undefined,
+          department: u.department || 'Geoinformatics Engineering',
+          yearOfStudy: u.year_of_study || '3rd Year',
+          phone: u.phone || undefined,
+          team: u.team || undefined,
+          teamRole: u.team_role || undefined,
+          isVolunteer: Boolean(u.is_volunteer),
+          status: u.status || 'active',
+          squadMemberships: u.squad_memberships
+            ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
+            : [],
+        }));
+        setUsers(mappedUsers);
+      }
 
-        // 3. Sync Squads & Teams
-        const liveTeams = await apiClient.getTeams().catch(() => null);
-        if (Array.isArray(liveTeams) && liveTeams.length > 0) {
-          setTeams((prev) => prev.map((t) => {
-            const matched = liveTeams.find((lt: any) => lt.name.toLowerCase() === t.name.toLowerCase() || lt.id === t.id);
-            if (!matched) return t;
-            return {
-              ...t,
-              description: matched.description || t.description,
-              memberIds: matched.member_user_ids || t.memberIds,
-              leadIds: matched.admin_user_ids || t.leadIds,
-            };
-          }));
-        }
+      // 3. Sync Squads & Teams
+      const liveTeams = await apiClient.getTeams().catch(() => null);
+      if (Array.isArray(liveTeams)) {
+        setTeams((prev) => prev.map((t) => {
+          const matched = liveTeams.find((lt: any) => lt.name.toLowerCase() === t.name.toLowerCase() || lt.id === t.id);
+          if (!matched) return { ...t, memberIds: [], leadIds: [] };
+          return {
+            ...t,
+            description: matched.description || t.description,
+            memberIds: matched.member_user_ids || [],
+            leadIds: matched.admin_user_ids || [],
+          };
+        }));
+      }
 
-        // 4. Sync Duty Tasks
-        const liveTasks = await apiClient.getTasks('all').catch(() => null);
-        if (Array.isArray(liveTasks) && liveTasks.length > 0) {
-          setTasks(liveTasks.map((t: any): TaskModel => ({
-            id: t.id,
-            title: t.title,
-            description: t.description || '',
-            priority: 'medium',
-            status: t.status || 'todo',
-            team: t.team_id || 'Management',
-            assigneeId: t.assigned_user_ids?.[0] || 'u_admin_02',
-            assigneeName: 'Assigned Scholar',
-            createdById: t.created_by || 'u_admin_02',
-            createdByName: 'Coordinator',
-            dueDate: t.deadline || new Date().toISOString(),
-            comments: [],
-            createdAt: t.created_at || new Date().toISOString(),
-            proofUrl: t.proof_urls?.[0],
-          })));
-        }
+      // 4. Sync Duty Tasks
+      const liveTasks = await apiClient.getTasks('all').catch(() => null);
+      if (Array.isArray(liveTasks)) {
+        setTasks(liveTasks.map((t: any): TaskModel => ({
+          id: t.id,
+          title: t.title,
+          description: t.description || '',
+          priority: 'medium',
+          status: t.status || 'todo',
+          team: t.team_id || 'Management',
+          assigneeId: t.assigned_user_ids?.[0] || 'SA01',
+          assigneeName: 'Assigned Scholar',
+          createdById: t.created_by || 'SA01',
+          createdByName: 'Coordinator',
+          dueDate: t.deadline || new Date().toISOString(),
+          comments: [],
+          createdAt: t.created_at || new Date().toISOString(),
+          proofUrl: t.proof_urls?.[0],
+        })));
+      }
 
-        // 5. Sync Treasury Budget Requests
-        const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
-        if (Array.isArray(liveBudget) && liveBudget.length > 0) {
-          setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
-            id: b.id,
-            teamName: b.team_name,
-            requestedAmount: Number(b.requested_amount || 0),
-            currentAllocation: Number(b.current_allocation || 0),
-            reason: b.reason,
-            requestedBy: b.requested_by,
-            requestedAt: b.created_at || new Date().toISOString(),
-            status: b.status || 'pending',
-          })));
-        }
+      // 5. Sync Treasury Budget Requests
+      const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
+      if (Array.isArray(liveBudget)) {
+        setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
+          id: b.id,
+          teamName: b.team_name,
+          requestedAmount: Number(b.requested_amount || 0),
+          currentAllocation: Number(b.current_allocation || 0),
+          reason: b.reason,
+          requestedBy: b.requested_by,
+          requestedAt: b.created_at || new Date().toISOString(),
+          status: b.status || 'pending',
+        })));
+      }
 
-        // 6. Sync Official Financial Ledger Expenses
-        const liveExpenses = await apiClient.getExpenses().catch(() => null);
-        if (Array.isArray(liveExpenses) && liveExpenses.length > 0) {
-          setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
-            id: exp.id,
-            title: exp.title,
-            amount: Number(exp.amount || 0),
-            category: exp.category,
-            buyingDate: exp.date || exp.created_at || new Date().toISOString(),
-            eventTitle: exp.event_title || 'General Operations',
-            vendorName: 'Official Vendor',
-            paidBy: exp.logged_by || 'Treasurer Lead',
-            approvedBy: 'Faculty Advisor',
-            receiptUrl: exp.receipt_url,
-            status: 'approved',
-          })));
-        }
+      // 6. Sync Official Financial Ledger Expenses
+      const liveExpenses = await apiClient.getExpenses().catch(() => null);
+      if (Array.isArray(liveExpenses)) {
+        setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
+          id: exp.id,
+          title: exp.title,
+          amount: Number(exp.amount || 0),
+          category: exp.category,
+          buyingDate: exp.date || exp.created_at || new Date().toISOString(),
+          eventTitle: exp.event_title || 'General Operations',
+          vendorName: 'Official Vendor',
+          paidBy: exp.logged_by || 'Treasurer Lead',
+          approvedBy: 'Faculty Advisor',
+          receiptUrl: exp.receipt_url,
+          status: 'approved',
+        })));
+      }
 
-        // 7. Sync Governance Audit Logs
-        const liveAudits = await apiClient.getAuditLogs().catch(() => null);
-        if (Array.isArray(liveAudits) && liveAudits.length > 0) {
-          setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
-            id: a.id,
-            actorId: a.actor_id,
-            actorName: a.actor_name,
-            action: a.action,
-            targetType: a.target_type,
-            targetId: a.target_id,
-            targetName: a.target_name,
-            details: a.details,
-            timestamp: a.timestamp || new Date().toISOString(),
-          })));
-        }
+      // 7. Sync Governance Audit Logs
+      const liveAudits = await apiClient.getAuditLogs().catch(() => null);
+      if (Array.isArray(liveAudits)) {
+        setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
+          id: a.id,
+          actorId: a.actor_id,
+          actorName: a.actor_name,
+          action: a.action,
+          targetType: a.target_type,
+          targetId: a.target_id,
+          targetName: a.target_name,
+          details: a.details,
+          timestamp: a.timestamp || new Date().toISOString(),
+        })));
+      }
         setSyncStatus('connected');
         setLastSyncedAt(new Date());
       } catch {
@@ -925,8 +946,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
+    apiClient.setToken(null);
     setIsAuthenticated(false);
-    setCurrentUser(demoFaculty);
+    setCurrentUser(demoSuperAdmin);
     setActiveTabState('login');
     setSelectedEventId(null);
     setSelectedTaskId(null);
