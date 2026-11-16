@@ -929,6 +929,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleSessionExpired = (e: any) => {
+      logout();
+      showToast(e?.detail?.reason || 'Signed out by admin');
+    };
+    window.addEventListener('geohub:session-expired', handleSessionExpired);
+    return () => window.removeEventListener('geohub:session-expired', handleSessionExpired);
+  }, []);
+
   const registerForEvent = (eventId: string) => {
     setEvents((prev) =>
       prev.map((ev) => {

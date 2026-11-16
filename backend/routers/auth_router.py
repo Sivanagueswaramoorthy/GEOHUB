@@ -53,7 +53,7 @@ def register(user_in: schemas.UserRegister, db: Session = Depends(get_db)):
         details=f"User registered with default role {initial_role}"
     )
 
-    token = auth.create_access_token(data={"sub": new_user.id, "role": new_user.role})
+    token = auth.create_access_token(data={"sub": new_user.id, "role": new_user.role, "tv": getattr(new_user, "token_version", 0) or 0})
     return schemas.TokenResponse(
         access_token=token,
         user=schemas.UserResponse.from_orm(new_user)
@@ -107,7 +107,15 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
     if user.status == "disabled":
         raise HTTPException(status_code=403, detail="Your account has been disabled by an administrator.")
 
-    token = auth.create_access_token(data={"sub": user.id, "role": user.role})
+    # Update login and platform telemetry
+    try:
+        user.last_login_at = datetime.utcnow()
+        user.last_seen_at = datetime.utcnow()
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    token = auth.create_access_token(data={"sub": user.id, "role": user.role, "tv": getattr(user, "token_version", 0) or 0})
     return schemas.TokenResponse(
         access_token=token,
         user=schemas.UserResponse.from_orm(user)

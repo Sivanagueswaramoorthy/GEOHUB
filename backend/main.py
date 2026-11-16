@@ -1,11 +1,14 @@
 import os
-from fastapi import FastAPI, HTTPException
+from typing import Optional
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 
 from config import settings
-from database import engine, Base, SessionLocal
+from database import engine, Base, SessionLocal, get_db
 import models
+import auth
 from routers import (
     auth_router,
     teams_router,
@@ -79,7 +82,52 @@ app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)
 app.include_router(app_router.router, prefix=settings.API_V1_STR)
 app.include_router(admin_router.router, prefix=settings.API_V1_STR)
+app.include_router(admin_router.router, prefix="/superadmin")
 app.include_router(sync_router.router, prefix=settings.API_V1_STR)
+
+@app.get("/me/modules")
+@app.get(f"{settings.API_V1_STR}/me/modules")
+def get_my_effective_modules(
+    current_user: Optional[models.User] = Depends(auth.get_optional_user),
+    db: Session = Depends(get_db)
+):
+    """Returns effective module states for the authenticated user."""
+    override = db.query(models.RolePermissionOverride).filter(
+        models.RolePermissionOverride.role == "platform_modules"
+    ).first()
+    base_mods = {
+        "events": True,
+        "members": True,
+        "squads": True,
+        "finance": True,
+        "qr_attendance": True,
+        "archives": True,
+        "campaigns": True,
+        "forum": True,
+        "documents": True,
+    }
+    if override:
+        try:
+            base_mods.update(json.loads(override.overrides_json))
+        except Exception:
+            pass
+
+    if not current_user:
+        return base_mods
+
+    role = auth.normalize_role(current_user.role)
+    if role == "super_admin":
+        return base_mods
+
+    role_overrides = db.query(models.RoleModuleAccess).filter(
+        models.RoleModuleAccess.role == role
+    ).all()
+    effective = base_mods.copy()
+    for ro in role_overrides:
+        if ro.module_key in effective:
+            effective[ro.module_key] = bool(effective[ro.module_key] and ro.enabled)
+
+    return effective
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")

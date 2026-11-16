@@ -45,6 +45,8 @@ import { AuditLogView } from './views/audit/AuditLogView';
 import { DesignSystemView } from './views/design/DesignSystemView';
 import { SuperAdminOperationsView } from './views/admin/SuperAdminOperationsView';
 import { ModulePausedNotice } from './components/shared/ModulePausedNotice';
+import { SuperAdminTopNav } from './components/navigation/SuperAdminTopNav';
+import { SuperAdminBottomNav } from './components/navigation/SuperAdminBottomNav';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -191,6 +193,7 @@ const MainAppContent: React.FC = () => {
     return <ChangePasswordView />;
   }
 
+  const isSuperAdmin = currentUser?.role === 'super_admin';
   const navTabs = getRoleNavTabs(currentUser.role, currentUser.post);
   const primaryTabKeys = [
     'home',
@@ -350,7 +353,11 @@ const MainAppContent: React.FC = () => {
         }}
       >
         {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
-        {activeTab !== 'scan_qr' && activeTab !== 'profile' && <TopBar />}
+        {isSuperAdmin ? (
+          <SuperAdminTopNav />
+        ) : (
+          activeTab !== 'scan_qr' && activeTab !== 'profile' && <TopBar />
+        )}
 
         {/* Global Security / Notification Toast (Floating gracefully below TopBar) */}
         {toast && (
@@ -363,13 +370,11 @@ const MainAppContent: React.FC = () => {
 
         {/* Main Content Area */}
         <main
-          className={`mobile-app-content ${
-            activeTab.startsWith('audits') ? 'audit-content-override' : ''
-          } ${
-            activeTab === 'community' || activeTab === 'forum'
+          className={`mobile-app-content ${activeTab.startsWith('audits') ? 'audit-content-override' : ''
+            } ${activeTab === 'community' || activeTab === 'forum'
               ? 'chat-content-override'
               : ''
-          } ${activeTab === 'scan_qr' ? 'scan-content-override' : ''}`}
+            } ${activeTab === 'scan_qr' ? 'scan-content-override' : ''}`}
         >
           <PageTransition tabKey={activeTab}>
             {renderActiveScreen()}
@@ -377,7 +382,11 @@ const MainAppContent: React.FC = () => {
         </main>
 
         {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
-        {!activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />}
+        {isSuperAdmin ? (
+          <SuperAdminBottomNav />
+        ) : (
+          !activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />
+        )}
 
         {/* Role Switcher Modal */}
         <RoleSwitcherModal />

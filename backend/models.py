@@ -25,6 +25,11 @@ class User(Base):
     squad_memberships = Column(Text, default="[]") # JSON string of [{ squad: 'Management', isLead: true }]
     is_volunteer = Column(Boolean, default=False)
     status = Column(String(32), default="pending") # pending, active, disabled
+    last_login_at = Column(DateTime, nullable=True)
+    last_seen_at = Column(DateTime, nullable=True)
+    last_platform = Column(String(32), default="Android")
+    last_app_version = Column(String(32), default="1.6.26")
+    token_version = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -208,4 +213,14 @@ class RolePermissionOverride(Base):
     overrides_json = Column(Text, nullable=False, default="{}") # JSON of { "canApproveEvents": true, ... }
     updated_by = Column(String(64), nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class RoleModuleAccess(Base):
+    __tablename__ = "role_module_access"
+
+    role = Column(String(32), primary_key=True)
+    module_key = Column(String(64), primary_key=True)
+    enabled = Column(Boolean, default=True, nullable=False)
+    updated_by = Column(String(64), nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 

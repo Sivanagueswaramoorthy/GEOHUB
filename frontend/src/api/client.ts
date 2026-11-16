@@ -129,6 +129,16 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          this.setToken(null);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('geohub:session-expired', {
+                detail: { reason: 'Signed out by admin' },
+              })
+            );
+          }
+        }
         let errorDetail = 'API request failed';
         try {
           const errorJson = await response.json();
@@ -151,6 +161,10 @@ class ApiClient {
   // ==========================================
   // Auth & Profile Endpoints
   // ==========================================
+  public async getEffectiveModules(): Promise<{ user_id: string; role: string; modules: Record<string, boolean> }> {
+    return this.request('/me/modules');
+  }
+
   public async login(identifier: string, password: string) {
     const res = await this.request<{ access_token: string; user: any }>('/auth/login', {
       method: 'POST',

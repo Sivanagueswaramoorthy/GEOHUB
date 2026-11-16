@@ -133,6 +133,8 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
+    if "tv" not in to_encode:
+        to_encode["tv"] = 0
     default_expire = timedelta(minutes=getattr(settings, "ACCESS_TOKEN_EXPIRE_MINUTES", 60 * 24 * 7))
     expire = datetime.utcnow() + (expires_delta or default_expire)
     to_encode.update({"exp": expire})
@@ -168,12 +170,32 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         user_id: str = payload.get("sub")
         if user_id is None:
             raise credentials_exception
+        token_tv = payload.get("tv")
     except jwt.PyJWTError:
         raise credentials_exception
 
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
         raise credentials_exception
+
+    # Check token version for instant revocation
+    if token_tv is not None and user.token_version is not None:
+        if token_tv != user.token_version:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Session has been revoked by admin. Please log in again.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    # Opportunistically update last_seen_at if older than 60 seconds
+    try:
+        now = datetime.utcnow()
+        if not user.last_seen_at or (now - user.last_seen_at).total_seconds() > 60:
+            user.last_seen_at = now
+            db.commit()
+    except Exception:
+        db.rollback()
+
     return user
 
 def get_current_active_user(current_user: models.User = Depends(get_current_user)) -> models.User:
@@ -221,6 +243,44 @@ def require_faculty(current_user: models.User = Depends(get_current_active_user)
             detail="Forbidden: Faculty clearance required."
         )
     return current_user
+
+def require_module(module_key: str):
+    """Route dependency ensuring module is enabled globally and for user's role (403 if paused)."""
+    def dependency(
+        current_user: models.User = Depends(get_current_active_user),
+        db: Session = Depends(get_db),
+    ) -> models.User:
+        norm_role = normalize_role(current_user.role)
+        if norm_role == "super_admin":
+            return current_user
+
+        # 1. Check Global Platform Switchboard
+        override = db.query(models.RolePermissionOverride).filter(
+            models.RolePermissionOverride.role == "platform_modules"
+        ).first()
+        if override:
+            try:
+                mods = json.loads(override.overrides_json)
+                if mods.get(module_key) is False:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail=f"Module '{module_key}' is currently paused by administrator."
+                    )
+            except Exception:
+                pass
+
+        # 2. Check Role-Specific Override
+        rma = db.query(models.RoleModuleAccess).filter(
+            models.RoleModuleAccess.role == norm_role,
+            models.RoleModuleAccess.module_key == module_key,
+        ).first()
+        if rma and not rma.enabled:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Module '{module_key}' is disabled for your role."
+            )
+        return current_user
+    return dependency
 
 def check_event_scanner_assignment(user, event) -> bool:
     """Helper to check if user is in event's assigned scanner list."""
