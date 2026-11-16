@@ -1,8 +1,8 @@
 {
-  "version": "1.6.28",
-  "version_code": 46,
+  "version": "1.6.29",
+  "version_code": 47,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Mobile-first SuperAdmin rebuild with token versioning, modular navbar, and clean governance decks",
+  "release_notes": "Remove duplicate bottom nav bar from SuperAdmin view",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-16",

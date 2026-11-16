@@ -8,7 +8,6 @@ import { RoleMatrixDeck } from './components/RoleMatrixDeck';
 import { MaintenanceDeck } from './components/MaintenanceDeck';
 import { Toast } from './ui/Toast';
 import { PullToRefresh } from './ui/PullToRefresh';
-import { SuperAdminBottomNav } from '../../components/navigation/SuperAdminBottomNav';
 import { FacultyFormModal } from './modals/FacultyFormModal';
 import { StudentFormModal } from './modals/StudentFormModal';
 import { useApp } from '../../context/AppContext';
@@ -282,14 +281,6 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
           state.showToast(`Onboarded scholar ${std.name}`);
         }}
       />
-
-      {/* Standalone Fallback Bottom Nav (rendered when tested independently without App.tsx) */}
-      <div className="lg:hidden">
-        <SuperAdminBottomNav
-          activeDeck={state.activeDeck}
-          onSelectDeck={(deck) => state.setActiveDeck(deck)}
-        />
-      </div>
 
       {/* Toast Notification */}
       {state.toast && (
