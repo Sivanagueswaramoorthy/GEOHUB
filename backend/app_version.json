@@ -1,12 +1,12 @@
 {
-  "version": "1.6.24",
-  "version_code": 42,
+  "version": "1.6.25",
+  "version_code": 43,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Restore clean SuperAdminOperationsView without duplicate JSX",
+  "release_notes": "SuperAdmin complete 5-deck capability suite: batch student actions, faculty department filters, security presets, and table telemetry",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
-  "released_at": "2026-11-15",
-  "file_size_bytes": 6864176,
+  "released_at": "2026-11-16",
+  "file_size_bytes": 6868724,
   "file_size_mb": "6.55 MB",
-  "sha256": "81772E0F4878DBB8E780FC0950BA7BB78CAD1758C7E6A51C462B213EA13889D5"
+  "sha256": "A9942CAABE7D08F2C9872FE8B561CA00C2BB2F0D58020463CCB2EB02C47DAB15"
 }

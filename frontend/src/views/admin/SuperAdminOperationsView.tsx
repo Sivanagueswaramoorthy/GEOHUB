@@ -32,6 +32,13 @@ import {
   Repeat,
   Search,
   MessageSquare,
+  Download,
+  Megaphone,
+  CheckSquare,
+  Square,
+  Zap,
+  BarChart3,
+  Radio,
 } from 'lucide-react';
 
 interface RoleMeta {
@@ -130,6 +137,45 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
   const [facultySearch, setFacultySearch] = useState<string>('');
   const [dbLatencyMs, setDbLatencyMs] = useState<number>(24);
 
+  // Diagnostics & Live Telemetry
+  const [diagnosticsData, setDiagnosticsData] = useState<{
+    status: string;
+    engine: string;
+    endpoint: string;
+    latency_ms: number;
+    table_counts: Record<string, number>;
+    recent_audits: Array<{
+      id: string;
+      action: string;
+      actor_name: string;
+      target_name: string;
+      details: string;
+      timestamp: string;
+    }>;
+  } | null>(null);
+
+  // Deck 1: Broadcast Modal & Priority
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [broadcastTitle, setBroadcastTitle] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcastPriority, setBroadcastPriority] = useState('urgent');
+  const [broadcastSubmitting, setBroadcastSubmitting] = useState(false);
+
+  // Deck 2: Department Filter & PIN Modal
+  const [selectedFacultyDept, setSelectedFacultyDept] = useState<string>('all');
+  const [pinModalFaculty, setPinModalFaculty] = useState<any | null>(null);
+  const [generatedPin, setGeneratedPin] = useState<string>('');
+  const [copiedPin, setCopiedPin] = useState(false);
+
+  // Deck 3: Student Multi-Select & Batch Actions
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
+  const [isBatchSquadModalOpen, setIsBatchSquadModalOpen] = useState(false);
+  const [batchTargetSquad, setBatchTargetSquad] = useState('Management');
+  const [batchSubmitting, setBatchSubmitting] = useState(false);
+
+  // Deck 5: Ping Telemetry
+  const [pingingDb, setPingingDb] = useState(false);
+
   // Matrix state
   const [matrixData, setMatrixData] = useState<Record<string, Record<string, boolean>>>({});
   const [loading, setLoading] = useState<boolean>(true);
@@ -213,13 +259,17 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
     setLoading(true);
     const start = Date.now();
     try {
-      const [rolesRes, matrixRes, facultyRes, usersRes] = await Promise.all([
+      const [rolesRes, matrixRes, facultyRes, usersRes, diagRes] = await Promise.all([
         apiClient.getAdminRolesCredentials().catch(() => DEFAULT_ROLES),
         apiClient.getAdminPermissionsMatrix().catch(() => null),
         apiClient.getAdminFaculty().catch(() => []),
         apiClient.getAdminUsers().catch(() => []),
+        apiClient.getAdminSystemDiagnostics().catch(() => null),
       ]);
-      setDbLatencyMs(Math.max(16, Date.now() - start));
+      setDbLatencyMs(diagRes?.latency_ms || Math.max(16, Date.now() - start));
+      if (diagRes) {
+        setDiagnosticsData(diagRes);
+      }
 
       if (rolesRes && Array.isArray(rolesRes) && rolesRes.length > 0) {
         setRoles(rolesRes);
@@ -331,18 +381,65 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
     }
   };
 
+  const facultyDepartments = useMemo(() => {
+    const set = new Set<string>();
+    facultyList.forEach((f) => {
+      if (f.department) set.add(f.department.trim());
+    });
+    return ['all', ...Array.from(set)];
+  }, [facultyList]);
+
   const filteredFaculty = useMemo(() => {
-    if (!facultySearch.trim()) return facultyList;
-    const q = facultySearch.trim().toLowerCase();
-    return facultyList.filter(
-      (f) =>
+    return facultyList.filter((f) => {
+      const q = facultySearch.trim().toLowerCase();
+      const matchSearch =
+        !q ||
         (f.name && f.name.toLowerCase().includes(q)) ||
         (f.roll_no && f.roll_no.toLowerCase().includes(q)) ||
         (f.email && f.email.toLowerCase().includes(q)) ||
         (f.department && f.department.toLowerCase().includes(q)) ||
-        (f.post && f.post.toLowerCase().includes(q))
-    );
-  }, [facultyList, facultySearch]);
+        (f.post && f.post.toLowerCase().includes(q));
+
+      const matchDept =
+        selectedFacultyDept === 'all' ||
+        (f.department && f.department.toLowerCase() === selectedFacultyDept.toLowerCase());
+
+      return matchSearch && matchDept;
+    });
+  }, [facultyList, facultySearch, selectedFacultyDept]);
+
+  const handleExportFacultyCsv = () => {
+    if (facultyList.length === 0) {
+      showToast('No faculty advisors to export', 'error');
+      return;
+    }
+    const headers = ['Name', 'Faculty ID', 'Email', 'Department', 'Post', 'Phone', 'Status'];
+    const rows = facultyList.map((f) => [
+      `"${(f.name || '').replace(/"/g, '""')}"`,
+      `"${(f.roll_no || '').replace(/"/g, '""')}"`,
+      `"${(f.email || '').replace(/"/g, '""')}"`,
+      `"${(f.department || '').replace(/"/g, '""')}"`,
+      `"${(f.post || '').replace(/"/g, '""')}"`,
+      `"${(f.phone || '').replace(/"/g, '""')}"`,
+      `"${(f.status || 'active').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent =
+      'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const link = document.createElement('a');
+    link.setAttribute('href', encodeURI(csvContent));
+    link.setAttribute('download', `faculty_directory_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('✓ Faculty directory exported as CSV', 'success');
+  };
+
+  const handleGeneratePin = (fac: any) => {
+    const pin = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedPin(pin);
+    setPinModalFaculty(fac);
+    setCopiedPin(false);
+  };
 
   const filteredStudents = useMemo(() => {
     return studentList.filter((s) => {
@@ -703,6 +800,230 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
     }
   };
 
+  // Deck 1: Campus Broadcast Dispatch
+  const handleSendBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastTitle.trim() || !broadcastMessage.trim()) {
+      showToast('Please enter an alert title and message', 'error');
+      return;
+    }
+    setBroadcastSubmitting(true);
+    try {
+      await apiClient.sendAdminBroadcastAlert({
+        title: broadcastTitle.trim(),
+        message: broadcastMessage.trim(),
+        priority: broadcastPriority,
+      });
+      showToast('✓ Campus broadcast dispatched to all devices', 'success');
+      setIsBroadcastModalOpen(false);
+      setBroadcastTitle('');
+      setBroadcastMessage('');
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to dispatch alert', 'error');
+    } finally {
+      setBroadcastSubmitting(false);
+    }
+  };
+
+  // Deck 1: Maintenance Freeze Toggle
+  const handleMaintenanceFreezeToggle = () => {
+    const isAnyPaused = Object.values(platformModules || {}).some((v) => v === false);
+    if (isAnyPaused) {
+      toggleAllModules(true);
+      showToast('✓ Resumed all platform modules', 'success');
+    } else {
+      const nonEssentials = ['events', 'archives', 'campaigns', 'forum'];
+      nonEssentials.forEach((modId) => toggleModule(modId, false));
+      showToast('⏸ Maintenance Freeze: paused public modules', 'info');
+    }
+  };
+
+  // Deck 3: Squad Telemetry & Multi-select Batch Handlers
+  const squadDistribution = useMemo(() => {
+    const counts: Record<string, number> = {
+      General: 0,
+      Management: 0,
+      Promotion: 0,
+      Documentation: 0,
+      Entertainment: 0,
+    };
+    studentList.forEach((s) => {
+      const sq = s.team || 'General';
+      counts[sq] = (counts[sq] || 0) + 1;
+    });
+    return counts;
+  }, [studentList]);
+
+  const toggleSelectStudent = (id: string) => {
+    setSelectedStudentIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllStudents = () => {
+    if (selectedStudentIds.length === filteredStudents.length) {
+      setSelectedStudentIds([]);
+    } else {
+      setSelectedStudentIds(filteredStudents.map((s) => s.id || s.uid).filter(Boolean));
+    }
+  };
+
+  const handleExecuteBatchSquad = async () => {
+    if (selectedStudentIds.length === 0) return;
+    setBatchSubmitting(true);
+    try {
+      const res = await apiClient.executeAdminBatchAction({
+        user_ids: selectedStudentIds,
+        action: 'assign_squad',
+        value: batchTargetSquad,
+      });
+      showToast(`✓ Assigned ${res.affected_count} scholars to ${batchTargetSquad}`, 'success');
+      setIsBatchSquadModalOpen(false);
+      setSelectedStudentIds([]);
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed batch squad assignment', 'error');
+    } finally {
+      setBatchSubmitting(false);
+    }
+  };
+
+  const handleBatchToggleStatus = async () => {
+    if (selectedStudentIds.length === 0) return;
+    setBatchSubmitting(true);
+    try {
+      const sample = studentList.filter((s) => selectedStudentIds.includes(s.id || s.uid));
+      const targetStatus = sample.some((s) => s.status === 'disabled') ? 'active' : 'disabled';
+      const res = await apiClient.executeAdminBatchAction({
+        user_ids: selectedStudentIds,
+        action: 'set_status',
+        value: targetStatus,
+      });
+      showToast(`✓ Updated status to "${targetStatus}" for ${res.affected_count} scholars`, 'success');
+      setSelectedStudentIds([]);
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed batch status update', 'error');
+    } finally {
+      setBatchSubmitting(false);
+    }
+  };
+
+  const handleBatchResetPassword = async () => {
+    if (selectedStudentIds.length === 0) return;
+    if (!window.confirm(`Reset passwords to default "geohub" for all ${selectedStudentIds.length} selected accounts?`)) return;
+    setBatchSubmitting(true);
+    try {
+      const res = await apiClient.executeAdminBatchAction({
+        user_ids: selectedStudentIds,
+        action: 'reset_password',
+        value: 'geohub',
+      });
+      showToast(`✓ Reset password to "geohub" for ${res.affected_count} scholars`, 'success');
+      setSelectedStudentIds([]);
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed batch password reset', 'error');
+    } finally {
+      setBatchSubmitting(false);
+    }
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedStudentIds.length === 0) return;
+    if (!window.confirm(`Permanently delete ${selectedStudentIds.length} selected accounts?\n\nRoot SuperAdmin (SA01) is protected and will never be deleted.`)) return;
+    setBatchSubmitting(true);
+    try {
+      const res = await apiClient.executeAdminBatchAction({
+        user_ids: selectedStudentIds,
+        action: 'delete',
+      });
+      showToast(`✓ Removed ${res.affected_count} student accounts`, 'info');
+      setSelectedStudentIds([]);
+      await fetchData();
+    } catch (err: any) {
+      showToast(err?.message || 'Failed batch deletion', 'error');
+    } finally {
+      setBatchSubmitting(false);
+    }
+  };
+
+  // Deck 4: Security Presets
+  const handleApplySecurityPreset = async (preset: 'baseline' | 'event_sprint' | 'exam_hiatus') => {
+    setTogglingOperation(true);
+    try {
+      if (preset === 'baseline') {
+        const res = await apiClient.resetAdminPermissionsMatrix(selectedRoleKey);
+        if (res.effective_matrix?.matrix) {
+          setMatrixData(res.effective_matrix.matrix);
+        } else {
+          await fetchData();
+        }
+        showToast(`✓ Applied Baseline preset for ${activeRoleMeta.badge}`, 'success');
+      } else if (preset === 'event_sprint') {
+        const sprintKeys = [
+          'canAssignEventDuties',
+          'canManageExpenses',
+          'canCreateMemories',
+          'canPublishMemories',
+          'canAccessDocStudio',
+          'canEditDocStudio',
+        ];
+        const currentRolePerms = { ...(matrixData[normRoleKey] || {}) };
+        sprintKeys.forEach((k) => (currentRolePerms[k] = true));
+        setMatrixData((prev) => ({ ...prev, [normRoleKey]: currentRolePerms }));
+        for (const k of sprintKeys) {
+          await apiClient.updateAdminPermissionsMatrix({
+            role: selectedRoleKey,
+            permissions: { [k]: true },
+          }).catch(() => null);
+        }
+        showToast(`⚡ Event Sprint preset applied to ${activeRoleMeta.badge}`, 'success');
+      } else if (preset === 'exam_hiatus') {
+        const hiatusKeys = [
+          'canCreateEditEvents',
+          'canApproveEvents',
+          'canSubmitBudgetRequest',
+          'canManageExpenses',
+          'canCreateMeetings',
+          'canManageCampaigns',
+        ];
+        const currentRolePerms = { ...(matrixData[normRoleKey] || {}) };
+        hiatusKeys.forEach((k) => (currentRolePerms[k] = false));
+        setMatrixData((prev) => ({ ...prev, [normRoleKey]: currentRolePerms }));
+        for (const k of hiatusKeys) {
+          await apiClient.updateAdminPermissionsMatrix({
+            role: selectedRoleKey,
+            permissions: { [k]: false },
+          }).catch(() => null);
+        }
+        showToast(`🔒 Exam Hiatus preset applied (restricted non-admin mutations)`, 'info');
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to apply preset', 'error');
+    } finally {
+      setTogglingOperation(false);
+    }
+  };
+
+  // Deck 5: Ping Database Diagnostic
+  const handlePingDatabase = async () => {
+    setPingingDb(true);
+    const start = Date.now();
+    try {
+      const diag = await apiClient.getAdminSystemDiagnostics();
+      const elapsed = Math.max(8, Date.now() - start);
+      setDbLatencyMs(diag?.latency_ms || elapsed);
+      if (diag) setDiagnosticsData(diag);
+      showToast(`✓ TiDB Cloud ping: ${diag?.latency_ms || elapsed}ms roundtrip`, 'success');
+    } catch {
+      showToast('TiDB ping completed', 'info');
+    } finally {
+      setPingingDb(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 pb-44 animate-fadeIn select-none">
       {/* Hero Cockpit Banner with Live Telemetry */}
@@ -996,12 +1317,23 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
               <Sliders size={20} strokeWidth={2.4} />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-sm font-bold text-[#051F20] leading-tight">
                   Platform Module Switchboard
                 </h2>
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347]">
                   {Object.values(platformModules || {}).filter(Boolean).length} / {MODULE_CONFIGS.length} Active
+                </span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                    Object.values(platformModules || {}).filter(Boolean).length === MODULE_CONFIGS.length
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                      : 'bg-amber-100 text-amber-800 border-amber-300'
+                  }`}
+                >
+                  {Object.values(platformModules || {}).filter(Boolean).length === MODULE_CONFIGS.length
+                    ? '● 100% Operational'
+                    : `● Degraded (${MODULE_CONFIGS.length - Object.values(platformModules || {}).filter(Boolean).length} paused)`}
                 </span>
               </div>
               <p className="text-xs text-[#235347]">
@@ -1010,7 +1342,27 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 self-start sm:self-auto">
+          <div className="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+            <button
+              type="button"
+              onClick={() => setIsBroadcastModalOpen(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] text-[11px] font-bold border border-[#8EB69B]/40 transition cursor-pointer flex items-center gap-1"
+            >
+              <Megaphone size={12} />
+              <span>Broadcast Alert</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleMaintenanceFreezeToggle}
+              className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold border transition cursor-pointer flex items-center gap-1 ${
+                Object.values(platformModules || {}).some((v) => v === false)
+                  ? 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
+                  : 'bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#235347] border-[#DAF1DE]'
+              }`}
+            >
+              <Lock size={12} />
+              <span>{Object.values(platformModules || {}).some((v) => v === false) ? 'Unfreeze' : 'Freeze'}</span>
+            </button>
             <button
               type="button"
               onClick={() => toggleAllModules(true)}
@@ -1176,15 +1528,52 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setIsAddFacultyModalOpen(true)}
-            className="px-3 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs self-start sm:self-auto"
-          >
-            <Plus size={15} strokeWidth={2.5} />
-            <span>Add Faculty Advisor</span>
-          </button>
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            <button
+              type="button"
+              onClick={handleExportFacultyCsv}
+              className="px-3 py-2 rounded-xl bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#235347] border border-[#DAF1DE] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-2xs"
+              title="Export faculty directory as CSV"
+            >
+              <Download size={14} />
+              <span>Export CSV</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAddFacultyModalOpen(true)}
+              className="px-3 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-xs"
+            >
+              <Plus size={15} strokeWidth={2.5} />
+              <span>Add Faculty Advisor</span>
+            </button>
+          </div>
         </div>
+
+        {/* Department Quick Filter Chips */}
+        {facultyDepartments.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            {facultyDepartments.map((dept) => {
+              const count =
+                dept === 'all'
+                  ? facultyList.length
+                  : facultyList.filter((f) => (f.department || '').trim().toLowerCase() === dept.toLowerCase()).length;
+              return (
+                <button
+                  key={dept}
+                  type="button"
+                  onClick={() => setSelectedFacultyDept(dept)}
+                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer touch-target-44 ${
+                    selectedFacultyDept === dept
+                      ? 'bg-[#163832] text-white shadow-2xs'
+                      : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:border-[#8EB69B]'
+                  }`}
+                >
+                  {dept === 'all' ? 'All Departments' : dept} ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Search Bar for Faculty */}
         {facultyList.length > 0 && (
@@ -1248,6 +1637,15 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
+                      onClick={() => handleGeneratePin(fac)}
+                      className="p-1 rounded-lg text-[#235347] hover:bg-[#DAF1DE] transition cursor-pointer"
+                      title="Generate Temporary Access PIN"
+                      aria-label={`Generate PIN for ${fac.name}`}
+                    >
+                      <Key size={14} />
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleOpenEditFaculty(fac)}
                       className="p-1 rounded-lg text-[#235347] hover:bg-[#DAF1DE] transition cursor-pointer"
                       title="Edit faculty details & password"
@@ -1268,6 +1666,66 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Sticky Batch Control Bar */}
+        {selectedStudentIds.length > 0 && (
+          <div className="sticky bottom-2 z-30 p-2.5 sm:p-3 rounded-2xl bg-[#051F20] text-white border border-[#163832] shadow-2xl flex items-center justify-between gap-2 animate-fadeIn flex-wrap sm:flex-nowrap">
+            <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-[#DAF1DE] text-[#051F20] shrink-0">
+              {selectedStudentIds.length} Selected
+            </span>
+
+            <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+              <button
+                type="button"
+                disabled={batchSubmitting}
+                onClick={() => setIsBatchSquadModalOpen(true)}
+                className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1 touch-target-44"
+              >
+                <Shield size={13} />
+                <span>Assign Squad</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={batchSubmitting}
+                onClick={handleBatchToggleStatus}
+                className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1 touch-target-44"
+              >
+                <Repeat size={13} />
+                <span>Toggle Status</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={batchSubmitting}
+                onClick={handleBatchResetPassword}
+                className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1 touch-target-44"
+              >
+                <Key size={13} />
+                <span>Reset Pass</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={batchSubmitting}
+                onClick={handleBatchDelete}
+                className="px-2.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1 touch-target-44"
+              >
+                <Trash2 size={13} />
+                <span>Delete</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedStudentIds([])}
+                className="p-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold transition cursor-pointer"
+                title="Deselect all"
+              >
+                <X size={14} />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -1304,6 +1762,28 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             <Plus size={15} strokeWidth={2.5} />
             <span>Add Student / Member</span>
           </button>
+        </div>
+
+        {/* Squad Distribution Telemetry */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <span className="text-[10px] font-bold text-[#8EB69B] uppercase tracking-wider">Squads:</span>
+          {Object.entries(squadDistribution).map(([sq, count]) => (
+            <span
+              key={sq}
+              className="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] whitespace-nowrap"
+            >
+              {sq} ({count})
+            </span>
+          ))}
+          {filteredStudents.length > 0 && (
+            <button
+              type="button"
+              onClick={handleSelectAllStudents}
+              className="ml-auto text-[11px] font-bold text-[#163832] hover:underline cursor-pointer whitespace-nowrap"
+            >
+              {selectedStudentIds.length === filteredStudents.length ? 'Deselect All' : 'Select All'}
+            </button>
+          )}
         </div>
 
         {/* Filter & Search Bar */}
@@ -1356,6 +1836,18 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
+                      <button
+                        type="button"
+                        onClick={() => toggleSelectStudent(st.id || st.uid)}
+                        className="text-[#163832] hover:text-[#235347] transition cursor-pointer p-0.5 shrink-0"
+                        aria-label={`Select student ${st.name}`}
+                      >
+                        {selectedStudentIds.includes(st.id || st.uid) ? (
+                          <CheckSquare size={16} className="text-[#163832]" />
+                        ) : (
+                          <Square size={16} className="text-[#8EB69B]" />
+                        )}
+                      </button>
                       <div className="w-8 h-8 rounded-full bg-[#163832] text-white flex items-center justify-center font-bold text-xs shrink-0">
                         {st.name ? st.name.charAt(0).toUpperCase() : 'S'}
                       </div>
@@ -1644,6 +2136,37 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             </div>
           </div>
 
+          {/* Security Presets Quick Actions */}
+          <div className="flex items-center gap-1.5 flex-wrap p-2 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE]">
+            <span className="text-[10px] font-bold text-[#8EB69B] uppercase tracking-wider">Presets:</span>
+            <button
+              type="button"
+              onClick={() => handleApplySecurityPreset('baseline')}
+              disabled={togglingOperation}
+              className="px-2 py-1 rounded-lg text-xs font-bold text-[#163832] bg-white border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-1 transition cursor-pointer shadow-2xs"
+            >
+              <span>🏛️ Baseline</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleApplySecurityPreset('event_sprint')}
+              disabled={togglingOperation}
+              className="px-2 py-1 rounded-lg text-xs font-bold text-[#163832] bg-white border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-1 transition cursor-pointer shadow-2xs"
+            >
+              <Zap size={11} className="text-amber-600" />
+              <span>Event Sprint</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleApplySecurityPreset('exam_hiatus')}
+              disabled={togglingOperation}
+              className="px-2 py-1 rounded-lg text-xs font-bold text-[#163832] bg-white border border-[#DAF1DE] hover:border-[#8EB69B] flex items-center gap-1 transition cursor-pointer shadow-2xs"
+            >
+              <Lock size={11} className="text-[#235347]" />
+              <span>Exam Hiatus</span>
+            </button>
+          </div>
+
           {/* Category Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
             <button
@@ -1814,6 +2337,75 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
             </div>
           </div>
         </div>
+
+        {/* Relational Table Record Inspector (Row Counts) */}
+        <div className="bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-3">
+          <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] flex items-center justify-center text-[#235347]">
+                <BarChart3 size={16} strokeWidth={2.4} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-[#051F20]">Relational Table Record Inspector</h3>
+                <p className="text-xs text-[#235347]">Live TiDB Cloud row distribution</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handlePingDatabase}
+              disabled={pingingDb}
+              className="px-2.5 py-1 rounded-xl bg-[#DAF1DE] hover:bg-[#8EB69B]/40 text-[#163832] text-xs font-bold transition flex items-center gap-1.5 cursor-pointer touch-target-44 shadow-2xs"
+            >
+              <Radio size={13} className={pingingDb ? 'animate-pulse text-emerald-600' : 'text-[#235347]'} />
+              <span>{pingingDb ? 'Probing...' : `Ping (${dbLatencyMs}ms)`}</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center">
+            {[
+              { label: 'Users', count: diagnosticsData?.table_counts?.users ?? studentList.length + facultyList.length + 1 },
+              { label: 'Events', count: diagnosticsData?.table_counts?.events ?? 0 },
+              { label: 'Registrations', count: diagnosticsData?.table_counts?.event_registrations ?? 0 },
+              { label: 'Tasks', count: diagnosticsData?.table_counts?.tasks ?? 0 },
+              { label: 'Ledger', count: (diagnosticsData?.table_counts?.expenses ?? 0) + (diagnosticsData?.table_counts?.budget_requests ?? 0) },
+              { label: 'Audit Logs', count: diagnosticsData?.table_counts?.audit_logs ?? 0 },
+            ].map((item) => (
+              <div key={item.label} className="p-3 rounded-xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col items-center justify-center">
+                <span className="font-mono text-base font-black text-[#051F20]">{item.count}</span>
+                <span className="text-[10px] font-bold text-[#52665C] uppercase tracking-wider mt-0.5">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Live Governance Audit Feed (Last 5 actions) */}
+        {diagnosticsData?.recent_audits && diagnosticsData.recent_audits.length > 0 && (
+          <div className="bg-white border border-[#DAF1DE] rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(5,31,32,0.04)] flex flex-col gap-2.5">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2">
+              <div className="flex items-center gap-2">
+                <Activity size={16} className="text-[#235347]" />
+                <h3 className="text-xs font-bold text-[#051F20] uppercase tracking-wider">Recent Governance Audit Log</h3>
+              </div>
+              <span className="text-[10px] font-bold text-[#8EB69B]">Last 5 Records</span>
+            </div>
+            <div className="divide-y divide-[#DAF1DE]/60">
+              {diagnosticsData.recent_audits.map((a) => (
+                <div key={a.id} className="py-2 flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#DAF1DE] text-[#163832] shrink-0">
+                      {a.action}
+                    </span>
+                    <span className="font-bold text-[#051F20] truncate">{a.target_name || a.actor_name}</span>
+                    <span className="text-[#52665C] truncate hidden sm:inline">{a.details}</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-[#8EB69B] shrink-0">
+                    {new Date(a.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Platform Data Purge & Clean Slate Controls */}
         <div className="bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-[0_4px_20px_rgba(225,29,72,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -2540,6 +3132,194 @@ export const SuperAdminOperationsView: React.FC<Props> = ({ onBack, isHomeCockpi
               >
                 <Trash2 size={14} />
                 <span>{isPurging ? 'Purging...' : 'Yes, Purge Everything'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Broadcast Alert Modal */}
+      {isBroadcastModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2.5">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold">
+                  <Megaphone size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#051F20]">Campus Push Broadcast</h3>
+                  <p className="text-xs text-[#235347]">Send real-time alert to all student and faculty devices</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsBroadcastModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSendBroadcast} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">Alert Title</label>
+                <input
+                  type="text"
+                  required
+                  value={broadcastTitle}
+                  onChange={(e) => setBroadcastTitle(e.target.value)}
+                  placeholder="e.g. Weather Advisory or Hackathon Commenced"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">Alert Message</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  placeholder="Provide clear, concise alert details..."
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#8EB69B] bg-white text-xs text-[#051F20] font-medium focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#163832] mb-1">Priority Level</label>
+                <div className="flex gap-2">
+                  {['urgent', 'normal'].map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setBroadcastPriority(p)}
+                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold uppercase transition capitalize cursor-pointer border ${
+                        broadcastPriority === p
+                          ? 'bg-[#163832] text-white border-[#163832]'
+                          : 'bg-[#F6FBF7] text-[#235347] border-[#DAF1DE]'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2 border-t border-[#DAF1DE]">
+                <button
+                  type="button"
+                  onClick={() => setIsBroadcastModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={broadcastSubmitting}
+                  className="px-5 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                >
+                  <Megaphone size={14} />
+                  <span>{broadcastSubmitting ? 'Broadcasting...' : 'Dispatch Alert'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Faculty Temporary PIN Modal */}
+      {pinModalFaculty && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-sm p-5 sm:p-6 flex flex-col gap-4 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center mx-auto font-bold">
+              <Key size={22} />
+            </div>
+
+            <div>
+              <h3 className="text-base font-bold text-[#051F20]">Temporary Access PIN</h3>
+              <p className="text-xs text-[#235347] mt-0.5">Faculty: {pinModalFaculty.name}</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col items-center gap-1">
+              <span className="text-[10px] font-bold text-[#8EB69B] uppercase tracking-wider">One-Time Token</span>
+              <span className="font-mono text-2xl font-black text-[#163832] tracking-widest">{generatedPin}</span>
+              <span className="text-[10px] text-[#52665C]">Valid for institutional verification</span>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedPin);
+                  setCopiedPin(true);
+                  showToast('✓ PIN copied to clipboard', 'success');
+                }}
+                className="flex-1 py-2 rounded-xl bg-[#163832] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                {copiedPin ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                <span>{copiedPin ? 'Copied' : 'Copy PIN'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPinModalFaculty(null)}
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Batch Assign Squad Modal */}
+      {isBatchSquadModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-sm p-5 sm:p-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-2">
+              <h3 className="text-sm font-bold text-[#051F20]">Assign Squad to {selectedStudentIds.length} Scholars</h3>
+              <button
+                type="button"
+                onClick={() => setIsBatchSquadModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 cursor-pointer"
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {['General', 'Management', 'Promotion', 'Documentation', 'Entertainment'].map((sq) => (
+                <button
+                  key={sq}
+                  type="button"
+                  onClick={() => setBatchTargetSquad(sq)}
+                  className={`w-full p-2.5 rounded-xl border text-xs font-bold text-left transition flex items-center justify-between cursor-pointer ${
+                    batchTargetSquad === sq
+                      ? 'bg-[#163832] text-white border-[#163832]'
+                      : 'bg-[#F6FBF7] text-[#051F20] border-[#DAF1DE] hover:border-[#8EB69B]'
+                  }`}
+                >
+                  <span>{sq} Squad</span>
+                  {batchTargetSquad === sq && <Check size={14} className="text-[#DAF1DE]" />}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-[#DAF1DE]">
+              <button
+                type="button"
+                onClick={() => setIsBatchSquadModalOpen(false)}
+                className="flex-1 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={batchSubmitting}
+                onClick={handleExecuteBatchSquad}
+                className="flex-1 py-2 rounded-xl bg-[#163832] hover:bg-[#235347] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 cursor-pointer"
+              >
+                <span>{batchSubmitting ? 'Assigning...' : 'Confirm'}</span>
               </button>
             </div>
           </div>

@@ -667,6 +667,54 @@ class ApiClient {
       body: JSON.stringify(modules),
     });
   }
+
+  public async executeAdminBatchAction(payload: {
+    user_ids: string[];
+    action: 'assign_squad' | 'set_status' | 'reset_password' | 'delete' | string;
+    value?: string;
+  }) {
+    return await this.request<{
+      status: string;
+      message: string;
+      affected_count: number;
+    }>('/admin/users/batch-action', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async getAdminSystemDiagnostics() {
+    return await this.request<{
+      status: string;
+      engine: string;
+      endpoint: string;
+      latency_ms: number;
+      table_counts: Record<string, number>;
+      recent_audits: Array<{
+        id: string;
+        action: string;
+        actor_name: string;
+        target_name: string;
+        details: string;
+        timestamp: string;
+      }>;
+    }>('/admin/system/diagnostics');
+  }
+
+  public async sendAdminBroadcastAlert(payload: {
+    title: string;
+    message: string;
+    priority?: string;
+  }) {
+    return await this.request<{
+      status: string;
+      message: string;
+      notification_id: string;
+    }>('/admin/broadcast-alert', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

@@ -757,3 +757,172 @@ def purge_platform_data(
 
     return {"status": "success", "message": "All dummy records and user accounts purged successfully.", "summary": res}
 
+# ==========================================
+# SuperAdmin Automated Batch Actions & Telemetry
+# ==========================================
+
+class BatchActionPayload(BaseModel):
+    user_ids: List[str]
+    action: str  # "assign_squad" | "set_status" | "reset_password" | "delete"
+    value: Optional[str] = None
+
+class BroadcastAlertPayload(BaseModel):
+    title: str
+    message: str
+    priority: Optional[str] = "urgent"
+
+@router.post("/users/batch-action")
+def execute_batch_user_action(
+    payload: BatchActionPayload,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Executes bulk administration operations across multiple user accounts simultaneously.
+    Enforces security invariants to safeguard root SuperAdmin (SA01).
+    """
+    if not payload.user_ids:
+        raise HTTPException(status_code=400, detail="No users specified for batch action.")
+
+    target_users = db.query(models.User).filter(models.User.id.in_(payload.user_ids)).all()
+    # Exclude root SuperAdmin SA01
+    sanitized_users = [u for u in target_users if u.roll_no != "SA01" and u.role != "super_admin"]
+
+    action = payload.action.lower().strip()
+    affected_count = 0
+
+    if action == "assign_squad":
+        squad_name = (payload.value or "General").strip()
+        for u in sanitized_users:
+            u.team = squad_name
+            u.squad_memberships = json.dumps([{"squad": squad_name, "isLead": False}])
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
+    elif action == "set_status":
+        status_val = (payload.value or "active").strip().lower()
+        for u in sanitized_users:
+            u.status = status_val
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
+    elif action == "reset_password":
+        pwd = (payload.value or "geohub").strip()
+        hashed = auth.get_password_hash(pwd)
+        for u in sanitized_users:
+            u.hashed_password = hashed
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
+    elif action == "delete":
+        for u in sanitized_users:
+            db.delete(u)
+            affected_count += 1
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported batch action: '{action}'.")
+
+    # Record governance audit
+    audit = models.AuditLog(
+        actor_id=current_user.id if current_user else "u_super_admin_sa01",
+        actor_name=current_user.name if current_user else "System SuperAdmin",
+        action="BATCH_USER_ACTION",
+        target_type="users",
+        target_id=f"count_{affected_count}",
+        target_name=f"Batch: {action}",
+        details=f"SuperAdmin executed batch {action} on {affected_count} users. Target value: {payload.value or 'N/A'}.",
+    )
+    db.add(audit)
+    db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("BATCH_USERS_UPDATED", {"action": action, "count": affected_count})
+    except Exception:
+        pass
+
+    return {
+        "status": "success",
+        "message": f"Successfully performed '{action}' on {affected_count} accounts.",
+        "affected_count": affected_count
+    }
+
+@router.get("/system/diagnostics")
+def get_system_diagnostics(db: Session = Depends(get_db)):
+    """
+    Returns live table row counts, TiDB Cloud diagnostics, and recent audit logs.
+    """
+    start = datetime.utcnow()
+    table_counts = {
+        "users": db.query(models.User).count(),
+        "events": db.query(models.Event).count(),
+        "event_registrations": db.query(models.EventRegistration).count(),
+        "tasks": db.query(models.Task).count(),
+        "expenses": db.query(models.Expense).count(),
+        "budget_requests": db.query(models.BudgetRequest).count(),
+        "audit_logs": db.query(models.AuditLog).count(),
+        "attendance": db.query(models.Attendance).count(),
+    }
+    latency_ms = max(8, int((datetime.utcnow() - start).total_seconds() * 1000))
+
+    recent_audits_raw = db.query(models.AuditLog).order_by(models.AuditLog.timestamp.desc()).limit(5).all()
+    recent_audits = [
+        {
+            "id": a.id,
+            "action": a.action,
+            "actor_name": a.actor_name or "SuperAdmin",
+            "target_name": a.target_name or "System",
+            "details": a.details or "",
+            "timestamp": a.timestamp.isoformat() if a.timestamp else datetime.utcnow().isoformat(),
+        }
+        for a in recent_audits_raw
+    ]
+
+    return {
+        "status": "online",
+        "engine": "TiDB Cloud MySQL Distributed 3306",
+        "endpoint": "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+        "latency_ms": latency_ms,
+        "table_counts": table_counts,
+        "recent_audits": recent_audits,
+    }
+
+@router.post("/broadcast-alert")
+def broadcast_admin_alert(
+    payload: BroadcastAlertPayload,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Broadcasts an urgent campus alert notification to all users.
+    """
+    notif = models.Notification(
+        user_id="all",
+        title=payload.title.strip(),
+        message=payload.message.strip(),
+        type="alert",
+    )
+    db.add(notif)
+
+    audit = models.AuditLog(
+        actor_id=current_user.id if current_user else "u_super_admin_sa01",
+        actor_name=current_user.name if current_user else "System SuperAdmin",
+        action="CAMPUS_ALERT_BROADCAST",
+        target_type="notification",
+        target_id=notif.id,
+        target_name=payload.title.strip(),
+        details=f"SuperAdmin broadcasted campus alert: '{payload.title}'",
+    )
+    db.add(audit)
+    db.commit()
+
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("CAMPUS_ALERT", {
+            "id": notif.id,
+            "title": notif.title,
+            "message": notif.message,
+            "priority": payload.priority or "urgent",
+            "created_at": datetime.utcnow().isoformat(),
+        })
+    except Exception:
+        pass
+
+    return {"status": "success", "message": "Alert broadcasted successfully.", "notification_id": notif.id}
+
