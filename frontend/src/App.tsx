@@ -2,6 +2,8 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { TopBar } from './components/shared/TopBar';
 import { FloatingNav } from './components/FloatingNav';
+import { SuperAdminTopNav } from './components/navigation/SuperAdminTopNav';
+import { SuperAdminBottomNav } from './components/navigation/SuperAdminBottomNav';
 import { PageTransition } from './components/shared/PageTransition';
 import { RoleSwitcherModal } from './components/navigation/RoleSwitcherModal';
 import { Toast } from './components/Toast';
@@ -60,6 +62,8 @@ const MainAppContent: React.FC = () => {
     isPhoneFrame,
     platformModules,
   } = useApp();
+
+  const isSuperAdmin = currentUser?.role === 'super_admin';
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -349,8 +353,10 @@ const MainAppContent: React.FC = () => {
           transition: 'max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
-        {activeTab !== 'scan_qr' && activeTab !== 'profile' && <TopBar />}
+        {/* Top Sticky Header (Dedicated SuperAdmin TopNav or Standard TopBar) */}
+        {activeTab !== 'scan_qr' && activeTab !== 'profile' && (
+          isSuperAdmin ? <SuperAdminTopNav /> : <TopBar />
+        )}
 
         {/* Global Security / Notification Toast (Floating gracefully below TopBar) */}
         {toast && (
@@ -376,8 +382,10 @@ const MainAppContent: React.FC = () => {
           </PageTransition>
         </main>
 
-        {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
-        {!activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />}
+        {/* Floating Pill Bottom Nav (Dedicated 5-Deck SuperAdmin Nav or Standard Role FloatingNav) */}
+        {!activeTab.startsWith('audits') && activeTab !== 'scan_qr' && (
+          isSuperAdmin ? <SuperAdminBottomNav /> : <FloatingNav />
+        )}
 
         {/* Role Switcher Modal */}
         <RoleSwitcherModal />
