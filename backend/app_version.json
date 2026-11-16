@@ -1,8 +1,8 @@
 {
-  "version": "1.6.29",
-  "version_code": 47,
+  "version": "1.6.30",
+  "version_code": 48,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Remove duplicate bottom nav bar from SuperAdmin view",
+  "release_notes": "Add comprehensive UI test suites covering all 9 roles, navigation suite, 5 decks, and mobile primitives",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-16",
