@@ -18,6 +18,7 @@ import {
 import { OverviewCounts, DiagnosticsData, SuperAdminTab } from '../types';
 import { Toggle } from '../ui/Toggle';
 import { AppContext } from '../../../context/AppContext';
+import { APP_VERSION } from '../../../config/version';
 
 export interface HomeTabProps {
   overviewCounts: OverviewCounts;
@@ -477,7 +478,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
               <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
                 <span className="text-slate-500 font-medium">API Version</span>
-                <span className="font-bold text-slate-800">v1.6.30 Production</span>
+                <span className="font-bold text-slate-800">v{APP_VERSION} Production</span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
                 <span className="text-slate-500 font-medium">Active Online Sessions</span>

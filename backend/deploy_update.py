@@ -164,7 +164,7 @@ def main():
         "version_code": new_code,
         "apk_filename": "geohub-app.apk",
         "release_notes": args.notes,
-        "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
+        "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
         "min_supported_version": "1.0.0",
         "released_at": release_date,
         "file_size_bytes": 0,

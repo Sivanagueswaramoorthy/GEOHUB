@@ -11,6 +11,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { APP_VERSION } from '../../config/version';
 
 export interface UnderMaintenanceScreenProps {
   onRefresh?: () => void;
@@ -127,7 +128,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
 
           <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
             <span>Production Version</span>
-            <span className="font-mono font-bold text-slate-700">v1.6.30 Production</span>
+            <span className="font-mono font-bold text-slate-700">v{APP_VERSION} Production</span>
           </div>
         </div>
 

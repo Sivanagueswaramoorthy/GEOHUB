@@ -49,9 +49,9 @@ export function compareSemver(v1: string, v2: string): number {
 }
 
 export const FALLBACK_VERSION_URL =
-  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/backend/app_version.json';
+  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/backend/app_version.json';
 export const CDN_APK_URL =
-  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk';
+  'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk';
 
 /**
  * Queries the backend for latest version manifest and checks if an update is available.
@@ -81,14 +81,20 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
     };
   };
 
+  const cacheBuster = `?_cb=${Date.now()}`;
+
   // Tier 1: Primary API server check
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-    const res = await fetch(`${baseUrl}/app/version`, {
+    const res = await fetch(`${baseUrl}/app/version${cacheBuster}`, {
       method: 'GET',
-      headers: { Accept: 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -101,14 +107,18 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
     // Fall through to Tier 2 CDN check
   }
 
-  // Tier 2: Global jsDelivr / GitHub CDN fallback check
+  // Tier 2: Global GitHub CDN fallback check (with cache busting)
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const res = await fetch(FALLBACK_VERSION_URL, {
+    const res = await fetch(`${FALLBACK_VERSION_URL}${cacheBuster}`, {
       method: 'GET',
-      headers: { Accept: 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+      },
       signal: controller.signal,
     });
     clearTimeout(timeoutId);

@@ -5,6 +5,7 @@ import { RelativeTime } from '../ui/RelativeTime';
 import { BottomSheet } from '../ui/BottomSheet';
 import { PurgeConfirmModal } from '../modals/PurgeConfirmModal';
 import { Toggle } from '../ui/Toggle';
+import { APP_VERSION } from '../../../config/version';
 
 export interface MaintenanceDeckProps {
   diagnostics: DiagnosticsData;
@@ -197,7 +198,7 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
           </div>
           <div className="flex items-center justify-between py-1 border-b border-slate-100">
             <span className="text-slate-500 font-bold">API Version</span>
-            <span className="font-bold text-slate-900">v1.6.30 Production</span>
+            <span className="font-bold text-slate-900">v{APP_VERSION} Production</span>
           </div>
           <div className="flex items-center justify-between py-1">
             <span className="text-slate-500 font-bold">Status</span>

@@ -3,7 +3,7 @@ import certifi
 
 class Settings:
     PROJECT_NAME: str = "GeoHub API"
-    VERSION: str = "1.6.32"
+    VERSION: str = "1.6.33"
     API_V1_STR: str = "/api"
 
     # Security & JWT

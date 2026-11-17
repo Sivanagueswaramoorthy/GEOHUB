@@ -14,6 +14,7 @@ import {
   Cpu,
 } from 'lucide-react';
 import { DiagnosticsData } from '../types';
+import { APP_VERSION } from '../../../config/version';
 
 export interface ProfileTabProps {
   diagnostics: DiagnosticsData;
@@ -151,7 +152,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({
             <span className="text-slate-400 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1">
               <Cpu size={12} /> App Build
             </span>
-            <p className="font-bold text-slate-900 text-sm">v1.6.30 Production</p>
+            <p className="font-bold text-slate-900 text-sm">v{APP_VERSION} Production</p>
           </div>
         </div>
 

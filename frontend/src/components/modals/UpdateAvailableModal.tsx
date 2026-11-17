@@ -41,7 +41,17 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
 
   if (!isOpen || !updateInfo) return null;
 
+  const handleDismiss = () => {
+    if (updateInfo?.version && typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+    }
+    onClose();
+  };
+
   const handleStartDownload = () => {
+    if (updateInfo?.version && typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+    }
     setIsDownloading(true);
     setDownloadProgress(10);
     setStatusMessage('Initiating download...');
@@ -98,7 +108,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
           {!isMandatory && (
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleDismiss}
               disabled={isDownloading}
               aria-label="Close update modal"
               className="w-8 h-8 rounded-full flex items-center justify-center text-[#235347] hover:bg-[#DAF1DE] transition-colors disabled:opacity-50"
@@ -171,7 +181,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
           {!isMandatory && (
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleDismiss}
               disabled={isDownloading}
               className="flex-1 py-3 rounded-2xl border border-[#8EB69B] text-xs font-bold text-[#235347] bg-white hover:bg-[#DAF1DE]/40 transition-colors disabled:opacity-50"
             >
