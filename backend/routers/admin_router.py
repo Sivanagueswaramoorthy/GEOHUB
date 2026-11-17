@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Body
 from pydantic import BaseModel
@@ -1080,6 +1080,7 @@ def set_role_module(
 def get_online_sessions(db: Session = Depends(get_db)):
     """
     Returns users who were active within the last 5 minutes.
+    Always ensures the active SuperAdmin session is present.
     """
     now = datetime.utcnow()
     five_min_ago = now - timedelta(minutes=5)
@@ -1088,7 +1089,8 @@ def get_online_sessions(db: Session = Depends(get_db)):
         models.User.last_seen_at >= five_min_ago
     ).all()
 
-    return [
+    sa_included = any(u.roll_no == "SA01" for u in online_users)
+    results = [
         {
             "id": u.id,
             "name": u.name,
@@ -1097,10 +1099,26 @@ def get_online_sessions(db: Session = Depends(get_db)):
             "department": u.department,
             "last_seen_at": u.last_seen_at.isoformat() if u.last_seen_at else now.isoformat(),
             "last_platform": u.last_platform or "Android",
-            "last_app_version": u.last_app_version or "1.6.26",
+            "last_app_version": u.last_app_version or "1.6.33",
         }
         for u in online_users
     ]
+
+    if not sa_included:
+        sa_user = db.query(models.User).filter(models.User.roll_no == "SA01").first()
+        if sa_user:
+            results.insert(0, {
+                "id": sa_user.id,
+                "name": sa_user.name,
+                "roll_no": sa_user.roll_no,
+                "role": sa_user.role,
+                "department": sa_user.department or "System Administration",
+                "last_seen_at": now.isoformat(),
+                "last_platform": "Web",
+                "last_app_version": "1.6.33",
+            })
+
+    return results
 
 @router.get("/users/{user_id}/detail")
 def get_user_detail(user_id: str, db: Session = Depends(get_db)):

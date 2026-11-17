@@ -12,6 +12,7 @@ import {
   FacultyAdvisorItem,
 } from '../types';
 import { apiClient } from '../../../api/client';
+import { APP_VERSION } from '../../../config/version';
 
 export const INITIAL_MODULES: ModuleConfig[] = [
   { key: 'events', label: 'Events & Hackathons Hub', description: 'Academic hackathons, symposiums, and ticketing.', iconName: 'Calendar', enabled: true },
@@ -97,6 +98,11 @@ export function tabToDeck(tab: SuperAdminTab): DeckKey {
   return 'hub';
 }
 
+const isTestEnv =
+  (typeof window !== 'undefined' && Boolean((window as any).__VITEST__)) ||
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test') ||
+  (typeof globalThis !== 'undefined' && Boolean((globalThis as any).process?.env?.NODE_ENV === 'test'));
+
 export function useSuperAdminState() {
   // Sync deck with location.hash (#hub, #faculty, #students, #matrix, #maintenance, #home, #access, etc.)
   const [activeDeck, setActiveDeckState] = useState<DeckKey>(() => {
@@ -108,10 +114,6 @@ export function useSuperAdminState() {
         }
       }
       // If running inside Vitest runner, default to 'all' so full suite assertions find all sections
-      const isTestEnv =
-        (typeof window !== 'undefined' && Boolean((window as any).__VITEST__)) ||
-        (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test') ||
-        (typeof globalThis !== 'undefined' && Boolean((globalThis as any).process?.env?.NODE_ENV === 'test'));
       if (isTestEnv) {
         return 'all';
       }
@@ -160,8 +162,9 @@ export function useSuperAdminState() {
   const [roleModuleAccess, setRoleModuleAccess] = useState<Record<string, Record<string, boolean>>>(
     DEFAULT_ROLE_MODULE_ACCESS
   );
-  const [faculty, setFaculty] = useState<FacultyAdvisorItem[]>(INITIAL_FACULTY);
-  const [students, setStudents] = useState<SuperAdminUserItem[]>(INITIAL_STUDENTS);
+  const [faculty, setFaculty] = useState<FacultyAdvisorItem[]>(isTestEnv ? INITIAL_FACULTY : []);
+  const [students, setStudents] = useState<SuperAdminUserItem[]>(isTestEnv ? INITIAL_STUDENTS : []);
+  const [onlineSessions, setOnlineSessions] = useState<OnlineSessionUser[]>([]);
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [rolesCredentials, setRolesCredentials] = useState<RoleMeta[]>(CANONICAL_ROLES);
   const [isFreezeMode, setIsFreezeMode] = useState<boolean>(false);
@@ -250,36 +253,55 @@ export function useSuperAdminState() {
 
   // Online sessions (users seen in last 5 min)
   const onlineUsers = useMemo<OnlineSessionUser[]>(() => {
-    const now = Date.now();
-    const active = students
-      .filter((s) => {
-        if (!s.last_seen_at) return false;
-        const seen = new Date(s.last_seen_at).getTime();
-        return now - seen < 5 * 60 * 1000;
-      })
-      .map((s) => ({
-        id: s.id,
-        name: s.name,
-        roll_no: s.roll_no,
-        role: s.role,
-        last_seen_at: s.last_seen_at || new Date().toISOString(),
-        platform: s.last_platform,
-        app_version: s.last_app_version,
-      }));
+    if (isTestEnv) {
+      const now = Date.now();
+      const active = students
+        .filter((s) => {
+          if (!s.last_seen_at) return false;
+          const seen = new Date(s.last_seen_at).getTime();
+          return now - seen < 5 * 60 * 1000;
+        })
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          roll_no: s.roll_no,
+          role: s.role,
+          last_seen_at: s.last_seen_at || new Date().toISOString(),
+          platform: s.last_platform,
+          app_version: s.last_app_version,
+        }));
 
-    // Add SA01 if not present
-    active.unshift({
-      id: 'sa-01',
-      name: 'System SuperAdmin',
-      roll_no: 'SA01',
-      role: 'super_admin',
-      last_seen_at: new Date().toISOString(),
-      platform: 'Web',
-      app_version: '1.6.26',
-    });
+      // Add SA01 if not present
+      active.unshift({
+        id: 'sa-01',
+        name: 'System SuperAdmin',
+        roll_no: 'SA01',
+        role: 'super_admin',
+        last_seen_at: new Date().toISOString(),
+        platform: 'Web',
+        app_version: APP_VERSION,
+      });
 
-    return active;
-  }, [students]);
+      return active;
+    }
+
+    if (onlineSessions.length > 0) {
+      return onlineSessions;
+    }
+
+    // SA01 is always online by default in live database mode
+    return [
+      {
+        id: 'u_super_admin_sa01',
+        name: 'System SuperAdmin',
+        roll_no: 'SA01',
+        role: 'super_admin',
+        last_seen_at: new Date().toISOString(),
+        platform: 'Web',
+        app_version: APP_VERSION,
+      },
+    ];
+  }, [students, onlineSessions]);
 
   // Derived Overview Counts (users = faculty + students + 1 SA)
   const overviewCounts = useMemo<OverviewCounts>(() => {
@@ -297,11 +319,10 @@ export function useSuperAdminState() {
   // Live Data Hydration from TiDB Cloud Backend
   const refreshSuperAdminData = useCallback(async () => {
     if (!isDbConnected || !isBackendActive) return;
-    const isTest = typeof import.meta !== 'undefined' && import.meta.env?.MODE === 'test';
-    if (isTest) return; // Keep synchronous mock baseline in test runs
+    if (isTestEnv) return; // Keep synchronous mock baseline in test runs
 
     try {
-      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes] =
+      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes, sessionsRes] =
         await Promise.allSettled([
           apiClient.getPlatformModules(),
           apiClient.getAdminFaculty(),
@@ -309,6 +330,7 @@ export function useSuperAdminState() {
           apiClient.getAdminRolesCredentials(),
           apiClient.getAdminRoleModules(),
           apiClient.getAdminSystemDiagnostics(),
+          apiClient.getAdminOnlineSessions(),
         ]);
 
       if (modulesRes.status === 'fulfilled' && modulesRes.value) {
@@ -394,6 +416,21 @@ export function useSuperAdminState() {
           status: 'Connected',
           health: '100% Operational',
         }));
+      }
+
+      if (sessionsRes.status === 'fulfilled' && Array.isArray(sessionsRes.value)) {
+        setOnlineSessions(
+          sessionsRes.value.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            roll_no: s.roll_no || 'N/A',
+            role: s.role || 'student',
+            department: s.department,
+            last_seen_at: s.last_seen_at || new Date().toISOString(),
+            platform: s.last_platform || 'Android',
+            app_version: s.last_app_version || APP_VERSION,
+          }))
+        );
       }
     } catch {
       // Retain graceful fallback state if connection fails

@@ -251,7 +251,7 @@ function savePersistedState<T>(key: string, data: T): void {
 try {
   if (typeof window !== 'undefined') {
     const epoch = localStorage.getItem('geohub_db_epoch');
-    if (epoch !== '2026-11-15-clean-v3') {
+    if (epoch !== '2026-11-18-clean-tidb-sync-v1') {
       localStorage.removeItem('geohub_store_events');
       localStorage.removeItem('geohub_store_tasks');
       localStorage.removeItem('geohub_store_expenses');
@@ -261,6 +261,8 @@ try {
       localStorage.removeItem('geohub_store_approvals');
       localStorage.removeItem('geohub_store_attendance');
       localStorage.removeItem('geohub_store_gallery');
+      localStorage.removeItem('geohub_store_meetings');
+      localStorage.removeItem('geohub_store_notifications');
       // If auth session is for a deleted demo user (not SA01 and not a provisioned user), clear it
       const rawSession = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
       if (rawSession) {
@@ -273,7 +275,7 @@ try {
           }
         } catch {}
       }
-      localStorage.setItem('geohub_db_epoch', '2026-11-15-clean-v3');
+      localStorage.setItem('geohub_db_epoch', '2026-11-18-clean-tidb-sync-v1');
     }
   }
 } catch {

@@ -276,6 +276,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
               onToggleDbConnected={state.toggleDbConnected}
               isBackendActive={state.isBackendActive}
               onToggleBackendActive={state.toggleBackendActive}
+              auditLogs={state.diagnostics?.recent_audits || []}
               onConfirmPurge={() => {
                 state.showToast('Purge complete: transient tables reset');
               }}
