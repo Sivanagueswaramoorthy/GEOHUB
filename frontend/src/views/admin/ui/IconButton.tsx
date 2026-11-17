@@ -16,10 +16,10 @@ export const IconButton: React.FC<IconButtonProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    primary: 'bg-[#051F20] text-white hover:bg-[#163832] shadow-xs',
-    secondary: 'bg-white text-[#235347] border border-[#E3EEE6] hover:bg-[#F7FAF8]',
-    ghost: 'bg-transparent text-[#235347] hover:bg-[#F0F5F2]',
-    danger: 'bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100',
+    primary: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-600/20 font-bold',
+    secondary: 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300 font-bold',
+    ghost: 'bg-transparent text-slate-700 hover:bg-slate-100 font-bold',
+    danger: 'bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 font-bold',
   };
 
   return (

@@ -116,17 +116,17 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
   return (
     <div className="space-y-3.5 select-none animate-fadeIn pb-16">
       {/* 1. Sticky Sub-header: Search + '+' IconButton (NOT full-width) */}
-      <div className="sticky top-14 z-30 bg-[#F7FAF8] pt-1 pb-2 flex items-center gap-2">
+      <div className="sticky top-14 z-30 bg-slate-50 pt-1 pb-2 flex items-center gap-2">
         {hasSelection ? (
-          <div className="flex-1 h-11 px-3.5 bg-white border border-[#051F20] rounded-xl flex items-center justify-between shadow-xs">
-            <span className="text-xs font-bold text-[#051F20]">
+          <div className="flex-1 h-11 px-3.5 bg-white border border-emerald-500 rounded-xl flex items-center justify-between shadow-xs">
+            <span className="text-xs font-bold text-slate-900">
               {selectedIds.length} selected
             </span>
             <div className="flex items-center gap-3 text-xs">
               <button
                 type="button"
                 onClick={onSelectAll}
-                className="font-bold text-[#235347] hover:underline cursor-pointer"
+                className="font-bold text-emerald-700 hover:underline cursor-pointer"
               >
                 Select all
               </button>
@@ -147,7 +147,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search name, roll no, role..."
-              className="w-full min-h-[44px] h-11 pl-10 pr-4 bg-white border border-[#E3EEE6] rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:border-[#8EB69B] shadow-xs"
+              className="w-full min-h-[44px] h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
             />
           </div>
         )}
@@ -158,7 +158,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
             setStudentToEdit(null);
             setIsAddModalOpen(true);
           }}
-          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white flex items-center justify-center transition shadow-xs cursor-pointer shrink-0"
+          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition shadow-sm shadow-emerald-600/20 cursor-pointer shrink-0"
           title="Onboard Student or Officer"
           aria-label="Add Student"
         >
@@ -168,7 +168,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
         <button
           type="button"
           onClick={() => setIsSortSheetOpen(true)}
-          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-[#235347] flex items-center justify-center transition shadow-xs cursor-pointer shrink-0"
+          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-xs cursor-pointer shrink-0"
           title="Sort Scholars"
           aria-label="Sort"
         >
@@ -189,16 +189,16 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
               key={`sq-${squad}`}
               type="button"
               onClick={() => setSelectedFilter(squad)}
-              className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+              className={`min-h-[44px] px-3.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 border ${
                 isSelected
-                  ? 'bg-[#051F20] text-white shadow-xs'
-                  : 'bg-white text-[#235347] border border-[#E3EEE6] hover:bg-[#F7FAF8]'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
               }`}
             >
               <span>{squad}</span>
               <span
-                className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                  isSelected ? 'bg-white/20 text-white' : 'bg-[#F0F5F2] text-[#235347]'
+                className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold ${
+                  isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
                 }`}
               >
                 {count}
@@ -207,7 +207,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
           );
         })}
 
-        <div className="w-px h-5 bg-[#DCE6E0] shrink-0" />
+        <div className="w-px h-5 bg-slate-200 shrink-0" />
 
         {ROLES.filter((r) => r !== 'All').map((role) => {
           const isSelected = selectedFilter === role;
@@ -216,10 +216,10 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
               key={`r-${role}`}
               type="button"
               onClick={() => setSelectedFilter(role)}
-              className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold whitespace-nowrap transition cursor-pointer shrink-0 ${
+              className={`min-h-[44px] px-3.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer shrink-0 border ${
                 isSelected
-                  ? 'bg-[#051F20] text-white shadow-xs'
-                  : 'bg-white text-[#235347] border border-[#E3EEE6] hover:bg-[#F7FAF8]'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
               }`}
             >
               Role: {role}
@@ -261,7 +261,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => onToggleSelect(s.id)}
-                      className="min-w-[24px] min-h-[24px] w-5 h-5 accent-[#051F20] rounded cursor-pointer"
+                      className="min-w-[24px] min-h-[24px] w-5 h-5 accent-emerald-600 rounded cursor-pointer"
                       aria-label={`Select ${s.name}`}
                     />
                     <StatusDot status={statusType} />
@@ -284,7 +284,7 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
                 }
                 rightSlot={
                   <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#DAF1DE] text-[#051F20] capitalize">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 capitalize">
                       {s.role}
                     </span>
                     <button
@@ -309,12 +309,12 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
       {/* 4. Sticky Batch Action Bar (Floats above bottom nav when >= 1 selected) */}
       {hasSelection && (
         <div
-          className="fixed left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-sm bg-[#051F20] text-white p-2.5 rounded-2xl shadow-2xl border border-white/10 flex items-center justify-between gap-2 animate-slideUp select-none"
+          className="fixed left-1/2 -translate-x-1/2 z-40 w-[calc(100%-24px)] max-w-md bg-white text-slate-900 p-2.5 rounded-2xl shadow-xl shadow-slate-300/40 border border-slate-200/90 flex items-center justify-between gap-2 animate-slideUp select-none"
           style={{
             bottom: 'calc(88px + env(safe-area-inset-bottom, 0px))',
           }}
         >
-          <span className="text-xs font-bold text-[#DAF1DE] shrink-0 pl-1">
+          <span className="text-xs font-bold text-slate-900 shrink-0 pl-1">
             {selectedIds.length} selected
           </span>
 
@@ -325,35 +325,35 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
             <button
               type="button"
               onClick={() => setIsBatchSquadOpen(true)}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#163832] hover:bg-[#235347] text-xs font-bold whitespace-nowrap cursor-pointer"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-xs font-bold whitespace-nowrap cursor-pointer"
             >
               Assign Squad
             </button>
             <button
               type="button"
               onClick={onBatchToggleStatus}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#163832] hover:bg-[#235347] text-xs font-bold whitespace-nowrap cursor-pointer"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-xs font-bold whitespace-nowrap cursor-pointer"
             >
               Toggle Status
             </button>
             <button
               type="button"
               onClick={onBatchResetPassword}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#163832] hover:bg-[#235347] text-xs font-bold whitespace-nowrap cursor-pointer"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-xs font-bold whitespace-nowrap cursor-pointer"
             >
               Reset Pass
             </button>
             <button
               type="button"
               onClick={() => setIsBatchLogoutConfirmOpen(true)}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-amber-900/60 hover:bg-amber-900 text-amber-200 text-xs font-bold whitespace-nowrap cursor-pointer"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold whitespace-nowrap cursor-pointer"
             >
               Force Logout
             </button>
             <button
               type="button"
               onClick={() => setIsBatchDeleteConfirmOpen(true)}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold whitespace-nowrap cursor-pointer"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold whitespace-nowrap cursor-pointer"
             >
               Delete
             </button>
@@ -450,12 +450,12 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
               }}
               className={`w-full min-h-[48px] px-3.5 rounded-xl border flex items-center justify-between text-xs font-bold transition cursor-pointer ${
                 sortBy === opt.key
-                  ? 'bg-[#051F20] text-white border-[#051F20]'
-                  : 'bg-white text-[#051F20] border-[#E3EEE6] hover:bg-[#F7FAF8]'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                  : 'bg-white text-slate-800 border-slate-200 hover:bg-slate-50'
               }`}
             >
               <span>{opt.label}</span>
-              {sortBy === opt.key && <span>✓</span>}
+              {sortBy === opt.key && <span className="font-extrabold">✓</span>}
             </button>
           ))}
         </div>

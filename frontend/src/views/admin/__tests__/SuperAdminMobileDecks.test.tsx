@@ -278,5 +278,41 @@ describe('SuperAdmin Mobile Decks Suite', () => {
       expect(screen.getByText('Events')).toBeInTheDocument();
       expect(screen.getByText('Tasks')).toBeInTheDocument();
     });
+
+    it('provides database connectivity toggle in MaintenanceDeck', () => {
+      const handleToggleDb = vi.fn();
+      render(
+        <MaintenanceDeck
+          diagnostics={{
+            host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
+            port: 3306,
+            dialect: 'MySQL (PyMySQL)',
+            latency_ms: 24,
+            engine: 'TiDB Cloud Serverless',
+            status: 'connected',
+            health: 'optimal',
+          }}
+          latencyMs={24}
+          isPinging={false}
+          onPingDatabase={vi.fn()}
+          overviewCounts={{
+            modulesLive: 9,
+            modulesTotal: 9,
+            faculty: 4,
+            students: 7,
+            users: 11,
+            online: 1,
+          }}
+          onConfirmPurge={vi.fn()}
+          isDbConnected={true}
+          onToggleDbConnected={handleToggleDb}
+        />
+      );
+
+      const dbToggle = screen.getByRole('switch', { name: /Toggle TiDB Database Connectivity/i });
+      expect(dbToggle).toBeInTheDocument();
+      fireEvent.click(dbToggle);
+      expect(handleToggleDb).toHaveBeenCalledWith(false);
+    });
   });
 });

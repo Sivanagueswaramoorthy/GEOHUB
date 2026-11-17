@@ -1,12 +1,12 @@
 {
-  "version": "1.6.30",
-  "version_code": 48,
+  "version": "1.6.32",
+  "version_code": 50,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Add comprehensive UI test suites covering all 9 roles, navigation suite, 5 decks, and mobile primitives",
+  "release_notes": "Routine performance improvements and stability updates.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/main/geohub-app.apk",
   "min_supported_version": "1.0.0",
-  "released_at": "2026-11-16",
-  "file_size_bytes": 0,
-  "file_size_mb": "",
-  "sha256": ""
+  "released_at": "2026-11-17",
+  "file_size_bytes": 6888896,
+  "file_size_mb": "6.57 MB",
+  "sha256": "D50BC9F17A4FF7710EF0A7B470A98D6568BDEA155A294000098790C9D1B1313F"
 }

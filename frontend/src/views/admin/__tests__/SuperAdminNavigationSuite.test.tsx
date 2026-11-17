@@ -43,44 +43,39 @@ describe('SuperAdmin Mobile Shell & Navigation Suite', () => {
   ];
 
   describe('SuperAdminTopNav', () => {
-    it('renders SA avatar, Root badge, and single shared latency value', () => {
-      render(
-        <AppProvider>
-          <SuperAdminTopNav latencyMs={28} />
-        </AppProvider>
-      );
-
-      // SA avatar
-      expect(screen.getByText('SA')).toBeInTheDocument();
-      // GeoHub title
-      expect(screen.getByText('GeoHub')).toBeInTheDocument();
-      // Root badge
-      expect(screen.getByText('Root')).toBeInTheDocument();
-      // Single source latency
-      expect(screen.getByText(/● 28ms/)).toBeInTheDocument();
-    });
-
-    it('renders Act as Role button and triggers bottom sheet on click', () => {
+    it('renders canonical top bar with logo wordmark, profile menu, and notification bell as like in faculty role', () => {
       render(
         <AppProvider>
           <SuperAdminTopNav />
         </AppProvider>
       );
 
-      const actAsRoleBtn = screen.getByRole('button', { name: /Act as Role/i });
-      expect(actAsRoleBtn).toBeInTheDocument();
+      // Logo wordmark (GeoHub home)
+      expect(screen.getByLabelText('GeoHub home')).toBeInTheDocument();
+      expect(screen.getByText('Green Eco')).toBeInTheDocument();
+      expect(screen.getByText('Organization')).toBeInTheDocument();
 
-      // Click to open sheet
-      fireEvent.click(actAsRoleBtn);
+      // Profile menu trigger
+      expect(screen.getByLabelText('Open profile menu')).toBeInTheDocument();
 
-      // BottomSheet header
-      expect(screen.getByText('Act as Role (Live Persona)')).toBeInTheDocument();
-      // Role options rendered
-      expect(screen.getByText('Faculty Advisor')).toBeInTheDocument();
-      expect(screen.getByText('Coordinator')).toBeInTheDocument();
+      // Notification bell
+      expect(screen.getByLabelText(/Notifications/i)).toBeInTheDocument();
     });
 
-    it('renders notification bell button', () => {
+    it('renders avatar button with user initial and opens profile menu on click', () => {
+      render(
+        <AppProvider>
+          <SuperAdminTopNav />
+        </AppProvider>
+      );
+
+      const avatarBtn = screen.getByLabelText('Open profile menu');
+      expect(avatarBtn).toBeInTheDocument();
+      fireEvent.click(avatarBtn);
+      expect(window.location.hash).toBe('#profile');
+    });
+
+    it('renders notification bell button and calls onOpenNotifications on click', () => {
       const handleOpenNotifications = vi.fn();
       render(
         <AppProvider>
@@ -88,10 +83,10 @@ describe('SuperAdmin Mobile Shell & Navigation Suite', () => {
         </AppProvider>
       );
 
-      const bellBtn = screen.getByTitle('Notifications');
+      const bellBtn = screen.getByLabelText(/Notifications/i);
       expect(bellBtn).toBeInTheDocument();
       fireEvent.click(bellBtn);
-      expect(handleOpenNotifications).toHaveBeenCalled();
+      expect(handleOpenNotifications).toHaveBeenCalledTimes(1);
     });
   });
 

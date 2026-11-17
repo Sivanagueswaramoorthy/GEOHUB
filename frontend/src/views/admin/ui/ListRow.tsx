@@ -22,10 +22,10 @@ export const ListRow: React.FC<ListRowProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`min-h-[64px] py-2.5 px-3.5 bg-white border rounded-2xl flex items-center justify-between gap-3 transition-all select-none ${
-        onClick ? 'cursor-pointer hover:border-[#8EB69B]' : ''
+      className={`min-h-[64px] py-3 px-3.5 bg-white border rounded-xl flex items-center justify-between gap-3 transition-all select-none shadow-xs ${
+        onClick ? 'cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/20' : ''
       } ${
-        selected ? 'border-[#051F20] bg-[#F7FAF8]' : 'border-[#E3EEE6]'
+        selected ? 'border-emerald-500 bg-emerald-50/30 ring-1 ring-emerald-500/20' : 'border-slate-200/90'
       } ${className}`}
     >
       {/* Left Slot (Checkbox or Avatar) */}
@@ -40,11 +40,11 @@ export const ListRow: React.FC<ListRowProps> = ({
 
       {/* Main Content (Title + Subtitle) */}
       <div className="flex-1 min-w-0 flex flex-col justify-center">
-        <div className="text-sm font-bold text-[#051F20] truncate leading-tight">
+        <div className="text-sm font-bold text-slate-900 truncate leading-tight">
           {title}
         </div>
         {subtitle && (
-          <div className="text-xs text-[#235347] truncate leading-normal mt-0.5">
+          <div className="text-xs font-semibold text-slate-500 truncate leading-normal mt-0.5">
             {subtitle}
           </div>
         )}

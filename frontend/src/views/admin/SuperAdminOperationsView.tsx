@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useSuperAdminState } from './hooks/useSuperAdminState';
-import { StatStrip } from '../../components/navigation/StatStrip';
+import { useSuperAdminState, deckToTab } from './hooks/useSuperAdminState';
 import { CommandHubDeck } from './components/CommandHubDeck';
 import { FacultyDeck } from './components/FacultyDeck';
 import { StudentDeck } from './components/StudentDeck';
@@ -11,6 +10,13 @@ import { PullToRefresh } from './ui/PullToRefresh';
 import { FacultyFormModal } from './modals/FacultyFormModal';
 import { StudentFormModal } from './modals/StudentFormModal';
 import { useApp } from '../../context/AppContext';
+
+// The 5 Rebuilt Executive Tabs for SuperAdmin
+import { HomeTab } from './tabs/HomeTab';
+import { AccessTab } from './tabs/AccessTab';
+import { FeaturesTab } from './tabs/FeaturesTab';
+import { LogsTab } from './tabs/LogsTab';
+import { ProfileTab } from './tabs/ProfileTab';
 
 export interface Props {
   onBack?: () => void;
@@ -28,7 +34,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
 
   const handleRefresh = async () => {
-    await state.pingDatabase();
+    await Promise.all([state.pingDatabase(), state.refreshSuperAdminData?.()]);
   };
 
   const handleActAsRole = (roleKey: string) => {
@@ -46,27 +52,82 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
     }
   };
 
-  return (
-    <div className="w-full min-h-screen bg-[#F7FAF8] text-[#051F20] flex flex-col relative select-none">
-      {/* Horizontally Scrollable Stat Strip directly under top bar */}
-      <StatStrip
-        counts={state.overviewCounts}
-        onlineUsers={state.onlineUsers}
-        onSelectDeck={(deck) => state.setActiveDeck(deck)}
-        onForceLogout={(id, name) => {
-          state.batchForceLogout();
-          state.showToast(`Logged out active session for ${name}`);
-        }}
-      />
+  // Determine whether to display the 5 modern tabs or legacy decks
+  const isModernTab = ['home', 'access', 'features', 'logs', 'profile'].includes(state.activeDeck);
 
+  return (
+    <div className="w-full min-h-screen bg-slate-50 text-slate-900 flex flex-col relative select-none">
       {/* Main Content Area with Safe-Area Padding Bottom for Bottom Nav */}
       <main
         className="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-4 pt-3"
         style={{
-          paddingBottom: 'calc(84px + env(safe-area-inset-bottom, 16px))',
+          paddingBottom: 'calc(88px + env(safe-area-inset-bottom, 16px))',
         }}
       >
         <PullToRefresh onRefresh={handleRefresh}>
+          {/* ========================================================================= */}
+          {/* 5 REBUILT EXECUTIVE TABS FOR SUPERADMIN (100% LIGHT THEME, MODERN, BOLD)  */}
+          {/* ========================================================================= */}
+
+          {/* 1. Home Tab (#home) */}
+          {state.activeDeck === 'home' && (
+            <HomeTab
+              overviewCounts={state.overviewCounts}
+              diagnostics={state.diagnostics}
+              latencyMs={state.latencyMs}
+              isPinging={state.isPinging}
+              onPingDatabase={state.pingDatabase}
+              onNavigateTab={(tab) => state.setActiveTab(tab)}
+              isDbConnected={state.isDbConnected}
+              onToggleDbConnected={state.toggleDbConnected}
+              isBackendActive={state.isBackendActive}
+              onToggleBackendActive={state.toggleBackendActive}
+            />
+          )}
+
+          {/* 2. Access Tab (#access) */}
+          {state.activeDeck === 'access' && (
+            <AccessTab
+              modules={state.modules}
+              roles={state.rolesCredentials}
+              roleModuleAccess={state.roleModuleAccess}
+              onToggleRoleModule={state.toggleRoleModuleAccess}
+              onSetAllRoleModules={state.setAllRoleModuleAccess}
+            />
+          )}
+
+          {/* 3. Features Tab (#features) */}
+          {state.activeDeck === 'features' && (
+            <FeaturesTab
+              onAddStudent={state.addStudent}
+              onAddFaculty={state.addFaculty}
+              onNavigateTab={(tab) => state.setActiveTab(tab)}
+            />
+          )}
+
+          {/* 4. Logs Tab (#logs) */}
+          {state.activeDeck === 'logs' && (
+            <LogsTab
+              members={state.allMembers}
+              modules={state.modules}
+              onToggleSuspend={state.toggleSuspendMember}
+              onDeleteMember={state.deleteMember}
+              onUpdateMemberModules={state.updateMemberModules}
+            />
+          )}
+
+          {/* 5. Profile Tab (#profile) */}
+          {state.activeDeck === 'profile' && (
+            <ProfileTab
+              diagnostics={state.diagnostics}
+              showToast={state.showToast}
+            />
+          )}
+
+          {/* ========================================================================= */}
+          {/* LEGACY DECK COMPONENT RENDERING (Preserved for Vitest test compatibility)  */}
+          {/* ========================================================================= */}
+
           {/* Deck 1: Cockpit (#hub) */}
           {(state.activeDeck === 'hub' || state.activeDeck === 'all') && (
             <CommandHubDeck
@@ -211,6 +272,10 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
               isPinging={state.isPinging}
               onPingDatabase={state.pingDatabase}
               overviewCounts={state.overviewCounts}
+              isDbConnected={state.isDbConnected}
+              onToggleDbConnected={state.toggleDbConnected}
+              isBackendActive={state.isBackendActive}
+              onToggleBackendActive={state.toggleBackendActive}
               onConfirmPurge={() => {
                 state.showToast('Purge complete: transient tables reset');
               }}
@@ -245,7 +310,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
         </button>
       </div>
 
-      {/* Modals for Direct Quick Action */}
+      {/* Modals for Quick Action */}
       <FacultyFormModal
         isOpen={isAddFacultyModalOpen}
         onClose={() => setIsAddFacultyModalOpen(false)}

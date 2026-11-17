@@ -1,4 +1,34 @@
-export type DeckKey = 'hub' | 'faculty' | 'students' | 'matrix' | 'maintenance' | 'all';
+export type DeckKey =
+  | 'hub'
+  | 'faculty'
+  | 'students'
+  | 'matrix'
+  | 'maintenance'
+  | 'all'
+  | 'home'
+  | 'access'
+  | 'features'
+  | 'logs'
+  | 'profile';
+
+export type SuperAdminTab = 'home' | 'access' | 'features' | 'logs' | 'profile';
+
+export interface UnifiedMemberItem {
+  id: string;
+  kind: 'student' | 'faculty';
+  roll_no: string;
+  name: string;
+  email: string;
+  department: string;
+  year_of_study?: string;
+  designation?: string;
+  role: string;
+  status: 'active' | 'disabled' | 'suspended';
+  phone?: string;
+  last_login_at?: string;
+  last_seen_at?: string;
+  allowedModules?: string[];
+}
 
 export interface RoleMeta {
   role: string;
@@ -40,6 +70,15 @@ export interface DiagnosticsData {
   engine: string;
   status: string;
   health: string;
+  table_counts?: Record<string, number>;
+  recent_audits?: Array<{
+    id: string;
+    action: string;
+    actor_name: string;
+    target_name?: string;
+    details?: string;
+    timestamp: string;
+  }>;
 }
 
 export interface OverviewCounts {

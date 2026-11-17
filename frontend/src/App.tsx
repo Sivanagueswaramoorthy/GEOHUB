@@ -45,6 +45,7 @@ import { AuditLogView } from './views/audit/AuditLogView';
 import { DesignSystemView } from './views/design/DesignSystemView';
 import { SuperAdminOperationsView } from './views/admin/SuperAdminOperationsView';
 import { ModulePausedNotice } from './components/shared/ModulePausedNotice';
+import { UnderMaintenanceScreen } from './components/shared/UnderMaintenanceScreen';
 import { SuperAdminTopNav } from './components/navigation/SuperAdminTopNav';
 import { SuperAdminBottomNav } from './components/navigation/SuperAdminBottomNav';
 
@@ -61,7 +62,18 @@ const MainAppContent: React.FC = () => {
     hideToast,
     isPhoneFrame,
     platformModules,
+    isBackendActive,
+    setIsBackendActive,
+    isDbConnected,
   } = useApp();
+
+  const [isBypassedBySuperAdmin, setIsBypassedBySuperAdmin] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isBackendActive) {
+      setIsBypassedBySuperAdmin(false);
+    }
+  }, [isBackendActive]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -341,6 +353,30 @@ const MainAppContent: React.FC = () => {
     }
   };
 
+  // If backend module is turned off (Maintenance Mode), render the Under Maintenance screen
+  if (!isBackendActive && !isBypassedBySuperAdmin) {
+    return (
+      <UnderMaintenanceScreen
+        onRefresh={() => {
+          const active = localStorage.getItem('geohub_backend_active') !== 'false';
+          if (active) {
+            setIsBackendActive(true);
+          }
+        }}
+        onResumeBackend={() => {
+          setIsBackendActive(true);
+          showToast('Backend services resumed successfully.', 'success');
+        }}
+        onBypassToCockpit={() => {
+          setIsBypassedBySuperAdmin(true);
+          setActiveTab('home');
+          showToast('Bypassed maintenance mode into SuperAdmin Cockpit.', 'info');
+        }}
+        isDbConnected={isDbConnected}
+      />
+    );
+  }
+
   return (
     <div className="mobile-scaffold-root">
       {/* Shell column: responsive fullscreen or mobile frame */}
@@ -353,10 +389,8 @@ const MainAppContent: React.FC = () => {
         }}
       >
         {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
-        {isSuperAdmin ? (
-          <SuperAdminTopNav />
-        ) : (
-          activeTab !== 'scan_qr' && activeTab !== 'profile' && <TopBar />
+        {activeTab !== 'scan_qr' && activeTab !== 'profile' && (
+          isSuperAdmin ? <SuperAdminTopNav /> : <TopBar />
         )}
 
         {/* Global Security / Notification Toast (Floating gracefully below TopBar) */}
@@ -432,6 +466,11 @@ const AppContentWithSplash: React.FC = () => {
     // even if already authenticated, blocking entry until stable connection is confirmed.
     if (isApk) {
       return true;
+    }
+
+    // If backend is offline, skip splash to show Under Maintenance immediately
+    if (localStorage.getItem('geohub_backend_active') === 'false') {
+      return false;
     }
 
     // Explicit bypass for automated tests or headless audits

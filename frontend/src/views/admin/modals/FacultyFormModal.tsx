@@ -161,7 +161,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
         <div className="pt-3 sticky bottom-0 bg-white">
           <button
             type="submit"
-            className="w-full min-h-[44px] h-11 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+            className="w-full min-h-[44px] h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/20 cursor-pointer"
           >
             {facultyToEdit ? 'Save Changes' : 'Confirm Advisor Provisioning'}
           </button>

@@ -13,6 +13,9 @@ import {
   ChevronUp,
   UserCheck,
   RotateCcw,
+  Lock,
+  Landmark,
+  Zap,
 } from 'lucide-react';
 import { RoleMeta, ModuleConfig, OperationDef } from '../types';
 import { CANONICAL_ROLES } from '../hooks/useSuperAdminState';
@@ -266,17 +269,17 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               key={r.role}
               type="button"
               onClick={() => handleRoleSelect(r.role)}
-              className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+              className={`min-h-[44px] px-3.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 border ${
                 isSelected
-                  ? 'bg-[#051F20] text-white shadow-xs'
-                  : 'bg-white text-[#235347] border border-[#E3EEE6] hover:bg-[#F7FAF8]'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
               }`}
             >
               <span>{r.badge}</span>
-              {isLocked && <span className="text-[10px]">🔒</span>}
+              {isLocked && <Lock size={12} className={isSelected ? 'text-white' : 'text-amber-500'} />}
               <span
-                className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                  isSelected ? 'bg-white/20 text-white' : 'bg-[#F0F5F2] text-[#235347]'
+                className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold ${
+                  isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
                 }`}
               >
                 1
@@ -287,44 +290,44 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
       </div>
 
       {/* 2. Governance Presets (1-tap apply with Undo Toast) */}
-      <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl shadow-xs space-y-2">
-        <div className="text-xs font-bold text-[#051F20]">Governance Presets</div>
+      <div className="bg-white border border-slate-200/90 p-4 rounded-2xl shadow-sm space-y-2.5">
+        <div className="text-xs font-bold text-slate-900">Governance Presets</div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => applyPreset('Baseline')}
-            className="flex-1 min-h-[44px] py-1.5 px-2 bg-[#F7FAF8] hover:bg-[#E3EEE6] border border-[#E3EEE6] rounded-xl text-xs font-bold text-[#051F20] flex items-center justify-center gap-1 cursor-pointer transition"
+            className="flex-1 min-h-[44px] py-1.5 px-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center justify-center gap-1.5 cursor-pointer transition shadow-xs"
           >
-            <span>🏛️</span>
+            <Landmark size={14} className="text-emerald-600" />
             <span>Baseline</span>
           </button>
           <button
             type="button"
             onClick={() => applyPreset('Event Sprint')}
-            className="flex-1 min-h-[44px] py-1.5 px-2 bg-[#F7FAF8] hover:bg-[#E3EEE6] border border-[#E3EEE6] rounded-xl text-xs font-bold text-[#051F20] flex items-center justify-center gap-1 cursor-pointer transition"
+            className="flex-1 min-h-[44px] py-1.5 px-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center justify-center gap-1.5 cursor-pointer transition shadow-xs"
           >
-            <span>⚡</span>
+            <Zap size={14} className="text-amber-500" />
             <span>Event Sprint</span>
           </button>
           <button
             type="button"
             onClick={() => applyPreset('Exam Hiatus')}
-            className="flex-1 min-h-[44px] py-1.5 px-2 bg-[#F7FAF8] hover:bg-[#E3EEE6] border border-[#E3EEE6] rounded-xl text-xs font-bold text-[#051F20] flex items-center justify-center gap-1 cursor-pointer transition"
+            className="flex-1 min-h-[44px] py-1.5 px-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 flex items-center justify-center gap-1.5 cursor-pointer transition shadow-xs"
           >
-            <span>🔒</span>
+            <Lock size={14} className="text-rose-500" />
             <span>Exam Hiatus</span>
           </button>
         </div>
       </div>
 
       {/* 3. Modules Card for Selected Role (Effective Access: global ON AND role ON) */}
-      <div className="bg-white border border-[#E3EEE6] p-4 rounded-2xl shadow-xs space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-[#E3EEE6]">
+      <div className="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
           <div>
-            <h3 className="text-sm font-bold text-[#051F20]">
+            <h3 className="text-sm font-bold text-slate-900">
               {activeRoleMeta.badge} Module Access
             </h3>
-            <div className="text-[11px] text-[#235347]">
+            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">
               Effective access = Global ON AND Role ON
             </div>
           </div>
@@ -335,7 +338,7 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 setRoleModuleOverrides((prev) => ({ ...prev, [selectedRole]: {} }));
                 showToast(`Enabled all modules for ${activeRoleMeta.badge}`);
               }}
-              className="font-bold text-[#235347] hover:underline cursor-pointer"
+              className="font-bold text-emerald-700 hover:underline cursor-pointer"
             >
               Enable All
             </button>
@@ -424,10 +427,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('all')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'all'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 All (26)
@@ -435,10 +438,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('events')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'events'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Events (6)
@@ -446,10 +449,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('finance')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'finance'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Finance (5)
@@ -457,10 +460,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('docs')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'docs'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Docs (5)
@@ -468,10 +471,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('operations')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'operations'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Operations (5)
@@ -479,10 +482,10 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveCategory('governance')}
-                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 ${
+                className={`min-h-[36px] px-3 rounded-lg text-xs font-bold transition cursor-pointer shrink-0 border ${
                   activeCategory === 'governance'
-                    ? 'bg-[#051F20] text-white'
-                    : 'bg-[#F7FAF8] text-[#235347] border border-[#E3EEE6]'
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 Governance (5)
@@ -496,13 +499,13 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 return (
                   <div
                     key={op.key}
-                    className="p-2.5 rounded-xl bg-[#F7FAF8] border border-[#E3EEE6] flex items-center justify-between gap-3"
+                    className="p-3 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-50/50 flex items-center justify-between gap-3 shadow-xs transition"
                   >
                     <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#051F20] truncate">
+                      <div className="text-xs font-bold text-slate-900 truncate">
                         {op.label}
                       </div>
-                      <div className="text-[11px] text-[#235347] truncate">
+                      <div className="text-[11px] font-medium text-slate-500 truncate mt-0.5">
                         {op.description}
                       </div>
                     </div>
@@ -520,14 +523,14 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={() => handleBulkRoleOps(true)}
-                className="text-xs font-bold text-[#235347] hover:underline cursor-pointer"
+                className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
               >
                 Enable All
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset('Baseline')}
-                className="text-xs font-bold text-[#235347] hover:underline cursor-pointer"
+                className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
               >
                 Default
               </button>
@@ -565,9 +568,9 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
         </button>
 
         {isCredentialsOpen && (
-          <div className="p-4 pt-1 space-y-3 border-t border-[#E3EEE6]">
+          <div className="p-4 pt-1 space-y-3 border-t border-slate-100">
             <div>
-              <label className="block text-xs font-semibold text-[#051F20] mb-1">
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
                 Scholar Full Name
               </label>
               <input
@@ -575,12 +578,12 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 value={scholarName}
                 onChange={(e) => setScholarName(e.target.value)}
                 placeholder="e.g. Alex Rivera"
-                className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-bold focus:outline-none focus:border-[#8EB69B]"
+                className="w-full h-11 px-3.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#051F20] mb-1">
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
                 Username / Roll Number
               </label>
               <input
@@ -588,12 +591,12 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 value={rollNo}
                 onChange={(e) => setRollNo(e.target.value)}
                 placeholder="e.g. 21GEO001 or FAC01"
-                className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-mono font-bold uppercase focus:outline-none focus:border-[#8EB69B]"
+                className="w-full h-11 px-3.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold uppercase text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#051F20] mb-1">
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
                 Institutional Email
               </label>
               <input
@@ -601,12 +604,12 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="officer@college.edu"
-                className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+                className="w-full h-11 px-3.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#051F20] mb-1">
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
                 Password Provision
               </label>
               <div className="flex items-center gap-2">
@@ -614,12 +617,12 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                   type="text"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="flex-1 h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-mono font-bold focus:outline-none focus:border-[#8EB69B]"
+                  className="flex-1 h-11 px-3.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
                 />
                 <button
                   type="button"
                   onClick={handleGeneratePassword}
-                  className="min-h-[44px] px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] transition cursor-pointer"
+                  className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-800 transition cursor-pointer shadow-xs"
                   title="Generate Random Password"
                 >
                   <RefreshCw size={14} />
@@ -627,7 +630,7 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyPassword}
-                  className="min-h-[44px] px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] transition cursor-pointer"
+                  className="min-h-[44px] px-3.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-800 transition cursor-pointer shadow-xs"
                   title="Copy Password"
                 >
                   {copiedPass ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
@@ -636,13 +639,13 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#051F20] mb-1">
+              <label className="block text-xs font-semibold text-slate-800 mb-1">
                 Account Status
               </label>
               <select
                 value={accountStatus}
                 onChange={(e) => setAccountStatus(e.target.value)}
-                className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-bold focus:outline-none focus:border-[#8EB69B]"
+                className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
               >
                 <option value="active">Active Authority</option>
                 <option value="disabled">Suspended / Frozen</option>
@@ -653,7 +656,7 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               <button
                 type="button"
                 onClick={handleSaveCredentials}
-                className="w-full min-h-[44px] h-11 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                className="w-full min-h-[44px] h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/20 cursor-pointer"
               >
                 Save Role Credentials
               </button>
@@ -667,7 +670,7 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
         <button
           type="button"
           onClick={() => applyPreset('Baseline')}
-          className="min-h-[44px] h-11 px-4 rounded-xl border border-[#E3EEE6] bg-white text-xs font-bold text-[#051F20] hover:bg-[#F7FAF8] transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+          className="min-h-[44px] h-11 px-4 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 hover:bg-slate-50 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
         >
           <RotateCcw size={15} />
           <span>Reset to Baseline</span>
@@ -680,7 +683,7 @@ export const RoleMatrixDeck: React.FC<RoleMatrixDeckProps> = ({
               onActAsRole(selectedRole);
             }
           }}
-          className="min-h-[44px] h-11 px-4 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+          className="min-h-[44px] h-11 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-emerald-600/20"
           aria-label={`Act as ${activeRoleMeta.badge} (Live Preview)`}
         >
           <UserCheck size={15} />

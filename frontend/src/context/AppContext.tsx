@@ -90,6 +90,10 @@ interface AppContextType {
   isSyncing: boolean;
   syncStatus: 'connected' | 'syncing' | 'offline';
   lastSyncedAt: Date | null;
+  isDbConnected: boolean;
+  setIsDbConnected: (connected: boolean) => void;
+  isBackendActive: boolean;
+  setIsBackendActive: (active: boolean) => void;
   platformModules: Record<string, boolean>;
   toggleModule: (moduleId: string, enabled: boolean) => Promise<void>;
   toggleAllModules: (enabled: boolean) => Promise<void>;
@@ -507,11 +511,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncStatus, setSyncStatus] = useState<'connected' | 'syncing' | 'offline'>('connected');
   const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(null);
+
+  // DB & Backend Module Connectivity State (Persisted in localStorage)
+  const [isDbConnected, setIsDbConnectedState] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const val = localStorage.getItem('geohub_db_connected');
+        if (val !== null) return val === 'true';
+      }
+    } catch {}
+    return true;
+  });
+
+  const [isBackendActive, setIsBackendActiveState] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const val = localStorage.getItem('geohub_backend_active');
+        if (val !== null) return val === 'true';
+      }
+    } catch {}
+    return true;
+  });
+
+  const setIsDbConnected = useCallback((connected: boolean) => {
+    setIsDbConnectedState(connected);
+    try {
+      localStorage.setItem('geohub_db_connected', String(connected));
+      window.dispatchEvent(new Event('geohub_system_state_change'));
+    } catch {}
+  }, []);
+
+  const setIsBackendActive = useCallback((active: boolean) => {
+    setIsBackendActiveState(active);
+    try {
+      localStorage.setItem('geohub_backend_active', String(active));
+      window.dispatchEvent(new Event('geohub_system_state_change'));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const handleSync = () => {
+      try {
+        const dbVal = localStorage.getItem('geohub_db_connected');
+        if (dbVal !== null) setIsDbConnectedState(dbVal === 'true');
+        const beVal = localStorage.getItem('geohub_backend_active');
+        if (beVal !== null) setIsBackendActiveState(beVal === 'true');
+      } catch {}
+    };
+    window.addEventListener('geohub_system_state_change', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('geohub_system_state_change', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
+
   const [isServerModalOpen, setIsServerModalOpen] = useState<boolean>(false);
   const [serverUrl, setServerUrlState] = useState<string>(() => apiClient.getBaseUrl());
 
   // Live Backend Data Synchronization with TiDB Cloud FastAPI
   const syncWithBackend = useCallback(async () => {
+    if (!isBackendActive) {
+      setSyncStatus('offline');
+      return;
+    }
     setIsSyncing(true);
     setSyncStatus((prev) => (prev === 'connected' ? 'syncing' : prev));
     try {
@@ -2084,6 +2147,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isSyncing,
         syncStatus,
         lastSyncedAt,
+        isDbConnected,
+        setIsDbConnected,
+        isBackendActive,
+        setIsBackendActive,
         platformModules,
         toggleModule,
         toggleAllModules,

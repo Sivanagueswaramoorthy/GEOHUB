@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Copy, Check, Activity, Trash2, Database, ShieldCheck } from 'lucide-react';
+import { Copy, Check, Activity, Trash2, Database, Server, ShieldCheck } from 'lucide-react';
 import { DiagnosticsData, OverviewCounts } from '../types';
 import { RelativeTime } from '../ui/RelativeTime';
 import { BottomSheet } from '../ui/BottomSheet';
 import { PurgeConfirmModal } from '../modals/PurgeConfirmModal';
+import { Toggle } from '../ui/Toggle';
 
 export interface MaintenanceDeckProps {
   diagnostics: DiagnosticsData;
@@ -12,6 +13,10 @@ export interface MaintenanceDeckProps {
   onPingDatabase: () => void;
   overviewCounts: OverviewCounts;
   onConfirmPurge: () => void;
+  isDbConnected?: boolean;
+  onToggleDbConnected?: (connected: boolean) => void;
+  isBackendActive?: boolean;
+  onToggleBackendActive?: (active: boolean) => void;
   auditLogs?: Array<{
     id: string;
     action: string;
@@ -37,6 +42,10 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
   onPingDatabase,
   overviewCounts,
   onConfirmPurge,
+  isDbConnected = true,
+  onToggleDbConnected,
+  isBackendActive = true,
+  onToggleBackendActive,
   auditLogs = DEFAULT_AUDIT_LOGS,
 }) => {
   const [copiedHost, setCopiedHost] = useState(false);
@@ -54,36 +63,55 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
   return (
     <div className="space-y-4 select-none animate-fadeIn pb-8">
       {/* 1. Light Engine Card (NOT dark green): TiDB Cloud, Connected chip, Host, Port, Dialect, Health */}
-      <div className="bg-white border border-[#E3EEE6] p-4 rounded-2xl shadow-xs space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-[#E3EEE6]">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-[#F0F5F2] text-[#235347] flex items-center justify-center shrink-0">
-              <Database size={17} />
+      <div className="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${
+                isDbConnected
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
+                  : 'bg-rose-50 text-rose-700 border-rose-200/80'
+              }`}
+            >
+              <Database size={19} />
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-[#051F20] truncate">
+              <h3 className="text-sm font-bold text-slate-900 truncate">
                 TiDB Cloud MySQL Distributed Database
               </h3>
-              <div className="text-[11px] text-[#235347] truncate">Distributed MySQL Engine</div>
+              <div className="text-xs font-semibold text-slate-500 truncate mt-0.5">Distributed MySQL Engine</div>
             </div>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#051F20] shrink-0 border border-[#8EB69B]/40">
-            ● Connected
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 border ${
+                isDbConnected
+                  ? 'bg-emerald-100 text-emerald-800 border-emerald-200/80'
+                  : 'bg-rose-100 text-rose-800 border-rose-200/80'
+              }`}
+            >
+              {isDbConnected ? '● Connected' : '● Disconnected'}
+            </span>
+            <Toggle
+              checked={isDbConnected}
+              onChange={(val) => onToggleDbConnected ? onToggleDbConnected(val) : null}
+              label="Toggle TiDB Database Connectivity"
+            />
+          </div>
         </div>
 
-        <div className="space-y-2 text-xs text-[#235347]">
+        <div className="space-y-2.5 text-xs text-slate-600">
           {/* Host (Text wraps instead of overflowing) */}
-          <div className="flex items-start justify-between gap-2 py-1 border-b border-[#E3EEE6]">
-            <span className="text-slate-500 font-medium shrink-0">Host</span>
+          <div className="flex items-start justify-between gap-2 py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-bold shrink-0">Host</span>
             <div className="flex items-center gap-1.5 min-w-0 text-right">
-              <span className="font-mono font-semibold break-all text-[#051F20] text-[11px]">
+              <span className="font-mono font-bold break-all text-slate-900 text-[11px]">
                 {diagnostics.host}
               </span>
               <button
                 type="button"
                 onClick={handleCopyHost}
-                className="p-1 rounded-md hover:bg-[#F0F5F2] text-[#235347] shrink-0"
+                className="p-1 rounded-md hover:bg-slate-100 text-slate-600 shrink-0 cursor-pointer"
                 title="Copy host to clipboard"
                 aria-label="Copy Host"
               >
@@ -93,25 +121,25 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
           </div>
 
           {/* Port */}
-          <div className="flex items-center justify-between py-1 border-b border-[#E3EEE6]">
-            <span className="text-slate-500 font-medium">Port</span>
-            <span className="font-mono font-semibold text-[#051F20]">{diagnostics.port}</span>
+          <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-bold">Port</span>
+            <span className="font-mono font-bold text-slate-900">{diagnostics.port}</span>
           </div>
 
           {/* Dialect */}
-          <div className="flex items-center justify-between py-1 border-b border-[#E3EEE6]">
-            <span className="text-slate-500 font-medium">Dialect</span>
-            <span className="font-semibold text-[#051F20]">{diagnostics.dialect}</span>
+          <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-bold">Dialect</span>
+            <span className="font-bold text-slate-900">{diagnostics.dialect}</span>
           </div>
 
           {/* Health & Ping Button */}
-          <div className="flex items-center justify-between py-1">
-            <span className="text-slate-500 font-medium">Latency & Probe</span>
+          <div className="flex items-center justify-between py-1.5">
+            <span className="text-slate-500 font-bold">Latency & Probe</span>
             <button
               type="button"
               onClick={onPingDatabase}
               disabled={isPinging}
-              className="min-h-[36px] px-3 py-1 rounded-xl bg-[#F0F5F2] hover:bg-[#E3EEE6] text-[#051F20] font-mono font-bold text-xs flex items-center gap-1.5 border border-[#E3EEE6] cursor-pointer transition"
+              className="min-h-[36px] px-3.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-mono font-bold text-xs flex items-center gap-1.5 border border-emerald-200 cursor-pointer transition shadow-xs"
             >
               <Activity size={13} className={isPinging ? 'animate-spin text-emerald-600' : 'text-emerald-700'} />
               <span>● {latencyMs}ms ({isPinging ? 'Pinging...' : 'Ping'})</span>
@@ -120,48 +148,108 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
         </div>
       </div>
 
+      {/* 1B. Backend Connectivity Card */}
+      <div className="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${
+                isBackendActive
+                  ? 'bg-blue-50 text-blue-700 border-blue-200/80'
+                  : 'bg-amber-50 text-amber-700 border-amber-200/80'
+              }`}
+            >
+              <Server size={19} />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-slate-900 truncate">
+                GeoHub Node.js & REST API Backend
+              </h3>
+              <div className="text-xs font-semibold text-slate-500 truncate mt-0.5">
+                {isBackendActive ? 'FastAPI Gateway Active' : 'Under Maintenance Mode'}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 border ${
+                isBackendActive
+                  ? 'bg-blue-100 text-blue-800 border-blue-200/80'
+                  : 'bg-amber-100 text-amber-800 border-amber-200/80'
+              }`}
+            >
+              {isBackendActive ? '● Operational' : '● Maintenance'}
+            </span>
+            <Toggle
+              checked={isBackendActive}
+              onChange={(val) => onToggleBackendActive ? onToggleBackendActive(val) : null}
+              label="Toggle Backend Module (Maintenance Mode)"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2.5 text-xs text-slate-600">
+          <div className="flex items-center justify-between py-1 border-b border-slate-100">
+            <span className="text-slate-500 font-bold">Health Route</span>
+            <span className="font-mono font-bold text-slate-900">
+              {isBackendActive ? '/api/v1/health' : '/api/v1/health (Paused)'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between py-1 border-b border-slate-100">
+            <span className="text-slate-500 font-bold">API Version</span>
+            <span className="font-bold text-slate-900">v1.6.30 Production</span>
+          </div>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-slate-500 font-bold">Status</span>
+            <span className={`font-mono font-bold px-2 py-0.5 rounded ${isBackendActive ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800'}`}>
+              {isBackendActive ? 'Server Active' : 'Maintenance Active'}
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* 2. Table Inspector: 3x2 Grid of Small Tiles */}
       <div className="space-y-2">
-        <h4 className="text-xs font-bold text-[#051F20] tracking-tight">Relational Records</h4>
+        <h4 className="text-xs font-bold text-slate-900 tracking-tight">Relational Records</h4>
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Users</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">{overviewCounts.users}</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Users</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.users ?? overviewCounts.users}</div>
           </div>
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Events</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">12</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Events</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.events ?? 0}</div>
           </div>
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Registrations</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">142</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Registrations</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.event_registrations ?? 0}</div>
           </div>
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Tasks</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">28</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Tasks</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.tasks ?? 0}</div>
           </div>
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Ledger</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">₹42.5k</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Ledger</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.expenses ? `₹${diagnostics.table_counts.expenses}k` : '₹0'}</div>
           </div>
-          <div className="bg-white border border-[#E3EEE6] p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-semibold text-slate-500">Audit Logs</div>
-            <div className="text-base font-extrabold text-[#051F20] mt-0.5">389</div>
+          <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500">Audit Logs</div>
+            <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.audit_logs ?? 1}</div>
           </div>
         </div>
       </div>
 
       {/* 3. Audit Feed: Last 5 Entries + "View all" opening BottomSheet */}
-      <div className="bg-white border border-[#E3EEE6] p-4 rounded-2xl shadow-xs space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-[#E3EEE6]">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck size={16} className="text-[#235347]" />
-            <h4 className="text-xs font-bold text-[#051F20]">Governance Audit Log</h4>
+      <div className="bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm space-y-3.5">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <ShieldCheck size={17} className="text-emerald-700" />
+            <h4 className="text-xs font-bold text-slate-900">Governance Audit Log</h4>
           </div>
           <button
             type="button"
             onClick={() => setIsAllAuditsOpen(true)}
-            className="text-xs font-bold text-[#235347] hover:underline cursor-pointer"
+            className="text-xs font-bold text-emerald-700 hover:underline cursor-pointer"
           >
             View all ›
           </button>
@@ -171,11 +259,11 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
           {auditLogs.slice(0, 5).map((log) => (
             <div
               key={log.id}
-              className="p-2.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl flex items-center justify-between gap-2 text-xs"
+              className="p-3 bg-white border border-slate-200/80 rounded-xl flex items-center justify-between gap-2 text-xs hover:bg-slate-50/50 transition shadow-xs"
             >
               <div className="min-w-0">
-                <div className="font-bold text-[#051F20] truncate">{log.action}</div>
-                <div className="text-[11px] text-[#235347] truncate">
+                <div className="font-bold text-slate-900 truncate">{log.action}</div>
+                <div className="text-[11px] font-medium text-slate-500 truncate mt-0.5">
                   {log.actor_name} → {log.target_name || log.target_type}
                 </div>
               </div>
@@ -189,12 +277,12 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
       </div>
 
       {/* 4. Danger Zone: Red-outline "Purge and Clean Slate" button */}
-      <div className="bg-white border border-rose-200 p-4 rounded-2xl shadow-xs space-y-2.5">
+      <div className="bg-white border border-rose-200 p-4 sm:p-5 rounded-2xl shadow-sm space-y-2.5">
         <div className="text-xs font-bold text-rose-700">Danger Zone</div>
         <button
           type="button"
           onClick={() => setIsPurgeModalOpen(true)}
-          className="w-full min-h-[44px] h-11 rounded-xl border border-rose-500 text-rose-600 hover:bg-rose-50 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2"
+          className="w-full min-h-[44px] h-11 rounded-xl border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2 shadow-xs"
         >
           <Trash2 size={15} />
           <span>Purge and Clean Slate</span>

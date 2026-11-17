@@ -1,8 +1,10 @@
 import os
+import time
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from config import settings
@@ -82,11 +84,14 @@ app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)
 app.include_router(app_router.router, prefix=settings.API_V1_STR)
 app.include_router(admin_router.router, prefix=settings.API_V1_STR)
+app.include_router(admin_router.router, prefix="/api/v1")
 app.include_router(admin_router.router, prefix="/superadmin")
+app.include_router(admin_router.router)
 app.include_router(sync_router.router, prefix=settings.API_V1_STR)
 
 @app.get("/me/modules")
 @app.get(f"{settings.API_V1_STR}/me/modules")
+@app.get("/api/v1/me/modules")
 def get_my_effective_modules(
     current_user: Optional[models.User] = Depends(auth.get_optional_user),
     db: Session = Depends(get_db)
@@ -131,13 +136,23 @@ def get_my_effective_modules(
 
 @app.get("/health")
 @app.get(f"{settings.API_V1_STR}/health")
-def health_check():
+@app.get("/api/v1/health")
+def health_check(db: Session = Depends(get_db)):
+    start = time.perf_counter()
+    try:
+        db.execute(text("SELECT 1"))
+        latency_ms = max(1, round((time.perf_counter() - start) * 1000))
+        db_ok = True
+    except Exception:
+        latency_ms = 0
+        db_ok = False
     return {
-        "status": "healthy",
+        "status": "healthy" if db_ok else "degraded",
         "app": settings.PROJECT_NAME,
         "version": settings.VERSION,
-        "database": engine.name,
-        "database_connected": True,
+        "database": "TiDB Cloud MySQL Distributed" if "mysql" in engine.name else engine.name,
+        "database_connected": db_ok,
+        "latency_ms": latency_ms,
     }
 
 @app.on_event("startup")

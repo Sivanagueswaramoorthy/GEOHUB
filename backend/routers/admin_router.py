@@ -737,6 +737,40 @@ def delete_admin_user(
 
     return {"status": "success", "message": f"User '{user.name}' ({user_id}) successfully deleted."}
 
+@router.post("/users/{user_id}/reset-password")
+def reset_admin_user_password(
+    user_id: str,
+    payload: Optional[Dict[str, str]] = Body(default={}),
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """Allows SuperAdmin to reset the password for any user account."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    pwd = (payload.get("password") if payload else None) or "geohub"
+    user.hashed_password = auth.get_password_hash(pwd.strip())
+    user.token_version = (user.token_version or 0) + 1
+    user.updated_at = datetime.utcnow()
+
+    actor_id = current_user.id if current_user else "u_super_admin_sa01"
+    actor_name = current_user.name if current_user else "System SuperAdmin"
+
+    audit = models.AuditLog(
+        actor_id=actor_id,
+        actor_name=actor_name,
+        action="PASSWORD_RESET",
+        target_type="user",
+        target_id=user.id,
+        target_name=user.name,
+        details=f"SuperAdmin reset password for user {user.name} ({user.roll_no}).",
+    )
+    db.add(audit)
+    db.commit()
+
+    return {"status": "success", "message": f"Password reset for {user.name} to '{pwd}'."}
+
 @router.post("/purge-data")
 def purge_platform_data(
     db: Session = Depends(get_db),
@@ -798,10 +832,21 @@ def execute_batch_user_action(
             u.squad_memberships = json.dumps([{"squad": squad_name, "isLead": False}])
             u.updated_at = datetime.utcnow()
             affected_count += 1
+    elif action == "set_role":
+        role_val = auth.normalize_role(payload.value or "student")
+        for u in sanitized_users:
+            u.role = role_val
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
     elif action == "set_status":
         status_val = (payload.value or "active").strip().lower()
         for u in sanitized_users:
             u.status = status_val
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
+    elif action == "toggle_status":
+        for u in sanitized_users:
+            u.status = "disabled" if u.status == "active" else "active"
             u.updated_at = datetime.utcnow()
             affected_count += 1
     elif action == "reset_password":
@@ -809,6 +854,11 @@ def execute_batch_user_action(
         hashed = auth.get_password_hash(pwd)
         for u in sanitized_users:
             u.hashed_password = hashed
+            u.updated_at = datetime.utcnow()
+            affected_count += 1
+    elif action in ("force_logout", "logout"):
+        for u in sanitized_users:
+            u.token_version = (u.token_version or 0) + 1
             u.updated_at = datetime.utcnow()
             affected_count += 1
     elif action == "delete":

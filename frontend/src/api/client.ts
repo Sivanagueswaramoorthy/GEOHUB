@@ -579,6 +579,18 @@ class ApiClient {
     });
   }
 
+  public async createAdminFaculty(payload: {
+    name: string;
+    roll_no: string;
+    email: string;
+    department?: string;
+    post?: string;
+    phone?: string;
+    password?: string;
+  }) {
+    return await this.addAdminFaculty(payload);
+  }
+
   public async updateAdminFaculty(
     facultyId: string,
     payload: {
@@ -728,6 +740,66 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  }
+
+  public async getAdminOverview() {
+    return await this.request<{
+      status: string;
+      faculty_count: number;
+      student_count: number;
+      users_count: number;
+      online_count: number;
+      modules: Record<string, boolean>;
+      latency_ms: number;
+    }>('/admin/overview');
+  }
+
+  public async getAdminRoleModules() {
+    return await this.request<Record<string, Record<string, boolean>>>('/admin/role-modules');
+  }
+
+  public async setAdminRoleModule(role: string, module: string, enabled: boolean) {
+    return await this.request<{
+      status: string;
+      role: string;
+      module: string;
+      enabled: boolean;
+    }>(`/admin/role-modules/${encodeURIComponent(role)}/${encodeURIComponent(module)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ enabled }),
+    });
+  }
+
+  public async getAdminOnlineSessions() {
+    return await this.request<Array<{
+      id: string;
+      name: string;
+      roll_no: string;
+      role: string;
+      department?: string;
+      last_seen_at: string;
+      last_platform?: string;
+      last_app_version?: string;
+    }>>('/admin/sessions/online');
+  }
+
+  public async resetAdminUserPassword(userId: string, password?: string) {
+    return await this.request<{ status: string; message: string }>(`/admin/users/${encodeURIComponent(userId)}/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ password: password || 'geohub' }),
+    });
+  }
+
+  public async pingTiDbHealth(): Promise<{ ok: boolean; latencyMs: number; status: string; database?: string }> {
+    const start = performance.now();
+    try {
+      const res = await this.request<{ status: string; database: string; latency_ms: number }>('/v1/health');
+      const elapsed = Math.round(performance.now() - start);
+      return { ok: true, latencyMs: res.latency_ms || elapsed, status: res.status, database: res.database };
+    } catch {
+      const elapsed = Math.round(performance.now() - start);
+      return { ok: false, latencyMs: elapsed, status: 'offline' };
+    }
   }
 }
 

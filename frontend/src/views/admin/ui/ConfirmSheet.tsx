@@ -30,16 +30,16 @@ export const ConfirmSheet: React.FC<ConfirmSheetProps> = ({
     <BottomSheet isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-4 pt-1 pb-2">
         {affectedCount !== undefined && (
-          <div className="p-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#235347]">Affected Entities</span>
-            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-[#051F20] text-white">
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700">Affected Entities</span>
+            <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-800">
               {affectedCount} {affectedCount === 1 ? 'item' : 'items'}
             </span>
           </div>
         )}
 
         {description && (
-          <p className="text-xs text-slate-600 leading-relaxed">{description}</p>
+          <p className="text-xs font-medium text-slate-600 leading-relaxed">{description}</p>
         )}
 
         <div className="grid grid-cols-2 gap-2 pt-2">
@@ -47,7 +47,7 @@ export const ConfirmSheet: React.FC<ConfirmSheetProps> = ({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="min-h-[44px] h-11 px-4 rounded-xl border border-[#E3EEE6] bg-white text-xs font-bold text-[#051F20] hover:bg-[#F7FAF8] transition cursor-pointer"
+            className="min-h-[44px] h-11 px-4 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
           >
             {cancelLabel}
           </button>
@@ -58,10 +58,10 @@ export const ConfirmSheet: React.FC<ConfirmSheetProps> = ({
               onClose();
             }}
             disabled={loading}
-            className={`min-h-[44px] h-11 px-4 rounded-xl text-xs font-bold text-white transition shadow-xs cursor-pointer ${
+            className={`min-h-[44px] h-11 px-4 rounded-xl text-xs font-bold text-white transition shadow-sm cursor-pointer ${
               isDestructive
-                ? 'bg-rose-600 hover:bg-rose-700'
-                : 'bg-[#051F20] hover:bg-[#163832]'
+                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20'
+                : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
             }`}
           >
             {loading ? 'Processing...' : confirmLabel}

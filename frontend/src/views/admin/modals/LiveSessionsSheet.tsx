@@ -19,32 +19,32 @@ export const LiveSessionsSheet: React.FC<LiveSessionsSheetProps> = ({
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title="Active Live Sessions">
       <div className="space-y-3 py-1">
-        <p className="text-xs text-[#235347] font-medium">
-          Scholars and administrators authenticated within the last 5 minutes.
+        <p className="text-xs text-slate-500 font-semibold">
+          Active users authenticated within the last 5 minutes.
         </p>
 
         <div className="space-y-2">
           {onlineUsers.length === 0 ? (
-            <div className="py-6 text-center text-xs text-slate-500 font-medium">
+            <div className="py-6 text-center text-xs text-slate-500 font-bold">
               No other active sessions detected.
             </div>
           ) : (
             onlineUsers.map((user) => (
               <div
                 key={user.id}
-                className="p-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl flex items-center justify-between gap-3"
+                className="p-3.5 bg-white border border-slate-200/90 rounded-2xl flex items-center justify-between gap-3 shadow-xs"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 ring-2 ring-emerald-100" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 ring-2 ring-emerald-100 animate-pulse" />
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-[#051F20] truncate">
+                    <div className="text-sm font-bold text-slate-900 truncate">
                       {user.name}{' '}
-                      <span className="text-xs font-mono font-normal text-slate-500">
+                      <span className="text-xs font-mono font-medium text-slate-400">
                         ({user.roll_no})
                       </span>
                     </div>
-                    <div className="text-xs text-[#235347] flex items-center gap-1.5 mt-0.5">
-                      <span className="capitalize">{user.role}</span>
+                    <div className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-0.5">
+                      <span className="capitalize text-emerald-700 font-bold">{user.role}</span>
                       <span>•</span>
                       <span>{user.platform || 'Android'}</span>
                       <span>•</span>
@@ -57,7 +57,7 @@ export const LiveSessionsSheet: React.FC<LiveSessionsSheetProps> = ({
                   <button
                     type="button"
                     onClick={() => onForceLogout(user.id, user.name)}
-                    className="min-h-[36px] px-3 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition cursor-pointer shrink-0"
+                    className="min-h-[36px] px-3 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold hover:bg-rose-100 transition cursor-pointer shrink-0 shadow-xs"
                   >
                     Logout
                   </button>
