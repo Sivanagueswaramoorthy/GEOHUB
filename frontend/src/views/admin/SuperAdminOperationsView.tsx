@@ -60,7 +60,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
     <div
       style={
         state.activeDeck === 'home'
-          ? { backgroundColor: '#06080b', color: '#f8fafc', minHeight: '100vh' }
+          ? { backgroundColor: '#FAF6F2', color: '#2D1A12', minHeight: '100vh' }
           : { backgroundColor: '#f8fafc', color: '#0f172a', minHeight: '100vh' }
       }
       className={`w-full min-h-screen flex flex-col relative select-none transition-colors duration-200 ${

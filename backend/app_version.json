@@ -1,8 +1,8 @@
 {
-  "version": "1.6.46",
-  "version_code": 65,
+  "version": "1.6.47",
+  "version_code": 66,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "SuperAdmin Executive Cockpit: pure obsidian card theme, tactile sliding switches (TiDB emerald/slate, Gateway cobalt/amber), high-contrast white metrics, single-status ping button, and cross-platform UI rectification.",
-  "sha256": "fdeeccfb4c9709ab3fdd2b705aeb3d7d7adca9a0323b8350302347cb7bbb8187",
-  "file_size": 6893356
+  "release_notes": "SuperAdmin Executive Cockpit: elegant light peach card boxes (#FFF2EB), rich dark espresso high-contrast typography (#2D1A12), tactile sliding toggles, and zero black background (#FAF6F2).",
+  "sha256": "8eb4bd807a02d7a12c0eca74b83a591e043105865e53a5aee6fcfb84c58bb066",
+  "file_size": 6893312
 }
