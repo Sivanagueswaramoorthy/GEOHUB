@@ -943,6 +943,152 @@ class ApiClient {
       return { ok: false, latencyMs: elapsed, status: 'offline' };
     }
   }
+
+  // ==========================================
+  // NOTIFICATIONS & CAMPUS BROADCASTS
+  // ==========================================
+  public async getNotifications() {
+    return await this.request<any[]>('/notifications');
+  }
+
+  public async broadcastNotification(payload: {
+    title: string;
+    message: string;
+    type?: string;
+    urgency?: 'normal' | 'urgent';
+  }) {
+    return await this.request<any>('/notifications/broadcast', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async markNotificationRead(id: string) {
+    return await this.request<any>(`/notifications/${encodeURIComponent(id)}/read`, {
+      method: 'PUT',
+    });
+  }
+
+  public async markAllNotificationsRead() {
+    return await this.request<any>('/notifications/read-all', {
+      method: 'PUT',
+    });
+  }
+
+  // ==========================================
+  // DOCUMENTS & MOM ARCHIVES
+  // ==========================================
+  public async getDocuments(teamId?: string, category?: string) {
+    const params = new URLSearchParams();
+    if (teamId) params.append('team_id', teamId);
+    if (category) params.append('category', category);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return await this.request<any[]>(`/documents${qs}`);
+  }
+
+  public async createDocument(payload: {
+    title?: string;
+    file_name: string;
+    download_url: string;
+    category?: string;
+    team_id?: string;
+    event_id?: string;
+    storage_path?: string;
+  }) {
+    return await this.request<any>('/documents', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteDocument(id: string) {
+    return await this.request<any>(`/documents/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // CAMPAIGNS & SOCIAL POSTS & DAILY NEWS
+  // ==========================================
+  public async getCampaigns() {
+    return await this.request<any[]>('/campaigns');
+  }
+
+  public async createCampaign(payload: any) {
+    return await this.request<any>('/campaigns', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async updateCampaign(id: string, payload: any) {
+    return await this.request<any>(`/campaigns/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async getPosts() {
+    return await this.request<any[]>('/posts');
+  }
+
+  public async createPost(payload: any) {
+    return await this.request<any>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async updatePost(id: string, payload: any) {
+    return await this.request<any>(`/posts/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deletePost(id: string) {
+    return await this.request<any>(`/posts/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async getDailyNews() {
+    return await this.request<any[]>('/daily-news');
+  }
+
+  public async createDailyNews(payload: any) {
+    return await this.request<any>('/daily-news', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async updateDailyNews(id: string, payload: any) {
+    return await this.request<any>(`/daily-news/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteDailyNews(id: string) {
+    return await this.request<any>(`/daily-news/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // MEMBER CUSTOM CLEARANCES
+  // ==========================================
+  public async getMemberCustomClearances() {
+    return await this.request<Record<string, string[]>>('/admin/member-clearances');
+  }
+
+  public async setMemberCustomClearance(userId: string, allowedModules: string[]) {
+    return await this.request<any>(`/admin/member-clearances/${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      body: JSON.stringify({ allowed_modules: allowedModules }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

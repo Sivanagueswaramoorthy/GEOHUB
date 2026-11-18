@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 from pydantic import BaseModel, Field
 
 # Auth Schemas
@@ -517,5 +517,174 @@ class GalleryItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Notification Schemas
+class NotificationCreate(BaseModel):
+    user_id: str
+    title: str
+    message: str
+    type: Optional[str] = "info"
+
+class NotificationBroadcastRequest(BaseModel):
+    title: str
+    message: str
+    type: Optional[str] = "alert"
+    urgency: Optional[str] = "normal"
+
+class NotificationResponse(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    message: str
+    type: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Document Schemas
+class DocumentCreate(BaseModel):
+    event_id: Optional[str] = "general"
+    category: Optional[str] = "reports"
+    storage_path: Optional[str] = ""
+    download_url: str
+    file_name: str
+    team_id: Optional[str] = "Documentation"
+
+class DocumentResponse(BaseModel):
+    id: str
+    event_id: str
+    category: str
+    storage_path: str
+    download_url: str
+    file_name: str
+    uploaded_by: str
+    uploaded_at: datetime
+    team_id: str
+
+    class Config:
+        from_attributes = True
+
+# Social Post Schemas
+class SocialPostCreate(BaseModel):
+    title: str
+    content: str
+    platform: Optional[str] = "all"
+    status: Optional[str] = "draft"
+    scheduled_for: Optional[str] = None
+    published_at: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+class SocialPostUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    platform: Optional[str] = None
+    status: Optional[str] = None
+    scheduled_for: Optional[str] = None
+    published_at: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+class SocialPostResponse(BaseModel):
+    id: str
+    title: str
+    content: str
+    platform: str
+    status: str
+    author_id: str
+    author_name: str
+    scheduled_for: Optional[str] = None
+    published_at: Optional[str] = None
+    image_url: Optional[str] = None
+    tags: Any = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Campaign Schemas
+class CampaignPlanCreate(BaseModel):
+    title: str
+    theme: str
+    target_audience: Optional[str] = "General Campus"
+    start_date: str
+    end_date: str
+    status: Optional[str] = "planning"
+    budget: Optional[float] = 0.0
+    checklist: Optional[Dict[str, Any]] = None
+
+class CampaignPlanUpdate(BaseModel):
+    title: Optional[str] = None
+    theme: Optional[str] = None
+    target_audience: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    status: Optional[str] = None
+    budget: Optional[float] = None
+    checklist: Optional[Dict[str, Any]] = None
+
+class CampaignPlanResponse(BaseModel):
+    id: str
+    title: str
+    theme: str
+    target_audience: str
+    start_date: str
+    end_date: str
+    status: str
+    budget: float
+    checklist: Any = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Daily News Schemas
+class DailyNewsItemCreate(BaseModel):
+    title: str
+    content: str
+    category: Optional[str] = "announcement"
+    source: Optional[str] = "GeoHub Editorial"
+    author_name: Optional[str] = "System SuperAdmin"
+    published_at: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+class DailyNewsItemUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    category: Optional[str] = None
+    source: Optional[str] = None
+    author_name: Optional[str] = None
+    published_at: Optional[str] = None
+    tags: Optional[List[str]] = None
+
+class DailyNewsItemResponse(BaseModel):
+    id: str
+    title: str
+    content: str
+    category: str
+    source: str
+    author_name: str
+    published_at: Optional[str] = None
+    tags: Any = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Member Custom Clearance Schemas
+class MemberClearanceRequest(BaseModel):
+    user_id: str
+    allowed_modules: List[str]
+
+class MemberClearanceResponse(BaseModel):
+    user_id: str
+    allowed_modules: List[str]
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
 
 

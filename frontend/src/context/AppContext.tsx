@@ -811,6 +811,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             caption: g.caption,
           })));
         }
+
+        // 13. Sync Notifications & Campus Broadcasts
+        const liveNotifs = await apiClient.getNotifications().catch(() => null);
+        if (Array.isArray(liveNotifs)) {
+          setNotifications(liveNotifs.map((n: any): NotificationModel => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+            type: (n.type as any) || 'info',
+            timestamp: n.created_at || new Date().toISOString(),
+            isRead: Boolean(n.is_read),
+          })));
+        }
+
+        // 14. Sync Chapter Campaigns
+        const liveCampaigns = await apiClient.getCampaigns().catch(() => null);
+        if (Array.isArray(liveCampaigns) && liveCampaigns.length > 0) {
+          setCampaigns(liveCampaigns.map((c: any): CampaignPlan => ({
+            id: c.id,
+            title: c.title,
+            eventId: '',
+            eventTitle: '',
+            startDate: c.start_date,
+            endDate: c.end_date,
+            targetAudience: c.target_audience || 'General Campus',
+            status: c.status || 'planning',
+            checklist: typeof c.checklist === 'string' ? JSON.parse(c.checklist) : (c.checklist || {}),
+          })));
+        }
+
+        // 15. Sync Social Media Posts
+        const livePosts = await apiClient.getPosts().catch(() => null);
+        if (Array.isArray(livePosts) && livePosts.length > 0) {
+          setPosts(livePosts.map((p: any): SocialPost => ({
+            id: p.id,
+            platform: (p.platform as any) || 'all',
+            status: (p.status as any) || 'draft',
+            caption: p.content || p.title,
+            scheduledDate: p.scheduled_for,
+            publishedDate: p.published_at,
+            hashtags: Array.isArray(p.tags) ? p.tags : (typeof p.tags === 'string' ? JSON.parse(p.tags) : []),
+            authorName: p.author_name,
+            mediaUrl: p.image_url,
+            createdAt: p.created_at || new Date().toISOString(),
+          })));
+        }
+
+        // 16. Sync Daily News Bulletin
+        const liveNews = await apiClient.getDailyNews().catch(() => null);
+        if (Array.isArray(liveNews) && liveNews.length > 0) {
+          setDailyNews(liveNews.map((dn: any): DailyNewsItem => ({
+            id: dn.id,
+            title: dn.title,
+            content: dn.content,
+            date: dn.published_at || new Date().toISOString().split('T')[0],
+            publishedAt: dn.published_at,
+            category: dn.category || 'announcement',
+            author: dn.author_name || 'System SuperAdmin',
+            authorName: dn.author_name,
+            hashtags: Array.isArray(dn.tags) ? dn.tags : (typeof dn.tags === 'string' ? JSON.parse(dn.tags) : []),
+            status: 'published',
+          })));
+        }
       }
 
         setSyncStatus('connected');
@@ -840,6 +903,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const testServerConnection = useCallback(async () => {
     return await apiClient.testServerHealth();
   }, []);
+
+  // Listen to cross-module data refresh events (e.g. from SuperAdmin operations portal)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleDataRefresh = () => {
+      syncWithBackend();
+    };
+    window.addEventListener('geohub_refresh_data', handleDataRefresh);
+    return () => {
+      window.removeEventListener('geohub_refresh_data', handleDataRefresh);
+    };
+  }, [syncWithBackend]);
 
   // 1. Real-Time Multi-Device SSE Event Stream
   useEffect(() => {
@@ -896,6 +971,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             } else if (type === 'MODULE_STATUS_CHANGED' && data) {
               setPlatformModules((prev) => ({ ...prev, ...data }));
               showToast('Platform module configuration updated', 'info');
+            } else if (type === 'CAMPUS_BROADCAST' && data?.title) {
+              showToast(`🔔 Campus Alert: ${data.title}`, 'info');
+            } else if (type === 'POST_CREATED' || type === 'POST_UPDATED') {
+              showToast('✓ Media studio updated', 'info');
+            } else if (type === 'CAMPAIGN_UPDATED' || type === 'DOCUMENT_UPLOADED') {
+              showToast('✓ Chapter records updated', 'info');
+            } else if (type === 'MEMBER_CLEARANCE_UPDATED') {
+              showToast('Member permissions updated', 'info');
             }
 
             // Always synchronize latest full authoritative state from backend
@@ -2213,6 +2296,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       })
     );
+
+    apiClient.updateAdminUser(uid, {
+      role,
+      team,
+      is_volunteer: isVolunteer,
+      status: status || 'active',
+    }).catch(() => {});
   };
 
   const uploadGalleryItem = (itemData: Omit<GalleryItem, 'id' | 'uploadedAt'>) => {
@@ -2273,16 +2363,38 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       authorName: postData.authorName || `${currentUser.name} (${currentUser.post || 'Promotion Lead'})`,
     };
     setPosts((prev) => [newPost, ...prev]);
+
+    apiClient.createPost({
+      title: postData.caption ? postData.caption.slice(0, 50) : 'Social Post',
+      content: postData.caption || '',
+      platform: postData.platform || 'all',
+      status: postData.status || 'draft',
+      scheduled_for: postData.scheduledDate,
+      published_at: postData.publishedDate,
+      image_url: postData.mediaUrl,
+      tags: postData.hashtags || [],
+    }).catch(() => {});
   };
 
   const updatePost = (id: string, updates: Partial<SocialPost>) => {
     setPosts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
     );
+
+    apiClient.updatePost(id, {
+      content: updates.caption,
+      platform: updates.platform,
+      status: updates.status,
+      scheduled_for: updates.scheduledDate,
+      published_at: updates.publishedDate,
+      image_url: updates.mediaUrl,
+      tags: updates.hashtags,
+    }).catch(() => {});
   };
 
   const deletePost = (id: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== id));
+    apiClient.deletePost(id).catch(() => {});
   };
 
   const markPostPublished = (id: string, postUrl?: string) => {
@@ -2298,6 +2410,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           : p
       )
     );
+
+    apiClient.updatePost(id, {
+      status: 'published',
+      published_at: new Date().toISOString().split('T')[0],
+    }).catch(() => {});
   };
 
   const addCampaign = (campaignData: Omit<CampaignPlan, 'id'>) => {
@@ -2306,22 +2423,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `camp_${Date.now()}`,
     };
     setCampaigns((prev) => [newCamp, ...prev]);
+
+    apiClient.createCampaign({
+      title: campaignData.title,
+      theme: (campaignData as any).theme || campaignData.title,
+      target_audience: campaignData.targetAudience,
+      start_date: campaignData.startDate,
+      end_date: campaignData.endDate || campaignData.startDate,
+      status: campaignData.status || 'planning',
+      checklist: campaignData.checklist,
+    }).catch(() => {});
   };
 
   const updateCampaignChecklist = (campaignId: string, itemKey: keyof CampaignChecklist, value: boolean) => {
+    let updatedChecklist: any = null;
     setCampaigns((prev) =>
-      prev.map((c) =>
-        c.id === campaignId
-          ? {
-              ...c,
-              checklist: {
-                ...c.checklist,
-                [itemKey]: value,
-              },
-            }
-          : c
-      )
+      prev.map((c) => {
+        if (c.id === campaignId) {
+          updatedChecklist = {
+            ...c.checklist,
+            [itemKey]: value,
+          };
+          return {
+            ...c,
+            checklist: updatedChecklist,
+          };
+        }
+        return c;
+      })
     );
+
+    if (updatedChecklist) {
+      apiClient.updateCampaign(campaignId, { checklist: updatedChecklist }).catch(() => {});
+    }
   };
 
   const addDailyNews = (itemData: Omit<DailyNewsItem, 'id'>) => {
@@ -2330,16 +2464,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: `news_${Date.now()}`,
     };
     setDailyNews((prev) => [newItem, ...prev]);
+
+    apiClient.createDailyNews({
+      title: itemData.title,
+      content: itemData.content,
+      category: itemData.category || 'announcement',
+      source: (itemData as any).source || 'GeoHub Editorial',
+      author_name: itemData.author || itemData.authorName || 'System SuperAdmin',
+      published_at: itemData.publishedAt || itemData.date,
+      tags: itemData.tags || itemData.hashtags || [],
+    }).catch(() => {});
   };
 
   const updateDailyNews = (id: string, updates: Partial<DailyNewsItem>) => {
     setDailyNews((prev) =>
       prev.map((n) => (n.id === id ? { ...n, ...updates } : n))
     );
+
+    apiClient.updateDailyNews(id, {
+      title: updates.title,
+      content: updates.content,
+      category: updates.category,
+      source: (updates as any).source || 'GeoHub Editorial',
+      author_name: updates.author || updates.authorName,
+      tags: updates.tags || updates.hashtags,
+    }).catch(() => {});
   };
 
   const deleteDailyNews = (id: string) => {
     setDailyNews((prev) => prev.filter((n) => n.id !== id));
+    apiClient.deleteDailyNews(id).catch(() => {});
   };
 
   return (

@@ -1221,4 +1221,55 @@ def force_logout_batch(
 
     return {"status": "success", "count": count}
 
+# ==========================================
+# CUSTOM MEMBER MODULE CLEARANCES
+# ==========================================
+@router.get("/member-clearances")
+def get_all_member_clearances(db: Session = Depends(get_db)):
+    """Retrieve all custom member module clearances."""
+    records = db.query(models.MemberCustomClearance).all()
+    result = {}
+    for r in records:
+        try:
+            result[r.user_id] = json.loads(r.allowed_modules) if isinstance(r.allowed_modules, str) else r.allowed_modules
+        except:
+            result[r.user_id] = []
+    return result
+
+@router.post("/member-clearances/{user_id}")
+def set_member_clearance(
+    user_id: str,
+    payload: Dict[str, Any] = Body(...),
+    db: Session = Depends(get_db)
+):
+    """Persist custom module clearance for an individual member."""
+    modules_list = payload.get("allowed_modules", [])
+    modules_json = json.dumps(modules_list)
+
+    existing = db.query(models.MemberCustomClearance).filter(
+        models.MemberCustomClearance.user_id == user_id
+    ).first()
+
+    if existing:
+        existing.allowed_modules = modules_json
+        existing.updated_at = datetime.utcnow()
+    else:
+        new_clearance = models.MemberCustomClearance(
+            id=f"clr_{uuid.uuid4().hex[:12]}",
+            user_id=user_id,
+            allowed_modules=modules_json,
+            updated_at=datetime.utcnow()
+        )
+        db.add(new_clearance)
+
+    db.commit()
+
+    broadcast_sync_event("MEMBER_CLEARANCE_UPDATED", {
+        "user_id": user_id,
+        "allowed_modules": modules_list
+    })
+
+    return {"status": "success", "user_id": user_id, "allowed_modules": modules_list}
+
+
 

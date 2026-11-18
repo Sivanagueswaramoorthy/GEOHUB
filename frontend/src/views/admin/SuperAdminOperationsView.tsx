@@ -10,6 +10,7 @@ import { PullToRefresh } from './ui/PullToRefresh';
 import { FacultyFormModal } from './modals/FacultyFormModal';
 import { StudentFormModal } from './modals/StudentFormModal';
 import { useApp } from '../../context/AppContext';
+import { apiClient } from '../../api/client';
 
 // The 5 Rebuilt Executive Tabs for SuperAdmin
 import { HomeTab } from './tabs/HomeTab';
@@ -141,8 +142,17 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
                 state.batchForceLogout();
                 state.showToast(`Logged out active session for ${name}`);
               }}
-              onDispatchBroadcast={(data) => {
+              onDispatchBroadcast={async (data) => {
                 state.showToast(`Dispatched campus push alert: ${data.title}`);
+                try {
+                  await apiClient.broadcastNotification({
+                    title: data.title,
+                    message: data.message,
+                    urgency: data.urgency,
+                  });
+                } catch (err: any) {
+                  console.warn('Failed to broadcast alert to cloud:', err);
+                }
               }}
               onOpenAddFaculty={() => setIsAddFacultyModalOpen(true)}
               onOpenAddStudent={() => setIsAddStudentModalOpen(true)}
@@ -315,36 +325,28 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
       <FacultyFormModal
         isOpen={isAddFacultyModalOpen}
         onClose={() => setIsAddFacultyModalOpen(false)}
-        onSave={(fac) => {
-          state.setFaculty((prev) => [
-            ...prev,
-            {
-              ...fac,
-              id: `fac-${Date.now()}`,
-              status: 'active',
-              last_login_at: new Date().toISOString(),
-              last_seen_at: new Date().toISOString(),
-            } as any,
-          ]);
-          state.showToast(`Provisioned faculty advisor ${fac.name}`);
+        onSave={async (fac) => {
+          await state.addFaculty({
+            rollno: fac.roll_no || 'FAC01',
+            name: fac.name || 'Faculty Member',
+            department: fac.department || 'Geoinformatics Engineering',
+            designation: fac.designation || 'Faculty Advisor',
+            email: fac.email,
+          });
         }}
       />
 
       <StudentFormModal
         isOpen={isAddStudentModalOpen}
         onClose={() => setIsAddStudentModalOpen(false)}
-        onSave={(std) => {
-          state.setStudents((prev) => [
-            ...prev,
-            {
-              ...std,
-              id: `std-${Date.now()}`,
-              status: 'active',
-              last_login_at: new Date().toISOString(),
-              last_seen_at: new Date().toISOString(),
-            } as any,
-          ]);
-          state.showToast(`Onboarded scholar ${std.name}`);
+        onSave={async (std) => {
+          await state.addStudent({
+            rollno: std.roll_no || '24GEO001',
+            name: std.name || 'Scholar Name',
+            year: std.year_of_study || '1st Year',
+            department: std.department || 'Geoinformatics',
+            email: std.email,
+          });
         }}
       />
 

@@ -322,7 +322,7 @@ export function useSuperAdminState() {
     if (isTestEnv) return; // Keep synchronous mock baseline in test runs
 
     try {
-      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes, sessionsRes] =
+      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes, sessionsRes, clearancesRes] =
         await Promise.allSettled([
           apiClient.getPlatformModules(),
           apiClient.getAdminFaculty(),
@@ -331,6 +331,7 @@ export function useSuperAdminState() {
           apiClient.getAdminRoleModules(),
           apiClient.getAdminSystemDiagnostics(),
           apiClient.getAdminOnlineSessions(),
+          apiClient.getMemberCustomClearances(),
         ]);
 
       if (modulesRes.status === 'fulfilled' && modulesRes.value) {
@@ -431,6 +432,10 @@ export function useSuperAdminState() {
             app_version: s.last_app_version || APP_VERSION,
           }))
         );
+      }
+
+      if (clearancesRes.status === 'fulfilled' && clearancesRes.value && typeof clearancesRes.value === 'object') {
+        setMemberCustomClearance(clearancesRes.value);
       }
     } catch {
       // Retain graceful fallback state if connection fails
@@ -779,6 +784,9 @@ export function useSuperAdminState() {
             setStudents((prev) =>
               prev.map((s) => (s.id === newStudent.id ? { ...s, id: res.id } : s))
             );
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
           }
         } catch (err: any) {
           console.warn('[useSuperAdminState] Failed to persist student to DB:', err?.message);
@@ -822,6 +830,9 @@ export function useSuperAdminState() {
             setFaculty((prev) =>
               prev.map((f) => (f.id === newFaculty.id ? { ...f, id: res.id } : f))
             );
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
           }
         } catch (err: any) {
           console.warn('[useSuperAdminState] Failed to persist faculty to DB:', err?.message);
@@ -912,16 +923,24 @@ export function useSuperAdminState() {
     [students, faculty, isDbConnected, isBackendActive, showToast]
   );
 
-  // Custom Member Access Clearance
+  // Custom Member Access Clearance with TiDB Persistence
   const updateMemberModules = useCallback(
-    (id: string, modulesList: string[]) => {
+    async (id: string, modulesList: string[]) => {
       setMemberCustomClearance((prev) => ({
         ...prev,
         [id]: modulesList,
       }));
       showToast('Updated module clearances');
+
+      if (isDbConnected && isBackendActive) {
+        try {
+          await apiClient.setMemberCustomClearance(id, modulesList);
+        } catch (err: any) {
+          console.warn('[useSuperAdminState] Failed to persist clearance:', err);
+        }
+      }
     },
-    [showToast]
+    [isDbConnected, isBackendActive, showToast]
   );
 
   // Unified Member Directory (Excludes SuperAdmin)

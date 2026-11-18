@@ -290,5 +290,57 @@ class GalleryItem(Base):
     file_size_bytes = Column(String(64), nullable=True)
     caption = Column(Text, nullable=True)
 
+class SocialPost(Base):
+    __tablename__ = "social_posts"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(255), nullable=False)
+    content = Column(Text, nullable=False)
+    platform = Column(String(32), default="all")  # instagram, linkedin, twitter, all
+    status = Column(String(32), default="draft")  # draft, scheduled, published
+    author_id = Column(String(64), nullable=False)
+    author_name = Column(String(128), nullable=False)
+    scheduled_for = Column(String(64), nullable=True)
+    published_at = Column(String(64), nullable=True)
+    image_url = Column(Text, nullable=True)
+    tags = Column(Text, default="[]")  # JSON string
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class CampaignPlan(Base):
+    __tablename__ = "campaigns"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(255), nullable=False)
+    theme = Column(String(128), nullable=False)
+    target_audience = Column(String(128), default="General Campus")
+    start_date = Column(String(64), nullable=False)
+    end_date = Column(String(64), nullable=False)
+    status = Column(String(32), default="planning")  # planning, active, completed
+    budget = Column(Float, default=0.0)
+    checklist = Column(Text, default="{}")  # JSON object
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class DailyNewsItem(Base):
+    __tablename__ = "daily_news"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(255), nullable=False)
+    content = Column(Text, nullable=False)
+    category = Column(String(64), default="announcement")
+    source = Column(String(128), default="GeoHub Editorial")
+    author_name = Column(String(128), default="System SuperAdmin")
+    published_at = Column(String(64), nullable=True)
+    tags = Column(Text, default="[]")  # JSON string
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class MemberCustomClearance(Base):
+    __tablename__ = "member_custom_clearances"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    user_id = Column(String(64), nullable=False, unique=True, index=True)
+    allowed_modules = Column(Text, nullable=False, default="[]")  # JSON array string
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 
 
