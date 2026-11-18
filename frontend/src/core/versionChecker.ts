@@ -86,14 +86,12 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
   // Tier 1: Primary API server check
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     const res = await fetch(`${baseUrl}/app/version${cacheBuster}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
       },
       signal: controller.signal,
     });
@@ -116,8 +114,6 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
       },
       signal: controller.signal,
     });
