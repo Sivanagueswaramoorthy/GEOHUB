@@ -7,8 +7,9 @@ import {
   Filter,
   X,
   RotateCcw,
-  Check,
+  ChevronDown,
 } from 'lucide-react';
+import { FilterDropdownMenu } from '../../../components/shared';
 
 export interface StudentFilterState {
   department: string;
@@ -56,16 +57,16 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
     filterState.status !== 'all',
   ].filter(Boolean).length;
 
-  const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filterState, department: e.target.value });
+  const handleDeptSelect = (dept: string) => {
+    onFilterChange({ ...filterState, department: dept });
   };
 
-  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filterState, role: e.target.value });
+  const handleRoleSelect = (role: string) => {
+    onFilterChange({ ...filterState, role });
   };
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filterState, year: e.target.value });
+  const handleYearSelect = (year: string) => {
+    onFilterChange({ ...filterState, year });
   };
 
   const handleStatusClick = (status: 'all' | 'active' | 'suspended') => {
@@ -189,104 +190,105 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
         </button>
       </div>
 
-      {/* 3. Dropdown Controls Grid: Department, Role, Year */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
-        {/* Department Dropdown */}
-        <div className="relative">
-          <label
-            htmlFor="student-filter-dept"
-            className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1"
-          >
-            <Building size={12} className="text-[#163832]" />
-            <span>Department</span>
-          </label>
-          <div className="relative">
-            <select
-              id="student-filter-dept"
-              value={filterState.department}
-              onChange={handleDeptChange}
-              className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                filterState.department !== 'All'
-                  ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                  : 'bg-white border-[#DAF1DE] text-[#051F20]'
-              }`}
-            >
-              {departments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept === 'All' ? 'All Departments' : dept}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-              ▼
-            </div>
-          </div>
-        </div>
+      {/* 3. Dropdown Menus for Refined Filtering */}
+      <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <FilterDropdownMenu
+          label="Department"
+          prefix="Dept"
+          value={filterState.department}
+          options={departments}
+          onChange={handleDeptSelect}
+          icon={<Building size={13} strokeWidth={2.2} />}
+          allLabel="All Depts"
+        />
 
-        {/* Role Dropdown */}
-        <div className="relative">
-          <label
-            htmlFor="student-filter-role"
-            className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1"
-          >
-            <Shield size={12} className="text-[#163832]" />
-            <span>Role</span>
-          </label>
-          <div className="relative">
-            <select
-              id="student-filter-role"
-              value={filterState.role}
-              onChange={handleRoleChange}
-              className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                filterState.role !== 'All'
-                  ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                  : 'bg-white border-[#DAF1DE] text-[#051F20]'
-              }`}
-            >
-              {roles.map((r) => (
-                <option key={r} value={r}>
-                  {r === 'All' ? 'All Roles' : `Role: ${r}`}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-              ▼
-            </div>
-          </div>
-        </div>
+        <FilterDropdownMenu
+          label="Role"
+          prefix="Role"
+          value={filterState.role}
+          options={roles}
+          onChange={handleRoleSelect}
+          icon={<Shield size={13} strokeWidth={2.2} />}
+          allLabel="All Roles"
+        />
 
-        {/* Year Dropdown */}
-        <div className="relative">
-          <label
-            htmlFor="student-filter-year"
-            className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1"
-          >
-            <GraduationCap size={12} className="text-[#163832]" />
-            <span>Year of Study</span>
-          </label>
-          <div className="relative">
-            <select
-              id="student-filter-year"
-              value={filterState.year}
-              onChange={handleYearChange}
-              className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                filterState.year !== 'All'
-                  ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                  : 'bg-white border-[#DAF1DE] text-[#051F20]'
-              }`}
-            >
-              {years.map((y) => (
-                <option key={y} value={y}>
-                  {y === 'All' ? 'All Years' : y}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-              ▼
-            </div>
-          </div>
-        </div>
+        <FilterDropdownMenu
+          label="Year"
+          prefix="Year"
+          value={filterState.year}
+          options={years}
+          onChange={handleYearSelect}
+          icon={<GraduationCap size={13} strokeWidth={2.2} />}
+          allLabel="All Years"
+        />
       </div>
+
+      {/* 4. Active Dismissible Filter Tags */}
+      {isAnyFilterActive && (
+        <div className="flex items-center gap-1.5 flex-wrap pt-1.5">
+          <span className="text-xs font-bold text-[#235347]">Active:</span>
+          {filterState.department !== 'All' && (
+            <button
+              type="button"
+              onClick={() => onFilterChange({ ...filterState, department: 'All' })}
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#051F20',
+                borderColor: '#8EB69B',
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer"
+            >
+              <span>Dept: {filterState.department}</span>
+              <X size={11} strokeWidth={2.5} />
+            </button>
+          )}
+          {filterState.role !== 'All' && (
+            <button
+              type="button"
+              onClick={() => onFilterChange({ ...filterState, role: 'All' })}
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#051F20',
+                borderColor: '#8EB69B',
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer"
+            >
+              <span>Role: {filterState.role}</span>
+              <X size={11} strokeWidth={2.5} />
+            </button>
+          )}
+          {filterState.year !== 'All' && (
+            <button
+              type="button"
+              onClick={() => onFilterChange({ ...filterState, year: 'All' })}
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#051F20',
+                borderColor: '#8EB69B',
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer"
+            >
+              <span>Year: {filterState.year}</span>
+              <X size={11} strokeWidth={2.5} />
+            </button>
+          )}
+          {filterState.status !== 'all' && (
+            <button
+              type="button"
+              onClick={() => onFilterChange({ ...filterState, status: 'all' })}
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#051F20',
+                borderColor: '#8EB69B',
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer"
+            >
+              <span>Status: {filterState.status}</span>
+              <X size={11} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };

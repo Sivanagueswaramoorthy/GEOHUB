@@ -186,11 +186,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span>Students</span>
             <span className="text-xs">🎓</span>
           </div>
-          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight my-1">
+          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight mt-1.5 mb-0.5">
             {overviewCounts.students}
-          </div>
-          <div style={{ color: '#163832' }} className="text-xs font-bold">
-            Enrolled
           </div>
           <span className="sr-only">Total Students</span>
         </div>
@@ -205,11 +202,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span>Staff</span>
             <span className="text-xs">💼</span>
           </div>
-          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight my-1">
+          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight mt-1.5 mb-0.5">
             {overviewCounts.faculty}
-          </div>
-          <div style={{ color: '#235347' }} className="text-xs font-bold">
-            Advisors
           </div>
           <span className="sr-only">Total Staff</span>
         </div>
@@ -224,11 +218,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             <span>Users</span>
             <span className="text-xs">👥</span>
           </div>
-          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight my-1">
+          <div style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight mt-1.5 mb-0.5">
             {overviewCounts.users}
-          </div>
-          <div style={{ color: '#235347' }} className="text-xs font-bold">
-            Campus Total
           </div>
           <span className="sr-only">Total Users</span>
         </div>

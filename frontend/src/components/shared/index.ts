@@ -38,3 +38,4 @@ export { Toast, type ToastProps } from '../Toast';
 export { FloatingNav, type FloatingNavProps } from '../FloatingNav';
 export { Header, type HeaderProps } from '../Header';
 export * from './UnderMaintenanceScreen';
+export * from './FilterDropdownMenu';

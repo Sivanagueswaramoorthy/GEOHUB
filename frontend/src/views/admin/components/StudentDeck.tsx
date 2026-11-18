@@ -11,6 +11,7 @@ import { StudentFormModal } from '../modals/StudentFormModal';
 import { StudentDetailSheet } from '../modals/StudentDetailSheet';
 import { BatchAssignSquadModal } from '../modals/BatchAssignSquadModal';
 import { StudentFilterBar, StudentFilterState } from './StudentFilterBar';
+import { SearchField } from '../../../components/shared';
 
 export interface StudentDeckProps {
   students: SuperAdminUserItem[];
@@ -232,16 +233,13 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
             </div>
           </div>
         ) : (
-          <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search name, roll no, role..."
-              className="w-full min-h-[44px] h-11 pl-10 pr-4 bg-white border border-[#DAF1DE] rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:border-[#8EB69B] shadow-xs"
-            />
-          </div>
+          <SearchField
+            className="flex-1"
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search name, roll no, role..."
+            resultsCount={searchQuery ? filteredStudents.length : undefined}
+          />
         )}
 
         <button

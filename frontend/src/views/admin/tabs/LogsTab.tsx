@@ -17,6 +17,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
+  SlidersHorizontal,
   UserCheck,
   Award,
   Users,
@@ -26,6 +28,7 @@ import {
   UserX,
 } from 'lucide-react';
 import { UnifiedMemberItem, ModuleConfig } from '../types';
+import { SearchField, FilterDropdownMenu } from '../../../components/shared';
 
 export interface LogsTabProps {
   members: UnifiedMemberItem[];
@@ -89,6 +92,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
     const list = Array.from(
       new Set(
         members
+          .filter((m) => m.kind !== 'faculty' && !m.role?.toLowerCase().includes('faculty'))
           .map((m) => m.role && (m.role.charAt(0).toUpperCase() + m.role.slice(1)))
           .filter(Boolean)
       )
@@ -115,10 +119,31 @@ export const LogsTab: React.FC<LogsTabProps> = ({
   const isAdvancedFilterActive =
     deptFilter !== 'All' || roleFilter !== 'All' || yearFilter !== 'All';
 
+  const isAnyFilterActive =
+    activeFilter !== 'all' ||
+    deptFilter !== 'All' ||
+    roleFilter !== 'All' ||
+    yearFilter !== 'All' ||
+    searchQuery.trim().length > 0;
+
+  const activeFilterCount =
+    (activeFilter !== 'all' ? 1 : 0) +
+    (deptFilter !== 'All' ? 1 : 0) +
+    (roleFilter !== 'All' ? 1 : 0) +
+    (yearFilter !== 'All' ? 1 : 0);
+
   const handleResetAdvancedFilters = () => {
     setDeptFilter('All');
     setRoleFilter('All');
     setYearFilter('All');
+  };
+
+  const handleResetAllFilters = () => {
+    setActiveFilter('all');
+    setDeptFilter('All');
+    setRoleFilter('All');
+    setYearFilter('All');
+    setSearchQuery('');
   };
 
   // Filter members (SuperAdmin SA01 is already excluded at hook level)
@@ -258,74 +283,130 @@ export const LogsTab: React.FC<LogsTabProps> = ({
         </div>
       </div>
 
-      {/* Search Bar & Filter Chips (Clean Mint Card) */}
+      {/* 1. Standalone Clean Search Bar */}
+      <SearchField
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search by name, roll number, department, or email..."
+        resultsCount={searchQuery ? filteredMembers.length : undefined}
+      />
+
+      {/* 2. Dedicated Directory Filter Deck (Separately with Premium Botanical UI) */}
       <div
-        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm space-y-3"
+        style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+        className="cockpit-card rounded-2xl p-4 sm:p-4.5 border shadow-xs space-y-3.5 select-none"
       >
-        {/* Search Input */}
-        <div className="relative">
-          <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
-          <input
-            type="text"
-            placeholder="Search by name, roll number, department, or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-emerald-600 transition-all shadow-xs"
-          />
-          {searchQuery && (
+        {/* Header: Title, Live Record Count & Reset Action */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <div
+              style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
+              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+            >
+              <Filter size={15} strokeWidth={2.2} />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span style={{ color: '#051F20' }} className="text-xs sm:text-sm font-bold tracking-tight">
+                  Directory Filters
+                </span>
+                {isAnyFilterActive && (
+                  <span
+                    style={{ backgroundColor: '#163832', color: '#FFFFFF' }}
+                    className="px-2 py-0.5 rounded-full text-xs font-bold font-mono"
+                  >
+                    {activeFilterCount} active
+                  </span>
+                )}
+              </div>
+              <p style={{ color: '#235347' }} className="text-xs font-medium">
+                Showing {filteredMembers.length} of {counts.all} campus records
+              </p>
+            </div>
+          </div>
+
+          {isAnyFilterActive && (
             <button
               type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1"
+              onClick={handleResetAllFilters}
+              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+              className="min-h-[36px] px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition hover:bg-[#DAF1DE] active:scale-95 cursor-pointer shadow-2xs"
+              title="Reset all directory filters"
             >
-              <X size={15} />
+              <RotateCcw size={12} className="text-[#235347]" />
+              <span>Reset Filters</span>
             </button>
           )}
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar pt-1">
+        {/* Primary Scope / Role Category Segmented Bar (Replacing image 2 with clean styling) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveFilter('all')}
             style={{
-              backgroundColor: activeFilter === 'all' ? '#051F20' : '#FFFFFF',
+              backgroundColor: activeFilter === 'all' ? '#163832' : '#FFFFFF',
               color: activeFilter === 'all' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'all' ? '#051F20' : '#DAF1DE',
+              borderColor: activeFilter === 'all' ? '#163832' : '#DAF1DE',
             }}
-            className="px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+            className="min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 flex items-center gap-1.5"
           >
-            All Members ({counts.all})
+            <span>All Members</span>
+            <span
+              style={{
+                backgroundColor: activeFilter === 'all' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
+                color: activeFilter === 'all' ? '#FFFFFF' : '#163832',
+              }}
+              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
+            >
+              {counts.all}
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveFilter('student')}
             style={{
-              backgroundColor: activeFilter === 'student' ? '#051F20' : '#FFFFFF',
+              backgroundColor: activeFilter === 'student' ? '#163832' : '#FFFFFF',
               color: activeFilter === 'student' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'student' ? '#051F20' : '#DAF1DE',
+              borderColor: activeFilter === 'student' ? '#163832' : '#DAF1DE',
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+            className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
           >
-            <GraduationCap size={14} />
-            Students ({counts.student})
+            <GraduationCap size={13} className={activeFilter === 'student' ? 'text-white' : 'text-[#163832]'} />
+            <span>Students</span>
+            <span
+              style={{
+                backgroundColor: activeFilter === 'student' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
+                color: activeFilter === 'student' ? '#FFFFFF' : '#163832',
+              }}
+              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
+            >
+              {counts.student}
+            </span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveFilter('faculty')}
             style={{
-              backgroundColor: activeFilter === 'faculty' ? '#051F20' : '#FFFFFF',
+              backgroundColor: activeFilter === 'faculty' ? '#163832' : '#FFFFFF',
               color: activeFilter === 'faculty' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'faculty' ? '#051F20' : '#DAF1DE',
+              borderColor: activeFilter === 'faculty' ? '#163832' : '#DAF1DE',
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+            className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
           >
-            <Briefcase size={14} />
-            Faculty ({counts.faculty})
+            <Briefcase size={13} className={activeFilter === 'faculty' ? 'text-white' : 'text-[#163832]'} />
+            <span>Faculty</span>
+            <span
+              style={{
+                backgroundColor: activeFilter === 'faculty' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
+                color: activeFilter === 'faculty' ? '#FFFFFF' : '#163832',
+              }}
+              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
+            >
+              {counts.faculty}
+            </span>
           </button>
 
           {counts.suspended > 0 && (
@@ -335,114 +416,109 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               style={{
                 backgroundColor: activeFilter === 'suspended' ? '#D9534F' : '#FFFFFF',
                 color: activeFilter === 'suspended' ? '#FFFFFF' : '#D9534F',
-                borderColor: activeFilter === 'suspended' ? '#D9534F' : '#D9534F',
+                borderColor: activeFilter === 'suspended' ? '#D9534F' : '#DAF1DE',
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-xs active:scale-95"
+              className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
             >
-              <AlertOctagon size={14} />
-              Suspended ({counts.suspended})
+              <AlertOctagon size={13} />
+              <span>Suspended</span>
+              <span
+                style={{
+                  backgroundColor: activeFilter === 'suspended' ? 'rgba(255,255,255,0.2)' : '#F6FBF7',
+                  color: activeFilter === 'suspended' ? '#FFFFFF' : '#D9534F',
+                }}
+                className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
+              >
+                {counts.suspended}
+              </span>
             </button>
           )}
         </div>
 
-        {/* Secondary Dimension Filters: Department, Role, Year */}
-        <div className="pt-2.5 border-t border-[#DAF1DE] grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {/* Department Select */}
-          <div className="relative">
-            <label className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1">
-              <Building size={12} className="text-[#163832]" />
-              <span>Department</span>
-            </label>
-            <div className="relative">
-              <select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                  deptFilter !== 'All'
-                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
-                }`}
-              >
-                {availableDepartments.map((d) => (
-                  <option key={d} value={d}>
-                    {d === 'All' ? 'All Departments' : d}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-                ▼
-              </div>
-            </div>
-          </div>
+        {/* Dropdown Menus Row: Department, Role, Year */}
+        <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <FilterDropdownMenu
+            label="Department"
+            prefix="Dept"
+            value={deptFilter}
+            options={availableDepartments}
+            onChange={setDeptFilter}
+            icon={<Building size={13} strokeWidth={2.2} />}
+            allLabel="All Departments"
+          />
 
-          {/* Role Select */}
-          <div className="relative">
-            <label className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1">
-              <Shield size={12} className="text-[#163832]" />
-              <span>Role</span>
-            </label>
-            <div className="relative">
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                  roleFilter !== 'All'
-                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
-                }`}
-              >
-                {availableRoles.map((r) => (
-                  <option key={r} value={r}>
-                    {r === 'All' ? 'All Roles' : `Role: ${r}`}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-                ▼
-              </div>
-            </div>
-          </div>
+          <FilterDropdownMenu
+            label="Role"
+            prefix="Role"
+            value={roleFilter}
+            options={availableRoles}
+            onChange={setRoleFilter}
+            icon={<Shield size={13} strokeWidth={2.2} />}
+            allLabel="All Roles"
+          />
 
-          {/* Year Select & Reset */}
-          <div className="relative">
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-[#235347] flex items-center gap-1">
-                <GraduationCap size={12} className="text-[#163832]" />
-                <span>Year</span>
-              </label>
-              {isAdvancedFilterActive && (
-                <button
-                  type="button"
-                  onClick={handleResetAdvancedFilters}
-                  className="text-xs font-bold text-[#D9534F] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <RotateCcw size={10} />
-                  <span>Clear</span>
-                </button>
-              )}
-            </div>
-            <div className="relative">
-              <select
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
-                  yearFilter !== 'All'
-                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
-                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
-                }`}
-              >
-                {availableYears.map((y) => (
-                  <option key={y} value={y}>
-                    {y === 'All' ? 'All Years' : y}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
-                ▼
-              </div>
-            </div>
-          </div>
+          <FilterDropdownMenu
+            label="Year of Study"
+            prefix="Year"
+            value={yearFilter}
+            options={availableYears}
+            onChange={setYearFilter}
+            icon={<GraduationCap size={13} strokeWidth={2.2} />}
+            allLabel="All Years"
+          />
         </div>
+
+        {/* Section: Active Filter Tags (when any non-All is active) */}
+        {isAdvancedFilterActive && (
+          <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs font-bold text-[#235347]">Active:</span>
+            {deptFilter !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setDeptFilter('All')}
+                style={{
+                  backgroundColor: '#DAF1DE',
+                  color: '#051F20',
+                  borderColor: '#8EB69B',
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
+              >
+                <span>Dept: {deptFilter}</span>
+                <X size={11} strokeWidth={2.5} />
+              </button>
+            )}
+            {roleFilter !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setRoleFilter('All')}
+                style={{
+                  backgroundColor: '#DAF1DE',
+                  color: '#051F20',
+                  borderColor: '#8EB69B',
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
+              >
+                <span>Role: {roleFilter}</span>
+                <X size={11} strokeWidth={2.5} />
+              </button>
+            )}
+            {yearFilter !== 'All' && (
+              <button
+                type="button"
+                onClick={() => setYearFilter('All')}
+                style={{
+                  backgroundColor: '#DAF1DE',
+                  color: '#051F20',
+                  borderColor: '#8EB69B',
+                }}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
+              >
+                <span>Year: {yearFilter}</span>
+                <X size={11} strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Member Records List (Cards in Clean Mint Grid) */}
