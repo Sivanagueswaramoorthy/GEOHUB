@@ -57,8 +57,10 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
       name: name.trim(),
       roll_no: rollNo.trim().toUpperCase() || '24GEO' + Math.floor(Math.random() * 900 + 100),
       email: email.trim() || `${name.toLowerCase().replace(/\s+/g, '.')}@college.edu`,
-      team,
+      team: team || 'General',
       role,
+      post: studentToEdit?.post || (role === 'student' ? 'Student Member' : undefined),
+      team_role: studentToEdit?.team_role || (role === 'student' ? 'Member' : undefined),
       department: studentToEdit?.department || 'Geoinformatics',
       status: studentToEdit?.status || 'active',
     });

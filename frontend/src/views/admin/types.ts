@@ -25,6 +25,8 @@ export interface UnifiedMemberItem {
   role: string;
   status: 'active' | 'disabled' | 'suspended';
   phone?: string;
+  team?: string;
+  post?: string;
   last_login_at?: string;
   last_seen_at?: string;
   allowedModules?: string[];
@@ -109,7 +111,9 @@ export interface SuperAdminUserItem {
   department: string;
   year_of_study?: string;
   team?: string;
-  status: 'active' | 'disabled' | 'pending';
+  post?: string;
+  team_role?: string;
+  status: 'active' | 'disabled' | 'pending' | 'suspended';
   last_login_at?: string;
   last_seen_at?: string;
   last_platform?: string;

@@ -680,7 +680,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             description: t.description || '',
             priority: 'medium',
             status: t.status || 'todo',
-            team: t.team_id || 'Management',
+            team: t.team_id || 'General',
             assigneeId: t.assigned_user_ids?.[0] || 'SA01',
             assigneeName: 'Assigned Scholar',
             createdById: t.created_by || 'SA01',
@@ -1902,19 +1902,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isLead?: boolean;
   }): UserModel => {
     const cleanName = data.name.trim();
-    const cleanSquad = data.squad.trim();
+    const rawSquad = (data.squad || 'General').trim();
+    const cleanSquad = rawSquad.toLowerCase() === 'member' ? 'General' : (rawSquad || 'General');
     const newUid = `u_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const cleanRollNo = data.rollNo?.trim() || `24GEO${Math.floor(100 + Math.random() * 900)}`;
     const cleanEmail =
       data.email?.trim() || `${cleanName.toLowerCase().replace(/\s+/g, '.')}@geohub.edu`;
 
+    const scholarRole = data.role || 'student';
+    const defaultPost = scholarRole === 'student' ? 'Student Member' : (data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`);
+    const defaultTeamRole = scholarRole === 'student' ? 'Member' : (data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`);
+
     const newScholar: UserModel = {
       uid: newUid,
       name: cleanName,
-      role: data.role || 'student',
-      post: data.post || (data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`),
+      role: scholarRole,
+      post: data.post || defaultPost,
       team: cleanSquad,
-      teamRole: data.isLead ? `${cleanSquad} Lead` : `${cleanSquad} Associate`,
+      teamRole: defaultTeamRole,
       rollNo: cleanRollNo,
       email: cleanEmail,
       department: data.department || 'Geoinformatics Engineering',

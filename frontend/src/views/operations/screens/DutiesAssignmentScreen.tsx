@@ -49,7 +49,7 @@ export const DutiesAssignmentScreen: React.FC<DutiesAssignmentScreenProps> = ({
   const initialUser = (users && users.find((u) => u.rollNo)) || null;
   const [newRoll, setNewRoll] = useState(initialUser?.rollNo || '24GEO102');
   const [newAssignee, setNewAssignee] = useState(initialUser?.name || 'Maya Patel');
-  const [newSquad, setNewSquad] = useState(initialUser?.team || 'Management');
+  const [newSquad, setNewSquad] = useState(initialUser?.team || 'General');
   const [newEvent, setNewEvent] = useState('Chapter Event');
   const [newTask, setNewTask] = useState('');
   const [newStation, setNewStation] = useState('Gate 2 Registration Counter');
@@ -61,7 +61,7 @@ export const DutiesAssignmentScreen: React.FC<DutiesAssignmentScreenProps> = ({
       eventTitle: t.eventTitle || 'Campus Initiative',
       assigneeName: t.assigneeName || 'Squad Member',
       assigneeRoll: t.assigneeRoll || '21GEO001',
-      squad: t.team || 'Management',
+      squad: t.team || 'General',
       task: t.title || t.task || 'Assigned Duty',
       station: t.station || 'Field Station',
       status: t.status === 'done' ? ('completed' as const) : ('in_progress' as const),

@@ -18,6 +18,7 @@ import {
   EmptyState,
   SearchField,
 } from '../../components/shared';
+import { StudentFilterBar, StudentFilterState } from '../admin/components/StudentFilterBar';
 
 export const MembersDirectoryView: React.FC = () => {
   const {
@@ -29,8 +30,13 @@ export const MembersDirectoryView: React.FC = () => {
   } = useApp();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDept, setSelectedDept] = useState('All');
   const [selectedSquad, setSelectedSquad] = useState('All');
+  const [filterState, setFilterState] = useState<StudentFilterState>({
+    department: 'All',
+    role: 'All',
+    year: 'All',
+    status: 'all',
+  });
 
   // Post Assign BottomSheet
   const [selectedUserForPost, setSelectedUserForPost] = useState<UserModel | null>(null);
@@ -41,27 +47,100 @@ export const MembersDirectoryView: React.FC = () => {
   const facultyUsers = users.filter((u) => u.role === 'faculty' || u.role === 'super_admin');
   const isOnlyOneFaculty = facultyUsers.length <= 1;
 
-  const departments = ['All', 'Geoinformatics', 'Computer Science', 'Civil Engineering', 'Environmental'];
   const squads = ['All', 'Management', 'Documentation', 'Promotion', 'Entertainment'];
+
+  // Dynamic filter dropdown options
+  const availableDepartments = useMemo(() => {
+    const set = new Set<string>();
+    users.forEach((u) => {
+      if (u.department && u.department.trim()) set.add(u.department.trim());
+    });
+    return Array.from(set).sort();
+  }, [users]);
+
+  const availableRoles = useMemo(() => {
+    const set = new Set<string>();
+    users.forEach((u) => {
+      if (u.role && u.role.trim()) set.add(u.role.trim());
+    });
+    return Array.from(set).sort();
+  }, [users]);
+
+  const availableYears = useMemo(() => {
+    const set = new Set<string>();
+    users.forEach((u) => {
+      if (u.yearOfStudy && u.yearOfStudy.trim()) set.add(u.yearOfStudy.trim());
+    });
+    return Array.from(set).sort();
+  }, [users]);
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
-      if (selectedDept !== 'All' && !(u.department || '').toLowerCase().includes(selectedDept.toLowerCase())) {
-        return false;
-      }
+      // 1. Squad filter
       if (selectedSquad !== 'All' && !(u.team || '').toLowerCase().includes(selectedSquad.toLowerCase())) {
         return false;
       }
+      // 2. Department filter
+      if (filterState.department !== 'All' && !(u.department || '').toLowerCase().includes(filterState.department.toLowerCase())) {
+        return false;
+      }
+      // 3. Role filter
+      if (filterState.role !== 'All') {
+        const r = (u.role || '').toLowerCase();
+        const target = filterState.role.toLowerCase();
+        if (r !== target && !r.replace(/_/g, ' ').includes(target)) {
+          return false;
+        }
+      }
+      // 4. Year filter
+      if (filterState.year !== 'All') {
+        if (!u.yearOfStudy) return false;
+        const matchesY =
+          u.yearOfStudy.toLowerCase() === filterState.year.toLowerCase() ||
+          u.yearOfStudy.charAt(0) === filterState.year.charAt(0);
+        if (!matchesY) return false;
+      }
+      // 5. Suspended / Status filter
+      if (filterState.status === 'active') {
+        if (u.status !== 'active') return false;
+      } else if (filterState.status === 'suspended') {
+        if (u.status !== 'disabled' && (u as any).status !== 'suspended') return false;
+      }
+      // 6. Search query
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         const matchName = u.name.toLowerCase().includes(q);
         const matchEmail = u.email.toLowerCase().includes(q);
         const matchPost = (u.post || '').toLowerCase().includes(q);
-        if (!matchName && !matchEmail && !matchPost) return false;
+        const matchRoll = (u.rollNo || '').toLowerCase().includes(q);
+        if (!matchName && !matchEmail && !matchPost && !matchRoll) return false;
       }
       return true;
     });
-  }, [users, selectedDept, selectedSquad, searchQuery]);
+  }, [users, selectedSquad, filterState, searchQuery]);
+
+  const counts = useMemo(() => {
+    const active = users.filter((u) => u.status === 'active').length;
+    const suspended = users.filter(
+      (u) => u.status === 'disabled' || (u as any).status === 'suspended'
+    ).length;
+    return {
+      total: users.length,
+      active,
+      suspended,
+      filtered: filteredUsers.length,
+    };
+  }, [users, filteredUsers.length]);
+
+  const handleResetFilters = () => {
+    setSelectedSquad('All');
+    setFilterState({
+      department: 'All',
+      role: 'All',
+      year: 'All',
+      status: 'all',
+    });
+  };
 
   const handleOpenAssignPost = (user: UserModel) => {
     setSelectedUserForPost(user);
@@ -158,6 +237,17 @@ export const MembersDirectoryView: React.FC = () => {
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="Search scholars by name, roll, or squad..."
+        />
+
+        {/* Multi-Dimension Student Filters */}
+        <StudentFilterBar
+          filterState={filterState}
+          onFilterChange={setFilterState}
+          onReset={handleResetFilters}
+          counts={counts}
+          departments={availableDepartments}
+          roles={availableRoles}
+          years={availableYears}
         />
 
         {/* Squad Filter Chips */}

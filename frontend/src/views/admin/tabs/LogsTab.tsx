@@ -21,6 +21,9 @@ import {
   Award,
   Users,
   Check,
+  RotateCcw,
+  Shield,
+  UserX,
 } from 'lucide-react';
 import { UnifiedMemberItem, ModuleConfig } from '../types';
 
@@ -50,6 +53,9 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'student' | 'faculty' | 'suspended'>('all');
+  const [deptFilter, setDeptFilter] = useState('All');
+  const [roleFilter, setRoleFilter] = useState('All');
+  const [yearFilter, setYearFilter] = useState('All');
   const [selectedMember, setSelectedMember] = useState<UnifiedMemberItem | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isManagingAccess, setIsManagingAccess] = useState(false);
@@ -60,6 +66,60 @@ export const LogsTab: React.FC<LogsTabProps> = ({
   const [assignRole, setAssignRole] = useState('student');
   const [assignSquad, setAssignSquad] = useState('General');
   const [isSavingPost, setIsSavingPost] = useState(false);
+
+  // Dynamic filter options
+  const availableDepartments = useMemo(() => {
+    const list = Array.from(new Set(members.map((m) => m.department).filter(Boolean)));
+    return [
+      'All',
+      ...Array.from(
+        new Set([
+          ...list,
+          'Geoinformatics',
+          'Computer Science',
+          'Information Technology',
+          'Civil Engineering',
+          'AI & Data Science',
+        ])
+      ),
+    ];
+  }, [members]);
+
+  const availableRoles = useMemo(() => {
+    const list = Array.from(
+      new Set(
+        members
+          .map((m) => m.role && (m.role.charAt(0).toUpperCase() + m.role.slice(1)))
+          .filter(Boolean)
+      )
+    );
+    return [
+      'All',
+      ...Array.from(
+        new Set([
+          ...list,
+          'Student',
+          'Volunteer',
+          'Coordinator',
+          'Management',
+          'Treasurer',
+          'Documentation',
+          'Promotion',
+        ])
+      ),
+    ];
+  }, [members]);
+
+  const availableYears = ['All', '1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+  const isAdvancedFilterActive =
+    deptFilter !== 'All' || roleFilter !== 'All' || yearFilter !== 'All';
+
+  const handleResetAdvancedFilters = () => {
+    setDeptFilter('All');
+    setRoleFilter('All');
+    setYearFilter('All');
+  };
 
   // Filter members (SuperAdmin SA01 is already excluded at hook level)
   const filteredMembers = useMemo(() => {
@@ -72,7 +132,27 @@ export const LogsTab: React.FC<LogsTabProps> = ({
       // Filter by category
       if (activeFilter === 'student' && m.kind !== 'student') return false;
       if (activeFilter === 'faculty' && m.kind !== 'faculty') return false;
-      if (activeFilter === 'suspended' && m.status !== 'suspended' && m.status !== 'disabled') return false;
+      if (activeFilter === 'suspended' && m.status !== 'suspended' && m.status !== 'disabled')
+        return false;
+
+      // Filter by department
+      if (deptFilter !== 'All') {
+        const d = (m.department || '').toLowerCase();
+        const target = deptFilter.toLowerCase();
+        if (d !== target && !d.includes(target)) return false;
+      }
+
+      // Filter by role
+      if (roleFilter !== 'All') {
+        if ((m.role || '').toLowerCase() !== roleFilter.toLowerCase()) return false;
+      }
+
+      // Filter by year
+      if (yearFilter !== 'All') {
+        const y = (m.year_of_study || '').toLowerCase();
+        const target = yearFilter.toLowerCase();
+        if (y !== target && y.charAt(0) !== target.charAt(0)) return false;
+      }
 
       // Filter by search query
       if (searchQuery.trim()) {
@@ -87,7 +167,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 
       return true;
     });
-  }, [members, activeFilter, searchQuery]);
+  }, [members, activeFilter, deptFilter, roleFilter, yearFilter, searchQuery]);
 
   // Counts for filter pills
   const counts = useMemo(() => {
@@ -263,6 +343,105 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               Suspended ({counts.suspended})
             </button>
           )}
+        </div>
+
+        {/* Secondary Dimension Filters: Department, Role, Year */}
+        <div className="pt-2.5 border-t border-[#DAF1DE] grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {/* Department Select */}
+          <div className="relative">
+            <label className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1">
+              <Building size={12} className="text-[#163832]" />
+              <span>Department</span>
+            </label>
+            <div className="relative">
+              <select
+                value={deptFilter}
+                onChange={(e) => setDeptFilter(e.target.value)}
+                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
+                  deptFilter !== 'All'
+                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
+                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
+                }`}
+              >
+                {availableDepartments.map((d) => (
+                  <option key={d} value={d}>
+                    {d === 'All' ? 'All Departments' : d}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
+                ▼
+              </div>
+            </div>
+          </div>
+
+          {/* Role Select */}
+          <div className="relative">
+            <label className="block text-xs font-semibold text-[#235347] mb-1 flex items-center gap-1">
+              <Shield size={12} className="text-[#163832]" />
+              <span>Role</span>
+            </label>
+            <div className="relative">
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
+                  roleFilter !== 'All'
+                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
+                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
+                }`}
+              >
+                {availableRoles.map((r) => (
+                  <option key={r} value={r}>
+                    {r === 'All' ? 'All Roles' : `Role: ${r}`}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
+                ▼
+              </div>
+            </div>
+          </div>
+
+          {/* Year Select & Reset */}
+          <div className="relative">
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-[#235347] flex items-center gap-1">
+                <GraduationCap size={12} className="text-[#163832]" />
+                <span>Year</span>
+              </label>
+              {isAdvancedFilterActive && (
+                <button
+                  type="button"
+                  onClick={handleResetAdvancedFilters}
+                  className="text-xs font-bold text-[#D9534F] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <RotateCcw size={10} />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <select
+                value={yearFilter}
+                onChange={(e) => setYearFilter(e.target.value)}
+                className={`w-full min-h-[44px] h-11 pl-3 pr-8 rounded-xl border text-xs font-bold appearance-none transition focus:outline-none focus:border-[#163832] cursor-pointer shadow-xs ${
+                  yearFilter !== 'All'
+                    ? 'bg-[#F6FBF7] border-[#163832] text-[#051F20]'
+                    : 'bg-white border-[#DAF1DE] text-[#051F20]'
+                }`}
+              >
+                {availableYears.map((y) => (
+                  <option key={y} value={y}>
+                    {y === 'All' ? 'All Years' : y}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] text-xs">
+                ▼
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -517,7 +696,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
                       style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
                       className="text-xs font-bold px-3 py-1.5 rounded-xl border shadow-xs cursor-pointer hover:border-emerald-600 active:scale-95 transition-all"
                     >
-                      {isAssigningPost ? 'Cancel' : 'Assign Post &rarr;'}
+                      {isAssigningPost ? 'Cancel' : 'Assign Post →'}
                     </button>
                   </div>
 

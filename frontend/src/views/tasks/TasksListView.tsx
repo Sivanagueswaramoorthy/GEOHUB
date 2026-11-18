@@ -32,7 +32,7 @@ export const TasksListView: React.FC = () => {
   // New Task form state
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
-  const [newTeam, setNewTeam] = useState(currentUser.team || 'Management');
+  const [newTeam, setNewTeam] = useState(currentUser.team || 'General');
   const [newAssigneeId, setNewAssigneeId] = useState(users[0]?.uid || '');
   const [newPriority, setNewPriority] = useState<TaskPriority>('medium');
   const [newDueDate, setNewDueDate] = useState('');

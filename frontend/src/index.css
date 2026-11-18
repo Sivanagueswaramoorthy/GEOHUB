@@ -87,7 +87,7 @@ html, body {
   width: 100%;
   max-width: 100vw;
   min-height: 100vh;
-  background: #F6F9F7;
+  background: #F6FBF7;
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -111,9 +111,9 @@ html, body {
   margin: 16px auto;
   min-height: calc(100vh - 32px);
   border-radius: var(--radius-phone, 36px);
-  border: 1px solid #DCE6E0;
+  border: 1px solid #DAF1DE;
   box-shadow: 0 16px 40px rgba(5, 31, 32, 0.08);
-  background: #F6F9F7;
+  background: #F6FBF7;
 }
 
 .mobile-shell-column.fullscreen-mode {
@@ -568,7 +568,7 @@ a {
   right: 8px;
   width: 8px;
   height: 8px;
-  background: #EF4444;
+  background: #D9534F;
   border-radius: 50%;
 }
 
@@ -578,7 +578,7 @@ a {
   right: 7px;
   width: 9px;
   height: 9px;
-  background: #EF4444;
+  background: #D9534F;
   border: 2px solid #FFFFFF;
   border-radius: 50%;
 }
@@ -649,7 +649,7 @@ a {
 }
 
 /* ==========================================================================
-   Card System (Pure White + Soft Border #E8ECF2 + Subtle Shadow)
+   Card System (Pure White + Soft Border #DAF1DE + Subtle Shadow)
    ========================================================================== */
 
 .app-card {
@@ -1192,7 +1192,7 @@ a {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #16A34A;
+  background-color: #163832;
   position: relative;
 }
 
@@ -1201,7 +1201,7 @@ a {
   position: absolute;
   inset: -3px;
   border-radius: 50%;
-  border: 1.5px solid #16A34A;
+  border: 1.5px solid #163832;
   animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
 }
 
@@ -1689,9 +1689,9 @@ a {
 }
 
 .geohub-searchbar-clear-btn:hover .geohub-searchbar-clear-icon-wrapper {
-  background-color: #FEE2E2;
-  color: #DC2626;
-  border-color: #FECACA;
+  background-color: #F6FBF7;
+  color: #D9534F;
+  border-color: #D9534F;
   transform: rotate(90deg) scale(1.08);
 }
 
@@ -2034,7 +2034,7 @@ a {
 }
 
 .scholar-status-badge-anchor.is-suspended {
-  background-color: #EF4444;
+  background-color: #D9534F;
   color: #FFFFFF;
 }
 
@@ -3087,11 +3087,11 @@ button.pill-button-pressable:active {
 
 button.pill-button-pressable[data-variant="primary"]:hover,
 button.pill-button-pressable[data-variant="primary"]:active {
-  background-color: #23523D !important;
+  background-color: #0B2B26 !important;
 }
 
 button.pill-button-pressable[data-variant="secondary"]:hover {
-  background-color: #F6F9F7 !important;
+  background-color: #F6FBF7 !important;
 }
 
 /* Soft Cards */
@@ -3125,35 +3125,35 @@ button.pill-button-pressable[data-variant="secondary"]:hover {
 
 .hero-card-mint {
   border-radius: 32px;
-  background: linear-gradient(135deg, #E3F1E8 0%, #FFFFFF 100%);
-  color: #11241B;
+  background: linear-gradient(135deg, #DAF1DE 0%, #FFFFFF 100%);
+  color: #051F20;
   box-shadow: 0 16px 36px -6px rgba(5, 31, 32, 0.14), 0 6px 16px -2px rgba(5, 31, 32, 0.08), 0 1px 3px rgba(5, 31, 32, 0.04);
-  border: 1px solid #DCE6E0;
+  border: 1px solid #DAF1DE;
 }
 
 
 
 
 /* ==========================================================================
-   SuperAdmin Executive Cockpit (Light Peach Design System)
+   SuperAdmin Executive Cockpit (Premium Forest & Mint Botanical Design System)
    ========================================================================== */
 .cockpit-view-bg {
-  background-color: #FAF6F2 !important;
-  color: #2D1A12 !important;
+  background-color: #F6FBF7 !important;
+  color: #051F20 !important;
 }
 
 .cockpit-card {
-  background-color: #FFF2EB !important;
-  border: 1px solid #FCDFD7 !important;
-  color: #2D1A12 !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #DAF1DE !important;
+  color: #051F20 !important;
   border-radius: 1.25rem !important;
-  box-shadow: 0 4px 16px -2px rgba(45, 26, 18, 0.06), 0 2px 6px -1px rgba(45, 26, 18, 0.03) !important;
+  box-shadow: 0 4px 20px -2px rgba(5, 31, 32, 0.05), 0 2px 6px -1px rgba(5, 31, 32, 0.02) !important;
 }
 
 .cockpit-pill {
-  background-color: #FFFFFF !important;
-  border: 1px solid #FCDFD7 !important;
-  color: #2D1A12 !important;
+  background-color: #F6FBF7 !important;
+  border: 1px solid #DAF1DE !important;
+  color: #051F20 !important;
   border-radius: 0.75rem !important;
 }
 

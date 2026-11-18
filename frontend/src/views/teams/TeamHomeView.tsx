@@ -24,7 +24,7 @@ export const TeamHomeView: React.FC = () => {
     setActiveTab,
   } = useApp();
 
-  const currentTeamName = currentUser.team || 'Management';
+  const currentTeamName = currentUser.team || 'General';
   const team = teams.find((t) => t.name.toLowerCase() === currentTeamName.toLowerCase()) || teams[0];
 
   const teamMembers = users.filter((u) => u.team?.toLowerCase() === team.name.toLowerCase());

@@ -1,8 +1,8 @@
 {
-  "version": "1.6.49",
-  "version_code": 68,
+  "version": "1.6.50",
+  "version_code": 69,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Light Peach Design System across all SuperAdmin cockpit tabs, tactile donut toggles, primary Student Member onboarding with administrative post and squad assignment workflow.",
-  "sha256": "c923e0b090a20b4c99bf47b2ce49afc2e01744b8599a9a12ba0fac7d559918c2",
-  "file_size": 7217775
+  "release_notes": "Rectified student enrollment to onboard strictly as active Members in General squad with 'Student Member' post, eliminating unintentional Management squad defaults, and streamlined administrative post assignment.",
+  "sha256": "fd2e732fbdecc641a5174ff6d78bc7e728afbba149cc88b50651e8f81c1e78d9",
+  "file_size": 6914742
 }

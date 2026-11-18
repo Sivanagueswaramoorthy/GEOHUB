@@ -31,8 +31,9 @@ interface Violation {
 
 const violations: Violation[] = [];
 
-// Directories/files to scan (Active UI views, auth features, and shared components)
+// Directories/files to scan (Active UI views, auth features, shared components, and global CSS)
 const TARGET_DIRS = [
+  path.join(SRC_DIR, 'index.css'),
   path.join(SRC_DIR, 'views'),
   path.join(SRC_DIR, 'features/auth'),
   path.join(SRC_DIR, 'components/shared'),

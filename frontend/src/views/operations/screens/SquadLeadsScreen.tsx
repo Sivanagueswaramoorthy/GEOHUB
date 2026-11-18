@@ -55,7 +55,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
           uid: u.uid,
           name: u.name,
           role: u.role,
-          squad: leadMembership ? leadMembership.squad : u.team || 'Management',
+          squad: leadMembership ? leadMembership.squad : u.team || 'General',
           isLead: true,
           post: u.post || u.teamRole || 'Squad Lead',
           email: u.email,

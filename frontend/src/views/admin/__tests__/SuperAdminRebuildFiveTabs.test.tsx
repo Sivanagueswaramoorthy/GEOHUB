@@ -488,6 +488,45 @@ describe('SuperAdmin Rebuilt 5 Tabs Unit & Integration Suite', () => {
       fireEvent.click(confirmDelete);
       expect(handleDelete).toHaveBeenCalledWith('std-1', 'student');
     });
+
+    it('allows assigning post and squad to student and triggers onAssignPost callback', async () => {
+      const handleAssignPost = vi.fn().mockResolvedValue({});
+
+      render(
+        <LogsTab
+          members={mockMembers}
+          modules={INITIAL_MODULES}
+          onToggleSuspend={vi.fn()}
+          onDeleteMember={vi.fn()}
+          onUpdateMemberModules={vi.fn()}
+          onAssignPost={handleAssignPost}
+        />
+      );
+
+      // Open student dossier
+      const studentCard = screen.getByText('Alex Rivera');
+      fireEvent.click(studentCard);
+
+      // Click Assign Post button to open the form
+      const assignBtn = screen.getByRole('button', { name: /Assign Post/i });
+      fireEvent.click(assignBtn);
+
+      // Select Vice President and save
+      const selectPost = screen.getByDisplayValue('Student Member (Primary)');
+      fireEvent.change(selectPost, { target: { value: 'Vice President' } });
+
+      const savePostBtn = screen.getByRole('button', { name: /Confirm & Assign Post/i });
+      fireEvent.click(savePostBtn);
+
+      expect(handleAssignPost).toHaveBeenCalledWith(
+        'std-1',
+        'Vice President',
+        'Coordinator',
+        'General',
+        'Geoinformatics',
+        '4th Year'
+      );
+    });
   });
 
   describe('Tab 5: ProfileTab', () => {

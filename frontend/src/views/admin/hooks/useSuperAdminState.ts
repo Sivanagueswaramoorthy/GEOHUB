@@ -386,7 +386,9 @@ export function useSuperAdminState() {
             role: u.role || 'student',
             department: u.department || 'Geoinformatics',
             year_of_study: u.year_of_study || '4th Year',
-            team: u.team || 'Management',
+            team: u.team || 'General',
+            post: u.post || u.team_role || 'Student Member',
+            team_role: u.team_role || u.post || 'Member',
             email: u.email,
             status: u.status || 'active',
             last_login_at: u.last_login_at || new Date().toISOString(),
@@ -915,8 +917,10 @@ export function useSuperAdminState() {
             email: cleanEmail,
             department: data.department?.trim() || 'Geoinformatics',
             year_of_study: data.year_of_study?.trim() || '1st Year',
-            team: data.team?.trim() || 'Management',
+            team: data.team?.trim() || 'General',
             role: data.role || 'student',
+            post: (data as any).post || (data as any).team_role || 'Student Member',
+            team_role: (data as any).team_role || (data as any).post || 'Member',
             password: 'geohub',
           });
           showToast(`Onboarded scholar ${res.name} (${res.roll_no}) in TiDB`);
@@ -1008,6 +1012,9 @@ export function useSuperAdminState() {
         department: data.department,
         email: data.email,
         role: 'student',
+        team: 'General',
+        post: 'Student Member',
+        team_role: 'Member',
       });
     },
     [saveStudent]
@@ -1181,6 +1188,9 @@ export function useSuperAdminState() {
         department: s.department,
         year_of_study: s.year_of_study || '2nd Year',
         role: s.role.charAt(0).toUpperCase() + s.role.slice(1),
+        designation: (s as any).post || (s as any).team_role || 'Student Member',
+        post: (s as any).post || (s as any).team_role || 'Student Member',
+        team: (s as any).team || 'General',
         status: s.status === 'active' ? 'active' : 'suspended',
         last_login_at: s.last_login_at,
         last_seen_at: s.last_seen_at,

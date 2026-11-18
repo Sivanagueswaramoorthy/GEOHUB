@@ -121,14 +121,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   return (
     <div className="space-y-3 animate-fadeIn pb-12 select-none">
-      {/* Executive Command Header (Light Peach Theme) */}
+      {/* Executive Command Header (Forest & Mint Botanical Theme) */}
       <div
-        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
         className="cockpit-card p-3.5 sm:p-4 rounded-2xl border shadow-sm flex items-center justify-between gap-2.5"
       >
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div
-            style={{ backgroundColor: '#DAF1DE', borderColor: '#DAF1DE', color: '#D9534F' }}
+            style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
             className="w-9 h-9 rounded-xl border flex items-center justify-center font-black text-xs shadow-xs shrink-0"
           >
             SA
@@ -164,10 +164,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           type="button"
           onClick={() => onPingDatabase()}
           disabled={isPinging || !activeDb}
-          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
-          className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-orange-50/50"
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+          className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-[#DAF1DE]"
         >
-          <RefreshCw size={12} className={isPinging ? 'animate-spin text-emerald-600' : 'text-emerald-600'} />
+          <RefreshCw size={12} className={isPinging ? 'animate-spin text-[#163832]' : 'text-[#163832]'} />
           <span className="text-xs whitespace-nowrap">
             {isPinging ? 'Checking...' : activeDb ? 'Refresh Status' : 'Offline'}
           </span>
@@ -179,8 +179,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         {/* Students Card */}
         <div
           onClick={() => onNavigateTab('logs')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-emerald-500/50 transition-all cursor-pointer group flex flex-col justify-between"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-[#8EB69B] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-center justify-between text-xs font-semibold" style={{ color: '#235347' }}>
             <span>Students</span>
@@ -198,8 +198,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         {/* Staff Card */}
         <div
           onClick={() => onNavigateTab('logs')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-blue-500/50 transition-all cursor-pointer group flex flex-col justify-between"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-[#8EB69B] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-center justify-between text-xs font-semibold" style={{ color: '#235347' }}>
             <span>Staff</span>
@@ -217,8 +217,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         {/* Users Card */}
         <div
           onClick={() => onNavigateTab('logs')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-purple-500/50 transition-all cursor-pointer group flex flex-col justify-between"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card p-2.5 sm:p-3 rounded-2xl border shadow-sm hover:border-[#8EB69B] transition-all cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-center justify-between text-xs font-semibold" style={{ color: '#235347' }}>
             <span>Users</span>
@@ -234,9 +234,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
-      {/* Card 1: TiDB Cloud Distributed (Light Peach Theme) */}
+      {/* Card 1: TiDB Cloud Distributed (Forest & Mint Botanical Theme) */}
       <div
-        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
         className="cockpit-card p-3 sm:p-3.5 rounded-2xl border shadow-sm space-y-2.5"
       >
         <div className="flex items-center justify-between gap-2.5">
@@ -299,17 +299,17 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </div>
         )}
 
-        {/* 3 Pills in a row (Crisp White on Mint) */}
+        {/* 3 Pills in a row (Crisp Soft Canvas on White) */}
         <div className="grid grid-cols-3 gap-1.5 pt-0.5 font-mono">
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">PORT</span>
             <span style={{ color: '#051F20' }} className="font-bold text-xs mt-0.5">{activeDb ? diagnostics.port : 'Offline'}</span>
           </div>
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">ENGINE</span>
@@ -318,7 +318,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </span>
           </div>
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">PING</span>
@@ -349,9 +349,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
-      {/* Card 2: GeoHub API Gateway (Light Peach Theme) */}
+      {/* Card 2: GeoHub API Gateway (Forest & Mint Botanical Theme) */}
       <div
-        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
         className="cockpit-card p-3 sm:p-3.5 rounded-2xl border shadow-sm space-y-2.5"
       >
         <div className="flex items-center justify-between gap-2.5">
@@ -413,10 +413,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </div>
         )}
 
-        {/* 3 Pills in a row (Crisp White on Mint) */}
+        {/* 3 Pills in a row (Crisp Soft Canvas on White) */}
         <div className="grid grid-cols-3 gap-1.5 pt-0.5 font-mono">
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">ROUTE</span>
@@ -425,7 +425,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </span>
           </div>
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">ONLINE</span>
@@ -434,7 +434,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </span>
           </div>
           <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
             className="cockpit-pill border rounded-xl p-2 flex flex-col shadow-xs"
           >
             <span style={{ color: '#235347' }} className="text-xs font-sans font-bold uppercase">MODULES</span>
@@ -464,8 +464,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <button
           type="button"
           onClick={() => onNavigateTab('access')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-emerald-500/50 text-center transition-all cursor-pointer shadow-xs active:scale-98"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-[#8EB69B] text-center transition-all cursor-pointer shadow-xs active:scale-98"
         >
           <ShieldCheck size={14} className="text-emerald-700 shrink-0" />
           <span style={{ color: '#051F20' }} className="text-xs font-bold">Role Access</span>
@@ -474,8 +474,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <button
           type="button"
           onClick={() => onNavigateTab('features')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-blue-500/50 text-center transition-all cursor-pointer shadow-xs active:scale-98"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-[#8EB69B] text-center transition-all cursor-pointer shadow-xs active:scale-98"
         >
           <UserPlus size={14} className="text-blue-700 shrink-0" />
           <span style={{ color: '#051F20' }} className="text-xs font-bold">Provision</span>
@@ -484,8 +484,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <button
           type="button"
           onClick={() => onNavigateTab('logs')}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-purple-500/50 text-center transition-all cursor-pointer shadow-xs active:scale-98"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card flex items-center justify-center gap-1.5 p-2.5 rounded-xl border hover:border-[#8EB69B] text-center transition-all cursor-pointer shadow-xs active:scale-98"
         >
           <GraduationCap size={14} className="text-purple-700 shrink-0" />
           <span style={{ color: '#051F20' }} className="text-xs font-bold">Audit Logs</span>

@@ -623,12 +623,12 @@ def create_admin_user(
         name=payload.name.strip(),
         hashed_password=hashed,
         role=norm_role,
-        post=payload.post,
+        post=payload.post or ("Student Member" if norm_role == "student" else None),
         department=payload.department or "Geoinformatics Engineering",
         year_of_study=payload.year_of_study or "1st Year",
         phone=payload.phone or "+91 94420 18820",
         team=payload.team or "General",
-        team_role=payload.team_role or "Member",
+        team_role=payload.team_role or ("Member" if norm_role == "student" else "Officer"),
         is_volunteer=bool(payload.is_volunteer),
         status="active"
     )

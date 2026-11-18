@@ -43,7 +43,7 @@ export const SquadsScreen: React.FC<SquadsScreenProps> = ({
         u.squadMemberships?.some((m) => m.isLead) ||
         (u.post && u.post.toLowerCase().includes('lead')) ||
         false;
-      const squad = u.team || u.squadMemberships?.[0]?.squad || 'Management';
+      const squad = u.team || u.squadMemberships?.[0]?.squad || 'General';
       return {
         uid: u.uid,
         name: u.name,

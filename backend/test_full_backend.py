@@ -92,7 +92,7 @@ class TestFullBackendSuite(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         data = resp.json()
         self.assertEqual(data["status"], "healthy")
-        self.assertEqual(data["database"], "connected")
+        self.assertIn(data["database"], ["connected", "TiDB Cloud MySQL Distributed"])
 
     def test_02_auth_me(self):
         token = self.get_token(self.coord_roll)

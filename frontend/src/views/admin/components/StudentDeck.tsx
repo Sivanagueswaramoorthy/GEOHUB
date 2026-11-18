@@ -10,6 +10,7 @@ import { BottomSheet } from '../ui/BottomSheet';
 import { StudentFormModal } from '../modals/StudentFormModal';
 import { StudentDetailSheet } from '../modals/StudentDetailSheet';
 import { BatchAssignSquadModal } from '../modals/BatchAssignSquadModal';
+import { StudentFilterBar, StudentFilterState } from './StudentFilterBar';
 
 export interface StudentDeckProps {
   students: SuperAdminUserItem[];
@@ -41,6 +42,17 @@ const ROLES = [
   'Documentation',
   'Promotion',
 ];
+const CANONICAL_DEPARTMENTS = [
+  'All',
+  'Geoinformatics',
+  'Computer Science',
+  'Information Technology',
+  'Electronics & Communication',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'AI & Data Science',
+];
+const CANONICAL_YEARS = ['All', '1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 export const StudentDeck: React.FC<StudentDeckProps> = ({
   students,
@@ -62,6 +74,12 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [filterState, setFilterState] = useState<StudentFilterState>({
+    department: 'All',
+    role: 'All',
+    year: 'All',
+    status: 'all',
+  });
   const [sortBy, setSortBy] = useState<'name' | 'roll' | 'active' | 'newest'>('name');
   const [isSortSheetOpen, setIsSortSheetOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -81,7 +99,21 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
     return counts;
   }, [students]);
 
-  // Filter and sort students
+  // Dynamic Departments from students list
+  const dynamicDepartments = useMemo(() => {
+    const fromStudents = Array.from(new Set(students.map((s) => s.department).filter(Boolean)));
+    return ['All', ...Array.from(new Set([...fromStudents, ...CANONICAL_DEPARTMENTS.slice(1)]))];
+  }, [students]);
+
+  // Dynamic Roles from students list
+  const dynamicRoles = useMemo(() => {
+    const fromStudents = Array.from(
+      new Set(students.map((s) => s.role && (s.role.charAt(0).toUpperCase() + s.role.slice(1))).filter(Boolean))
+    );
+    return ['All', ...Array.from(new Set([...fromStudents, ...ROLES.slice(1)]))];
+  }, [students]);
+
+  // Filter and sort students by Department, Role, Year, and Suspended Status
   const filteredStudents = useMemo(() => {
     return students
       .filter((s) => {
@@ -90,14 +122,49 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
           !q ||
           s.name.toLowerCase().includes(q) ||
           s.roll_no.toLowerCase().includes(q) ||
-          s.role.toLowerCase().includes(q);
+          s.role.toLowerCase().includes(q) ||
+          (s.department && s.department.toLowerCase().includes(q));
 
-        const matchesFilter =
+        const matchesLegacyFilter =
           selectedFilter === 'All' ||
           s.team === selectedFilter ||
           s.role.toLowerCase() === selectedFilter.toLowerCase();
 
-        return matchesQuery && matchesFilter;
+        // 1. Department Filter
+        const matchesDept =
+          filterState.department === 'All' ||
+          (s.department &&
+            (s.department.toLowerCase() === filterState.department.toLowerCase() ||
+              s.department.toLowerCase().includes(filterState.department.toLowerCase())));
+
+        // 2. Role Filter
+        const matchesRole =
+          filterState.role === 'All' ||
+          (s.role && s.role.toLowerCase() === filterState.role.toLowerCase());
+
+        // 3. Year Filter
+        const matchesYear =
+          filterState.year === 'All' ||
+          (s.year_of_study &&
+            (s.year_of_study.toLowerCase() === filterState.year.toLowerCase() ||
+              s.year_of_study.charAt(0) === filterState.year.charAt(0)));
+
+        // 4. Suspended Status Filter
+        let matchesStatus = true;
+        if (filterState.status === 'active') {
+          matchesStatus = s.status === 'active';
+        } else if (filterState.status === 'suspended') {
+          matchesStatus = s.status === 'disabled' || s.status === 'suspended';
+        }
+
+        return (
+          matchesQuery &&
+          matchesLegacyFilter &&
+          matchesDept &&
+          matchesRole &&
+          matchesYear &&
+          matchesStatus
+        );
       })
       .sort((a, b) => {
         if (sortBy === 'name') return a.name.localeCompare(b.name);
@@ -109,7 +176,32 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
         }
         return 0;
       });
-  }, [students, searchQuery, selectedFilter, sortBy]);
+  }, [students, searchQuery, selectedFilter, filterState, sortBy]);
+
+  // Counts for StudentFilterBar
+  const counts = useMemo(() => {
+    const active = students.filter((s) => s.status === 'active').length;
+    const suspended = students.filter(
+      (s) => s.status === 'disabled' || s.status === 'suspended'
+    ).length;
+    return {
+      total: students.length,
+      active,
+      suspended,
+      filtered: filteredStudents.length,
+    };
+  }, [students, filteredStudents.length]);
+
+  const handleResetFilters = () => {
+    setFilterState({
+      department: 'All',
+      role: 'All',
+      year: 'All',
+      status: 'all',
+    });
+    setSelectedFilter('All');
+    setSearchQuery('');
+  };
 
   const hasSelection = selectedIds.length > 0;
 
@@ -176,7 +268,18 @@ export const StudentDeck: React.FC<StudentDeckProps> = ({
         </button>
       </div>
 
-      {/* 2. ONE Horizontally Scrolling Chip Row: Squads + divider + Role filters */}
+      {/* 2. Multi-Dimension Filter Component (Department, Role, Year, Suspended) */}
+      <StudentFilterBar
+        filterState={filterState}
+        onFilterChange={setFilterState}
+        departments={dynamicDepartments}
+        roles={dynamicRoles}
+        years={CANONICAL_YEARS}
+        counts={counts}
+        onReset={handleResetFilters}
+      />
+
+      {/* 3. ONE Horizontally Scrolling Chip Row: Squads + divider + Role filters */}
       <div
         className="flex items-center gap-2 overflow-x-auto select-none py-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}

@@ -114,7 +114,7 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
   const [studentEmail, setStudentEmail] = useState('');
   const [studentDept, setStudentDept] = useState('Geography & Earth Sciences');
   const [studentYear, setStudentYear] = useState('1st Year');
-  const [studentSquad, setStudentSquad] = useState('Management');
+  const [studentSquad, setStudentSquad] = useState('General');
 
   // Documentation Lead Form States
   const [reportTitle, setReportTitle] = useState('');
@@ -419,8 +419,9 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
       email: cleanEmail,
       department: studentDept,
       yearOfStudy: studentYear,
-      squad: 'Member',
+      squad: 'General',
       role: 'student',
+      post: 'Student Member',
     });
     showToast(`✓ Student ${cleanName} (${cleanRoll}) enrolled as Member! Login: ${cleanRoll} | Password: geohub`);
     setStudentRollNo('');
