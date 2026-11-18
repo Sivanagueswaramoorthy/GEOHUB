@@ -641,8 +641,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPlatformModules((prev) => ({ ...prev, ...liveModules }));
       }
 
-      // 4. Sync Users & Official Chapter Roster (Public from TiDB Cloud)
-      const liveUsers = await apiClient.getUsers().catch(() => null);
+      // 4. Sync Users & Official Chapter Roster (Public from TiDB Cloud with Dual Fallback)
+      let liveUsers = await apiClient.getUsers().catch(() => null);
+      if (!Array.isArray(liveUsers)) {
+        liveUsers = await apiClient.getAdminUsers().catch(() => null);
+      }
       if (Array.isArray(liveUsers)) {
         const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
           uid: u.id,
@@ -1814,12 +1817,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const addStudentToTeam = (studentData: Omit<UserModel, 'uid'>) => {
-    const newUid = `u_${Date.now()}`;
     const cleanRollNo = studentData.rollNo ? studentData.rollNo.trim().toUpperCase() : `24GEO${Math.floor(100 + Math.random() * 900)}`;
+    const cleanEmail = studentData.email?.trim() || `${cleanRollNo.toLowerCase()}@geohub.edu`;
+    const cleanName = studentData.name.trim();
+    const tempUid = `u_${Date.now()}`;
+
     const newStudent: UserModel = {
       ...studentData,
-      uid: newUid,
+      uid: tempUid,
       rollNo: cleanRollNo,
+      name: cleanName,
+      email: cleanEmail,
       role: 'student',
       isVolunteer: false,
       post: studentData.post || 'Student Member',
@@ -1827,12 +1835,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       status: 'active',
       createdAt: new Date().toISOString(),
     };
-    setUsers((prev) => [...prev, newStudent]);
+
+    setUsers((prev) => {
+      const filtered = prev.filter((u) => u.rollNo !== cleanRollNo);
+      return [...filtered, newStudent];
+    });
+
     if (newStudent.team) {
       setTeams((prev) =>
         prev.map((tm) => {
           if (tm.name.toLowerCase() === newStudent.team?.toLowerCase()) {
-            return { ...tm, memberIds: [...tm.memberIds, newUid] };
+            return { ...tm, memberIds: [...new Set([...tm.memberIds, tempUid])] };
           }
           return tm;
         })
@@ -1844,24 +1857,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       actorName: currentUser.name,
       action: 'student_added',
       targetType: 'user',
-      targetId: newUid,
+      targetId: tempUid,
       targetName: newStudent.name,
       details: `Added student ${newStudent.name} (${cleanRollNo}) with default credentials (password: geohub)`,
     });
 
+    // Direct asynchronous TiDB Cloud persistence with cross-device sync broadcast
     apiClient
       .enrollUser({
-        name: newStudent.name,
+        name: cleanName,
         roll_no: cleanRollNo,
-        email: newStudent.email || `${cleanRollNo.toLowerCase()}@geohub.edu`,
+        email: cleanEmail,
         role: 'student',
-        team: newStudent.team,
+        team: newStudent.team || 'General',
         post: newStudent.post,
-        department: newStudent.department,
-        year_of_study: newStudent.yearOfStudy,
+        department: newStudent.department || 'Geoinformatics Engineering',
+        year_of_study: newStudent.yearOfStudy || '1st Year',
         password: 'geohub',
       })
-      .catch(() => {});
+      .then((res) => {
+        if (res?.id) {
+          setUsers((prev) =>
+            prev.map((u) => (u.rollNo === cleanRollNo ? { ...u, uid: res.id, createdAt: res.created_at || u.createdAt } : u))
+          );
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+        }
+      })
+      .catch((err) => {
+        console.warn('[AppContext] Could not persist student to TiDB Cloud:', err?.message);
+      });
   };
 
   const enrollScholar = (data: {
@@ -1931,6 +1957,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       department: newScholar.department,
       year_of_study: newScholar.yearOfStudy,
       password: 'geohub',
+    }).then(() => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+      }
     }).catch(() => {});
 
     return newScholar;

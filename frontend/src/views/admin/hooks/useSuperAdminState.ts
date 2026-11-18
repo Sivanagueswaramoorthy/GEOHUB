@@ -303,18 +303,29 @@ export function useSuperAdminState() {
     ];
   }, [students, onlineSessions]);
 
-  // Derived Overview Counts (users = faculty + students + 1 SA)
+  // Live Server Metrics Cache from TiDB Cloud
+  const [serverOverview, setServerOverview] = useState<{
+    faculty_count?: number;
+    student_count?: number;
+    users_count?: number;
+  } | null>(null);
+
+  // Derived Overview Counts (harmonized with live TiDB Cloud SSOT)
   const overviewCounts = useMemo<OverviewCounts>(() => {
     const liveModules = isBackendActive ? modules.filter((m) => m.enabled).length : 0;
+    const facCount = serverOverview?.faculty_count !== undefined ? serverOverview.faculty_count : faculty.length;
+    const stdCount = serverOverview?.student_count !== undefined ? serverOverview.student_count : students.length;
+    const usrCount = serverOverview?.users_count !== undefined ? serverOverview.users_count : (faculty.length + students.length + 1);
+
     return {
-      faculty: faculty.length,
-      students: students.length,
-      users: faculty.length + students.length + 1, // perfectly harmonized!
+      faculty: Math.max(facCount, faculty.length),
+      students: Math.max(stdCount, students.length),
+      users: Math.max(usrCount, faculty.length + students.length + 1),
       online: isBackendActive ? onlineUsers.length : 0,
       modulesLive: liveModules,
       modulesTotal: modules.length,
     };
-  }, [faculty.length, students.length, modules, onlineUsers.length, isBackendActive]);
+  }, [faculty.length, students.length, serverOverview, modules, onlineUsers.length, isBackendActive]);
 
   // Live Data Hydration from TiDB Cloud Backend
   const refreshSuperAdminData = useCallback(async () => {
@@ -322,7 +333,7 @@ export function useSuperAdminState() {
     if (isTestEnv) return; // Keep synchronous mock baseline in test runs
 
     try {
-      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes, sessionsRes, clearancesRes] =
+      const [modulesRes, facultyRes, usersRes, rolesRes, matrixRes, diagRes, sessionsRes, clearancesRes, overviewRes] =
         await Promise.allSettled([
           apiClient.getPlatformModules(),
           apiClient.getAdminFaculty(),
@@ -332,7 +343,12 @@ export function useSuperAdminState() {
           apiClient.getAdminSystemDiagnostics(),
           apiClient.getAdminOnlineSessions(),
           apiClient.getMemberCustomClearances(),
+          apiClient.getAdminOverview(),
         ]);
+
+      if (overviewRes.status === 'fulfilled' && overviewRes.value) {
+        setServerOverview(overviewRes.value);
+      }
 
       if (modulesRes.status === 'fulfilled' && modulesRes.value) {
         const modObj = modulesRes.value;

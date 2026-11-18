@@ -188,6 +188,9 @@ class ApiClient {
       if (err?.name === 'AbortError') {
         throw new Error('Connection timed out. Please check your internet connection.');
       }
+      if (err?.message === 'Failed to fetch' || err?.message?.includes('NetworkError')) {
+        throw new Error('Unable to reach server. Please check your connection or server status.');
+      }
       if (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== 'test') {
         console.warn(`[GeoHub API Client] Request to ${url} failed:`, err?.message);
       }

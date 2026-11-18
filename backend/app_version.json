@@ -1,8 +1,8 @@
 {
-  "version": "1.6.47",
-  "version_code": 66,
+  "version": "1.6.48",
+  "version_code": 67,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "SuperAdmin Executive Cockpit: elegant light peach card boxes (#FFF2EB), rich dark espresso high-contrast typography (#2D1A12), tactile sliding toggles, and zero black background (#FAF6F2).",
-  "sha256": "8eb4bd807a02d7a12c0eca74b83a591e043105865e53a5aee6fcfb84c58bb066",
-  "file_size": 6893312
+  "release_notes": "Cross-device TiDB Cloud persistence fix: full public roster sync, direct TiDB Cloud student/faculty provisioning, real-time multi-device SSE event stream, and elegant light peach theme.",
+  "sha256": "c8715ebb4ed3e6ea0bd4f77aed5d72ea08749dd049c448ae2b0c24372d857f89",
+  "file_size": 7198985
 }

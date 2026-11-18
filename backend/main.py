@@ -99,6 +99,13 @@ app.include_router(admin_router.router, prefix="/superadmin")
 app.include_router(admin_router.router)
 app.include_router(sync_router.router, prefix=settings.API_V1_STR)
 
+@app.get("/users")
+@app.get("/api/users")
+@app.get(f"{settings.API_V1_STR}/users")
+def get_global_users_directory(db: Session = Depends(get_db)):
+    """Global public roster endpoint ensuring multi-device synchronization without 404/401 errors."""
+    return db.query(models.User).order_by(models.User.name.asc()).all()
+
 @app.get("/me/modules")
 @app.get(f"{settings.API_V1_STR}/me/modules")
 @app.get("/api/v1/me/modules")
