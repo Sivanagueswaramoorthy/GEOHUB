@@ -17,34 +17,21 @@ export const Toggle: React.FC<ToggleProps> = ({
   className = '',
   color = 'emerald',
 }) => {
-  // Prototype accurate styling matching user screenshots:
-  // - TiDB ON: emerald-600, OFF: slate-400
-  // - Gateway ON: blue-600, OFF: amber-500 (Maintenance Mode)
-  let trackClass = '';
-  let dotClass = '';
+  // Determine exact colors matching the prototype in Images 1 & 2:
+  // - TiDB ON: emerald (#059669), OFF: slate (#64748b)
+  // - Gateway ON: cobalt blue (#2563eb), OFF: amber (#d97706) for maintenance mode
+  let activeColor = '#059669';
+  let inactiveColor = '#64748b';
 
-  if (checked) {
-    if (color === 'blue') {
-      trackClass = 'bg-blue-600 border border-blue-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]';
-      dotClass = 'bg-blue-600';
-    } else if (color === 'amber') {
-      trackClass = 'bg-amber-500 border border-amber-600/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]';
-      dotClass = 'bg-amber-500';
-    } else {
-      trackClass = 'bg-emerald-600 border border-emerald-700/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]';
-      dotClass = 'bg-emerald-600';
-    }
-  } else {
-    if (color === 'blue') {
-      // Offline/Maintenance mode for Gateway is radiant amber
-      trackClass = 'bg-amber-500 border border-amber-600/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]';
-      dotClass = 'bg-amber-500';
-    } else {
-      // Disconnected state for TiDB is muted slate-400
-      trackClass = 'bg-slate-400 border border-slate-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]';
-      dotClass = 'bg-slate-400';
-    }
+  if (color === 'blue') {
+    activeColor = '#2563eb';
+    inactiveColor = '#d97706'; // Amber when offline/maintenance
+  } else if (color === 'amber') {
+    activeColor = '#d97706';
+    inactiveColor = '#64748b';
   }
+
+  const currentTrackColor = checked ? activeColor : inactiveColor;
 
   return (
     <button
@@ -54,18 +41,54 @@ export const Toggle: React.FC<ToggleProps> = ({
       aria-label={label || 'Toggle switch'}
       disabled={disabled}
       onClick={() => !disabled && onChange(!checked)}
-      className={`relative w-12 min-w-12 h-7 min-h-7 rounded-full p-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shrink-0 select-none active:scale-95 transition-all duration-200 ease-in-out ${
-        disabled ? 'opacity-40 cursor-not-allowed bg-slate-700 border-slate-600' : trackClass
-      } ${className}`}
+      style={{
+        position: 'relative',
+        width: '48px',
+        minWidth: '48px',
+        maxWidth: '48px',
+        height: '28px',
+        minHeight: '28px',
+        maxHeight: '28px',
+        borderRadius: '9999px',
+        padding: '2px',
+        backgroundColor: currentTrackColor,
+        border: '1px solid rgba(0, 0, 0, 0.25)',
+        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.25)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.4 : 1,
+        flexShrink: 0,
+        outline: 'none',
+        display: 'inline-flex',
+        alignItems: 'center',
+        transition: 'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        userSelect: 'none',
+      }}
+      className={`shrink-0 ${className}`}
     >
       <span
         aria-hidden="true"
-        className={`flex items-center justify-center w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-          checked ? 'translate-x-5' : 'translate-x-0'
-        }`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '22px',
+          height: '22px',
+          borderRadius: '9999px',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)',
+          transform: checked ? 'translateX(20px)' : 'translateX(0px)',
+          transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          pointerEvents: 'none',
+        }}
       >
         <span
-          className={`w-1.5 h-1.5 rounded-full transition-colors duration-150 ${dotClass}`}
+          style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '9999px',
+            backgroundColor: currentTrackColor,
+            transition: 'background-color 0.15s ease',
+          }}
         />
       </span>
     </button>

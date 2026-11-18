@@ -57,7 +57,16 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
   const isModernTab = ['home', 'access', 'features', 'logs', 'profile'].includes(state.activeDeck);
 
   return (
-    <div className={`w-full min-h-screen flex flex-col relative select-none transition-colors duration-200 ${state.activeDeck === 'home' ? 'bg-[#06080b] text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+    <div
+      style={
+        state.activeDeck === 'home'
+          ? { backgroundColor: '#06080b', color: '#f8fafc', minHeight: '100vh' }
+          : { backgroundColor: '#f8fafc', color: '#0f172a', minHeight: '100vh' }
+      }
+      className={`w-full min-h-screen flex flex-col relative select-none transition-colors duration-200 ${
+        state.activeDeck === 'home' ? 'cockpit-view-bg' : ''
+      }`}
+    >
       {/* Main Content Area with Safe-Area Padding Bottom for Bottom Nav */}
       <main
         className="flex-1 w-full max-w-4xl mx-auto px-3 sm:px-4 pt-3"

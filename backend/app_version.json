@@ -1,12 +1,8 @@
 {
-  "version": "1.6.45",
-  "version_code": 64,
-  "apk_filename": "geohub-app.apk",
-  "release_notes": "Implemented exact prototype toggle switch behavior and dark obsidian cockpit UI matching design specs.",
-  "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "min_supported_version": "1.0.0",
-  "released_at": "2026-11-18",
-  "file_size_bytes": 6892780,
-  "file_size_mb": "6.57 MB",
-  "sha256": "DD60B885360CE76413FC775DF1C15191308F6CAB7960194C2E0069813658FBC7"
+  "version": "1.6.46",
+  "version_code": 65,
+  "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
+  "release_notes": "SuperAdmin Executive Cockpit: pure obsidian card theme, tactile sliding switches (TiDB emerald/slate, Gateway cobalt/amber), high-contrast white metrics, single-status ping button, and cross-platform UI rectification.",
+  "sha256": "fdeeccfb4c9709ab3fdd2b705aeb3d7d7adca9a0323b8350302347cb7bbb8187",
+  "file_size": 6893356
 }

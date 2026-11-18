@@ -3133,3 +3133,53 @@ button.pill-button-pressable[data-variant="secondary"]:hover {
 
 
 
+
+/* ==========================================================================
+   SuperAdmin Executive Cockpit (Dark Obsidian Design System)
+   ========================================================================== */
+.cockpit-view-bg {
+  background-color: #06080b !important;
+  color: #f8fafc !important;
+}
+
+.cockpit-card {
+  background-color: #0c0e12 !important;
+  border: 1px solid #1e2430 !important;
+  color: #ffffff !important;
+  border-radius: 1rem !important;
+}
+
+.cockpit-pill {
+  background-color: #141822 !important;
+  border: 1px solid #1e2430 !important;
+  color: #ffffff !important;
+  border-radius: 0.75rem !important;
+}
+
+.cockpit-toggle-track {
+  position: relative !important;
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  border-radius: 9999px !important;
+  padding: 2px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.cockpit-toggle-thumb {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 9999px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  pointer-events: none !important;
+}
