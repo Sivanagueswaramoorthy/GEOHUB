@@ -41,7 +41,12 @@ import {
 } from '../../components/shared';
 import { apiClient } from '../../api/client';
 import { APP_VERSION, APP_VERSION_CODE } from '../../config/version';
-import { triggerApkInstallation, onApkDownloadProgress } from '../../core/versionChecker';
+import {
+  triggerApkInstallation,
+  onApkDownloadProgress,
+  getInstalledVersion,
+  getInstalledVersionCode,
+} from '../../core/versionChecker';
 
 export const ProfileView: React.FC = () => {
   const {
@@ -803,7 +808,7 @@ export const ProfileView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#163832]">
-                  <span>Installed: v{APP_VERSION}</span>
+                  <span>Installed: v{getInstalledVersion()}</span>
                   <ArrowRight size={13} className="text-[#235347]" />
                   <span className="text-emerald-800 font-bold">New: v{updateInfo.version} ({updateInfo.file_size_mb || '6.5 MB'})</span>
                 </div>
@@ -850,7 +855,7 @@ export const ProfileView: React.FC = () => {
                   </div>
                   <div>
                     <span className="font-bold text-[#051F20] block">GeoHub is up to date</span>
-                    <span className="text-[#235347] font-mono">Installed: v{APP_VERSION} (Build {APP_VERSION_CODE})</span>
+                    <span className="text-[#235347] font-mono">Installed: v{getInstalledVersion()} (Build {getInstalledVersionCode()})</span>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B]/40">
@@ -963,7 +968,7 @@ export const ProfileView: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 text-xs font-semibold text-[#163832]">
-                  <span>Installed: v{APP_VERSION}</span>
+                  <span>Installed: v{getInstalledVersion()}</span>
                   <ArrowRight size={13} className="text-[#235347]" />
                   <span className="text-emerald-800 font-bold">New: v{updateInfo.version} ({updateInfo.file_size_mb || '6.5 MB'})</span>
                 </div>
@@ -1010,7 +1015,7 @@ export const ProfileView: React.FC = () => {
                   </div>
                   <div>
                     <span className="font-bold text-[#051F20] block">GeoHub is up to date</span>
-                    <span className="text-[#235347] font-mono">Installed: v{APP_VERSION} (Build {APP_VERSION_CODE})</span>
+                    <span className="text-[#235347] font-mono">Installed: v{getInstalledVersion()} (Build {getInstalledVersionCode()})</span>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B]/40">

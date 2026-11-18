@@ -400,8 +400,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         const result = await checkForAppUpdate();
         if (result.hasUpdate && result.updateInfo) {
-          // If the user already dismissed or started installing this version in the current session, do not re-prompt on focus
-          const dismissedVer = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('geohub_dismissed_update_version') : null;
+          // If the user already dismissed or started installing this version, do not re-prompt automatically on focus/visibility
+          const dismissedVer =
+            (typeof localStorage !== 'undefined' ? localStorage.getItem('geohub_dismissed_update_version') : null) ||
+            (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('geohub_dismissed_update_version') : null);
           if (!manual && dismissedVer === result.updateInfo.version) {
             return result;
           }

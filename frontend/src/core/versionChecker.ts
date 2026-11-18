@@ -54,6 +54,36 @@ export const CDN_APK_URL =
   'https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk';
 
 /**
+ * Returns the active app version, querying native Android OS package manager if in APK wrapper.
+ */
+export function getInstalledVersion(): string {
+  if (typeof window !== 'undefined' && (window as any).AndroidBridge?.getAppVersion) {
+    try {
+      const nativeVer = (window as any).AndroidBridge.getAppVersion();
+      if (nativeVer && typeof nativeVer === 'string' && nativeVer.trim()) {
+        return nativeVer.trim();
+      }
+    } catch {}
+  }
+  return APP_VERSION;
+}
+
+/**
+ * Returns the active app version code, querying native Android OS package manager if in APK wrapper.
+ */
+export function getInstalledVersionCode(): number {
+  if (typeof window !== 'undefined' && (window as any).AndroidBridge?.getAppVersionCode) {
+    try {
+      const nativeCode = (window as any).AndroidBridge.getAppVersionCode();
+      if (typeof nativeCode === 'number' && nativeCode > 0) {
+        return nativeCode;
+      }
+    } catch {}
+  }
+  return APP_VERSION_CODE;
+}
+
+/**
  * Queries the backend for latest version manifest and checks if an update is available.
  * Uses a resilient 2-tier check: primary API endpoint followed by high-speed global CDN fallback.
  */
@@ -61,9 +91,13 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
   const baseUrl = resolveApiBaseUrl();
 
   const parseAndEvaluate = (data: AppVersionManifest): CheckUpdateResult => {
-    const isNewer = compareSemver(APP_VERSION, data.version) > 0;
+    const currentVer = getInstalledVersion();
+    const currentCode = getInstalledVersionCode();
+
+    const semverDiff = compareSemver(currentVer, data.version);
+    const isNewer = semverDiff > 0 || (semverDiff === 0 && (data.version_code || 0) > currentCode);
     const isMandatory = Boolean(
-      data.min_supported_version && compareSemver(APP_VERSION, data.min_supported_version) > 0
+      data.min_supported_version && compareSemver(currentVer, data.min_supported_version) > 0
     );
 
     // If download_url is relative, ensure a robust direct fallback
@@ -76,7 +110,7 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
       hasUpdate: isNewer,
       updateInfo: isNewer ? { ...data, download_url: resolvedDownloadUrl } : null,
       isMandatory,
-      currentVersion: APP_VERSION,
+      currentVersion: currentVer,
       latestVersion: data.version,
     };
   };
@@ -128,12 +162,13 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
     // Both tiers exhausted
   }
 
+  const activeVer = getInstalledVersion();
   return {
     hasUpdate: false,
     updateInfo: null,
     isMandatory: false,
-    currentVersion: APP_VERSION,
-    latestVersion: APP_VERSION,
+    currentVersion: activeVer,
+    latestVersion: activeVer,
   };
 }
 

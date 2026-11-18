@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DownloadCloud, Sparkles, ShieldCheck, ArrowRight, X, Loader2 } from 'lucide-react';
-import { AppVersionManifest, triggerApkInstallation, onApkDownloadProgress } from '../../core/versionChecker';
+import { AppVersionManifest, triggerApkInstallation, onApkDownloadProgress, getInstalledVersion } from '../../core/versionChecker';
 import { APP_VERSION } from '../../config/version';
 
 interface UpdateAvailableModalProps {
@@ -42,15 +42,21 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
   if (!isOpen || !updateInfo) return null;
 
   const handleDismiss = () => {
-    if (updateInfo?.version && typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+    if (updateInfo?.version) {
+      try {
+        localStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+        sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+      } catch {}
     }
     onClose();
   };
 
   const handleStartDownload = () => {
-    if (updateInfo?.version && typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+    if (updateInfo?.version) {
+      try {
+        localStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+        sessionStorage.setItem('geohub_dismissed_update_version', updateInfo.version);
+      } catch {}
     }
     setIsDownloading(true);
     setDownloadProgress(10);
@@ -123,7 +129,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-[#235347] font-medium">Installed:</span>
             <span className="font-bold text-[#051F20] bg-[#F6FBF7] px-2 py-0.5 rounded-lg border border-[#DAF1DE]">
-              v{APP_VERSION}
+              v{getInstalledVersion()}
             </span>
           </div>
           <ArrowRight size={14} className="text-[#8EB69B]" />

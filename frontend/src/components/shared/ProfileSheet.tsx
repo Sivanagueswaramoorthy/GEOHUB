@@ -6,6 +6,7 @@ import { BottomSheet } from './BottomSheet';
 import { ListRow } from './ListRow';
 import { ConfirmDialog } from './ConfirmDialog';
 import { APP_VERSION } from '../../config/version';
+import { getInstalledVersion } from '../../core/versionChecker';
 
 export interface ProfileSheetProps {
   isOpen: boolean;
@@ -140,7 +141,7 @@ export const ProfileSheet: React.FC<ProfileSheetProps> = ({
             <ListRow
               icon={<Settings size={20} strokeWidth={1.75} className="lucide text-[#163832]" />}
               title="Settings & Updates"
-              subtitle={`GeoHub v${APP_VERSION} • Software updates`}
+              subtitle={`GeoHub v${getInstalledVersion()} • Software updates`}
               meta={
                 updateInfo ? (
                   <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#DAF1DE] text-[#235347] border border-[#8EB69B] animate-pulse">
