@@ -289,6 +289,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
         if (raw) {
           const parsed = JSON.parse(raw);
+          if (parsed?.token) {
+            apiClient.setToken(parsed.token);
+          }
           if (parsed?.user) return parsed.user;
         }
       }
@@ -582,10 +585,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setSyncStatus('offline');
       return;
     }
+    const token = apiClient.getToken();
+    const hasValidToken = Boolean(token && !token.startsWith('geohub_jwt_mock_'));
+
     setIsSyncing(true);
     setSyncStatus((prev) => (prev === 'connected' ? 'syncing' : prev));
     try {
-      // 1. Sync Events
+      // 1. Sync Events (Public)
       const liveEvents = await apiClient.getEvents().catch(() => null);
       if (Array.isArray(liveEvents)) {
         const mappedEvents: EventModel[] = liveEvents.map((e: any): EventModel => ({
@@ -612,31 +618,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setEvents(mappedEvents);
       }
 
-      // 2. Sync Users & Official Chapter Roster
-      const liveUsers = await apiClient.getUsers().catch(() => null);
-      if (Array.isArray(liveUsers)) {
-        const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
-          uid: u.id,
-          rollNo: u.roll_no,
-          name: u.name,
-          email: u.email,
-          role: u.role || 'student',
-          post: u.post || undefined,
-          department: u.department || 'Geoinformatics Engineering',
-          yearOfStudy: u.year_of_study || '3rd Year',
-          phone: u.phone || undefined,
-          team: u.team || undefined,
-          teamRole: u.team_role || undefined,
-          isVolunteer: Boolean(u.is_volunteer),
-          status: u.status || 'active',
-          squadMemberships: u.squad_memberships
-            ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
-            : [],
-        }));
-        setUsers(mappedUsers);
-      }
-
-      // 3. Sync Squads & Teams
+      // 2. Sync Squads & Teams (Public)
       const liveTeams = await apiClient.getTeams().catch(() => null);
       if (Array.isArray(liveTeams)) {
         setTeams((prev) => prev.map((t) => {
@@ -651,157 +633,184 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }));
       }
 
-      // 4. Sync Duty Tasks
-      const liveTasks = await apiClient.getTasks('all').catch(() => null);
-      if (Array.isArray(liveTasks)) {
-        setTasks(liveTasks.map((t: any): TaskModel => ({
-          id: t.id,
-          title: t.title,
-          description: t.description || '',
-          priority: 'medium',
-          status: t.status || 'todo',
-          team: t.team_id || 'Management',
-          assigneeId: t.assigned_user_ids?.[0] || 'SA01',
-          assigneeName: 'Assigned Scholar',
-          createdById: t.created_by || 'SA01',
-          createdByName: 'Coordinator',
-          dueDate: t.deadline || new Date().toISOString(),
-          comments: [],
-          createdAt: t.created_at || new Date().toISOString(),
-          proofUrl: t.proof_urls?.[0],
-        })));
-      }
-
-      // 5. Sync Treasury Budget Requests
-      const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
-      if (Array.isArray(liveBudget)) {
-        setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
-          id: b.id,
-          teamName: b.team_name,
-          requestedAmount: Number(b.requested_amount || 0),
-          currentAllocation: Number(b.current_allocation || 0),
-          reason: b.reason,
-          requestedBy: b.requested_by,
-          requestedAt: b.created_at || new Date().toISOString(),
-          status: b.status || 'pending',
-        })));
-      }
-
-      // 6. Sync Official Financial Ledger Expenses
-      const liveExpenses = await apiClient.getExpenses().catch(() => null);
-      if (Array.isArray(liveExpenses)) {
-        setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
-          id: exp.id,
-          title: exp.title,
-          amount: Number(exp.amount || 0),
-          category: exp.category,
-          buyingDate: exp.date || exp.created_at || new Date().toISOString(),
-          eventTitle: exp.event_title || 'General Operations',
-          vendorName: 'Official Vendor',
-          paidBy: exp.logged_by || 'Treasurer Lead',
-          approvedBy: 'Faculty Advisor',
-          receiptUrl: exp.receipt_url,
-          status: 'approved',
-        })));
-      }
-
-      // 7. Sync Governance Audit Logs
-      const liveAudits = await apiClient.getAuditLogs().catch(() => null);
-      if (Array.isArray(liveAudits)) {
-        setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
-          id: a.id,
-          actorId: a.actor_id,
-          actorName: a.actor_name,
-          action: a.action,
-          targetType: a.target_type,
-          targetId: a.target_id,
-          targetName: a.target_name,
-          details: a.details,
-          timestamp: a.timestamp || new Date().toISOString(),
-        })));
-      }
-
-      // 8. Sync Platform Module Toggles
+      // 3. Sync Platform Module Toggles (Public)
       const liveModules = await apiClient.getPlatformModules().catch(() => null);
       if (liveModules && typeof liveModules === 'object' && !Array.isArray(liveModules)) {
         setPlatformModules((prev) => ({ ...prev, ...liveModules }));
       }
 
-      // 9. Sync Meetings & MoM
-      const liveMeetings = await apiClient.getMeetings().catch(() => null);
-      if (Array.isArray(liveMeetings)) {
-        setMeetings(liveMeetings.map((m: any): MeetingModel => ({
-          id: m.id,
-          title: m.title,
-          type: m.type || 'general',
-          eventId: m.event_id,
-          eventTitle: m.event_title,
-          dateTime: m.date_time || new Date().toISOString(),
-          venue: m.venue || 'Campus Auditorium',
-          organizerName: m.organizer_name || 'Coordinator',
-          attendeeIds: Array.isArray(m.attendee_ids) ? m.attendee_ids : [],
-          agenda: m.agenda || '',
-          momNotes: m.mom_notes,
-          actionItems: Array.isArray(m.action_items) ? m.action_items : [],
-          status: m.status || 'scheduled',
-          createdAt: m.created_at || new Date().toISOString(),
-        })));
-      }
+      // Authenticated Data Synchronization: Only query if user has an active backend JWT
+      if (hasValidToken) {
+        // 4. Sync Users & Official Chapter Roster
+        const liveUsers = await apiClient.getUsers().catch(() => null);
+        if (Array.isArray(liveUsers)) {
+          const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
+            uid: u.id,
+            rollNo: u.roll_no,
+            name: u.name,
+            email: u.email,
+            role: u.role || 'student',
+            post: u.post || undefined,
+            department: u.department || 'Geoinformatics Engineering',
+            yearOfStudy: u.year_of_study || '3rd Year',
+            phone: u.phone || undefined,
+            team: u.team || undefined,
+            teamRole: u.team_role || undefined,
+            isVolunteer: Boolean(u.is_volunteer),
+            status: u.status || 'active',
+            squadMemberships: u.squad_memberships
+              ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
+              : [],
+          }));
+          setUsers(mappedUsers);
+        }
 
-      // 10. Sync Campus Forum Messages
-      const liveForum = await apiClient.getForumMessages().catch(() => null);
-      if (Array.isArray(liveForum)) {
-        setForumMessages(liveForum.map((fm: any): ForumMessage => ({
-          id: fm.id,
-          channelId: fm.channel_id,
-          authorId: fm.author_id,
-          authorName: fm.author_name,
-          authorRole: fm.author_role,
-          authorAvatar: fm.author_avatar,
-          title: fm.title,
-          content: fm.content,
-          timestamp: fm.timestamp,
-          likes: Number(fm.likes || 0),
-          likedBy: Array.isArray(fm.liked_by) ? fm.liked_by : [],
-          pinned: Boolean(fm.pinned),
-          replies: Array.isArray(fm.replies) ? fm.replies : [],
-        })));
-      }
+        // 5. Sync Duty Tasks
+        const liveTasks = await apiClient.getTasks('all').catch(() => null);
+        if (Array.isArray(liveTasks)) {
+          setTasks(liveTasks.map((t: any): TaskModel => ({
+            id: t.id,
+            title: t.title,
+            description: t.description || '',
+            priority: 'medium',
+            status: t.status || 'todo',
+            team: t.team_id || 'Management',
+            assigneeId: t.assigned_user_ids?.[0] || 'SA01',
+            assigneeName: 'Assigned Scholar',
+            createdById: t.created_by || 'SA01',
+            createdByName: 'Coordinator',
+            dueDate: t.deadline || new Date().toISOString(),
+            comments: [],
+            createdAt: t.created_at || new Date().toISOString(),
+            proofUrl: t.proof_urls?.[0],
+          })));
+        }
 
-      // 11. Sync Inventory & Stock
-      const liveStock = await apiClient.getStockItems().catch(() => null);
-      if (Array.isArray(liveStock)) {
-        setStockItems(liveStock.map((s: any): StockItem => ({
-          id: s.id,
-          name: s.name,
-          category: s.category || 'Logistics',
-          quantity: Number(s.quantity || 0),
-          unit: s.unit || 'pcs',
-          minThreshold: Number(s.min_threshold || 5),
-          unitCost: Number(s.unit_cost || 0),
-          lastRestocked: s.last_restocked || '',
-          location: s.location || 'Main Store',
-          status: s.status || 'in_stock',
-        })));
-      }
+        // 6. Sync Treasury Budget Requests
+        const liveBudget = await apiClient.getBudgetRequests().catch(() => null);
+        if (Array.isArray(liveBudget)) {
+          setBudgetRequests(liveBudget.map((b: any): BudgetChangeRequest => ({
+            id: b.id,
+            teamName: b.team_name,
+            requestedAmount: Number(b.requested_amount || 0),
+            currentAllocation: Number(b.current_allocation || 0),
+            reason: b.reason,
+            requestedBy: b.requested_by,
+            requestedAt: b.created_at || new Date().toISOString(),
+            status: b.status || 'pending',
+          })));
+        }
 
-      // 12. Sync Media & Gallery
-      const liveGallery = await apiClient.getGalleryItems().catch(() => null);
-      if (Array.isArray(liveGallery)) {
-        setGallery(liveGallery.map((g: any): GalleryItem => ({
-          id: g.id,
-          title: g.title,
-          eventId: g.event_id || '',
-          eventTitle: g.event_title || '',
-          academicYear: g.academic_year || '2025-26',
-          category: g.category || 'photos',
-          url: g.url,
-          thumbnailUrl: g.thumbnail_url,
-          uploadedByName: g.uploaded_by_name || 'Documentation Lead',
-          uploadedAt: g.uploaded_at || new Date().toISOString(),
-          fileSizeBytes: g.file_size_bytes,
-          caption: g.caption,
-        })));
+        // 7. Sync Official Financial Ledger Expenses
+        const liveExpenses = await apiClient.getExpenses().catch(() => null);
+        if (Array.isArray(liveExpenses)) {
+          setExpenses(liveExpenses.map((exp: any): ExpenseItem => ({
+            id: exp.id,
+            title: exp.title,
+            amount: Number(exp.amount || 0),
+            category: exp.category,
+            buyingDate: exp.date || exp.created_at || new Date().toISOString(),
+            eventTitle: exp.event_title || 'General Operations',
+            vendorName: 'Official Vendor',
+            paidBy: exp.logged_by || 'Treasurer Lead',
+            approvedBy: 'Faculty Advisor',
+            receiptUrl: exp.receipt_url,
+            status: 'approved',
+          })));
+        }
+
+        // 8. Sync Governance Audit Logs
+        const liveAudits = await apiClient.getAuditLogs().catch(() => null);
+        if (Array.isArray(liveAudits)) {
+          setAuditLogs(liveAudits.map((a: any): AuditLogItem => ({
+            id: a.id,
+            actorId: a.actor_id,
+            actorName: a.actor_name,
+            action: a.action,
+            targetType: a.target_type,
+            targetId: a.target_id,
+            targetName: a.target_name,
+            details: a.details,
+            timestamp: a.timestamp || new Date().toISOString(),
+          })));
+        }
+
+        // 9. Sync Meetings & MoM
+        const liveMeetings = await apiClient.getMeetings().catch(() => null);
+        if (Array.isArray(liveMeetings)) {
+          setMeetings(liveMeetings.map((m: any): MeetingModel => ({
+            id: m.id,
+            title: m.title,
+            type: m.type || 'general',
+            eventId: m.event_id,
+            eventTitle: m.event_title,
+            dateTime: m.date_time || new Date().toISOString(),
+            venue: m.venue || 'Campus Auditorium',
+            organizerName: m.organizer_name || 'Coordinator',
+            attendeeIds: Array.isArray(m.attendee_ids) ? m.attendee_ids : [],
+            agenda: m.agenda || '',
+            momNotes: m.mom_notes,
+            actionItems: Array.isArray(m.action_items) ? m.action_items : [],
+            status: m.status || 'scheduled',
+            createdAt: m.created_at || new Date().toISOString(),
+          })));
+        }
+
+        // 10. Sync Campus Forum Messages
+        const liveForum = await apiClient.getForumMessages().catch(() => null);
+        if (Array.isArray(liveForum)) {
+          setForumMessages(liveForum.map((fm: any): ForumMessage => ({
+            id: fm.id,
+            channelId: fm.channel_id,
+            authorId: fm.author_id,
+            authorName: fm.author_name,
+            authorRole: fm.author_role,
+            authorAvatar: fm.author_avatar,
+            title: fm.title,
+            content: fm.content,
+            timestamp: fm.timestamp,
+            likes: Number(fm.likes || 0),
+            likedBy: Array.isArray(fm.liked_by) ? fm.liked_by : [],
+            pinned: Boolean(fm.pinned),
+            replies: Array.isArray(fm.replies) ? fm.replies : [],
+          })));
+        }
+
+        // 11. Sync Inventory & Stock
+        const liveStock = await apiClient.getStockItems().catch(() => null);
+        if (Array.isArray(liveStock)) {
+          setStockItems(liveStock.map((s: any): StockItem => ({
+            id: s.id,
+            name: s.name,
+            category: s.category || 'Logistics',
+            quantity: Number(s.quantity || 0),
+            unit: s.unit || 'pcs',
+            minThreshold: Number(s.min_threshold || 5),
+            unitCost: Number(s.unit_cost || 0),
+            lastRestocked: s.last_restocked || '',
+            location: s.location || 'Main Store',
+            status: s.status || 'in_stock',
+          })));
+        }
+
+        // 12. Sync Media & Gallery
+        const liveGallery = await apiClient.getGalleryItems().catch(() => null);
+        if (Array.isArray(liveGallery)) {
+          setGallery(liveGallery.map((g: any): GalleryItem => ({
+            id: g.id,
+            title: g.title,
+            eventId: g.event_id || '',
+            eventTitle: g.event_title || '',
+            academicYear: g.academic_year || '2025-26',
+            category: g.category || 'photos',
+            url: g.url,
+            thumbnailUrl: g.thumbnail_url,
+            uploadedByName: g.uploaded_by_name || 'Documentation Lead',
+            uploadedAt: g.uploaded_at || new Date().toISOString(),
+            fileSizeBytes: g.file_size_bytes,
+            caption: g.caption,
+          })));
+        }
       }
 
         setSyncStatus('connected');
@@ -986,6 +995,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCurrentUser(user);
     setIsAuthenticated(true);
     setUsers((prev) => (prev.some((u) => u.uid === user.uid) ? prev : [user, ...prev]));
+    
+    // Ensure auth session is safely mirrored in localStorage
+    try {
+      if (typeof window !== 'undefined') {
+        const existing = localStorage.getItem('geohub_auth_session');
+        if (!existing) {
+          localStorage.setItem('geohub_auth_session', JSON.stringify({
+            user,
+            token: apiClient.getToken() || `geohub_jwt_token_${user.uid}`,
+            rememberMe: true,
+            createdAt: Date.now(),
+          }));
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     switch (user.role) {
       case 'super_admin':
       case 'admin':

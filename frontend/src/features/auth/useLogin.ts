@@ -115,6 +115,13 @@ export const useLogin = (options?: UseLoginOptions) => {
 
       setActiveTab(targetRoute);
       window.location.hash = targetRoute === 'home' ? '' : targetRoute;
+      if (typeof window !== 'undefined') {
+        try {
+          window.history.replaceState(null, '', window.location.pathname);
+        } catch {
+          // ignore in file:// or webview
+        }
+      }
       options?.onSuccessRedirect?.(targetRoute);
     },
     [setActiveTab, options]
@@ -293,12 +300,18 @@ export const useLogin = (options?: UseLoginOptions) => {
         createdAt: Date.now(),
       };
 
-      if (rememberMe) {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionPayload));
-        sessionStorage.removeItem(AUTH_STORAGE_KEY);
-      } else {
+      // Immediately sync token with ApiClient singleton
+      if (token) {
+        apiClient.setToken(token);
+      }
+
+      // Always persist session in localStorage so mobile APK webviews retain authentication
+      apiClient.setToken(sessionPayload.token);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionPayload));
+      try {
         sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionPayload));
-        localStorage.removeItem(AUTH_STORAGE_KEY);
+      } catch {
+        // ignore
       }
 
       setIsSuccess(true);
@@ -334,6 +347,7 @@ export const useLogin = (options?: UseLoginOptions) => {
       createdAt: Date.now(),
     };
 
+    apiClient.setToken(sessionPayload.token);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionPayload));
 
     setIsSuccess(true);

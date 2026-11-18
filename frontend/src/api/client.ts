@@ -96,6 +96,20 @@ class ApiClient {
   public getToken(): string | null {
     if (!this.token && typeof window !== 'undefined') {
       this.token = localStorage.getItem('geohub_access_token');
+      if (!this.token) {
+        try {
+          const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.token) {
+              this.token = parsed.token;
+              localStorage.setItem('geohub_access_token', parsed.token);
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
     }
     return this.token;
   }
@@ -129,7 +143,10 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        if (response.status === 401) {
+        // Only trigger session revocation on explicit user session verification failure,
+        // NEVER on routine background polling or login/register requests.
+        const isAuthVerification = cleanEndpoint === '/me' || cleanEndpoint === '/auth/me' || cleanEndpoint === '/me/modules';
+        if (response.status === 401 && isAuthVerification && token && !token.startsWith('geohub_jwt_mock_')) {
           this.setToken(null);
           if (typeof window !== 'undefined') {
             window.dispatchEvent(

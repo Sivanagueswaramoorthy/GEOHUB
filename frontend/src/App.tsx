@@ -86,69 +86,27 @@ const MainAppContent: React.FC = () => {
     if (typeof window === 'undefined') return;
 
     const hash = window.location.hash.split('?')[0].replace(/^#\/?/, '').trim();
-    const rawPath = window.location.pathname.replace(/^\//, '').trim();
-    const isAsset =
-      !rawPath ||
-      rawPath === 'index.html' ||
-      rawPath === 'assets/index.html' ||
-      rawPath.startsWith('assets') ||
-      rawPath.startsWith('android_asset') ||
-      rawPath.includes('android_asset') ||
-      rawPath.includes('.html');
-    const path = isAsset ? '' : rawPath;
+    const isDesignSystem = hash === 'design-system' || hash === 'design_system';
 
-    const isDesignSystem = hash === 'design-system' || path === 'design-system' || hash === 'design_system' || path === 'design_system';
     if (isDesignSystem) {
       setActiveTab('design-system');
       return;
     }
 
-    const isLogin = hash === 'login' || path === 'login';
-
     if (isAuthenticated) {
-      if (isLogin) {
-        // Authenticated users visiting /login are redirected to their role home,
-        // BUT ONLY IF a valid stored session actually exists!
-        let hasStoredSession = false;
-        try {
-          hasStoredSession = Boolean(
-            localStorage.getItem('geohub_auth_session') ||
-            sessionStorage.getItem('geohub_auth_session')
-          );
-        } catch {
-          // ignore
-        }
-
-        if (!hasStoredSession) {
-          // User just executed a logout! Respect logout state.
-          setActiveTab('login');
-          return;
-        }
-
+      // If user is authenticated and currently on login tab/hash, move them to home
+      if (activeTab === 'login' || hash === 'login') {
         setActiveTab('home');
         if (window.location.hash.includes('login')) {
           window.location.hash = '';
         }
-        if (path === 'login') {
-          try {
-            window.history.replaceState(null, '', '/');
-          } catch {
-            // ignore in file:// or webview
-          }
-        }
       }
     } else {
-      // Unauthenticated users hitting any protected route are redirected to /login?next=<path>
-      if (!isLogin) {
-        const attemptedRoute = hash || (path && path !== 'index.html' ? path : '');
-        if (attemptedRoute && attemptedRoute !== 'login') {
-          const nextUrl = `/login?next=${encodeURIComponent(attemptedRoute)}`;
-          try {
-            window.history.replaceState(null, '', nextUrl);
-          } catch {
-            // ignore
-          }
-          setActiveTab('login');
+      // Unauthenticated users hitting protected routes are set to login
+      if (activeTab !== 'login' && hash !== 'login') {
+        setActiveTab('login');
+        if (window.location.hash && window.location.hash !== '#login') {
+          window.location.hash = 'login';
         }
       }
     }

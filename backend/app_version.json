@@ -2,11 +2,11 @@
   "version": "1.6.37",
   "version_code": 56,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Live TiDB Cloud persistence for meetings, campus forum, stock inventory, and media gallery. Path routing synchronization and OTA update enhancements.",
+  "release_notes": "Fixed session auto-logout issue. Stabilized token persistence across Android WebViews and silenced unauthenticated 401s during background sync.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-18",
-  "file_size_bytes": 7192117,
-  "file_size_mb": "6.86 MB",
-  "sha256": "B5464FF02D7E119C11967283BC984D34118664EB378ACB413DE8575EAEAB26E3"
+  "file_size_bytes": 7494998,
+  "file_size_mb": "7.15 MB",
+  "sha256": "438D53D7716F74D0F47A02EA2EF93899BE6B363310DDD430B6D25BFEC6446434"
 }
