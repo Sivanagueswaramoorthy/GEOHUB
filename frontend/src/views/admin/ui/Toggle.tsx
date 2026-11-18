@@ -37,10 +37,10 @@ export const Toggle: React.FC<ToggleProps> = ({
       onClick={() => !disabled && onChange(!checked)}
       className={`min-w-[52px] w-[52px] min-h-[30px] h-[30px] p-0.5 rounded-full transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 cursor-pointer relative shrink-0 border select-none active:scale-95 ${
         disabled
-          ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
+          ? 'opacity-40 cursor-not-allowed bg-slate-800 border-slate-700'
           : checked
-          ? `${activeBg} shadow-[inset_0_2px_4px_rgba(0,0,0,0.18)]`
-          : 'bg-slate-300 border-slate-400/60 hover:bg-slate-400/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.12)]'
+          ? `${activeBg} shadow-[inset_0_2px_4px_rgba(0,0,0,0.25)]`
+          : 'bg-[#1e2430] border-slate-700/80 hover:bg-[#252d3d] shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]'
       } ${className}`}
     >
       <span

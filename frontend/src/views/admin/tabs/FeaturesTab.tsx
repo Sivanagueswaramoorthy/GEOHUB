@@ -91,7 +91,11 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       setStudentRollNo('');
       setStudentName('');
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Failed to onboard student to TiDB Cloud');
+      const msg =
+        err?.message === 'Failed to fetch'
+          ? 'Unable to reach cloud server. Please check your internet connection.'
+          : err?.message || 'Failed to onboard student to TiDB Cloud';
+      setErrorMsg(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +139,11 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       setFacultyRollNo('');
       setFacultyName('');
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Failed to provision faculty to TiDB Cloud');
+      const msg =
+        err?.message === 'Failed to fetch'
+          ? 'Unable to reach cloud server. Please check your internet connection.'
+          : err?.message || 'Failed to provision faculty to TiDB Cloud';
+      setErrorMsg(msg);
     } finally {
       setIsSubmitting(false);
     }

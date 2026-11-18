@@ -1,12 +1,12 @@
 {
-  "version": "1.6.42",
-  "version_code": 61,
+  "version": "1.6.43",
+  "version_code": 62,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Rebuilt SuperAdmin Cockpit Home UI with minimalist high-density layout, zero text bloat, and premium tactile 3D toggle switches for TiDB Cloud and API Gateway control.",
+  "release_notes": "Rebuilt SuperAdmin Cockpit Home UI with dark obsidian executive aesthetic, 3-column KPI metric tiles, and tactile 3D control toggles for TiDB Cloud and API Gateway.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-18",
-  "file_size_bytes": 6892776,
+  "file_size_bytes": 6892800,
   "file_size_mb": "6.57 MB",
-  "sha256": "AC63E324255547F698B32E5084F9E25519644F7939ACDD60309AA1C6D7B83842"
+  "sha256": "CC12761A90A6C4F8A1E6C3113071C983536132759048026010629BCE36ED1BE7"
 }

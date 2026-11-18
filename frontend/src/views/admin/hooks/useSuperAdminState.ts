@@ -851,7 +851,10 @@ export function useSuperAdminState() {
           return res;
         }
       } catch (err: any) {
-        const msg = err?.message || 'Failed to persist faculty record to TiDB Cloud';
+        const msg =
+          err?.message === 'Failed to fetch'
+            ? 'Unable to reach cloud server. Please check your internet connection.'
+            : err?.message || 'Failed to persist faculty record to TiDB Cloud';
         showToast(msg);
         throw err;
       }
@@ -906,7 +909,10 @@ export function useSuperAdminState() {
           return res;
         }
       } catch (err: any) {
-        const msg = err?.message || 'Failed to persist scholar record to TiDB Cloud';
+        const msg =
+          err?.message === 'Failed to fetch'
+            ? 'Unable to reach cloud server. Please check your internet connection.'
+            : err?.message || 'Failed to persist scholar record to TiDB Cloud';
         showToast(msg);
         throw err;
       }
