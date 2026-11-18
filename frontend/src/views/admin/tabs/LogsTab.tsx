@@ -126,12 +126,6 @@ export const LogsTab: React.FC<LogsTabProps> = ({
     yearFilter !== 'All' ||
     searchQuery.trim().length > 0;
 
-  const activeFilterCount =
-    (activeFilter !== 'all' ? 1 : 0) +
-    (deptFilter !== 'All' ? 1 : 0) +
-    (roleFilter !== 'All' ? 1 : 0) +
-    (yearFilter !== 'All' ? 1 : 0);
-
   const handleResetAdvancedFilters = () => {
     setDeptFilter('All');
     setRoleFilter('All');
@@ -310,14 +304,6 @@ export const LogsTab: React.FC<LogsTabProps> = ({
                 <span style={{ color: '#051F20' }} className="text-sm font-bold tracking-tight">
                   Directory Filters
                 </span>
-                {isAdvancedFilterActive && (
-                  <span
-                    style={{ backgroundColor: '#163832', color: '#FFFFFF' }}
-                    className="px-2 py-0.5 rounded-full text-xs font-bold font-mono"
-                  >
-                    {activeFilterCount} active
-                  </span>
-                )}
               </div>
               <p style={{ color: '#235347' }} className="text-xs font-medium">
                 Showing {filteredMembers.length} of {counts.all} campus records

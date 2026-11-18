@@ -1,8 +1,8 @@
 {
-  "version": "1.6.50",
-  "version_code": 69,
+  "version": "1.6.51",
+  "version_code": 70,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Removed redundant Active filter tags from Directory view for a cleaner, unified experience.",
-  "sha256": "bc68d4e959d7c74d9c270fd35ebcf3f4b653654b819e26c3360789b4560c3052",
-  "file_size": 7226615
+  "release_notes": "Removed active filter count badge and tags from scholar and directory filters for a cleaner, unified UI.",
+  "sha256": "91963fd282a4bcdc766174fe7532731c633149a826e9dab75bbc7274aece3f44",
+  "file_size": 8202204
 }

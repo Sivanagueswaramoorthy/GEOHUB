@@ -50,13 +50,6 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
     filterState.year !== 'All' ||
     filterState.status !== 'all';
 
-  const activeFilterCount = [
-    filterState.department !== 'All',
-    filterState.role !== 'All',
-    filterState.year !== 'All',
-    filterState.status !== 'all',
-  ].filter(Boolean).length;
-
   const handleDeptSelect = (dept: string) => {
     onFilterChange({ ...filterState, department: dept });
   };
@@ -88,11 +81,6 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
               <span className="text-xs sm:text-sm font-bold text-[#051F20]">
                 Scholar Filters
               </span>
-              {isAnyFilterActive && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#163832] text-white">
-                  {activeFilterCount} active
-                </span>
-              )}
             </div>
             <p className="text-xs font-medium text-[#235347]">
               Showing {counts.filtered} of {counts.total} scholars

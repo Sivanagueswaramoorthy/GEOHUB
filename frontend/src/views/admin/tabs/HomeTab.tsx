@@ -19,6 +19,7 @@ import { OverviewCounts, DiagnosticsData, SuperAdminTab } from '../types';
 import { Toggle } from '../ui/Toggle';
 import { AppContext } from '../../../context/AppContext';
 import { APP_VERSION } from '../../../config/version';
+import { AnimatedHackerIllustration } from '../../../components/shared';
 
 export interface HomeTabProps {
   overviewCounts: OverviewCounts;
@@ -121,57 +122,100 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   return (
     <div className="space-y-3 animate-fadeIn pb-12 select-none">
-      {/* Executive Command Header (Forest & Mint Botanical Theme) */}
+      {/* Executive Command Header (System Overview & Health + Animated Hacker on the Right) */}
       <div
         style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
-        className="cockpit-card p-3.5 sm:p-4 rounded-2xl border shadow-sm flex items-center justify-between gap-2.5"
+        className="cockpit-card p-3.5 sm:p-4.5 rounded-2xl border shadow-sm relative overflow-hidden"
       >
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <div
-            style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
-            className="w-9 h-9 rounded-xl border flex items-center justify-center font-black text-xs shadow-xs shrink-0"
-          >
-            SA
-          </div>
-          <div className="min-w-0 flex-1">
+        {/* Subtle Cyber Grid Watermark Overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#163832_1px,transparent_1px)] [background-size:12px_12px]" />
+
+        <div className="relative z-10 flex items-center justify-between gap-2.5 sm:gap-4">
+          {/* Left Column: Command & Health Information */}
+          <div className="min-w-0 flex-1 space-y-2">
+            {/* Title & Authority Avatar */}
+            <div className="flex items-center gap-2">
+              <div
+                style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
+                className="w-8 h-8 rounded-xl border flex items-center justify-center font-black text-xs shadow-2xs shrink-0"
+              >
+                SA
+              </div>
+              <div className="min-w-0">
+                <h1 style={{ color: '#051F20' }} className="text-xs sm:text-sm font-black tracking-tight truncate">
+                  System Overview & Health
+                </h1>
+                <p style={{ color: '#235347' }} className="text-xs font-medium truncate">
+                  SuperAdmin Root Authority
+                </p>
+              </div>
+            </div>
+
+            {/* Badges & Operations Pill */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h1 style={{ color: '#051F20' }} className="text-xs sm:text-sm font-black tracking-tight">
-                System Overview & Health
-              </h1>
               <span
                 style={{
-                  backgroundColor: activeBackend ? '#DAF1DE' : '#DAF1DE',
-                  borderColor: activeBackend ? '#DAF1DE' : '#DAF1DE',
-                  color: activeBackend ? '#163832' : '#051F20',
+                  backgroundColor: '#DAF1DE',
+                  borderColor: '#8EB69B',
+                  color: '#163832',
                 }}
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-extrabold border shrink-0"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-extrabold border shrink-0 shadow-2xs"
               >
                 <span
-                  style={{ backgroundColor: activeBackend ? '#163832' : '#051F20' }}
+                  style={{ backgroundColor: '#163832' }}
                   className={`w-1.5 h-1.5 rounded-full ${activeBackend ? 'animate-pulse' : ''}`}
                 />
-                {activeBackend ? 'Live Operations' : 'Maintenance Mode Active'}
+                <span>{activeBackend ? 'Live Operations' : 'Maintenance Mode Active'}</span>
+              </span>
+
+              <span
+                style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#163832' }}
+                className="hidden xs:inline-flex items-center px-1.5 py-0.5 rounded-md border text-xs font-mono font-bold"
+              >
+                SA01 ROOT
               </span>
             </div>
-            <p style={{ color: '#235347' }} className="text-xs font-medium truncate block mt-0.5">
-              SuperAdmin Root Authority
-            </p>
+
+            {/* Refresh Status Action Button */}
+            <div className="pt-0.5">
+              <button
+                type="button"
+                onClick={() => onPingDatabase()}
+                disabled={isPinging || !activeDb}
+                style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-[#DAF1DE] hover:border-[#163832]"
+              >
+                <RefreshCw size={12} className={isPinging ? 'animate-spin text-[#163832]' : 'text-[#163832]'} />
+                <span className="text-xs whitespace-nowrap">
+                  {isPinging ? 'Checking...' : activeDb ? 'Refresh Status' : 'Offline'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Animated Hacker with Laptop Illustration */}
+          <div className="shrink-0 flex items-center justify-center pl-1 sm:pl-2">
+            <AnimatedHackerIllustration isPinging={isPinging} />
           </div>
         </div>
 
-        {/* Single clean Refresh Status button (No duplicated text) */}
-        <button
-          type="button"
-          onClick={() => onPingDatabase()}
-          disabled={isPinging || !activeDb}
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-          className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-[#DAF1DE]"
-        >
-          <RefreshCw size={12} className={isPinging ? 'animate-spin text-[#163832]' : 'text-[#163832]'} />
-          <span className="text-xs whitespace-nowrap">
-            {isPinging ? 'Checking...' : activeDb ? 'Refresh Status' : 'Offline'}
-          </span>
-        </button>
+        {/* Live Cyber Telemetry Strip */}
+        <div className="relative z-10 mt-3 pt-2.5 border-t border-[#DAF1DE]/70 flex items-center justify-between text-xs font-mono text-[#235347] flex-wrap gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#163832] animate-pulse" />
+            <span className="font-bold text-[#051F20]">TELEMETRY:</span>
+            <span>{latencyMs > 0 ? `${latencyMs}ms latency` : 'Nominal (Online)'}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline-block">TLS 1.3 • AES-256</span>
+            <span className="hidden sm:inline-block">•</span>
+            <div className="flex items-center gap-1 text-[#163832] font-bold">
+              <span>LIVE FEED</span>
+              <Activity size={12} className="animate-pulse" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Top 3 Core Metrics (Clean Mint 3-Column Strip) */}
