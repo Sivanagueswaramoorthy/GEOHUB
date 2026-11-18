@@ -726,6 +726,84 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (liveModules && typeof liveModules === 'object' && !Array.isArray(liveModules)) {
         setPlatformModules((prev) => ({ ...prev, ...liveModules }));
       }
+
+      // 9. Sync Meetings & MoM
+      const liveMeetings = await apiClient.getMeetings().catch(() => null);
+      if (Array.isArray(liveMeetings)) {
+        setMeetings(liveMeetings.map((m: any): MeetingModel => ({
+          id: m.id,
+          title: m.title,
+          type: m.type || 'general',
+          eventId: m.event_id,
+          eventTitle: m.event_title,
+          dateTime: m.date_time || new Date().toISOString(),
+          venue: m.venue || 'Campus Auditorium',
+          organizerName: m.organizer_name || 'Coordinator',
+          attendeeIds: Array.isArray(m.attendee_ids) ? m.attendee_ids : [],
+          agenda: m.agenda || '',
+          momNotes: m.mom_notes,
+          actionItems: Array.isArray(m.action_items) ? m.action_items : [],
+          status: m.status || 'scheduled',
+          createdAt: m.created_at || new Date().toISOString(),
+        })));
+      }
+
+      // 10. Sync Campus Forum Messages
+      const liveForum = await apiClient.getForumMessages().catch(() => null);
+      if (Array.isArray(liveForum)) {
+        setForumMessages(liveForum.map((fm: any): ForumMessage => ({
+          id: fm.id,
+          channelId: fm.channel_id,
+          authorId: fm.author_id,
+          authorName: fm.author_name,
+          authorRole: fm.author_role,
+          authorAvatar: fm.author_avatar,
+          title: fm.title,
+          content: fm.content,
+          timestamp: fm.timestamp,
+          likes: Number(fm.likes || 0),
+          likedBy: Array.isArray(fm.liked_by) ? fm.liked_by : [],
+          pinned: Boolean(fm.pinned),
+          replies: Array.isArray(fm.replies) ? fm.replies : [],
+        })));
+      }
+
+      // 11. Sync Inventory & Stock
+      const liveStock = await apiClient.getStockItems().catch(() => null);
+      if (Array.isArray(liveStock)) {
+        setStockItems(liveStock.map((s: any): StockItem => ({
+          id: s.id,
+          name: s.name,
+          category: s.category || 'Logistics',
+          quantity: Number(s.quantity || 0),
+          unit: s.unit || 'pcs',
+          minThreshold: Number(s.min_threshold || 5),
+          unitCost: Number(s.unit_cost || 0),
+          lastRestocked: s.last_restocked || '',
+          location: s.location || 'Main Store',
+          status: s.status || 'in_stock',
+        })));
+      }
+
+      // 12. Sync Media & Gallery
+      const liveGallery = await apiClient.getGalleryItems().catch(() => null);
+      if (Array.isArray(liveGallery)) {
+        setGallery(liveGallery.map((g: any): GalleryItem => ({
+          id: g.id,
+          title: g.title,
+          eventId: g.event_id || '',
+          eventTitle: g.event_title || '',
+          academicYear: g.academic_year || '2025-26',
+          category: g.category || 'photos',
+          url: g.url,
+          thumbnailUrl: g.thumbnail_url,
+          uploadedByName: g.uploaded_by_name || 'Documentation Lead',
+          uploadedAt: g.uploaded_at || new Date().toISOString(),
+          fileSizeBytes: g.file_size_bytes,
+          caption: g.caption,
+        })));
+      }
+
         setSyncStatus('connected');
         setLastSyncedAt(new Date());
       } catch {
@@ -1020,6 +1098,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return { ...ev, registeredUserIds: updatedIds };
       })
     );
+    apiClient.registerForEvent(eventId).catch((err: any) => {
+      console.warn('[Event Register] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const registerStudentForEvent = (eventId: string, studentId: string) => {
@@ -1030,6 +1111,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return { ...ev, registeredUserIds: [...ev.registeredUserIds, studentId] };
       })
     );
+    apiClient.registerForEvent(eventId).catch((err: any) => {
+      console.warn('[Event Register] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const registerMultipleStudentsForEvent = (eventId: string, studentIds: string[]) => {
@@ -1515,8 +1599,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'Mandatory reason required' };
     }
     const norm = normalizeRole(currentUser.role);
-    if (norm !== 'faculty' && norm !== 'coordinator') {
-      showToast('Permission denied: Faculty or Coordinator role required to cancel events.', 'error');
+    if (norm !== 'faculty' && norm !== 'coordinator' && norm !== 'super_admin') {
+      showToast('Permission denied: Faculty, Coordinator, or SuperAdmin role required to cancel events.', 'error');
       return { success: false, message: 'Permission denied' };
     }
     const targetEvent = events.find((e) => e.id === eventId);
@@ -1546,14 +1630,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       details: `Event cancelled. Reason: ${cleanReason}`,
     });
 
+    apiClient.cancelEvent(eventId, cleanReason).catch((err: any) => {
+      console.warn('[Event Cancel] Cloud server unreachable, updated locally:', err?.message);
+    });
+
     showToast('Event has been cancelled.', 'info');
     return { success: true, message: 'Event cancelled' };
   };
 
   const assignEventScanners = (eventId: string, scannerUserIds: string[]) => {
     const norm = normalizeRole(currentUser.role);
-    if (norm !== 'faculty' && norm !== 'coordinator' && norm !== 'management') {
-      showToast('Permission denied: Management, Coordinator, or Faculty role required.', 'error');
+    if (norm !== 'faculty' && norm !== 'coordinator' && norm !== 'management' && norm !== 'super_admin') {
+      showToast('Permission denied: Management, Coordinator, Faculty, or SuperAdmin role required.', 'error');
       return { success: false, message: 'Permission denied' };
     }
     const targetEvent = events.find((e) => e.id === eventId);
@@ -1572,6 +1660,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       targetId: eventId,
       targetName: targetEvent.title,
       details: `Assigned ${scannerUserIds.length} scanners for event attendance`,
+    });
+
+    apiClient.assignEventScanners(eventId, scannerUserIds).catch((err: any) => {
+      console.warn('[Scanner Assign] Cloud server unreachable, saved locally:', err?.message);
     });
 
     showToast('Event scanners updated successfully.', 'success');
@@ -1801,12 +1893,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const createMeeting = (meetingData: Omit<MeetingModel, 'id' | 'createdAt'>) => {
+    const tempId = `meet_${Date.now()}`;
     const newMeeting: MeetingModel = {
       ...meetingData,
-      id: `meet_${Date.now()}`,
+      id: tempId,
       createdAt: new Date().toISOString(),
     };
     setMeetings((prev) => [newMeeting, ...prev]);
+
+    apiClient.createMeeting({
+      title: meetingData.title,
+      type: meetingData.type,
+      event_id: meetingData.eventId,
+      event_title: meetingData.eventTitle,
+      date_time: meetingData.dateTime,
+      venue: meetingData.venue,
+      organizer_name: meetingData.organizerName,
+      attendee_ids: meetingData.attendeeIds || [],
+      agenda: meetingData.agenda || '',
+    }).then((created) => {
+      if (created && created.id) {
+        setMeetings((prev) => prev.map((m) => (m.id === tempId ? { ...m, id: created.id } : m)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Meeting Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const updateMeetingMoM = (
@@ -1825,6 +1936,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       })
     );
+
+    apiClient.updateMeetingMoM(meetingId, momNotes, actionItems).catch((err: any) => {
+      console.warn('[Meeting MoM Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const addForumMessage = (msgData: {
@@ -1832,8 +1947,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     title?: string;
     content: string;
   }) => {
+    const tempId = `forum_${Date.now()}`;
     const newMsg: ForumMessage = {
-      id: `forum_${Date.now()}`,
+      id: tempId,
       channelId: msgData.channelId,
       authorId: currentUser.uid,
       authorName: currentUser.name,
@@ -1846,6 +1962,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       replies: [],
     };
     setForumMessages((prev) => [newMsg, ...prev]);
+
+    apiClient.createForumMessage(msgData.channelId, msgData.content, msgData.title).then((created) => {
+      if (created && created.id) {
+        setForumMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, id: created.id } : m)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Forum Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const addForumReply = (messageId: string, content: string) => {
@@ -1884,12 +2008,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         };
       })
     );
+    apiClient.toggleLikeForumMessage(messageId).catch((err: any) => {
+      console.warn('[Forum Like Sync] Cloud server unreachable:', err?.message);
+    });
   };
 
   const togglePinForumMessage = (messageId: string) => {
     setForumMessages((prev) =>
       prev.map((m) => (m.id === messageId ? { ...m, pinned: !m.pinned } : m))
     );
+    apiClient.togglePinForumMessage(messageId).catch((err: any) => {
+      console.warn('[Forum Pin Sync] Cloud server unreachable:', err?.message);
+    });
   };
 
   const updateBudgetAllocations = (teamName: string, newAllocation: number) => {
@@ -1941,28 +2071,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setExpenses((prev) =>
       prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
     );
+    apiClient.updateExpense(id, updates).catch((err: any) => {
+      console.warn('[Expense Update Sync] Cloud server unreachable:', err?.message);
+    });
   };
 
   const deleteExpenseItem = (id: string) => {
     setExpenses((prev) => prev.filter((e) => e.id !== id));
+    apiClient.deleteExpense(id).catch((err: any) => {
+      console.warn('[Expense Delete Sync] Cloud server unreachable:', err?.message);
+    });
   };
 
   const addStockItem = (itemData: Omit<StockItem, 'id'>) => {
+    const tempId = `stock_${Date.now()}`;
     const newItem: StockItem = {
       ...itemData,
-      id: `stock_${Date.now()}`,
+      id: tempId,
     };
     setStockItems((prev) => [newItem, ...prev]);
+
+    apiClient.createStockItem({
+      name: itemData.name,
+      category: itemData.category,
+      quantity: itemData.quantity,
+      unit: itemData.unit,
+      min_threshold: itemData.minThreshold,
+      unit_cost: itemData.unitCost,
+      last_restocked: itemData.lastRestocked,
+      location: itemData.location,
+      status: itemData.status,
+    }).then((created) => {
+      if (created && created.id) {
+        setStockItems((prev) => prev.map((s) => (s.id === tempId ? { ...s, id: created.id } : s)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Stock Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const updateStockItem = (id: string, updates: Partial<StockItem>) => {
     setStockItems((prev) =>
       prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
     );
+
+    apiClient.updateStockItem(id, {
+      name: updates.name,
+      category: updates.category,
+      quantity: updates.quantity,
+      unit: updates.unit,
+      min_threshold: updates.minThreshold,
+      unit_cost: updates.unitCost,
+      last_restocked: updates.lastRestocked,
+      location: updates.location,
+      status: updates.status,
+    }).catch((err: any) => {
+      console.warn('[Stock Update Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const deleteStockItem = (id: string) => {
     setStockItems((prev) => prev.filter((s) => s.id !== id));
+    apiClient.deleteStockItem(id).catch((err: any) => {
+      console.warn('[Stock Delete Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const requestBudgetChange = (teamName: string, requestedAmount: number, reason: string) => {
@@ -2017,12 +2189,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const uploadGalleryItem = (itemData: Omit<GalleryItem, 'id' | 'uploadedAt'>) => {
+    const tempId = `gal_${Date.now()}`;
     const newItem: GalleryItem = {
       ...itemData,
-      id: `gal_${Date.now()}`,
+      id: tempId,
       uploadedAt: new Date().toISOString(),
     };
     setGallery((prev) => [newItem, ...prev]);
+
+    apiClient.createGalleryItem({
+      title: itemData.title,
+      event_id: itemData.eventId,
+      event_title: itemData.eventTitle,
+      academic_year: itemData.academicYear,
+      category: itemData.category,
+      url: itemData.url,
+      thumbnail_url: itemData.thumbnailUrl,
+      caption: itemData.caption,
+    }).then((created) => {
+      if (created && created.id) {
+        setGallery((prev) => prev.map((g) => (g.id === tempId ? { ...g, id: created.id } : g)));
+      }
+    }).catch((err: any) => {
+      console.warn('[Gallery Sync] Cloud server unreachable, saved locally:', err?.message);
+    });
   };
 
   const updateGalleryItem = (id: string, updates: Partial<GalleryItem>) => {
@@ -2033,6 +2223,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const deleteGalleryItem = (id: string) => {
     setGallery((prev) => prev.filter((item) => item.id !== id));
+    apiClient.deleteGalleryItem(id).catch((err: any) => {
+      console.warn('[Gallery Delete Sync] Cloud server unreachable:', err?.message);
+    });
   };
 
   const markNotificationAsRead = (id: string) => {

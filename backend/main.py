@@ -24,6 +24,8 @@ from routers import (
     app_router,
     admin_router,
     sync_router,
+    meetings_router,
+    forum_router,
 )
 
 # Create database tables
@@ -79,6 +81,8 @@ app.include_router(events_router.router, prefix=settings.API_V1_STR)
 app.include_router(qr_router.router, prefix=settings.API_V1_STR)
 app.include_router(tasks_router.router, prefix=settings.API_V1_STR)
 app.include_router(gallery_router.router, prefix=settings.API_V1_STR)
+app.include_router(meetings_router.router, prefix=settings.API_V1_STR)
+app.include_router(forum_router.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard_router.router, prefix=settings.API_V1_STR)
 app.include_router(audit_router.router, prefix=settings.API_V1_STR)
 app.include_router(finance_router.router, prefix=settings.API_V1_STR)

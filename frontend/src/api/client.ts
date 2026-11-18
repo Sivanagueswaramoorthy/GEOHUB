@@ -486,6 +486,131 @@ class ApiClient {
   }
 
   // ==========================================
+  // Meetings & Minutes of Meeting (MoM)
+  // ==========================================
+  public async getMeetings(eventId?: string, status?: string) {
+    const params = new URLSearchParams();
+    if (eventId) params.append('event_id', eventId);
+    if (status) params.append('status', status);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return await this.request<any[]>(`/meetings${qs}`);
+  }
+
+  public async createMeeting(meetingData: any) {
+    return await this.request<any>('/meetings', {
+      method: 'POST',
+      body: JSON.stringify(meetingData),
+    });
+  }
+
+  public async updateMeetingMoM(meetingId: string, momNotes: string, actionItems?: any[]) {
+    return await this.request<any>(`/meetings/${encodeURIComponent(meetingId)}/mom`, {
+      method: 'PATCH',
+      body: JSON.stringify({ mom_notes: momNotes, action_items: actionItems || [] }),
+    });
+  }
+
+  public async deleteMeeting(meetingId: string) {
+    return await this.request<{ success: boolean; message: string }>(`/meetings/${encodeURIComponent(meetingId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // Campus Forum & Discussions
+  // ==========================================
+  public async getForumMessages(channelId?: string) {
+    const qs = channelId ? `?channel_id=${encodeURIComponent(channelId)}` : '';
+    return await this.request<any[]>(`/forum/messages${qs}`);
+  }
+
+  public async createForumMessage(channelId: string, content: string, title?: string) {
+    return await this.request<any>('/forum/messages', {
+      method: 'POST',
+      body: JSON.stringify({ channel_id: channelId, content, title }),
+    });
+  }
+
+  public async togglePinForumMessage(messageId: string) {
+    return await this.request<any>(`/forum/messages/${encodeURIComponent(messageId)}/pin`, {
+      method: 'POST',
+    });
+  }
+
+  public async toggleLikeForumMessage(messageId: string) {
+    return await this.request<any>(`/forum/messages/${encodeURIComponent(messageId)}/like`, {
+      method: 'POST',
+    });
+  }
+
+  public async deleteForumMessage(messageId: string) {
+    return await this.request<{ success: boolean; message: string }>(`/forum/messages/${encodeURIComponent(messageId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // Stock & Inventory
+  // ==========================================
+  public async getStockItems() {
+    return await this.request<any[]>('/finance/stock');
+  }
+
+  public async createStockItem(itemData: any) {
+    return await this.request<any>('/finance/stock', {
+      method: 'POST',
+      body: JSON.stringify(itemData),
+    });
+  }
+
+  public async updateStockItem(itemId: string, itemData: any) {
+    return await this.request<any>(`/finance/stock/${encodeURIComponent(itemId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(itemData),
+    });
+  }
+
+  public async deleteStockItem(itemId: string) {
+    return await this.request<{ status: string; message: string }>(`/finance/stock/${encodeURIComponent(itemId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // Gallery & Media
+  // ==========================================
+  public async getGalleryItems(eventId?: string, category?: string) {
+    const params = new URLSearchParams();
+    if (eventId) params.append('event_id', eventId);
+    if (category) params.append('category', category);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    return await this.request<any[]>(`/gallery/items${qs}`);
+  }
+
+  public async createGalleryItem(itemData: any) {
+    return await this.request<any>('/gallery/items', {
+      method: 'POST',
+      body: JSON.stringify(itemData),
+    });
+  }
+
+  public async deleteGalleryItem(itemId: string) {
+    return await this.request<{ status: string; message: string }>(`/gallery/items/${encodeURIComponent(itemId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ==========================================
+  // Team Membership
+  // ==========================================
+  public async addTeamMember(teamId: string, userId: string, teamRole: string = 'Member') {
+    return await this.request<{ success: boolean; message: string }>(`/teams/${encodeURIComponent(teamId)}/members`, {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId, team_role: teamRole }),
+    });
+  }
+
+  // ==========================================
   // Audit Logs & Analytics
   // ==========================================
   public async getAuditLogs() {

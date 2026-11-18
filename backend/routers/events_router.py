@@ -273,6 +273,7 @@ def update_event_status(
     return {"success": True, "event_id": event.id, "status": target_status}
 
 @router.patch("/{event_id}/cancel")
+@router.post("/{event_id}/cancel")
 def cancel_event(
     event_id: str,
     req: schemas.EventCancelRequest,
@@ -329,8 +330,8 @@ def assign_event_scanners(
 ):
     """Organizers (coordinator or faculty) assign users authorized to scan for this event."""
     norm_role = auth.normalize_role(organizer.role)
-    if norm_role not in ["faculty", "coordinator"]:
-        raise HTTPException(status_code=403, detail="Only Coordinators or Faculty organizers can assign scanners.")
+    if norm_role not in ["faculty", "coordinator", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Only Coordinators, Faculty, or SuperAdmin organizers can assign scanners.")
 
     event = db.query(models.Event).filter(models.Event.id == event_id).first()
     if not event:

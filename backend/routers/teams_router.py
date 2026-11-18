@@ -128,3 +128,42 @@ def approve_join_request(
     )
 
     return {"success": True, "message": f"Approved {req.user_name} for {req.team_id}."}
+
+@router.post("/{team_id}/members")
+def add_team_member(
+    team_id: str,
+    body: schemas.TeamMemberAddRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    team = db.query(models.Team).filter((models.Team.id == team_id) | (models.Team.name == team_id)).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found.")
+
+    target_user = db.query(models.User).filter(models.User.id == body.user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    target_user.team = team.name
+    target_user.team_role = body.team_role
+    target_user.status = "active"
+
+    member_ids = json.loads(team.member_user_ids or "[]")
+    if target_user.id not in member_ids:
+        member_ids.append(target_user.id)
+        team.member_user_ids = json.dumps(member_ids)
+
+    db.commit()
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="team_member_added",
+        target_type="team",
+        target_id=team.id,
+        target_name=team.name,
+        details=f"Added {target_user.name} ({target_user.roll_no}) to team {team.name} as {body.team_role}"
+    )
+
+    return {"success": True, "message": f"Added {target_user.name} to {team.name}."}
+

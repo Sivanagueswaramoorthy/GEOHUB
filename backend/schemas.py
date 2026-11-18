@@ -96,6 +96,10 @@ class JoinRequestResponse(BaseModel):
 class ApproveJoinRequest(BaseModel):
     team_role: str
 
+class TeamMemberAddRequest(BaseModel):
+    user_id: str
+    team_role: Optional[str] = "Member"
+
 # Event Schemas
 class EventCreate(BaseModel):
     title: str
@@ -386,4 +390,132 @@ class UserAdminUpdateRequest(BaseModel):
     is_volunteer: Optional[bool] = None
     status: Optional[str] = None
     password: Optional[str] = None
+
+# Meeting Schemas
+class MeetingCreate(BaseModel):
+    title: str
+    type: Optional[str] = "general"
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    date_time: str
+    venue: str
+    organizer_name: Optional[str] = None
+    attendee_ids: Optional[List[str]] = []
+    agenda: Optional[str] = ""
+
+class MeetingMoMUpdate(BaseModel):
+    mom_notes: str
+    action_items: Optional[List[dict]] = []
+
+class MeetingResponse(BaseModel):
+    id: str
+    title: str
+    type: str
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    date_time: str
+    venue: str
+    organizer_name: str
+    attendee_ids: List[str]
+    agenda: str
+    mom_notes: Optional[str] = None
+    action_items: List[dict] = []
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Forum Message Schemas
+class ForumMessageCreate(BaseModel):
+    channel_id: str = "general"
+    title: Optional[str] = None
+    content: str
+
+class ForumMessageResponse(BaseModel):
+    id: str
+    channel_id: str
+    author_id: str
+    author_name: str
+    author_role: str
+    author_avatar: Optional[str] = None
+    title: Optional[str] = None
+    content: str
+    timestamp: str
+    likes: int = 0
+    liked_by: List[str] = []
+    pinned: bool = False
+    replies: List[dict] = []
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Stock Item Schemas
+class StockItemCreate(BaseModel):
+    name: str
+    category: Optional[str] = "Logistics"
+    quantity: int = 0
+    unit: Optional[str] = "pcs"
+    min_threshold: Optional[int] = 5
+    unit_cost: Optional[float] = 0.0
+    last_restocked: Optional[str] = None
+    location: Optional[str] = "Main Store"
+    status: Optional[str] = "in_stock"
+
+class StockItemUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    quantity: Optional[int] = None
+    unit: Optional[str] = None
+    min_threshold: Optional[int] = None
+    unit_cost: Optional[float] = None
+    last_restocked: Optional[str] = None
+    location: Optional[str] = None
+    status: Optional[str] = None
+
+class StockItemResponse(BaseModel):
+    id: str
+    name: str
+    category: str
+    quantity: int
+    unit: str
+    min_threshold: int
+    unit_cost: float
+    last_restocked: Optional[str] = None
+    location: str
+    status: str
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Gallery Item Schemas
+class GalleryItemCreate(BaseModel):
+    title: str
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    academic_year: Optional[str] = "2025-26"
+    category: Optional[str] = "photos"
+    url: str
+    thumbnail_url: Optional[str] = None
+    caption: Optional[str] = None
+
+class GalleryItemResponse(BaseModel):
+    id: str
+    title: str
+    event_id: Optional[str] = None
+    event_title: Optional[str] = None
+    academic_year: str
+    category: str
+    url: str
+    thumbnail_url: Optional[str] = None
+    uploaded_by_name: str
+    uploaded_at: datetime
+    file_size_bytes: Optional[str] = None
+    caption: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
 

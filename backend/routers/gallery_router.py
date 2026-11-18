@@ -63,3 +63,77 @@ async def upload_gallery_file(
     db.refresh(doc)
 
     return schemas.DocumentResponse.from_orm(doc)
+
+@router.get("/items", response_model=List[schemas.GalleryItemResponse])
+def get_gallery_item_records(
+    event_id: Optional[str] = None,
+    category: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    query = db.query(models.GalleryItem)
+    if event_id:
+        query = query.filter(models.GalleryItem.event_id == event_id)
+    if category:
+        query = query.filter(models.GalleryItem.category == category)
+    return query.order_by(models.GalleryItem.uploaded_at.desc()).all()
+
+@router.post("/items", response_model=schemas.GalleryItemResponse)
+def create_gallery_item_record(
+    item_in: schemas.GalleryItemCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    item = models.GalleryItem(
+        title=item_in.title,
+        event_id=item_in.event_id,
+        event_title=item_in.event_title,
+        academic_year=item_in.academic_year or "2025-26",
+        category=item_in.category or "photos",
+        url=item_in.url,
+        thumbnail_url=item_in.thumbnail_url,
+        uploaded_by_name=current_user.name,
+        caption=item_in.caption
+    )
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="gallery_item_created",
+        target_type="gallery",
+        target_id=item.id,
+        target_name=item.title,
+        details=f"Added gallery item '{item.title}'"
+    )
+
+    return item
+
+@router.delete("/items/{item_id}")
+def delete_gallery_item_record(
+    item_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    item = db.query(models.GalleryItem).filter(models.GalleryItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Gallery item not found.")
+
+    title = item.title
+    db.delete(item)
+    db.commit()
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="gallery_item_deleted",
+        target_type="gallery",
+        target_id=item_id,
+        target_name=title,
+        details=f"Deleted gallery item '{title}'"
+    )
+
+    return {"status": "success", "message": f"Gallery item '{title}' deleted."}
+

@@ -285,3 +285,116 @@ def delete_budget_request(
         pass
 
     return {"status": "success", "message": f"Budget request '{request_id}' successfully deleted."}
+
+# Stock & Inventory Management Endpoints
+@router.get("/stock", response_model=List[schemas.StockItemResponse])
+def get_stock_items(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    return db.query(models.StockItem).order_by(models.StockItem.name.asc()).all()
+
+@router.post("/stock", response_model=schemas.StockItemResponse)
+def create_stock_item(
+    item_in: schemas.StockItemCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    stock_item = models.StockItem(
+        name=item_in.name,
+        category=item_in.category or "Logistics",
+        quantity=item_in.quantity,
+        unit=item_in.unit or "pcs",
+        min_threshold=item_in.min_threshold if item_in.min_threshold is not None else 5,
+        unit_cost=item_in.unit_cost or 0.0,
+        last_restocked=item_in.last_restocked,
+        location=item_in.location or "Main Store",
+        status=item_in.status or "in_stock"
+    )
+    db.add(stock_item)
+    db.commit()
+    db.refresh(stock_item)
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="stock_item_created",
+        target_type="stock",
+        target_id=stock_item.id,
+        target_name=stock_item.name,
+        details=f"Created stock item '{stock_item.name}' with quantity {stock_item.quantity}"
+    )
+
+    return stock_item
+
+@router.put("/stock/{item_id}", response_model=schemas.StockItemResponse)
+def update_stock_item(
+    item_id: str,
+    item_in: schemas.StockItemUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    stock_item = db.query(models.StockItem).filter(models.StockItem.id == item_id).first()
+    if not stock_item:
+        raise HTTPException(status_code=404, detail="Stock item not found.")
+
+    if item_in.name is not None:
+        stock_item.name = item_in.name
+    if item_in.category is not None:
+        stock_item.category = item_in.category
+    if item_in.quantity is not None:
+        stock_item.quantity = item_in.quantity
+    if item_in.unit is not None:
+        stock_item.unit = item_in.unit
+    if item_in.min_threshold is not None:
+        stock_item.min_threshold = item_in.min_threshold
+    if item_in.unit_cost is not None:
+        stock_item.unit_cost = item_in.unit_cost
+    if item_in.last_restocked is not None:
+        stock_item.last_restocked = item_in.last_restocked
+    if item_in.location is not None:
+        stock_item.location = item_in.location
+    if item_in.status is not None:
+        stock_item.status = item_in.status
+
+    db.commit()
+    db.refresh(stock_item)
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="stock_item_updated",
+        target_type="stock",
+        target_id=stock_item.id,
+        target_name=stock_item.name,
+        details=f"Updated stock item '{stock_item.name}'"
+    )
+
+    return stock_item
+
+@router.delete("/stock/{item_id}")
+def delete_stock_item(
+    item_id: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    stock_item = db.query(models.StockItem).filter(models.StockItem.id == item_id).first()
+    if not stock_item:
+        raise HTTPException(status_code=404, detail="Stock item not found.")
+
+    name = stock_item.name
+    db.delete(stock_item)
+    db.commit()
+
+    auth.log_audit(
+        db=db,
+        actor=current_user,
+        action="stock_item_deleted",
+        target_type="stock",
+        target_id=item_id,
+        target_name=name,
+        details=f"Deleted stock item '{name}'"
+    )
+
+    return {"status": "success", "message": f"Stock item '{name}' deleted."}
+

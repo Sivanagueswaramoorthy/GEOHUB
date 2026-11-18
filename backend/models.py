@@ -223,4 +223,72 @@ class RoleModuleAccess(Base):
     updated_by = Column(String(64), nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class Meeting(Base):
+    __tablename__ = "meetings"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(255), nullable=False)
+    type = Column(String(50), default="general")  # pre_event, post_event, general, core, faculty
+    event_id = Column(String(64), nullable=True)
+    event_title = Column(String(255), nullable=True)
+    date_time = Column(String(100), nullable=False)
+    venue = Column(String(255), nullable=False)
+    organizer_name = Column(String(255), nullable=False)
+    attendee_ids = Column(Text, default="[]")  # JSON string of attendee user IDs
+    agenda = Column(Text, default="")
+    mom_notes = Column(Text, nullable=True)
+    action_items = Column(Text, default="[]")  # JSON string of [{task, assignedTo, isDone}]
+    status = Column(String(50), default="scheduled")  # scheduled, completed, cancelled
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class ForumMessage(Base):
+    __tablename__ = "forum_messages"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    channel_id = Column(String(64), nullable=False, index=True)  # announcements, coordination, tech_geo, general
+    author_id = Column(String(64), nullable=False)
+    author_name = Column(String(255), nullable=False)
+    author_role = Column(String(100), default="student")
+    author_avatar = Column(String(500), nullable=True)
+    title = Column(String(255), nullable=True)
+    content = Column(Text, nullable=False)
+    timestamp = Column(String(100), nullable=False)
+    likes = Column(Integer, default=0)
+    liked_by = Column(Text, default="[]")  # JSON list of user IDs
+    pinned = Column(Boolean, default=False)
+    replies = Column(Text, default="[]")   # JSON list of replies/comments
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class StockItem(Base):
+    __tablename__ = "stock_items"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    name = Column(String(255), nullable=False)
+    category = Column(String(100), default="Logistics")  # Logistics, Stage, Printing, Refreshments, Field Equipment, Stationery
+    quantity = Column(Integer, default=0)
+    unit = Column(String(50), default="pcs")
+    min_threshold = Column(Integer, default=5)
+    unit_cost = Column(Float, default=0.0)
+    last_restocked = Column(String(100), nullable=True)
+    location = Column(String(255), default="Main Store")
+    status = Column(String(50), default="in_stock")  # in_stock, low_stock, out_of_stock
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class GalleryItem(Base):
+    __tablename__ = "gallery_items"
+
+    id = Column(String(64), primary_key=True, default=generate_uuid)
+    title = Column(String(255), nullable=False)
+    event_id = Column(String(64), nullable=True)
+    event_title = Column(String(255), nullable=True)
+    academic_year = Column(String(32), default="2025-26")
+    category = Column(String(50), default="photos")  # photos, videos, bills, reports
+    url = Column(Text, nullable=False)
+    thumbnail_url = Column(Text, nullable=True)
+    uploaded_by_name = Column(String(255), nullable=False)
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
+    file_size_bytes = Column(String(64), nullable=True)
+    caption = Column(Text, nullable=True)
+
+
 
