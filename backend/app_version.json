@@ -1,12 +1,12 @@
 {
-  "version": "1.6.44",
-  "version_code": 63,
+  "version": "1.6.45",
+  "version_code": 64,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Rebuilt SuperAdmin Cockpit Home UI with clean high-contrast colorful aesthetic, vibrant 3-column KPI tiles, and perfectly aligned tactile 3D control toggles.",
+  "release_notes": "Implemented exact prototype toggle switch behavior and dark obsidian cockpit UI matching design specs.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-18",
-  "file_size_bytes": 6892884,
+  "file_size_bytes": 6892780,
   "file_size_mb": "6.57 MB",
-  "sha256": "535A18BC323C2714D8814AFCCB68803584D1721EE4EF3C1DBE980EA1DC96C370"
+  "sha256": "DD60B885360CE76413FC775DF1C15191308F6CAB7960194C2E0069813658FBC7"
 }
