@@ -1980,11 +1980,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'No self-escalation permitted' };
     }
 
-    // Protection Rule 2: Only faculty can change roles and assign posts
+    // Protection Rule 2: Faculty and SuperAdmin can change roles and assign posts
     const normCurrentRole = normalizeRole(currentUser.role);
-    if (normCurrentRole !== 'faculty') {
-      showToast('Protection Rule: Only Faculty can assign posts or change user roles.', 'error');
-      return { success: false, message: 'Only Faculty can assign posts or change user roles' };
+    if (normCurrentRole !== 'faculty' && normCurrentRole !== 'super_admin') {
+      showToast('Protection Rule: Only Faculty and SuperAdmin can assign posts or change user roles.', 'error');
+      return { success: false, message: 'Only Faculty and SuperAdmin can assign posts or change user roles' };
     }
 
     const targetUser = users.find((u) => u.uid === userId);

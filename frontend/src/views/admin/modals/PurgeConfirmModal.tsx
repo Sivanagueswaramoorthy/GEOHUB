@@ -43,7 +43,7 @@ export const PurgeConfirmModal: React.FC<PurgeConfirmModalProps> = ({
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder="Type PURGE"
-            className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-sm font-mono font-bold focus:outline-none focus:border-rose-500 uppercase"
+            className="w-full h-11 px-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-sm font-mono font-bold focus:outline-none focus:border-rose-500 uppercase"
           />
         </div>
 
@@ -52,7 +52,7 @@ export const PurgeConfirmModal: React.FC<PurgeConfirmModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="min-h-[44px] h-11 px-4 rounded-xl border border-[#E3EEE6] bg-white text-xs font-bold text-[#051F20] hover:bg-[#F7FAF8] transition cursor-pointer"
+            className="min-h-[44px] h-11 px-4 rounded-xl border border-[#DAF1DE] bg-white text-xs font-bold text-[#051F20] hover:bg-[#DAF1DE] transition cursor-pointer"
           >
             Cancel
           </button>

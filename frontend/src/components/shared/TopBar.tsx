@@ -208,13 +208,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="flex items-baseline min-w-0" style={{ gap: '6px' }}>
                     {/* Line 1: Custom Org Name in Astafine Luxury Serif */}
                     <span
-                      className="geohub-bar-title font-extrabold text-[#11241B] truncate"
+                      className="geohub-bar-title font-extrabold text-[#051F20] truncate"
                       style={{
                         fontFamily: astafineSerifFamily,
                         fontSize: '20px',
                         lineHeight: '24px',
                         fontWeight: 900,
-                        color: '#11241B',
+                        color: '#051F20',
                         letterSpacing: '-0.025em',
                         fontOpticalSizing: 'auto',
                         fontFeatureSettings: "'dlig' 1, 'liga' 1, 'swsh' 1, 'calt' 1",
@@ -227,13 +227,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                     {/* Line 2: Custom Org Subtitle in Astafine Luxury Serif */}
                     {displayOrgSubtitle && (
                       <span
-                        className="geohub-bar-subtitle font-bold text-[#52665C] truncate"
+                        className="geohub-bar-subtitle font-bold text-[#235347] truncate"
                         style={{
                           fontFamily: astafineSerifFamily,
                           fontSize: '12px',
                           lineHeight: '14px',
                           fontWeight: 700,
-                          color: '#52665C',
+                          color: '#235347',
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
                           fontOpticalSizing: 'auto',
@@ -267,7 +267,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <Bell
                   size={18}
                   strokeWidth={2}
-                  className="lucide text-[#11241B]"
+                  className="lucide text-[#051F20]"
                 />
               </IconCircleButton>
             )}
@@ -278,17 +278,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                 type="button"
                 onClick={handleProfileClick}
                 aria-label="Open profile menu"
-                className="group flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183A2B] focus-visible:ring-offset-2"
+                className="group flex items-center gap-1.5 p-0 m-0 bg-transparent border-0 cursor-pointer select-none rounded-full transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#163832] focus-visible:ring-offset-2"
                 style={{ minHeight: '44px', minWidth: '44px' }}
               >
-                {/* 38px Avatar Circle in Deep Forest Green #183A2B with Sage Ring and Moss Hover #23523D */}
+                {/* 38px Avatar Circle in Deep Forest Green #163832 with Mint Ring and Deep Emerald Hover #0B2B26 */}
                 <div
-                  className="flex items-center justify-center rounded-full shrink-0 transition-colors duration-150 group-hover:bg-[#23523D] group-active:bg-[#23523D]"
+                  className="flex items-center justify-center rounded-full shrink-0 transition-colors duration-150 group-hover:bg-[#0B2B26] group-active:bg-[#0B2B26]"
                   style={{
                     width: '38px',
                     height: '38px',
-                    backgroundColor: '#183A2B',
-                    border: '2px solid #DCE6E0',
+                    backgroundColor: '#163832',
+                    border: '2px solid #DAF1DE',
                     boxShadow: '0 2px 8px rgba(5, 31, 32, 0.12)',
                   }}
                 >
@@ -305,11 +305,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </span>
                 </div>
 
-                {/* Dropdown Chevron in Slate Neutral */}
+                {/* Dropdown Chevron in Muted Moss */}
                 <ChevronDown
                   size={14}
                   strokeWidth={2.5}
-                  className="lucide text-[#7D8F86] shrink-0"
+                  className="lucide text-[#235347] shrink-0"
                 />
               </button>
             )}

@@ -11,7 +11,7 @@ export const SkeletonList: React.FC<SkeletonListProps> = ({ count = 4, className
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="min-h-[64px] p-3.5 bg-white border border-[#E3EEE6] rounded-2xl flex items-center justify-between gap-3 animate-pulse"
+          className="min-h-[64px] p-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl flex items-center justify-between gap-3 animate-pulse"
         >
           <div className="flex items-center gap-3 flex-1">
             <div className="w-8 h-8 rounded-full bg-slate-200 shrink-0" />

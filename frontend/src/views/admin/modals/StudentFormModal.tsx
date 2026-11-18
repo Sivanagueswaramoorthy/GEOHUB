@@ -82,7 +82,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Priya Sharma"
-            className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#8EB69B]"
+            className="w-full h-11 px-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-sm font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
           />
         </div>
 
@@ -96,7 +96,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               value={rollNo}
               onChange={(e) => setRollNo(e.target.value)}
               placeholder="e.g. 23GEO042"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-mono font-bold uppercase focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-mono font-bold uppercase text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
           <div>
@@ -108,7 +108,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="priya@college.edu"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
         </div>
@@ -121,7 +121,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
             <select
               value={team}
               onChange={(e) => setTeam(e.target.value)}
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             >
               {SQUADS.map((sq) => (
                 <option key={sq} value={sq}>
@@ -138,7 +138,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             >
               {ROLES.map((r) => (
                 <option key={r.key} value={r.key}>
@@ -153,7 +153,7 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
         <div className="pt-3 sticky bottom-0 bg-white">
           <button
             type="submit"
-            className="w-full min-h-[44px] h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/20 cursor-pointer"
+            className="w-full min-h-[44px] h-11 rounded-xl bg-[#163832] hover:bg-[#163832] text-white text-xs font-bold transition shadow-sm cursor-pointer"
           >
             {studentToEdit ? 'Save Changes' : 'Onboard Scholar'}
           </button>

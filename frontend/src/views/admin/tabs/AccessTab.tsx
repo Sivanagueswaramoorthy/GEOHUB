@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { ModuleConfig, RoleMeta } from '../types';
+import { Toggle } from '../ui/Toggle';
 
 export interface AccessTabProps {
   modules: ModuleConfig[];
@@ -58,22 +59,30 @@ export const AccessTab: React.FC<AccessTabProps> = ({
   const enabledCount = modules.filter((m) => permissions[m.key] ?? true).length;
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
-      {/* Page Header */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 sm:space-y-5 animate-fadeIn pb-16 font-sans">
+      {/* Page Header (Clean Mint Design System) */}
+      <div
+        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-              <ShieldCheck size={13} className="text-indigo-600" />
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span
+              style={{ backgroundColor: '#DAF1DE', borderColor: '#DAF1DE', color: '#163832' }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border"
+            >
+              <ShieldCheck size={13} className="text-emerald-700" />
               Role Access Control
             </span>
-            <span className="text-xs font-semibold text-slate-500">Module Permissions</span>
+            <span style={{ color: '#235347' }} className="text-xs font-semibold">
+              Module Permissions Matrix
+            </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          <h1 style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight">
             Role Access & Permissions
           </h1>
-          <p className="text-sm font-medium text-slate-600 mt-1">
-            Click any role to toggle access on or off for respective module hubs.
+          <p style={{ color: '#235347' }} className="text-xs sm:text-sm font-medium mt-1">
+            Configure permission clearances across all academic hubs for verified roles.
           </p>
         </div>
 
@@ -82,7 +91,8 @@ export const AccessTab: React.FC<AccessTabProps> = ({
           <button
             type="button"
             onClick={() => onSetAllRoleModules(selectedRoleKey, true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer"
+            style={{ backgroundColor: '#DAF1DE', borderColor: '#DAF1DE', color: '#163832' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-xs hover:brightness-95 transition-all cursor-pointer active:scale-95"
           >
             <Check size={14} strokeWidth={2.4} />
             Grant All
@@ -90,7 +100,8 @@ export const AccessTab: React.FC<AccessTabProps> = ({
           <button
             type="button"
             onClick={() => onSetAllRoleModules(selectedRoleKey, false)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-bold transition-colors cursor-pointer"
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#D9534F', color: '#D9534F' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold shadow-xs hover:brightness-95 transition-all cursor-pointer active:scale-95"
           >
             <X size={14} strokeWidth={2.4} />
             Decline All
@@ -99,12 +110,15 @@ export const AccessTab: React.FC<AccessTabProps> = ({
       </div>
 
       {/* Role Selector Carousel / Pill Grid */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+      <div
+        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm space-y-3"
+      >
+        <div className="flex items-center justify-between px-1">
+          <span style={{ color: '#235347' }} className="text-xs font-bold uppercase tracking-wider">
             Select Role to Configure
           </span>
-          <span className="text-xs font-semibold text-indigo-600">
+          <span style={{ color: '#163832' }} className="text-xs font-bold">
             {selectableRoles.length} Roles Registered
           </span>
         </div>
@@ -120,41 +134,44 @@ export const AccessTab: React.FC<AccessTabProps> = ({
                 key={role.role}
                 type="button"
                 onClick={() => setSelectedRoleKey(role.role)}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                  isSelected
-                    ? 'bg-indigo-50/80 border-indigo-400 shadow-sm ring-1 ring-indigo-400'
-                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                }`}
+                style={{
+                  backgroundColor: isSelected ? '#FFFFFF' : '#F6FBF7',
+                  borderColor: isSelected ? '#051F20' : '#DAF1DE',
+                  boxShadow: isSelected ? '0 0 0 1px #051F20, 0 2px 4px rgba(45,26,18,0.06)' : undefined,
+                }}
+                className="p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <span
-                      className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                        isSelected
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-100 text-slate-700'
-                      }`}
+                      style={{
+                        backgroundColor: isSelected ? '#051F20' : '#DAF1DE',
+                        color: isSelected ? '#FFFFFF' : '#235347',
+                      }}
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
                     >
                       {role.badge}
                     </span>
                     {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
                     )}
                   </div>
-                  <p className="text-xs font-semibold text-slate-900 truncate">
+                  <p style={{ color: '#051F20' }} className="text-xs font-bold truncate">
                     {role.default_name}
                   </p>
-                  <p className="text-[11px] font-medium text-slate-500 truncate">
+                  <p style={{ color: '#235347' }} className="text-xs font-medium truncate mt-0.5">
                     {role.default_post}
                   </p>
                 </div>
 
-                <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">Clearance:</span>
+                <div
+                  style={{ borderColor: '#DAF1DE' }}
+                  className="mt-2.5 pt-2 border-t flex items-center justify-between text-xs"
+                >
+                  <span style={{ color: '#235347' }} className="font-medium">Clearance:</span>
                   <span
-                    className={`font-bold ${
-                      count > 0 ? 'text-emerald-700' : 'text-rose-600'
-                    }`}
+                    style={{ color: count > 0 ? '#163832' : '#D9534F' }}
+                    className="font-bold"
                   >
                     {count}/{modules.length} Hubs
                   </span>
@@ -166,33 +183,42 @@ export const AccessTab: React.FC<AccessTabProps> = ({
       </div>
 
       {/* Selected Role Active Banner */}
-      <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div
+        style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+        className="rounded-2xl p-3.5 sm:p-4 border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+          <div
+            style={{ backgroundColor: '#051F20', color: '#FFFFFF' }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs shrink-0"
+          >
             {selectedRole?.badge.slice(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-black text-slate-900">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 style={{ color: '#051F20' }} className="text-sm sm:text-base font-black">
                 {selectedRole?.badge} Module Clearance
               </h2>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-700">
+              <span
+                style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#235347' }}
+                className="text-xs font-bold px-2 py-0.5 rounded-md border"
+              >
                 {selectedRole?.default_post}
               </span>
             </div>
-            <p className="text-xs font-medium text-slate-600 mt-0.5">
-              Currently granted access to <strong className="text-emerald-700">{enabledCount} of {modules.length} modules</strong>
+            <p style={{ color: '#235347' }} className="text-xs font-medium mt-0.5">
+              Currently granted access to <strong style={{ color: '#163832' }}>{enabledCount} of {modules.length} modules</strong>
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-slate-500">Toggle switch to grant or decline:</span>
+          <span style={{ color: '#235347' }} className="text-xs font-medium">Toggle switches below to update:</span>
         </div>
       </div>
 
-      {/* Module Hub Grid with Accessible Toggle Switches */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Module Hub Grid with Accessible Tactile Toggle Switches */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">
         {modules.map((mod) => {
           const isAllowed = permissions[mod.key] ?? true;
           const Icon = MODULE_ICONS[mod.key] || Sliders;
@@ -200,40 +226,47 @@ export const AccessTab: React.FC<AccessTabProps> = ({
           return (
             <div
               key={mod.key}
-              className={`bg-white rounded-2xl p-4 border transition-all shadow-sm flex items-start justify-between gap-4 ${
-                isAllowed
-                  ? 'border-slate-200/90 hover:border-slate-300'
-                  : 'border-slate-200 bg-slate-50/50 opacity-90'
-              }`}
+              style={{
+                backgroundColor: '#F6FBF7',
+                borderColor: '#DAF1DE',
+              }}
+              className="cockpit-card rounded-2xl p-3.5 sm:p-4 border shadow-sm flex items-start justify-between gap-3.5"
             >
               <div className="flex items-start gap-3 flex-1 min-w-0">
                 <div
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border transition-colors ${
-                    isAllowed
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                      : 'bg-slate-100 text-slate-400 border-slate-200'
-                  }`}
+                  style={{
+                    backgroundColor: isAllowed ? '#DAF1DE' : '#F6FBF7',
+                    borderColor: isAllowed ? '#DAF1DE' : '#D9534F',
+                    color: isAllowed ? '#163832' : '#D9534F',
+                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-colors"
                 >
-                  <Icon size={20} strokeWidth={2.2} />
+                  <Icon size={18} strokeWidth={2.2} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="text-sm font-bold text-slate-900 truncate">
+                    <h3 style={{ color: '#051F20' }} className="text-xs sm:text-sm font-bold truncate">
                       {mod.label}
                     </h3>
                   </div>
-                  <p className="text-xs font-medium text-slate-500 line-clamp-2">
+                  <p style={{ color: '#235347' }} className="text-xs font-medium line-clamp-2">
                     {mod.description}
                   </p>
 
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-2.5 flex items-center gap-2">
                     {isAllowed ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">
-                        <CheckCircle2 size={12} className="text-emerald-600" />
+                      <span
+                        style={{ backgroundColor: '#DAF1DE', borderColor: '#DAF1DE', color: '#163832' }}
+                        className="inline-flex items-center gap-1 text-xs font-bold border px-2 py-0.5 rounded-full"
+                      >
+                        <CheckCircle2 size={12} className="text-emerald-700" />
                         Access Granted
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200/70 px-2 py-0.5 rounded-full">
+                      <span
+                        style={{ backgroundColor: '#F6FBF7', borderColor: '#D9534F', color: '#D9534F' }}
+                        className="inline-flex items-center gap-1 text-xs font-bold border px-2 py-0.5 rounded-full"
+                      >
                         <XCircle size={12} className="text-rose-600" />
                         Access Declined
                       </span>
@@ -242,30 +275,14 @@ export const AccessTab: React.FC<AccessTabProps> = ({
                 </div>
               </div>
 
-              {/* Accessible Toggle Button */}
+              {/* Accessible Tactile Toggle Button with Donut Indicator */}
               <div className="shrink-0 pt-1">
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isAllowed}
-                  aria-label={`Toggle access to ${mod.label} for ${selectedRole?.badge}`}
-                  onClick={() => onToggleRoleModule(selectedRoleKey, mod.key)}
-                  className={`w-14 h-8 rounded-full p-1 transition-colors duration-200 ease-in-out relative focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 cursor-pointer ${
-                    isAllowed ? 'bg-emerald-600' : 'bg-slate-300'
-                  }`}
-                >
-                  <div
-                    className={`w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out flex items-center justify-center ${
-                      isAllowed ? 'translate-x-6' : 'translate-x-0'
-                    }`}
-                  >
-                    {isAllowed ? (
-                      <Check size={12} strokeWidth={3} className="text-emerald-600" />
-                    ) : (
-                      <X size={12} strokeWidth={3} className="text-slate-400" />
-                    )}
-                  </div>
-                </button>
+                <Toggle
+                  checked={isAllowed}
+                  onChange={() => onToggleRoleModule(selectedRoleKey, mod.key)}
+                  label={`Toggle access to ${mod.label} for ${selectedRole?.badge}`}
+                  color="emerald"
+                />
               </div>
             </div>
           );

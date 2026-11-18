@@ -34,7 +34,7 @@ export const FacultyPinModal: React.FC<FacultyPinModalProps> = ({
         </p>
 
         {/* Large 6-Digit PIN Display */}
-        <div className="py-4 px-6 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl flex items-center justify-center">
+        <div className="py-4 px-6 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl flex items-center justify-center">
           <span className="font-mono text-3xl font-extrabold tracking-[0.35em] text-[#051F20]">
             {pin}
           </span>
@@ -51,7 +51,7 @@ export const FacultyPinModal: React.FC<FacultyPinModalProps> = ({
           <button
             type="button"
             onClick={handleCopy}
-            className="w-full min-h-[44px] h-11 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-2"
+            className="w-full min-h-[44px] h-11 rounded-xl bg-[#163832] hover:bg-[#163832] text-white text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-2"
           >
             {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
             <span>{copied ? 'Copied to Clipboard!' : 'Copy 6-Digit PIN'}</span>

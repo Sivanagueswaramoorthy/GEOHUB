@@ -82,7 +82,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Dr. Sarah Jenkins"
-            className="w-full h-11 px-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-sm font-medium focus:outline-none focus:border-[#8EB69B]"
+            className="w-full h-11 px-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-sm font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
           />
         </div>
 
@@ -96,7 +96,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
               value={designation}
               onChange={(e) => setDesignation(e.target.value)}
               placeholder="e.g. Senior Advisor"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
           <div>
@@ -108,7 +108,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
               value={rollNo}
               onChange={(e) => setRollNo(e.target.value)}
               placeholder="e.g. FAC01"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-mono font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
         </div>
@@ -120,7 +120,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
           <select
             value={department}
             onChange={(e) => setDepartment(e.target.value)}
-            className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+            className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
           >
             {DEPARTMENTS.map((dept) => (
               <option key={dept} value={dept}>
@@ -140,7 +140,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="advisor@college.edu"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
           <div>
@@ -152,7 +152,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="+91 94420 18820"
-              className="w-full h-11 px-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl text-xs font-medium focus:outline-none focus:border-[#8EB69B]"
+              className="w-full h-11 px-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl text-xs font-medium text-[#051F20] focus:outline-none focus:border-[#163832]"
             />
           </div>
         </div>
@@ -161,7 +161,7 @@ export const FacultyFormModal: React.FC<FacultyFormModalProps> = ({
         <div className="pt-3 sticky bottom-0 bg-white">
           <button
             type="submit"
-            className="w-full min-h-[44px] h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-emerald-600/20 cursor-pointer"
+            className="w-full min-h-[44px] h-11 rounded-xl bg-[#163832] hover:bg-[#163832] text-white text-xs font-bold transition shadow-sm cursor-pointer"
           >
             {facultyToEdit ? 'Save Changes' : 'Confirm Advisor Provisioning'}
           </button>

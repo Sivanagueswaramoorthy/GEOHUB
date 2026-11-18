@@ -36,7 +36,7 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
       <BottomSheet isOpen={isOpen} onClose={onClose} title="Scholar Identity Dossier">
         <div className="space-y-4 py-1">
           {/* Header Block: Name, Roll, Role Badge, Status */}
-          <div className="p-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl flex items-center justify-between gap-3">
+          <div className="p-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl flex items-center justify-between gap-3">
             <div className="min-w-0">
               <h3 className="text-base font-bold text-[#051F20] truncate">{student.name}</h3>
               <div className="text-xs text-[#235347] font-mono font-medium">
@@ -61,19 +61,19 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
 
           {/* Info Grid: Name, Roll, Email, Dept, Year, Squad, Role */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Campus Email</div>
               <div className="font-medium text-[#051F20] mt-0.5 truncate">{student.email}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Department</div>
               <div className="font-semibold text-[#051F20] mt-0.5 truncate">{student.department}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Year of Study</div>
               <div className="font-medium text-[#051F20] mt-0.5">{student.year_of_study || 'Senior'}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Working Squad</div>
               <div className="font-bold text-[#051F20] mt-0.5">{student.team || 'General'}</div>
             </div>
@@ -81,14 +81,14 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
 
           {/* Stats: Events Attended, Tasks Done */}
           <div className="grid grid-cols-2 gap-2 text-center">
-            <div className="p-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl">
-              <div className="text-[11px] font-semibold text-slate-500">Events Attended</div>
+            <div className="p-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl">
+              <div className="text-xs font-semibold text-slate-500">Events Attended</div>
               <div className="text-lg font-black text-[#051F20] mt-0.5">
                 {student.events_attended ?? 8}
               </div>
             </div>
-            <div className="p-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl">
-              <div className="text-[11px] font-semibold text-slate-500">Tasks Completed</div>
+            <div className="p-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl">
+              <div className="text-xs font-semibold text-slate-500">Tasks Completed</div>
               <div className="text-lg font-black text-[#051F20] mt-0.5">
                 {student.tasks_completed ?? 14}
               </div>
@@ -96,7 +96,7 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
           </div>
 
           {/* Last Used Block */}
-          <div className="p-3.5 bg-white border border-[#E3EEE6] rounded-2xl space-y-2">
+          <div className="p-3.5 bg-white border border-[#DAF1DE] rounded-2xl space-y-2">
             <div className="text-xs font-bold text-[#051F20]">Session & Client Telemetry</div>
             <div className="grid grid-cols-2 gap-2 text-xs text-[#235347]">
               <div>
@@ -123,7 +123,7 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onResetPassword(student)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <RotateCcw size={14} className="text-[#235347]" />
               <span>Reset Pass</span>
@@ -132,7 +132,7 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onEdit(student)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <Edit3 size={14} className="text-[#235347]" />
               <span>Edit Details</span>
@@ -141,7 +141,7 @@ export const StudentDetailSheet: React.FC<StudentDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onToggleStatus(student)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <UserX size={14} className={student.status === 'active' ? 'text-amber-600' : 'text-emerald-600'} />
               <span>{student.status === 'active' ? 'Suspend' : 'Activate'}</span>

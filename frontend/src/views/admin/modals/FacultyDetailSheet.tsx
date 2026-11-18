@@ -38,7 +38,7 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
       <BottomSheet isOpen={isOpen} onClose={onClose} title="Faculty Advisor Dossier">
         <div className="space-y-4 py-1">
           {/* Header Block: Name, Designation, Status Chip */}
-          <div className="p-3.5 bg-[#F7FAF8] border border-[#E3EEE6] rounded-2xl flex items-center justify-between gap-3">
+          <div className="p-3.5 bg-[#F6FBF7] border border-[#DAF1DE] rounded-2xl flex items-center justify-between gap-3">
             <div className="min-w-0">
               <h3 className="text-base font-bold text-[#051F20] truncate">{faculty.name}</h3>
               <div className="text-xs text-[#235347] font-medium">{faculty.designation || 'Advisor'}</div>
@@ -56,26 +56,26 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
 
           {/* Info Grid: Department, Email, Phone, Username */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Staff / Roll No</div>
               <div className="font-mono font-bold text-[#051F20] mt-0.5">{faculty.roll_no}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Department</div>
               <div className="font-semibold text-[#051F20] mt-0.5 truncate">{faculty.department}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Institutional Email</div>
               <div className="font-medium text-[#051F20] mt-0.5 truncate">{faculty.email}</div>
             </div>
-            <div className="p-3 bg-white border border-[#E3EEE6] rounded-xl">
+            <div className="p-3 bg-white border border-[#DAF1DE] rounded-xl">
               <div className="text-slate-400 font-semibold">Contact Phone</div>
               <div className="font-medium text-[#051F20] mt-0.5 truncate">{faculty.phone || 'N/A'}</div>
             </div>
           </div>
 
           {/* "Last Used" Block: Last login, last activity, platform, app version, active sessions count */}
-          <div className="p-3.5 bg-white border border-[#E3EEE6] rounded-2xl space-y-2">
+          <div className="p-3.5 bg-white border border-[#DAF1DE] rounded-2xl space-y-2">
             <div className="text-xs font-bold text-[#051F20]">Device & Session Telemetry</div>
             <div className="grid grid-cols-2 gap-2 text-xs text-[#235347]">
               <div>
@@ -102,7 +102,7 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onGeneratePin(faculty)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <KeyRound size={14} className="text-[#235347]" />
               <span>Generate PIN</span>
@@ -111,7 +111,7 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onResetPassword(faculty)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <RotateCcw size={14} className="text-[#235347]" />
               <span>Reset Pass</span>
@@ -120,7 +120,7 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onEdit(faculty)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <Edit3 size={14} className="text-[#235347]" />
               <span>Edit Details</span>
@@ -129,7 +129,7 @@ export const FacultyDetailSheet: React.FC<FacultyDetailSheetProps> = ({
             <button
               type="button"
               onClick={() => onToggleStatus(faculty)}
-              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#E3EEE6] hover:bg-[#F7FAF8] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
+              className="min-h-[44px] h-11 px-3 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#DAF1DE] text-xs font-bold text-[#051F20] flex items-center justify-center gap-1.5 transition cursor-pointer"
             >
               <UserX size={14} className={faculty.status === 'active' ? 'text-amber-600' : 'text-emerald-600'} />
               <span>{faculty.status === 'active' ? 'Suspend' : 'Activate'}</span>

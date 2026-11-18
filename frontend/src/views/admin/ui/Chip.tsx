@@ -36,7 +36,7 @@ export const Chip: React.FC<ChipProps> = ({
         <span>{label}</span>
         {count !== undefined && (
           <span
-            className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
+            className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded-md ${
               selected ? 'bg-white/25 text-white' : 'bg-slate-100 text-slate-700'
             }`}
           >

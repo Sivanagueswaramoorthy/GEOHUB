@@ -26,49 +26,52 @@ export const StatTile: React.FC<StatTileProps> = ({
     switch (tint) {
       case 'emerald':
         return {
-          bg: '#E3F1E8',
-          color: '#1E9E63',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#1E9E63',
-          valueColor: '#1E9E63',
+          bg: '#DAF1DE',
+          color: '#163832',
+          border: '1px solid #DAF1DE',
+          footnoteColor: '#163832',
+          valueColor: '#163832',
         };
       case 'teal':
         return {
-          bg: '#E3F1E8',
-          color: '#1B6B7A',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#1B6B7A',
-          valueColor: '#11241B',
+          bg: '#DAF1DE',
+          color: '#235347',
+          border: '1px solid #DAF1DE',
+          footnoteColor: '#235347',
+          valueColor: '#051F20',
         };
       case 'amber':
         return {
-          bg: '#E3F1E8',
-          color: '#D99B26',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#D99B26',
-          valueColor: '#11241B',
+          bg: 'rgba(242, 184, 75, 0.14)',
+          color: '#F2B84B',
+          border: '1px solid rgba(242, 184, 75, 0.40)',
+          footnoteColor: '#F2B84B',
+          valueColor: '#051F20',
         };
       case 'mint':
         return {
-          bg: '#E3F1E8',
-          color: '#183A2B',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#183A2B',
+          bg: '#DAF1DE',
+          color: '#163832',
+          border: '1px solid #DAF1DE',
+          footnoteColor: '#163832',
+          valueColor: '#051F20',
         };
       case 'sage':
         return {
-          bg: '#E3F1E8',
-          color: '#183A2B',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#52665C',
+          bg: '#DAF1DE',
+          color: '#163832',
+          border: '1px solid #DAF1DE',
+          footnoteColor: '#235347',
+          valueColor: '#051F20',
         };
       case 'white':
       default:
         return {
-          bg: '#E3F1E8',
-          color: '#183A2B',
-          border: '1px solid #DCE6E0',
-          footnoteColor: '#52665C',
+          bg: '#DAF1DE',
+          color: '#163832',
+          border: '1px solid #DAF1DE',
+          footnoteColor: '#235347',
+          valueColor: '#051F20',
         };
     }
   };
@@ -81,12 +84,12 @@ export const StatTile: React.FC<StatTileProps> = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       className={`p-4 flex flex-col justify-between select-none transition-all ${
-        onClick ? 'pressable cursor-pointer hover:border-[#183A2B]/40 hover:shadow-md' : ''
+        onClick ? 'pressable cursor-pointer hover:border-[#163832]/40 hover:shadow-md' : ''
       } ${className}`}
       style={{
         borderRadius: '24px',
         backgroundColor: '#FFFFFF',
-        border: '1px solid #DCE6E0',
+        border: '1px solid #DAF1DE',
         boxShadow: '0 4px 16px -2px rgba(5, 31, 32, 0.05)',
         minHeight: '110px',
         ...style,
@@ -107,10 +110,10 @@ export const StatTile: React.FC<StatTileProps> = ({
 
         {footnote && (
           <span
-            className="text-xs font-semibold max-w-[90px] truncate text-right px-2 py-0.5 rounded-full border border-[#DCE6E0]"
+            className="text-xs font-semibold max-w-[90px] truncate text-right px-2 py-0.5 rounded-full border border-[#DAF1DE]"
             style={{
-              backgroundColor: '#F6F9F7',
-              color: badgeStyles.footnoteColor || '#52665C',
+              backgroundColor: '#F6FBF7',
+              color: badgeStyles.footnoteColor || '#235347',
             }}
           >
             {footnote}
@@ -124,13 +127,13 @@ export const StatTile: React.FC<StatTileProps> = ({
           style={{
             fontSize: '24px',
             lineHeight: '28px',
-            color: badgeStyles.valueColor || '#11241B',
+            color: badgeStyles.valueColor || '#051F20',
           }}
         >
           <AnimatedNumber value={value} />
         </div>
         <div
-          className="text-xs font-semibold text-[#52665C] mt-0.5 truncate"
+          className="text-xs font-semibold text-[#235347] mt-0.5 truncate"
         >
           {label}
         </div>

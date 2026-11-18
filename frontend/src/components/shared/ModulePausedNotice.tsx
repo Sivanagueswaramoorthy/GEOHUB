@@ -17,7 +17,7 @@ export const ModulePausedNotice: React.FC<Props> = ({ moduleName, onBack }) => {
       </div>
 
       <div className="space-y-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold">
+        <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold">
           <ShieldAlert size={12} />
           <span>Scheduled Maintenance</span>
         </div>

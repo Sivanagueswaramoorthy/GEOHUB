@@ -84,7 +84,7 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
   return (
     <div className="space-y-3.5 select-none animate-fadeIn pb-8">
       {/* 1. Sticky Sub-header: Search input (full width, 44px) + '+' Primary IconButton */}
-      <div className="sticky top-14 z-30 bg-slate-50 pt-1 pb-2 flex items-center gap-2">
+      <div className="sticky top-14 z-30 bg-[#F6FBF7] pt-1 pb-2 flex items-center gap-2">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -92,7 +92,7 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search faculty name or dept..."
-            className="w-full min-h-[44px] h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:border-emerald-500 shadow-xs"
+            className="w-full min-h-[44px] h-11 pl-10 pr-4 bg-white border border-[#DAF1DE] rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:border-[#8EB69B] shadow-xs"
           />
         </div>
 
@@ -102,7 +102,7 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
             setFacultyToEdit(null);
             setIsAddModalOpen(true);
           }}
-          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition shadow-sm shadow-emerald-600/20 cursor-pointer"
+          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-[#051F20] hover:bg-[#163832] text-white flex items-center justify-center transition shadow-xs cursor-pointer"
           title="Provision Faculty Advisor"
           aria-label="Provision Faculty Advisor"
         >
@@ -112,7 +112,7 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
         <button
           type="button"
           onClick={handleExportCsv}
-          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-xs cursor-pointer"
+          className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-xl bg-white border border-[#DAF1DE] hover:bg-[#F6FBF7] text-[#235347] flex items-center justify-center transition shadow-xs cursor-pointer"
           title="Export CSV Directory"
           aria-label="Export CSV"
         >
@@ -132,17 +132,15 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
               key={dept}
               type="button"
               onClick={() => setSelectedDept(dept)}
-              className={`min-h-[44px] px-3.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 border ${
-                isSelected
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/20'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
+              className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 ${isSelected
+                ? 'bg-[#051F20] text-white shadow-xs'
+                : 'bg-white text-[#235347] border border-[#DAF1DE] hover:bg-[#F6FBF7]'
+                }`}
             >
               <span>{dept}</span>
               <span
-                className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold ${
-                  isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
-                }`}
+                className={`text-xs font-mono px-1.5 py-0.5 rounded-md font-bold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                  }`}
               >
                 {count}
               </span>
@@ -177,7 +175,7 @@ export const FacultyDeck: React.FC<FacultyDeckProps> = ({
                 title={
                   <div className="flex items-center gap-2">
                     <span className="truncate">{f.name}</span>
-                    <span className="text-[11px] font-mono font-normal text-slate-400">
+                    <span className="text-xs font-mono font-normal text-slate-400">
                       {f.roll_no}
                     </span>
                   </div>

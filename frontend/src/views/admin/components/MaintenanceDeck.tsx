@@ -114,7 +114,7 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
           <div className="flex items-start justify-between gap-2 py-1.5 border-b border-slate-100">
             <span className="text-slate-500 font-bold shrink-0">Host</span>
             <div className="flex items-center gap-1.5 min-w-0 text-right">
-              <span className="font-mono font-bold break-all text-slate-900 text-[11px]">
+              <span className="font-mono font-bold break-all text-slate-900 text-xs">
                 {diagnostics.host}
               </span>
               <button
@@ -222,27 +222,27 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
         <h4 className="text-xs font-bold text-slate-900 tracking-tight">Relational Records</h4>
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Users</div>
+            <div className="text-xs font-bold text-slate-500">Users</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.users ?? overviewCounts.users}</div>
           </div>
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Events</div>
+            <div className="text-xs font-bold text-slate-500">Events</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.events ?? 0}</div>
           </div>
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Registrations</div>
+            <div className="text-xs font-bold text-slate-500">Registrations</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.event_registrations ?? 0}</div>
           </div>
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Tasks</div>
+            <div className="text-xs font-bold text-slate-500">Tasks</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.tasks ?? 0}</div>
           </div>
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Ledger</div>
+            <div className="text-xs font-bold text-slate-500">Ledger</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.expenses ? `₹${diagnostics.table_counts.expenses}k` : '₹0'}</div>
           </div>
           <div className="bg-white border border-slate-200/90 p-3 rounded-2xl text-center shadow-xs">
-            <div className="text-[11px] font-bold text-slate-500">Audit Logs</div>
+            <div className="text-xs font-bold text-slate-500">Audit Logs</div>
             <div className="text-base font-extrabold text-slate-900 mt-0.5">{diagnostics.table_counts?.audit_logs ?? 1}</div>
           </div>
         </div>
@@ -277,13 +277,13 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
               >
                 <div className="min-w-0">
                   <div className="font-bold text-slate-900 truncate">{log.action}</div>
-                  <div className="text-[11px] font-medium text-slate-500 truncate mt-0.5">
+                  <div className="text-xs font-medium text-slate-500 truncate mt-0.5">
                     {log.actor_name} → {log.target_name || log.target_type || log.details || 'System'}
                   </div>
                 </div>
                 <RelativeTime
                   date={log.timestamp}
-                  className="text-[11px] font-mono text-slate-400 shrink-0"
+                  className="text-xs font-mono text-slate-400 shrink-0"
                 />
               </div>
             ))
@@ -315,7 +315,7 @@ export const MaintenanceDeck: React.FC<MaintenanceDeckProps> = ({
           {auditLogs.map((log) => (
             <div
               key={log.id}
-              className="p-3 bg-[#F7FAF8] border border-[#E3EEE6] rounded-xl flex items-center justify-between gap-2 text-xs"
+              className="p-3 bg-[#F6FBF7] border border-[#DAF1DE] rounded-xl flex items-center justify-between gap-2 text-xs"
             >
               <div className="min-w-0">
                 <div className="font-bold text-[#051F20]">{log.action}</div>

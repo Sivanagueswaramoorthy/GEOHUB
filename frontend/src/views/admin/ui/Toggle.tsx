@@ -17,21 +17,20 @@ export const Toggle: React.FC<ToggleProps> = ({
   className = '',
   color = 'emerald',
 }) => {
-  // Determine exact colors matching the prototype in Images 1 & 2:
-  // - TiDB ON: emerald (#059669), OFF: slate (#64748b)
-  // - Gateway ON: cobalt blue (#2563eb), OFF: amber (#d97706) for maintenance mode
-  let activeColor = '#059669';
-  let inactiveColor = '#64748b';
-
+  // Vibrant tactile colors matching the approved prototype
+  let activeTrackColor = '#163832'; // Vibrant emerald green
   if (color === 'blue') {
-    activeColor = '#2563eb';
-    inactiveColor = '#d97706'; // Amber when offline/maintenance
+    activeTrackColor = '#163832'; // Vibrant royal blue
   } else if (color === 'amber') {
-    activeColor = '#d97706';
-    inactiveColor = '#64748b';
+    activeTrackColor = '#F2B84B'; // Vibrant amber
   }
 
-  const currentTrackColor = checked ? activeColor : inactiveColor;
+  // Soft muted track when inactive / disabled
+  const inactiveTrackColor = '#DAF1DE';
+  const inactiveDotColor = '#8EB69B';
+
+  const currentTrackColor = checked ? activeTrackColor : inactiveTrackColor;
+  const currentDotColor = checked ? activeTrackColor : inactiveDotColor;
 
   return (
     <button
@@ -43,24 +42,24 @@ export const Toggle: React.FC<ToggleProps> = ({
       onClick={() => !disabled && onChange(!checked)}
       style={{
         position: 'relative',
-        width: '48px',
-        minWidth: '48px',
-        maxWidth: '48px',
+        width: '50px',
+        minWidth: '50px',
+        maxWidth: '50px',
         height: '28px',
         minHeight: '28px',
         maxHeight: '28px',
         borderRadius: '9999px',
-        padding: '2px',
+        padding: '3px',
         backgroundColor: currentTrackColor,
-        border: '1px solid rgba(0, 0, 0, 0.25)',
-        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.25)',
+        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.18)',
+        border: '1px solid rgba(0, 0, 0, 0.08)',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.4 : 1,
+        opacity: disabled ? 0.45 : 1,
         flexShrink: 0,
         outline: 'none',
         display: 'inline-flex',
         alignItems: 'center',
-        transition: 'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'background-color 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
         userSelect: 'none',
       }}
       className={`shrink-0 ${className}`}
@@ -74,20 +73,21 @@ export const Toggle: React.FC<ToggleProps> = ({
           width: '22px',
           height: '22px',
           borderRadius: '9999px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)',
-          transform: checked ? 'translateX(20px)' : 'translateX(0px)',
+          backgroundColor: '#FFFFFF',
+          boxShadow: '0 2px 5px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.1)',
+          transform: checked ? 'translateX(22px)' : 'translateX(0px)',
           transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
           pointerEvents: 'none',
         }}
       >
+        {/* Donut bullseye center dot matching the prototype */}
         <span
           style={{
-            width: '6px',
-            height: '6px',
+            width: '7px',
+            height: '7px',
             borderRadius: '9999px',
-            backgroundColor: currentTrackColor,
-            transition: 'background-color 0.15s ease',
+            backgroundColor: currentDotColor,
+            transition: 'background-color 0.2s ease',
           }}
         />
       </span>

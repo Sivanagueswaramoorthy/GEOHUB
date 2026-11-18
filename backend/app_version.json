@@ -1,8 +1,8 @@
 {
-  "version": "1.6.48",
-  "version_code": 67,
+  "version": "1.6.49",
+  "version_code": 68,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Cross-device TiDB Cloud persistence fix: full public roster sync, direct TiDB Cloud student/faculty provisioning, real-time multi-device SSE event stream, and elegant light peach theme.",
-  "sha256": "c8715ebb4ed3e6ea0bd4f77aed5d72ea08749dd049c448ae2b0c24372d857f89",
-  "file_size": 7198985
+  "release_notes": "Light Peach Design System across all SuperAdmin cockpit tabs, tactile donut toggles, primary Student Member onboarding with administrative post and squad assignment workflow.",
+  "sha256": "c923e0b090a20b4c99bf47b2ce49afc2e01744b8599a9a12ba0fac7d559918c2",
+  "file_size": 7217775
 }

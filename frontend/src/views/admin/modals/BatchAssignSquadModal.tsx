@@ -36,8 +36,8 @@ export const BatchAssignSquadModal: React.FC<BatchAssignSquadModalProps> = ({
               key={squad}
               className={`p-3 rounded-2xl border flex items-center justify-between cursor-pointer transition select-none ${
                 selectedSquad === squad
-                  ? 'border-[#051F20] bg-[#F7FAF8]'
-                  : 'border-[#E3EEE6] bg-white hover:bg-[#F7FAF8]'
+                  ? 'border-[#163832] bg-[#F6FBF7]'
+                  : 'border-[#DAF1DE] bg-white hover:bg-[#DAF1DE]'
               }`}
             >
               <div className="flex items-center gap-2.5">
@@ -58,14 +58,14 @@ export const BatchAssignSquadModal: React.FC<BatchAssignSquadModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[44px] h-11 px-4 rounded-xl border border-[#E3EEE6] bg-white text-xs font-bold text-[#051F20] hover:bg-[#F7FAF8] transition cursor-pointer"
+            className="min-h-[44px] h-11 px-4 rounded-xl border border-[#DAF1DE] bg-white text-xs font-bold text-[#051F20] hover:bg-[#DAF1DE] transition cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            className="min-h-[44px] h-11 px-4 rounded-xl text-xs font-bold text-white bg-[#051F20] hover:bg-[#163832] transition shadow-xs cursor-pointer"
+            className="min-h-[44px] h-11 px-4 rounded-xl text-xs font-bold text-white bg-[#163832] hover:bg-[#163832] transition shadow-xs cursor-pointer"
           >
             Assign Squad
           </button>

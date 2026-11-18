@@ -892,6 +892,8 @@ export function useSuperAdminState() {
             year_of_study: data.year_of_study,
             team: data.team,
             role: data.role,
+            post: (data as any).post || (data as any).team_role,
+            team_role: (data as any).team_role || (data as any).post,
             status: data.status,
           });
           showToast(`Updated scholar ${data.name || ''}`);
@@ -959,6 +961,41 @@ export function useSuperAdminState() {
       }
     },
     [showToast]
+  );
+
+  // Assign Post & Role to Scholar with direct TiDB Cloud persistence
+  const assignMemberPost = useCallback(
+    async (
+      userId: string,
+      post: string,
+      role: string,
+      team?: string,
+      department?: string,
+      year?: string
+    ) => {
+      try {
+        const cleanPost = post.trim();
+        const cleanRole = role.trim();
+        const res = await apiClient.updateAdminUser(userId, {
+          post: cleanPost,
+          team_role: cleanPost,
+          role: cleanRole,
+          team: team?.trim() || 'General',
+          department: department?.trim(),
+          year_of_study: year?.trim(),
+        });
+        showToast(`Assigned post "${cleanPost}" (${cleanRole}) in TiDB Cloud`);
+        await refreshSuperAdminData();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+        }
+        return res;
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to assign post in TiDB');
+        throw err;
+      }
+    },
+    [refreshSuperAdminData, showToast]
   );
 
   // Legacy wrappers for FeaturesTab compatibility
@@ -1185,6 +1222,7 @@ export function useSuperAdminState() {
     toggleSuspendMember,
     deleteMember,
     updateMemberModules,
+    assignMemberPost,
     selectedStudentIds,
     toggleSelectStudent,
     selectAllStudents,

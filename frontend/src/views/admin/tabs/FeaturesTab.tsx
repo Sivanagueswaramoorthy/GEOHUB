@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import {
+  UserPlus,
   GraduationCap,
   Briefcase,
-  UserPlus,
   CheckCircle2,
   AlertCircle,
   Eye,
-  Sparkles,
   ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { SuperAdminTab } from '../types';
 
@@ -48,14 +50,14 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
   const [facultyDept, setFacultyDept] = useState('Geoinformatics Engineering');
   const [facultyDesignation, setFacultyDesignation] = useState('Faculty Advisor');
 
-  // Success Feedback
+  // Submission State
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastAdded, setLastAdded] = useState<{
     type: 'student' | 'faculty';
     name: string;
     roll: string;
   } | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +94,7 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       setStudentName('');
     } catch (err: any) {
       const msg =
-        err?.message === 'Failed to fetch'
+        err?.message === 'Failed to fetch' || err?.message?.includes('NetworkError')
           ? 'Unable to reach cloud server. Please check your internet connection.'
           : err?.message || 'Failed to onboard student to TiDB Cloud';
       setErrorMsg(msg);
@@ -140,7 +142,7 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       setFacultyName('');
     } catch (err: any) {
       const msg =
-        err?.message === 'Failed to fetch'
+        err?.message === 'Failed to fetch' || err?.message?.includes('NetworkError')
           ? 'Unable to reach cloud server. Please check your internet connection.'
           : err?.message || 'Failed to provision faculty to TiDB Cloud';
       setErrorMsg(msg);
@@ -150,37 +152,49 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
-      {/* Page Header */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-4 sm:space-y-5 animate-fadeIn pb-16 font-sans">
+      {/* Page Header (Light Peach Theme) */}
+      <div
+        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <UserPlus size={13} className="text-emerald-600" />
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span
+              style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border"
+            >
+              <UserPlus size={13} className="text-emerald-700" />
               Member Provisioning
             </span>
-            <span className="text-xs font-semibold text-slate-500">Add Features</span>
+            <span style={{ color: '#235347' }} className="text-xs font-semibold">
+              Live TiDB Cloud Onboarding
+            </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+          <h1 style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight">
             Add Student or Faculty
           </h1>
-          <p className="text-sm font-medium text-slate-600 mt-1">
-            Choose whether to onboard a student or faculty advisor to the platform.
+          <p style={{ color: '#235347' }} className="text-xs sm:text-sm font-medium mt-1">
+            New scholars are onboarded primarily as active members; custom posts can be assigned afterwards.
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => onNavigateTab('logs')}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto shrink-0"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold shadow-xs hover:border-emerald-500/50 transition-all cursor-pointer self-start sm:self-auto shrink-0 border active:scale-95"
         >
-          View All in Logs &rarr;
+          View All in Directory &rarr;
         </button>
       </div>
 
-      {/* The ASK Switcher: Student or Faculty */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm">
-        <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+      {/* The ASK Switcher: Student or Faculty (Clean Mint Card) */}
+      <div
+        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm"
+      >
+        <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-2">
           Select Member Category
         </label>
         <div className="grid grid-cols-2 gap-3 max-w-md">
@@ -190,11 +204,12 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
               setMemberType('student');
               setErrorMsg('');
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl font-bold text-sm transition-all cursor-pointer border ${
-              memberType === 'student'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-            }`}
+            style={{
+              backgroundColor: memberType === 'student' ? '#051F20' : '#FFFFFF',
+              color: memberType === 'student' ? '#FFFFFF' : '#051F20',
+              borderColor: memberType === 'student' ? '#051F20' : '#DAF1DE',
+            }}
+            className="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl font-bold text-sm transition-all cursor-pointer border shadow-xs active:scale-95"
           >
             <GraduationCap size={18} strokeWidth={2.4} />
             Student
@@ -206,11 +221,12 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
               setMemberType('faculty');
               setErrorMsg('');
             }}
-            className={`flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl font-bold text-sm transition-all cursor-pointer border ${
-              memberType === 'faculty'
-                ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-            }`}
+            style={{
+              backgroundColor: memberType === 'faculty' ? '#051F20' : '#FFFFFF',
+              color: memberType === 'faculty' ? '#FFFFFF' : '#051F20',
+              borderColor: memberType === 'faculty' ? '#051F20' : '#DAF1DE',
+            }}
+            className="flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl font-bold text-sm transition-all cursor-pointer border shadow-xs active:scale-95"
           >
             <Briefcase size={18} strokeWidth={2.4} />
             Faculty
@@ -220,54 +236,69 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
 
       {/* Success Notification Alert */}
       {lastAdded && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between gap-3 animate-fadeIn">
+        <div
+          style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B' }}
+          className="rounded-2xl p-4 border flex items-center justify-between gap-3 animate-fadeIn shadow-xs"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+            <div
+              style={{ backgroundColor: '#163832', color: '#FFFFFF' }}
+              className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            >
               <CheckCircle2 size={18} strokeWidth={2.6} />
             </div>
             <div>
-              <p className="text-sm font-bold text-emerald-900">
-                Successfully enrolled {lastAdded.type === 'student' ? 'Student' : 'Faculty'}!
+              <p style={{ color: '#051F20' }} className="text-sm font-black">
+                Successfully enrolled {lastAdded.type === 'student' ? 'Student Member' : 'Faculty Advisor'} in TiDB!
               </p>
-              <p className="text-xs font-semibold text-emerald-700">
-                {lastAdded.name} ({lastAdded.roll}) is now provisioned with active status.
+              <p style={{ color: '#163832' }} className="text-xs font-semibold mt-0.5">
+                {lastAdded.name} ({lastAdded.roll}) is now provisioned. You can assign their post and squad in Directory.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => onNavigateTab('logs')}
-            className="text-xs font-bold text-emerald-800 hover:text-emerald-900 bg-white border border-emerald-300 px-3 py-1.5 rounded-lg shadow-sm shrink-0 cursor-pointer flex items-center gap-1"
+            style={{ backgroundColor: '#FFFFFF', borderColor: '#8EB69B', color: '#051F20' }}
+            className="text-xs font-bold px-3 py-1.5 rounded-xl border shadow-xs shrink-0 cursor-pointer flex items-center gap-1 active:scale-95"
           >
-            Inspect in Logs <ArrowRight size={12} />
+            Assign Post <ArrowRight size={12} />
           </button>
         </div>
       )}
 
       {/* Error Message */}
       {errorMsg && (
-        <div className="bg-rose-50 border border-rose-200 rounded-2xl p-3.5 flex items-center gap-2 text-rose-700 text-xs font-bold">
-          <AlertCircle size={16} className="shrink-0" />
+        <div
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#D9534F', color: '#D9534F' }}
+          className="rounded-2xl p-3.5 border flex items-center gap-2 text-xs font-bold animate-fadeIn"
+        >
+          <AlertCircle size={16} className="shrink-0 text-rose-600" />
           <span>{errorMsg}</span>
         </div>
       )}
 
       {/* Form & Live Preview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
         {/* Form Container (2 Columns) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+        <div
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+          className="lg:col-span-2 cockpit-card rounded-2xl p-5 sm:p-6 border shadow-sm"
+        >
           {memberType === 'student' ? (
             /* Student Form: rollno, name, year */
             <form onSubmit={handleStudentSubmit} className="space-y-4">
-              <div className="border-b border-slate-100 pb-3 mb-4">
-                <h2 className="text-base font-bold text-slate-900">Student Enrollment Form</h2>
-                <p className="text-xs text-slate-500">
-                  Required fields: Roll Number, Full Name, and Year of Study.
+              <div style={{ borderColor: '#DAF1DE' }} className="border-b pb-3 mb-4">
+                <h2 style={{ color: '#051F20' }} className="text-base font-black">
+                  Student Enrollment Form
+                </h2>
+                <p style={{ color: '#235347' }} className="text-xs font-medium mt-0.5">
+                  Required: Roll Number, Full Name, and Year. Scholar joins as a primary Member.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                   Roll Number *
                 </label>
                 <input
@@ -275,14 +306,15 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                   placeholder="e.g. 24GEO055"
                   value={studentRollNo}
                   onChange={(e) => setStudentRollNo(e.target.value.toUpperCase())}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm font-semibold uppercase text-slate-900 outline-none transition-all"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-bold uppercase outline-none focus:border-emerald-600 transition-all shadow-xs"
                   required
                 />
-                <p className="text-[11px] text-slate-400 mt-1">Roll number will be used as user login ID.</p>
+                <p style={{ color: '#235347' }} className="text-xs font-medium mt-1">Roll number will be used as student login ID.</p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                   Student Full Name *
                 </label>
                 <input
@@ -290,20 +322,22 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                   placeholder="e.g. Kavya Sharma"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm font-semibold text-slate-900 outline-none transition-all"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-emerald-600 transition-all shadow-xs"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                  <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                     Year of Study *
                   </label>
                   <select
                     value={studentYear}
                     onChange={(e) => setStudentYear(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm font-semibold text-slate-900 bg-white outline-none transition-all cursor-pointer"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-bold outline-none focus:border-emerald-600 transition-all shadow-xs cursor-pointer"
                   >
                     <option value="1st Year">1st Year (Fresher)</option>
                     <option value="2nd Year">2nd Year (Sophomore)</option>
@@ -313,26 +347,28 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                  <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                     Department
                   </label>
                   <input
                     type="text"
                     value={studentDept}
                     onChange={(e) => setStudentDept(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 text-sm font-semibold text-slate-900 outline-none transition-all"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-emerald-600 transition-all shadow-xs"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-500 font-medium">
-                  Default temporary password: <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-slate-700">geohub</code>
+              <div style={{ borderColor: '#DAF1DE' }} className="pt-4 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span style={{ color: '#235347' }} className="text-xs font-medium">
+                  Default temporary password: <code style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }} className="px-1.5 py-0.5 rounded border font-bold">geohub</code>
                 </span>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
+                  style={{ backgroundColor: '#051F20', color: '#FFFFFF' }}
+                  className="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-95"
                 >
                   {isSubmitting ? (
                     <>
@@ -351,15 +387,17 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
           ) : (
             /* Faculty Form: ROLLNO, NAME, DEPARTMENT */
             <form onSubmit={handleFacultySubmit} className="space-y-4">
-              <div className="border-b border-slate-100 pb-3 mb-4">
-                <h2 className="text-base font-bold text-slate-900">Faculty Provisioning Form</h2>
-                <p className="text-xs text-slate-500">
+              <div style={{ borderColor: '#DAF1DE' }} className="border-b pb-3 mb-4">
+                <h2 style={{ color: '#051F20' }} className="text-base font-black">
+                  Faculty Provisioning Form
+                </h2>
+                <p style={{ color: '#235347' }} className="text-xs font-medium mt-0.5">
                   Required fields: ROLL NO, NAME, and DEPARTMENT.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                   ROLLNO (Faculty ID) *
                 </label>
                 <input
@@ -367,13 +405,14 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                   placeholder="e.g. FAC05"
                   value={facultyRollNo}
                   onChange={(e) => setFacultyRollNo(e.target.value.toUpperCase())}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm font-semibold uppercase text-slate-900 outline-none transition-all"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-bold uppercase outline-none focus:border-blue-600 transition-all shadow-xs"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                   NAME *
                 </label>
                 <input
@@ -381,14 +420,15 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                   placeholder="e.g. Dr. Rajesh Kumar"
                   value={facultyName}
                   onChange={(e) => setFacultyName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm font-semibold text-slate-900 outline-none transition-all"
+                  style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-blue-600 transition-all shadow-xs"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                  <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                     DEPARTMENT *
                   </label>
                   <input
@@ -396,32 +436,35 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     placeholder="e.g. Geoinformatics Engineering"
                     value={facultyDept}
                     onChange={(e) => setFacultyDept(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm font-semibold text-slate-900 outline-none transition-all"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-blue-600 transition-all shadow-xs"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                  <label style={{ color: '#235347' }} className="block text-xs font-bold uppercase tracking-wider mb-1.5">
                     Designation
                   </label>
                   <input
                     type="text"
                     value={facultyDesignation}
                     onChange={(e) => setFacultyDesignation(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm font-semibold text-slate-900 outline-none transition-all"
+                    style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#051F20' }}
+                    className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold outline-none focus:border-blue-600 transition-all shadow-xs"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-500 font-medium">
-                  Portal clearance: <strong className="text-slate-700">Faculty Advisor Role</strong>
+              <div style={{ borderColor: '#DAF1DE' }} className="pt-4 border-t flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span style={{ color: '#235347' }} className="text-xs font-medium">
+                  Portal clearance: <strong style={{ color: '#051F20' }}>Faculty Advisor Role</strong>
                 </span>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
+                  style={{ backgroundColor: '#051F20', color: '#FFFFFF' }}
+                  className="px-5 py-2.5 rounded-xl font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-95"
                 >
                   {isSubmitting ? (
                     <>
@@ -440,36 +483,42 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
           )}
         </div>
 
-        {/* Live Preview Card */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        {/* Live Preview Card (Light Peach Theme) */}
+        <div
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+          className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm flex flex-col justify-between"
+        >
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Eye size={16} className="text-slate-500" />
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <Eye size={16} className="text-emerald-700" />
+              <span style={{ color: '#235347' }} className="text-xs font-bold uppercase tracking-wider">
                 Live Badge Preview
               </span>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+            <div
+              style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+              className="p-4 rounded-xl border space-y-3 shadow-xs"
+            >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-sm ${
-                    memberType === 'student'
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-blue-600 text-white'
-                  }`}
+                  style={{
+                    backgroundColor: '#051F20',
+                    color: '#FFFFFF',
+                  }}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base shadow-xs shrink-0"
                 >
                   {memberType === 'student'
                     ? (studentName.slice(0, 2).toUpperCase() || 'ST')
                     : (facultyName.slice(0, 2).toUpperCase() || 'FA')}
                 </div>
-                <div>
-                  <h3 className="text-sm font-black text-slate-900 truncate">
+                <div className="min-w-0">
+                  <h3 style={{ color: '#051F20' }} className="text-sm font-black truncate">
                     {memberType === 'student'
                       ? studentName || 'Student Name'
                       : facultyName || 'Faculty Name'}
                   </h3>
-                  <p className="text-xs font-mono font-bold text-slate-600">
+                  <p style={{ color: '#235347' }} className="text-xs font-mono font-bold">
                     {memberType === 'student'
                       ? studentRollNo || '24GEO000'
                       : facultyRollNo || 'FAC00'}
@@ -477,28 +526,31 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-2 border-t border-slate-200/70 text-xs">
+              <div style={{ borderColor: '#DAF1DE' }} className="space-y-1.5 pt-2 border-t text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Category:</span>
-                  <span className="font-bold text-slate-800 capitalize">{memberType}</span>
+                  <span style={{ color: '#235347' }}>Category:</span>
+                  <span style={{ color: '#051F20' }} className="font-bold capitalize">{memberType}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Department:</span>
-                  <span className="font-semibold text-slate-800 truncate max-w-[140px]">
+                  <span style={{ color: '#235347' }}>Department:</span>
+                  <span style={{ color: '#051F20' }} className="font-semibold truncate max-w-[140px]">
                     {memberType === 'student' ? studentDept : facultyDept}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">
-                    {memberType === 'student' ? 'Year:' : 'Designation:'}
+                  <span style={{ color: '#235347' }}>
+                    {memberType === 'student' ? 'Primary Post:' : 'Designation:'}
                   </span>
-                  <span className="font-semibold text-slate-800">
-                    {memberType === 'student' ? studentYear : facultyDesignation}
+                  <span style={{ color: '#051F20' }} className="font-semibold">
+                    {memberType === 'student' ? 'Student Member' : facultyDesignation}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Status:</span>
-                  <span className="font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full text-[10px]">
+                <div className="flex justify-between items-center">
+                  <span style={{ color: '#235347' }}>Status:</span>
+                  <span
+                    style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
+                    className="font-bold px-2 py-0.5 rounded-full text-xs border"
+                  >
                     Active
                   </span>
                 </div>
@@ -506,9 +558,9 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-100">
-            <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
-              <Sparkles size={12} className="text-amber-500" />
+          <div style={{ borderColor: '#DAF1DE' }} className="mt-4 pt-3 border-t">
+            <p style={{ color: '#235347' }} className="text-xs font-medium flex items-center gap-1.5">
+              <Sparkles size={12} className="text-amber-600 shrink-0" />
               Instantly synchronized into Logs & Directory.
             </p>
           </div>

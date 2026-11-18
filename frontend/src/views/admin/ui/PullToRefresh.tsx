@@ -66,7 +66,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
           opacity: pullY > 10 ? 1 : 0,
         }}
       >
-        <div className="flex items-center gap-1.5 text-xs font-bold text-[#235347] bg-[#DAF1DE] px-3 py-1 rounded-full border border-[#8EB69B]">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-[#051F20] bg-[#F6FBF7] px-3 py-1 rounded-full border border-[#DAF1DE] shadow-xs">
           <span className={`inline-block text-sm ${isRefreshing ? 'animate-spin' : ''}`}>
             ↻
           </span>

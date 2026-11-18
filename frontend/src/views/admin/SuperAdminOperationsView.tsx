@@ -58,11 +58,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
 
   return (
     <div
-      style={
-        state.activeDeck === 'home'
-          ? { backgroundColor: '#FAF6F2', color: '#2D1A12', minHeight: '100vh' }
-          : { backgroundColor: '#f8fafc', color: '#0f172a', minHeight: '100vh' }
-      }
+      style={{ backgroundColor: '#F6FBF7', color: '#051F20', minHeight: '100vh' }}
       className={`w-full min-h-screen flex flex-col relative select-none transition-colors duration-200 ${
         state.activeDeck === 'home' ? 'cockpit-view-bg' : ''
       }`}
@@ -123,6 +119,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
               onToggleSuspend={state.toggleSuspendMember}
               onDeleteMember={state.deleteMember}
               onUpdateMemberModules={state.updateMemberModules}
+              onAssignPost={state.assignMemberPost}
             />
           )}
 

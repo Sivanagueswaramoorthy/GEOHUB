@@ -162,9 +162,11 @@ export const SuperAdminBottomNav: React.FC<SuperAdminBottomNavProps> = ({
       aria-label="SuperAdmin Operations Navigation"
     >
       <div
-        className="w-full h-full rounded-[28px] px-2 flex items-center justify-around shadow-xl shadow-slate-300/40 border border-slate-200/90"
+        className="w-full h-full rounded-[28px] px-2 flex items-center justify-around border shadow-xl"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          borderColor: '#DAF1DE',
+          boxShadow: '0 10px 30px rgba(5, 31, 32, 0.08)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
         }}
@@ -182,7 +184,12 @@ export const SuperAdminBottomNav: React.FC<SuperAdminBottomNavProps> = ({
                 title={item.label}
                 aria-label={item.label}
                 aria-current="page"
-                className="min-h-[44px] h-10 px-4 rounded-full bg-emerald-600 text-white flex items-center gap-1.5 transition-all duration-200 shadow-sm shadow-emerald-600/30 cursor-pointer shrink-0"
+                style={{
+                  backgroundColor: '#163832',
+                  color: '#FFFFFF',
+                  boxShadow: '0 2px 8px rgba(22, 56, 50, 0.35)',
+                }}
+                className="min-h-[44px] h-10 px-4 rounded-full flex items-center gap-1.5 transition-all duration-200 cursor-pointer shrink-0 active:scale-95"
               >
                 <Icon size={18} strokeWidth={2.4} />
                 <span className="text-xs font-bold tracking-tight whitespace-nowrap">
@@ -199,7 +206,8 @@ export const SuperAdminBottomNav: React.FC<SuperAdminBottomNavProps> = ({
               onClick={() => handleTabClick(item.id)}
               title={item.label}
               aria-label={item.label}
-              className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100/70 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              style={{ color: '#235347' }}
+              className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-full hover:text-[#051F20] hover:bg-[#DAF1DE] flex items-center justify-center transition-colors cursor-pointer shrink-0 active:scale-95"
             >
               <Icon size={20} strokeWidth={1.8} />
             </button>

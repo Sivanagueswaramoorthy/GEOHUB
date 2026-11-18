@@ -100,7 +100,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
 
         {/* Real-time Infrastructure Status Breakdown */}
         <div className="w-full bg-[#F6FBF7] rounded-2xl p-4 border border-[#DAF1DE] mt-5 mb-5 text-left text-xs space-y-2.5">
-          <div className="flex items-center justify-between pb-2 border-b border-[#E3EEE6]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
             <span className="text-slate-600 font-semibold flex items-center gap-1.5">
               <Server size={14} className="text-amber-600" />
               Backend REST API
@@ -110,7 +110,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center justify-between pb-2 border-b border-[#E3EEE6]">
+          <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
             <span className="text-slate-600 font-semibold flex items-center gap-1.5">
               <Database size={14} className={isDbConnected ? 'text-emerald-600' : 'text-rose-600'} />
               TiDB Cloud Database
@@ -126,7 +126,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+          <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
             <span>Production Version</span>
             <span className="font-mono font-bold text-slate-700">v{APP_VERSION} Production</span>
           </div>
@@ -151,7 +151,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
                 <ShieldCheck size={14} className="text-emerald-700" />
                 SuperAdmin Authority
               </span>
-              <span className="text-[10px] bg-emerald-200 text-emerald-800 px-1.5 py-0.2 rounded font-extrabold uppercase">
+              <span className="text-xs bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded font-extrabold uppercase">
                 Root
               </span>
             </div>
@@ -189,7 +189,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAdminUnlock(true)}
-                className="text-[11px] font-bold text-slate-500 hover:text-[#051F20] transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-slate-500 hover:text-[#051F20] transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Lock size={12} />
                 <span>SuperAdmin Maintenance Bypass</span>
@@ -214,14 +214,14 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
                     Unlock
                   </button>
                 </div>
-                {pinError && <p className="text-[11px] font-bold text-rose-600 text-left">{pinError}</p>}
+                {pinError && <p className="text-xs font-bold text-rose-600 text-left">{pinError}</p>}
               </form>
             )}
           </div>
         )}
       </div>
 
-      <p className="text-[11px] font-medium text-slate-400 mt-4">
+      <p className="text-xs font-medium text-slate-400 mt-4">
         Green Eco Organization • Institutional Governance Portal
       </p>
     </div>
