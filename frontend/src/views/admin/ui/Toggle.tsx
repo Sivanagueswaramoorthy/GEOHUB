@@ -6,6 +6,7 @@ export interface ToggleProps {
   disabled?: boolean;
   label?: string;
   className?: string;
+  color?: 'emerald' | 'blue' | 'amber';
 }
 
 export const Toggle: React.FC<ToggleProps> = ({
@@ -14,7 +15,18 @@ export const Toggle: React.FC<ToggleProps> = ({
   disabled = false,
   label,
   className = '',
+  color = 'emerald',
 }) => {
+  const activeBg =
+    color === 'blue'
+      ? 'bg-blue-600 border-blue-700/60 shadow-[0_0_12px_rgba(37,99,235,0.25)]'
+      : color === 'amber'
+      ? 'bg-amber-500 border-amber-600/60 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+      : 'bg-emerald-600 border-emerald-700/60 shadow-[0_0_12px_rgba(16,185,129,0.25)]';
+
+  const dotColor =
+    color === 'blue' ? 'bg-blue-600' : color === 'amber' ? 'bg-amber-500' : 'bg-emerald-600';
+
   return (
     <button
       type="button"
@@ -23,20 +35,26 @@ export const Toggle: React.FC<ToggleProps> = ({
       aria-label={label || 'Toggle switch'}
       disabled={disabled}
       onClick={() => !disabled && onChange(!checked)}
-      className={`min-w-[50px] w-[50px] min-h-[28px] h-[28px] p-0.5 rounded-full transition-colors duration-200 ease-in-out focus:outline-none cursor-pointer relative shrink-0 border ${
+      className={`min-w-[52px] w-[52px] min-h-[30px] h-[30px] p-0.5 rounded-full transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 cursor-pointer relative shrink-0 border select-none active:scale-95 ${
         disabled
           ? 'opacity-40 cursor-not-allowed bg-slate-100 border-slate-200'
           : checked
-          ? 'bg-emerald-600 border-emerald-600'
-          : 'bg-slate-200 border-slate-300 hover:bg-slate-300'
+          ? `${activeBg} shadow-[inset_0_2px_4px_rgba(0,0,0,0.18)]`
+          : 'bg-slate-300 border-slate-400/60 hover:bg-slate-400/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.12)]'
       } ${className}`}
     >
       <span
         aria-hidden="true"
-        className={`pointer-events-none inline-block w-[24px] h-[24px] rounded-full bg-white shadow-sm transform transition ease-in-out duration-200 ${
+        className={`pointer-events-none flex items-center justify-center w-[24px] h-[24px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.25)] transform transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
           checked ? 'translate-x-[22px]' : 'translate-x-0'
         }`}
-      />
+      >
+        <span
+          className={`w-1.5 h-1.5 rounded-full transition-colors duration-150 ${
+            checked ? dotColor : 'bg-slate-400'
+          }`}
+        />
+      </span>
     </button>
   );
 };

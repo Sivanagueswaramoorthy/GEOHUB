@@ -119,259 +119,237 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     }
   };
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
-      {/* Welcome Banner */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                activeBackend
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  : 'bg-amber-50 text-amber-800 border border-amber-300'
-              }`}
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  activeBackend ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
-                }`}
-              />
-              {activeBackend ? 'Live Operations' : 'Maintenance Mode Active'}
-            </span>
-            <span className="text-xs font-semibold text-slate-500">SuperAdmin Root Authority</span>
+    <div className="space-y-5 animate-fadeIn pb-12">
+      {/* Executive Command Header */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+            SA
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-            System Overview & Health
-          </h1>
-          <p className="text-sm font-medium text-slate-600 mt-1">
-            Real-time control over campus users, TiDB cloud database, and API backend.
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                System Overview & Health
+              </h1>
+              <span
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-extrabold border ${
+                  activeBackend
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-300'
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    activeBackend ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                  }`}
+                />
+                {activeBackend ? 'Live Operations' : 'Maintenance Mode Active'}
+              </span>
+            </div>
+            <p className="text-xs font-semibold text-slate-500">SuperAdmin Root Authority</p>
+          </div>
         </div>
 
         <button
           type="button"
           onClick={() => onPingDatabase()}
           disabled={isPinging || !activeDb}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-sm font-bold shadow-sm transition-all disabled:opacity-50 cursor-pointer self-start sm:self-auto shrink-0"
+          className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-sm transition-all disabled:opacity-50 cursor-pointer self-start sm:self-auto shrink-0 active:scale-95"
         >
-          <RefreshCw size={16} className={isPinging ? 'animate-spin' : ''} />
-          {isPinging ? 'Checking Latency...' : activeDb ? 'Refresh Status' : 'Database Offline'}
+          <RefreshCw size={14} className={isPinging ? 'animate-spin' : ''} />
+          <span>{isPinging ? 'Checking Latency...' : activeDb ? 'Refresh Status' : 'Database Offline'}</span>
         </button>
       </div>
 
-      {/* Top 3 Core Metrics: Total Students, Total Staff, Total Users */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Top 3 Core Metrics (Clean, Bold & Text-Free) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {/* Total Students */}
         <div
           onClick={() => onNavigateTab('logs')}
-          className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm hover:border-emerald-300 hover:shadow-md transition-all cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Total Students
             </span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <GraduationCap size={20} strokeWidth={2.4} />
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <GraduationCap size={18} strokeWidth={2.4} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               {overviewCounts.students}
             </span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
               Enrolled
             </span>
           </div>
-          <p className="text-xs font-medium text-slate-500 mt-2 flex items-center gap-1 group-hover:text-emerald-700">
-            View in Logs & Directory <ArrowRight size={12} />
-          </p>
         </div>
 
         {/* Total Staff (Faculty) */}
         <div
           onClick={() => onNavigateTab('logs')}
-          className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Total Staff
             </span>
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Briefcase size={20} strokeWidth={2.4} />
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Briefcase size={18} strokeWidth={2.4} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               {overviewCounts.faculty}
             </span>
-            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
               Faculty
             </span>
           </div>
-          <p className="text-xs font-medium text-slate-500 mt-2 flex items-center gap-1 group-hover:text-blue-700">
-            View Faculty Advisors <ArrowRight size={12} />
-          </p>
         </div>
 
         {/* Total Users Combined */}
         <div
           onClick={() => onNavigateTab('logs')}
-          className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm hover:border-purple-300 hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm hover:border-purple-300 hover:shadow-md transition-all cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Total Users
             </span>
-            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Users size={20} strokeWidth={2.4} />
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Users size={18} strokeWidth={2.4} />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-black text-slate-900 tracking-tight">
+            <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               {overviewCounts.users}
             </span>
-            <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-purple-700 bg-purple-50 border border-purple-200/60 px-2 py-0.5 rounded-full">
               Campus Wide
             </span>
           </div>
-          <p className="text-xs font-medium text-slate-500 mt-2 flex items-center gap-1 group-hover:text-purple-700">
-            Inspect All Profiles <ArrowRight size={12} />
-          </p>
         </div>
       </div>
 
-      {/* Connectivity & Infrastructure Grid (Rebuilt with Toggle Modules) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Infrastructure Telemetry Grid (With Single Tactile Master Toggles) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         {/* 1. Database Connectivity Card */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-start justify-between gap-3 mb-3.5">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-colors ${
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-colors shrink-0 ${
                     activeDb
-                      ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                      ? 'bg-emerald-50 text-emerald-600 border-emerald-200/60'
                       : 'bg-rose-50 text-rose-600 border-rose-200'
                   }`}
                 >
-                  <Database size={22} strokeWidth={2.2} />
+                  <Database size={20} strokeWidth={2.2} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Database Connectivity</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-900">Database Connectivity</h2>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold border transition-colors ${
+                        activeDb
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-rose-50 text-rose-700 border-rose-200'
+                      }`}
+                    >
+                      {activeDb ? (
+                        <>
+                          <CheckCircle2 size={11} className="text-emerald-600" />
+                          Connected
+                        </>
+                      ) : (
+                        <>
+                          <XCircle size={11} className="text-rose-600" />
+                          Disconnected
+                        </>
+                      )}
+                    </span>
+                  </div>
                   <p className="text-xs font-medium text-slate-500">TiDB Cloud Distributed Cluster</p>
                 </div>
               </div>
 
-              {/* Status Pill Badge + Toggle Switch */}
-              <div className="flex items-center gap-2.5 shrink-0">
-                <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors ${
-                    activeDb
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-rose-50 text-rose-700 border-rose-200'
-                  }`}
-                >
-                  {activeDb ? (
-                    <>
-                      <CheckCircle2 size={13} className="text-emerald-600" />
-                      Connected
-                    </>
-                  ) : (
-                    <>
-                      <XCircle size={13} className="text-rose-600" />
-                      Disconnected
-                    </>
-                  )}
-                </span>
-                <Toggle
-                  checked={activeDb}
-                  onChange={handleToggleDb}
-                  label="Toggle TiDB Database Connectivity"
-                />
-              </div>
+              {/* Single Master Tactile Toggle */}
+              <Toggle
+                checked={activeDb}
+                onChange={handleToggleDb}
+                label="Toggle TiDB Database Connectivity"
+                color="emerald"
+              />
             </div>
 
-            {/* Prominent Quick Toggle Bar */}
-            <div className="mb-3.5 p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-slate-800">Database Connectivity Switch</div>
-                <div className="text-[11px] font-medium text-slate-500">
-                  {activeDb ? 'TiDB Cloud Live · Queries Enabled' : 'Offline Mode · Mock Fallback'}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[11px] font-mono font-extrabold px-2 py-0.5 rounded ${
-                    activeDb ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  {activeDb ? 'ON' : 'OFF'}
-                </span>
-                <Toggle
-                  checked={activeDb}
-                  onChange={handleToggleDb}
-                  label="Quick Switch Database Connectivity"
-                />
-              </div>
-            </div>
-
-            {/* Offline Notice Banner */}
+            {/* Offline Alert Banner */}
             {!activeDb && (
-              <div className="mb-3.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 animate-fadeIn">
+              <div className="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 animate-fadeIn font-medium">
                 <AlertTriangle size={15} className="text-amber-600 shrink-0" />
                 <span>TiDB database connection is turned off. Offline fallback mode active.</span>
               </div>
             )}
 
-            <div className="space-y-2.5 text-xs bg-slate-50 rounded-xl p-3.5 border border-slate-100">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-1 border-b border-slate-200/60 gap-1">
-                <span className="text-slate-500 font-medium shrink-0">Host Endpoint</span>
+            {/* Spec Readout Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Port & Protocol</span>
+                <span className="font-bold text-slate-800 flex items-center gap-1 mt-0.5">
+                  <Lock size={11} className={activeDb ? 'text-emerald-600' : 'text-slate-400'} />
+                  {activeDb ? diagnostics.port : 'Offline'}
+                </span>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Database Engine</span>
+                <span className="font-bold text-slate-800 truncate mt-0.5" title={diagnostics.engine}>
+                  {activeDb ? diagnostics.engine : 'Standby'}
+                </span>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Ping Round-Trip</span>
                 <span
-                  className="font-mono font-bold text-slate-800 text-[11px] break-all sm:text-right"
-                  title={diagnostics.host}
-                >
-                  {diagnostics.host}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
-                <span className="text-slate-500 font-medium">Port & Protocol</span>
-                <span className="font-bold text-slate-800 flex items-center gap-1">
-                  <Lock size={12} className={activeDb ? 'text-emerald-600' : 'text-slate-400'} />
-                  {activeDb ? diagnostics.port : 'Offline / Inactive'}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
-                <span className="text-slate-500 font-medium">Database Engine</span>
-                <span className="font-bold text-slate-800">
-                  {activeDb ? diagnostics.engine : 'TiDB Cloud (Standby)'}
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500 font-medium">Ping Round-Trip</span>
-                <span
-                  className={`font-bold flex items-center gap-1.5 px-2 py-0.5 rounded-md ${
-                    activeDb
-                      ? 'text-emerald-700 bg-emerald-100/60'
-                      : 'text-slate-500 bg-slate-200/60'
+                  className={`font-bold flex items-center gap-1 mt-0.5 ${
+                    activeDb ? 'text-emerald-700' : 'text-slate-400'
                   }`}
                 >
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
-                      activeDb ? 'bg-emerald-600' : 'bg-slate-400'
+                      activeDb ? 'bg-emerald-600 animate-pulse' : 'bg-slate-400'
                     }`}
                   />
                   {activeDb ? `${latencyMs} ms` : 'Offline'}
                 </span>
               </div>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Health status</span>
+                <span
+                  className={`font-bold truncate mt-0.5 ${
+                    activeDb ? 'text-slate-800' : 'text-rose-600'
+                  }`}
+                >
+                  {activeDb ? diagnostics.health : 'Disconnected (Offline)'}
+                </span>
+              </div>
+            </div>
+
+            {/* Host Spec Pill */}
+            <div className="mt-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px] font-mono">
+              <span className="text-slate-400 font-sans font-semibold text-[10px] uppercase">Host</span>
+              <span className="font-bold text-slate-700 truncate max-w-[280px]" title={diagnostics.host}>
+                {diagnostics.host}
+              </span>
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">
-              Health status:{' '}
-              <strong className={activeDb ? 'text-slate-700' : 'text-rose-600'}>
-                {activeDb ? diagnostics.health : 'Disconnected (Offline)'}
-              </strong>
+          <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-xs text-slate-400 font-medium">
+              SSL Gateway: <strong className="text-slate-700 font-semibold">Active Encryption</strong>
             </span>
             <button
               type="button"
@@ -388,112 +366,91 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </div>
         </div>
 
-        {/* 2. Backend Connectivity Card (with Toggle Module for Maintenance Mode) */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+        {/* 2. Backend Connectivity Card */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-start justify-between gap-3 mb-3.5">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-11 h-11 rounded-xl border flex items-center justify-center transition-colors ${
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-colors shrink-0 ${
                     activeBackend
-                      ? 'bg-blue-50 text-blue-600 border-blue-100'
+                      ? 'bg-blue-50 text-blue-600 border-blue-200/60'
                       : 'bg-amber-50 text-amber-600 border-amber-200'
                   }`}
                 >
-                  <Server size={22} strokeWidth={2.2} />
+                  <Server size={20} strokeWidth={2.2} />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-slate-900">Backend Connectivity</h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-sm font-bold text-slate-900">Backend Connectivity</h2>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold border transition-colors ${
+                        activeBackend
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-300'
+                      }`}
+                    >
+                      {activeBackend ? (
+                        <>
+                          <CheckCircle2 size={11} className="text-blue-600" />
+                          Operational
+                        </>
+                      ) : (
+                        <>
+                          <AlertTriangle size={11} className="text-amber-600" />
+                          Maintenance
+                        </>
+                      )}
+                    </span>
+                  </div>
                   <p className="text-xs font-medium text-slate-500">GeoHub Node.js & REST API</p>
                 </div>
               </div>
 
-              {/* Status Pill Badge + Toggle Switch */}
-              <div className="flex items-center gap-2.5 shrink-0">
-                <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors ${
-                    activeBackend
-                      ? 'bg-blue-50 text-blue-700 border-blue-200'
-                      : 'bg-amber-50 text-amber-800 border-amber-300'
-                  }`}
-                >
-                  {activeBackend ? (
-                    <>
-                      <CheckCircle2 size={13} className="text-blue-600" />
-                      Operational
-                    </>
-                  ) : (
-                    <>
-                      <AlertTriangle size={13} className="text-amber-600" />
-                      Maintenance
-                    </>
-                  )}
-                </span>
-                <Toggle
-                  checked={activeBackend}
-                  onChange={handleToggleBackend}
-                  label="Toggle Backend Module (Maintenance Mode)"
-                />
-              </div>
-            </div>
-
-            {/* Prominent Quick Toggle Bar */}
-            <div className="mb-3.5 p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-slate-800">Backend Server Switch</div>
-                <div className="text-[11px] font-medium text-slate-500">
-                  {activeBackend ? 'Server Active · Normal App Mode' : 'Server Offline · Maintenance Mode Active'}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className={`text-[11px] font-mono font-extrabold px-2 py-0.5 rounded ${
-                    activeBackend ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'
-                  }`}
-                >
-                  {activeBackend ? 'ON' : 'OFF'}
-                </span>
-                <Toggle
-                  checked={activeBackend}
-                  onChange={handleToggleBackend}
-                  label="Quick Switch Backend Module"
-                />
-              </div>
+              {/* Single Master Tactile Toggle */}
+              <Toggle
+                checked={activeBackend}
+                onChange={handleToggleBackend}
+                label="Toggle Backend Module (Maintenance Mode)"
+                color="blue"
+              />
             </div>
 
             {/* Maintenance Warning Banner */}
             {!activeBackend && (
-              <div className="mb-3.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 animate-fadeIn">
+              <div className="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2 animate-fadeIn font-medium">
                 <AlertTriangle size={15} className="text-amber-600 shrink-0" />
                 <span>Backend offline. App is in Maintenance Mode (users see Under Maintenance).</span>
               </div>
             )}
 
-            <div className="space-y-2.5 text-xs bg-slate-50 rounded-xl p-3.5 border border-slate-100">
-              <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
-                <span className="text-slate-500 font-medium">Health Route</span>
-                <span className="font-mono font-bold text-slate-800">
+            {/* Spec Readout Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Health Route</span>
+                <span className="font-mono font-bold text-slate-800 truncate mt-0.5">
                   {activeBackend ? '/api/v1/health' : '/api/v1/health (Paused)'}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
-                <span className="text-slate-500 font-medium">API Version</span>
-                <span className="font-bold text-slate-800">v{APP_VERSION} Production</span>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">API Version</span>
+                <span className="font-bold text-slate-800 mt-0.5">v{APP_VERSION}</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-200/60">
-                <span className="text-slate-500 font-medium">Active Online Sessions</span>
-                <span className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <Activity size={12} className={activeBackend ? 'text-emerald-600' : 'text-amber-600'} />
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Active Sessions</span>
+                <span className="font-bold text-slate-800 flex items-center gap-1 mt-0.5">
+                  <Activity size={11} className={activeBackend ? 'text-emerald-600' : 'text-amber-600'} />
                   {activeBackend ? `${overviewCounts.online} Sessions` : '0 Sessions (Offline)'}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="text-slate-500 font-medium">Active Modules</span>
+
+              <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Active Modules</span>
                 <span
-                  className={`font-bold px-2 py-0.5 rounded-md ${
-                    activeBackend
-                      ? 'text-emerald-700 bg-emerald-100/60'
-                      : 'text-amber-800 bg-amber-100/60'
+                  className={`font-bold truncate mt-0.5 ${
+                    activeBackend ? 'text-emerald-700' : 'text-amber-700'
                   }`}
                 >
                   {activeBackend
@@ -502,18 +459,23 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </span>
               </div>
             </div>
+
+            {/* API Gateway Spec Pill */}
+            <div className="mt-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400 font-sans font-semibold text-[10px] uppercase">API Gateway</span>
+              <span className="font-bold text-slate-700">
+                {activeBackend ? 'Healthy & Synchronized' : 'Paused / Maintenance'}
+              </span>
+            </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">
-              API Gateway:{' '}
-              <strong className={activeBackend ? 'text-slate-700' : 'text-amber-700'}>
-                {activeBackend ? 'Healthy & Synchronized' : 'Paused / Maintenance'}
-              </strong>
+          <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-xs text-slate-400 font-medium">
+              Architecture: <strong className="text-slate-700 font-semibold">FastAPI + Async Worker</strong>
             </span>
             <span
               className={`text-xs font-bold ${
-                activeBackend ? 'text-slate-400' : 'text-amber-600'
+                activeBackend ? 'text-emerald-700' : 'text-amber-600'
               }`}
             >
               {activeBackend ? 'Zero downtime' : 'Maintenance Active'}
@@ -522,54 +484,40 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
-      {/* Quick Access Action Shortcuts */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
-          Quick Navigation
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button
-            type="button"
-            onClick={() => onNavigateTab('access')}
-            className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/40 text-left transition-all cursor-pointer group"
-          >
-            <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <ShieldCheck size={18} strokeWidth={2.4} />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">Manage Access</p>
-              <p className="text-xs font-medium text-slate-500">Configure role module toggles</p>
-            </div>
-          </button>
+      {/* Quick Navigation Dock */}
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+        <button
+          type="button"
+          onClick={() => onNavigateTab('access')}
+          className="flex items-center justify-center sm:justify-start gap-2.5 p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all cursor-pointer shadow-sm group active:scale-98"
+        >
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <ShieldCheck size={16} strokeWidth={2.4} />
+          </div>
+          <span className="text-xs font-bold text-slate-800">Role Access</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => onNavigateTab('features')}
-            className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/40 text-left transition-all cursor-pointer group"
-          >
-            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <UserPlus size={18} strokeWidth={2.4} />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">Add Members</p>
-              <p className="text-xs font-medium text-slate-500">Register student or faculty</p>
-            </div>
-          </button>
+        <button
+          type="button"
+          onClick={() => onNavigateTab('features')}
+          className="flex items-center justify-center sm:justify-start gap-2.5 p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400 hover:bg-blue-50/30 transition-all cursor-pointer shadow-sm group active:scale-98"
+        >
+          <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <UserPlus size={16} strokeWidth={2.4} />
+          </div>
+          <span className="text-xs font-bold text-slate-800">Provision</span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => onNavigateTab('logs')}
-            className="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 hover:border-amber-400 hover:bg-amber-50/40 text-left transition-all cursor-pointer group"
-          >
-            <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <GraduationCap size={18} strokeWidth={2.4} />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">View Logs & Records</p>
-              <p className="text-xs font-medium text-slate-500">Filter, inspect, suspend, delete</p>
-            </div>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => onNavigateTab('logs')}
+          className="flex items-center justify-center sm:justify-start gap-2.5 p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-purple-400 hover:bg-purple-50/30 transition-all cursor-pointer shadow-sm group active:scale-98"
+        >
+          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <GraduationCap size={16} strokeWidth={2.4} />
+          </div>
+          <span className="text-xs font-bold text-slate-800">Audit Logs</span>
+        </button>
       </div>
     </div>
   );
