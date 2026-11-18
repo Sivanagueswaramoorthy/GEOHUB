@@ -442,8 +442,68 @@ export function useSuperAdminState() {
     }
   }, [isDbConnected, isBackendActive]);
 
+  // Real-Time Cross-Device SSE Stream & Adaptive Foreground Polling
   useEffect(() => {
     refreshSuperAdminData();
+
+    if (isTestEnv) return;
+
+    // 1. Subscribe to Live Multi-Device SSE Sync Stream
+    let unsubscribe: (() => void) | null = null;
+    try {
+      unsubscribe = apiClient.subscribeToSyncStream((event) => {
+        if (
+          event.type === 'FACULTY_PROVISIONED' ||
+          event.type === 'FACULTY_UPDATED' ||
+          event.type === 'FACULTY_DELETED' ||
+          event.type === 'MEMBER_ENROLLED' ||
+          event.type === 'MEMBER_DELETED' ||
+          event.type === 'USER_UPDATED' ||
+          event.type === 'BATCH_USERS_UPDATED' ||
+          event.type === 'PLATFORM_PURGED' ||
+          event.type === 'MODULE_STATUS_CHANGED'
+        ) {
+          refreshSuperAdminData();
+        }
+      });
+    } catch {}
+
+    // 2. Foreground Adaptive Polling every 8s
+    const pollInterval = setInterval(() => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        refreshSuperAdminData();
+      }
+    }, 8000);
+
+    // 3. Lifecycle Listeners (window focus, visibility, cross-tab refresh)
+    const handleFocusOrVisible = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        refreshSuperAdminData();
+      }
+    };
+    const handleDataRefresh = () => {
+      refreshSuperAdminData();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleFocusOrVisible);
+      window.addEventListener('geohub_refresh_data', handleDataRefresh);
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleFocusOrVisible);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      clearInterval(pollInterval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleFocusOrVisible);
+        window.removeEventListener('geohub_refresh_data', handleDataRefresh);
+      }
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleFocusOrVisible);
+      }
+    };
   }, [refreshSuperAdminData]);
 
   // Single Ping Database Function (Connected to Live TiDB Health Probe)
@@ -746,101 +806,165 @@ export function useSuperAdminState() {
     [isDbConnected, isBackendActive, showToast]
   );
 
-  // Direct Student & Faculty Provisioning with TiDB Cloud Persistence
-  const addStudent = useCallback(
-    async (data: { rollno: string; name: string; year: string; department?: string; email?: string }) => {
-      const cleanRoll = data.rollno.toUpperCase().trim();
-      const newStudent: SuperAdminUserItem = {
-        id: `std-${Date.now()}`,
-        roll_no: cleanRoll,
-        name: data.name.trim(),
-        year_of_study: data.year,
-        department: data.department?.trim() || 'Geoinformatics',
-        email: data.email?.trim() || `${cleanRoll.toLowerCase()}@college.edu`,
-        role: 'student',
-        status: 'active',
-        last_login_at: new Date().toISOString(),
-        last_seen_at: new Date().toISOString(),
-        last_platform: 'Web',
-        last_app_version: '1.6.26',
-        events_attended: 0,
-        tasks_completed: 0,
-      };
-      setStudents((prev) => [newStudent, ...prev]);
-      showToast(`Added student: ${newStudent.name} (${newStudent.roll_no})`);
+  // Direct TiDB Cloud Persistence: Save (Add or Update) Faculty
+  const saveFaculty = useCallback(
+    async (data: Partial<FacultyAdvisorItem>) => {
+      try {
+        if (data.id && !data.id.startsWith('fac-')) {
+          // Update existing faculty advisor in TiDB Cloud
+          const res = await apiClient.updateAdminFaculty(data.id, {
+            name: data.name,
+            roll_no: data.roll_no,
+            email: data.email,
+            department: data.department,
+            post: data.designation,
+            phone: data.phone,
+            status: data.status,
+          });
+          showToast(`Updated faculty advisor ${data.name || ''}`);
+          await refreshSuperAdminData();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+          }
+          return res;
+        } else {
+          // Provision new faculty advisor directly into TiDB Cloud
+          const cleanRoll = (data.roll_no || 'FAC01').toUpperCase().trim();
+          const cleanName = (data.name || 'Faculty Member').trim();
+          const cleanEmail = (
+            data.email || `${cleanName.toLowerCase().replace(/\s+/g, '.')}@college.edu`
+          ).trim();
+          const res = await apiClient.createAdminFaculty({
+            name: cleanName,
+            roll_no: cleanRoll,
+            email: cleanEmail,
+            department: data.department?.trim() || 'Geoinformatics Engineering',
+            post: data.designation?.trim() || 'Faculty Advisor',
+            phone: data.phone?.trim() || '+91 94420 18820',
+            password: 'GeoHub2026!',
+          });
+          showToast(`Provisioned faculty advisor ${res.name} (${res.roll_no}) in TiDB`);
+          await refreshSuperAdminData();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+          }
+          return res;
+        }
+      } catch (err: any) {
+        const msg = err?.message || 'Failed to persist faculty record to TiDB Cloud';
+        showToast(msg);
+        throw err;
+      }
+    },
+    [refreshSuperAdminData, showToast]
+  );
 
-      if (isDbConnected && isBackendActive) {
-        try {
+  // Direct TiDB Cloud Persistence: Save (Add or Update) Student Scholar
+  const saveStudent = useCallback(
+    async (data: Partial<SuperAdminUserItem>) => {
+      try {
+        if (data.id && !data.id.startsWith('std-')) {
+          // Update existing student in TiDB Cloud
+          const res = await apiClient.updateAdminUser(data.id, {
+            name: data.name,
+            roll_no: data.roll_no,
+            email: data.email,
+            department: data.department,
+            year_of_study: data.year_of_study,
+            team: data.team,
+            role: data.role,
+            status: data.status,
+          });
+          showToast(`Updated scholar ${data.name || ''}`);
+          await refreshSuperAdminData();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+          }
+          return res;
+        } else {
+          // Onboard new student directly into TiDB Cloud
+          const cleanRoll = (data.roll_no || '24GEO001').toUpperCase().trim();
+          const cleanName = (data.name || 'Scholar Name').trim();
+          const cleanEmail = (
+            data.email || `${cleanName.toLowerCase().replace(/\s+/g, '.')}@college.edu`
+          ).trim();
           const res = await apiClient.createAdminUser({
-            roll_no: newStudent.roll_no,
-            name: newStudent.name,
-            email: newStudent.email,
-            department: newStudent.department,
-            year_of_study: newStudent.year_of_study,
-            role: 'student',
+            name: cleanName,
+            roll_no: cleanRoll,
+            email: cleanEmail,
+            department: data.department?.trim() || 'Geoinformatics',
+            year_of_study: data.year_of_study?.trim() || '1st Year',
+            team: data.team?.trim() || 'Management',
+            role: data.role || 'student',
             password: 'geohub',
           });
-          if (res?.id) {
-            setStudents((prev) =>
-              prev.map((s) => (s.id === newStudent.id ? { ...s, id: res.id } : s))
-            );
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
-            }
+          showToast(`Onboarded scholar ${res.name} (${res.roll_no}) in TiDB`);
+          await refreshSuperAdminData();
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
           }
-        } catch (err: any) {
-          console.warn('[useSuperAdminState] Failed to persist student to DB:', err?.message);
+          return res;
         }
+      } catch (err: any) {
+        const msg = err?.message || 'Failed to persist scholar record to TiDB Cloud';
+        showToast(msg);
+        throw err;
       }
-      return newStudent;
     },
-    [isDbConnected, isBackendActive, showToast]
+    [refreshSuperAdminData, showToast]
+  );
+
+  // Direct TiDB Cloud Password Resets
+  const resetFacultyPassword = useCallback(
+    async (id: string) => {
+      try {
+        await apiClient.resetAdminUserPassword(id, 'GeoHub2026!');
+        showToast('Reset faculty portal password to GeoHub2026!');
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to reset faculty password in TiDB');
+      }
+    },
+    [showToast]
+  );
+
+  const resetStudentPassword = useCallback(
+    async (id: string) => {
+      try {
+        await apiClient.resetAdminUserPassword(id, 'geohub');
+        showToast('Reset scholar password to default (geohub)');
+      } catch (err: any) {
+        showToast(err?.message || 'Failed to reset scholar password in TiDB');
+      }
+    },
+    [showToast]
+  );
+
+  // Legacy wrappers for FeaturesTab compatibility
+  const addStudent = useCallback(
+    async (data: { rollno: string; name: string; year?: string; department?: string; email?: string }) => {
+      return await saveStudent({
+        roll_no: data.rollno,
+        name: data.name,
+        year_of_study: data.year,
+        department: data.department,
+        email: data.email,
+        role: 'student',
+      });
+    },
+    [saveStudent]
   );
 
   const addFaculty = useCallback(
     async (data: { rollno: string; name: string; department: string; designation?: string; email?: string }) => {
-      const cleanRoll = data.rollno.toUpperCase().trim();
-      const newFaculty: FacultyAdvisorItem = {
-        id: `fac-${Date.now()}`,
-        roll_no: cleanRoll,
-        name: data.name.trim(),
-        department: data.department.trim(),
-        designation: data.designation?.trim() || 'Faculty Advisor',
-        email: data.email?.trim() || `${data.name.toLowerCase().replace(/\s+/g, '.')}@college.edu`,
-        status: 'active',
-        last_login_at: new Date().toISOString(),
-        last_seen_at: new Date().toISOString(),
-        last_platform: 'Web',
-        last_app_version: '1.6.26',
-      };
-      setFaculty((prev) => [newFaculty, ...prev]);
-      showToast(`Added faculty: ${newFaculty.name} (${newFaculty.roll_no})`);
-
-      if (isDbConnected && isBackendActive) {
-        try {
-          const res = await apiClient.createAdminFaculty({
-            roll_no: newFaculty.roll_no,
-            name: newFaculty.name,
-            email: newFaculty.email,
-            department: newFaculty.department,
-            post: newFaculty.designation,
-            password: 'GeoHub2026!',
-          });
-          if (res?.id) {
-            setFaculty((prev) =>
-              prev.map((f) => (f.id === newFaculty.id ? { ...f, id: res.id } : f))
-            );
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
-            }
-          }
-        } catch (err: any) {
-          console.warn('[useSuperAdminState] Failed to persist faculty to DB:', err?.message);
-        }
-      }
-      return newFaculty;
+      return await saveFaculty({
+        roll_no: data.rollno,
+        name: data.name,
+        department: data.department,
+        designation: data.designation,
+        email: data.email,
+      });
     },
-    [isDbConnected, isBackendActive, showToast]
+    [saveFaculty]
   );
 
   // Suspend Member (excludes SA01) with TiDB Persistence
@@ -862,7 +986,13 @@ export function useSuperAdminState() {
         if (isDbConnected && isBackendActive) {
           try {
             await apiClient.updateAdminUser(target.id, { status: nextStatus });
-          } catch {}
+            await refreshSuperAdminData();
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
+          } catch (err: any) {
+            showToast(err?.message || 'Failed to update student status in TiDB');
+          }
         }
       } else {
         const target = faculty.find((f) => f.id === id);
@@ -880,11 +1010,17 @@ export function useSuperAdminState() {
         if (isDbConnected && isBackendActive) {
           try {
             await apiClient.updateAdminFaculty(target.id, { status: nextStatus });
-          } catch {}
+            await refreshSuperAdminData();
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
+          } catch (err: any) {
+            showToast(err?.message || 'Failed to update faculty status in TiDB');
+          }
         }
       }
     },
-    [students, faculty, isDbConnected, isBackendActive, showToast]
+    [students, faculty, isDbConnected, isBackendActive, refreshSuperAdminData, showToast]
   );
 
   // Delete Member (excludes SA01) with TiDB Persistence
@@ -902,7 +1038,13 @@ export function useSuperAdminState() {
         if (isDbConnected && isBackendActive && target) {
           try {
             await apiClient.deleteAdminUser(target.id);
-          } catch {}
+            await refreshSuperAdminData();
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
+          } catch (err: any) {
+            showToast(err?.message || 'Failed to delete student from TiDB');
+          }
         }
       } else {
         const target = faculty.find((f) => f.id === id);
@@ -916,11 +1058,17 @@ export function useSuperAdminState() {
         if (isDbConnected && isBackendActive && target) {
           try {
             await apiClient.deleteAdminFaculty(target.id);
-          } catch {}
+            await refreshSuperAdminData();
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+            }
+          } catch (err: any) {
+            showToast(err?.message || 'Failed to delete faculty from TiDB');
+          }
         }
       }
     },
-    [students, faculty, isDbConnected, isBackendActive, showToast]
+    [students, faculty, isDbConnected, isBackendActive, refreshSuperAdminData, showToast]
   );
 
   // Custom Member Access Clearance with TiDB Persistence
@@ -1006,6 +1154,10 @@ export function useSuperAdminState() {
     students,
     setStudents,
     allMembers,
+    saveFaculty,
+    saveStudent,
+    resetFacultyPassword,
+    resetStudentPassword,
     addStudent,
     addFaculty,
     toggleSuspendMember,

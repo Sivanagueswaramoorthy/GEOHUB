@@ -641,31 +641,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setPlatformModules((prev) => ({ ...prev, ...liveModules }));
       }
 
+      // 4. Sync Users & Official Chapter Roster (Public from TiDB Cloud)
+      const liveUsers = await apiClient.getUsers().catch(() => null);
+      if (Array.isArray(liveUsers)) {
+        const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
+          uid: u.id,
+          rollNo: u.roll_no,
+          name: u.name,
+          email: u.email,
+          role: u.role || 'student',
+          post: u.post || undefined,
+          department: u.department || 'Geoinformatics Engineering',
+          yearOfStudy: u.year_of_study || '3rd Year',
+          phone: u.phone || undefined,
+          team: u.team || undefined,
+          teamRole: u.team_role || undefined,
+          isVolunteer: Boolean(u.is_volunteer),
+          status: u.status || 'active',
+          squadMemberships: u.squad_memberships
+            ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
+            : [],
+        }));
+        setUsers(mappedUsers);
+      }
+
       // Authenticated Data Synchronization: Only query if user has an active backend JWT
       if (hasValidToken) {
-        // 4. Sync Users & Official Chapter Roster
-        const liveUsers = await apiClient.getUsers().catch(() => null);
-        if (Array.isArray(liveUsers)) {
-          const mappedUsers: UserModel[] = liveUsers.map((u: any): UserModel => ({
-            uid: u.id,
-            rollNo: u.roll_no,
-            name: u.name,
-            email: u.email,
-            role: u.role || 'student',
-            post: u.post || undefined,
-            department: u.department || 'Geoinformatics Engineering',
-            yearOfStudy: u.year_of_study || '3rd Year',
-            phone: u.phone || undefined,
-            team: u.team || undefined,
-            teamRole: u.team_role || undefined,
-            isVolunteer: Boolean(u.is_volunteer),
-            status: u.status || 'active',
-            squadMemberships: u.squad_memberships
-              ? (typeof u.squad_memberships === 'string' ? JSON.parse(u.squad_memberships) : u.squad_memberships)
-              : [],
-          }));
-          setUsers(mappedUsers);
-        }
 
         // 5. Sync Duty Tasks
         const liveTasks = await apiClient.getTasks('all').catch(() => null);
@@ -2001,6 +2002,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     showToast(`Updated ${targetUser.name}'s role to ${normNewRole} (${newPost}).`, 'success');
+
+    apiClient
+      .updateAdminUser(userId, {
+        role: normNewRole,
+        post: newPost,
+        team_role: newPost,
+        department: department || targetUser.department,
+        year_of_study: yearOfStudy || targetUser.yearOfStudy,
+      })
+      .then(() => {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('geohub_refresh_data'));
+        }
+      })
+      .catch(() => {});
+
     return { success: true, message: 'Role and post updated' };
   };
 

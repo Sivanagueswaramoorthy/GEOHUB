@@ -1,12 +1,12 @@
 {
-  "version": "1.6.39",
-  "version_code": 58,
+  "version": "1.6.40",
+  "version_code": 59,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Synchronized embedded web bundle with native APK build. Resolved infinite update dialog loop, added native AndroidBridge version resolution, and persisted update dismissal.",
+  "release_notes": "Direct TiDB Cloud persistence and real-time cross-device synchronization for SuperAdmin staff and student management. Replaced disconnected local state callbacks with direct database operations and live SSE event stream.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-18",
-  "file_size_bytes": 6892004,
+  "file_size_bytes": 6892492,
   "file_size_mb": "6.57 MB",
-  "sha256": "6C7160DA7057796FAE789CB8E7667A19B56498BA31F8C05EA9380AEF5BC59758"
+  "sha256": "17A0FF9F91AD59C166D633162CEA07C3B44FA99F2F0EFA29770A9357F4E1F2D5"
 }

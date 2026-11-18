@@ -697,6 +697,21 @@ def update_admin_user(
     db.commit()
     db.refresh(user)
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("USER_UPDATED", {
+            "id": user.id,
+            "roll_no": user.roll_no,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "department": user.department,
+            "team": user.team,
+            "status": user.status,
+        })
+    except Exception:
+        pass
+
     return schemas.UserResponse.from_orm(user)
 
 @router.delete("/users/{user_id}")

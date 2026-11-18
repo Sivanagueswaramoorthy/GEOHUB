@@ -163,41 +163,10 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
           {(state.activeDeck === 'faculty' || state.activeDeck === 'all') && (
             <FacultyDeck
               facultyList={state.faculty}
-              onSaveFaculty={(fac) => {
-                if (fac.id) {
-                  state.setFaculty((prev) =>
-                    prev.map((f) => (f.id === fac.id ? ({ ...f, ...fac } as any) : f))
-                  );
-                  state.showToast(`Updated advisor record`);
-                } else {
-                  state.setFaculty((prev) => [
-                    ...prev,
-                    {
-                      ...fac,
-                      id: `fac-${Date.now()}`,
-                      status: 'active',
-                      last_login_at: new Date().toISOString(),
-                      last_seen_at: new Date().toISOString(),
-                    } as any,
-                  ]);
-                  state.showToast(`Provisioned faculty advisor ${fac.name}`);
-                }
-              }}
-              onDeleteFaculty={(id) => {
-                state.setFaculty((prev) => prev.filter((f) => f.id !== id));
-                state.showToast(`Deleted faculty advisor`);
-              }}
-              onToggleStatus={(id) => {
-                state.setFaculty((prev) =>
-                  prev.map((f) =>
-                    f.id === id ? { ...f, status: f.status === 'active' ? 'disabled' : 'active' } : f
-                  )
-                );
-                state.showToast(`Toggled faculty status`);
-              }}
-              onResetPassword={(id) => {
-                state.showToast(`Reset faculty portal password`);
-              }}
+              onSaveFaculty={state.saveFaculty}
+              onDeleteFaculty={(id) => state.deleteMember(id, 'faculty')}
+              onToggleStatus={(id) => state.toggleSuspendMember(id, 'faculty')}
+              onResetPassword={state.resetFacultyPassword}
               onForceLogout={(id, name) => {
                 state.showToast(`Logged out all devices for ${name}`);
               }}
@@ -212,41 +181,10 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
               onToggleSelect={state.toggleSelectStudent}
               onSelectAll={state.selectAllStudents}
               onClearSelection={state.clearSelectedStudents}
-              onSaveStudent={(std) => {
-                if (std.id) {
-                  state.setStudents((prev) =>
-                    prev.map((s) => (s.id === std.id ? ({ ...s, ...std } as any) : s))
-                  );
-                  state.showToast(`Updated scholar record`);
-                } else {
-                  state.setStudents((prev) => [
-                    ...prev,
-                    {
-                      ...std,
-                      id: `std-${Date.now()}`,
-                      status: 'active',
-                      last_login_at: new Date().toISOString(),
-                      last_seen_at: new Date().toISOString(),
-                    } as any,
-                  ]);
-                  state.showToast(`Onboarded scholar ${std.name}`);
-                }
-              }}
-              onDeleteStudent={(id) => {
-                state.setStudents((prev) => prev.filter((s) => s.id !== id));
-                state.showToast(`Deleted scholar record`);
-              }}
-              onToggleStatus={(id) => {
-                state.setStudents((prev) =>
-                  prev.map((s) =>
-                    s.id === id ? { ...s, status: s.status === 'active' ? 'disabled' : 'active' } : s
-                  )
-                );
-                state.showToast(`Toggled scholar status`);
-              }}
-              onResetPassword={(id) => {
-                state.showToast(`Reset scholar password`);
-              }}
+              onSaveStudent={state.saveStudent}
+              onDeleteStudent={(id) => state.deleteMember(id, 'student')}
+              onToggleStatus={(id) => state.toggleSuspendMember(id, 'student')}
+              onResetPassword={state.resetStudentPassword}
               onForceLogout={(id, name) => {
                 state.showToast(`Logged out all devices for ${name}`);
               }}
@@ -326,13 +264,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
         isOpen={isAddFacultyModalOpen}
         onClose={() => setIsAddFacultyModalOpen(false)}
         onSave={async (fac) => {
-          await state.addFaculty({
-            rollno: fac.roll_no || 'FAC01',
-            name: fac.name || 'Faculty Member',
-            department: fac.department || 'Geoinformatics Engineering',
-            designation: fac.designation || 'Faculty Advisor',
-            email: fac.email,
-          });
+          await state.saveFaculty(fac);
         }}
       />
 
@@ -340,13 +272,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
         isOpen={isAddStudentModalOpen}
         onClose={() => setIsAddStudentModalOpen(false)}
         onSave={async (std) => {
-          await state.addStudent({
-            rollno: std.roll_no || '24GEO001',
-            name: std.name || 'Scholar Name',
-            year: std.year_of_study || '1st Year',
-            department: std.department || 'Geoinformatics',
-            email: std.email,
-          });
+          await state.saveStudent(std);
         }}
       />
 
