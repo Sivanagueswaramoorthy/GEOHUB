@@ -18,14 +18,14 @@ export interface FeaturesTabProps {
     year: string;
     department?: string;
     email?: string;
-  }) => void;
+  }) => void | Promise<any>;
   onAddFaculty: (data: {
     rollno: string;
     name: string;
     department: string;
     designation?: string;
     email?: string;
-  }) => void;
+  }) => void | Promise<any>;
   onNavigateTab: (tab: SuperAdminTab) => void;
 }
 
@@ -55,9 +55,11 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
     roll: string;
   } | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleStudentSubmit = (e: React.FormEvent) => {
+  const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMsg('');
 
     if (!studentRollNo.trim()) {
@@ -69,27 +71,35 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       return;
     }
 
-    onAddStudent({
-      rollno: studentRollNo,
-      name: studentName,
-      year: studentYear,
-      department: studentDept,
-      email: `${studentRollNo.toLowerCase().trim()}@college.edu`,
-    });
+    try {
+      setIsSubmitting(true);
+      await onAddStudent({
+        rollno: studentRollNo.trim(),
+        name: studentName.trim(),
+        year: studentYear,
+        department: studentDept.trim(),
+        email: `${studentRollNo.toLowerCase().trim()}@college.edu`,
+      });
 
-    setLastAdded({
-      type: 'student',
-      name: studentName.trim(),
-      roll: studentRollNo.toUpperCase().trim(),
-    });
+      setLastAdded({
+        type: 'student',
+        name: studentName.trim(),
+        roll: studentRollNo.toUpperCase().trim(),
+      });
 
-    // Reset Form
-    setStudentRollNo('');
-    setStudentName('');
+      // Reset Form
+      setStudentRollNo('');
+      setStudentName('');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to onboard student to TiDB Cloud');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleFacultySubmit = (e: React.FormEvent) => {
+  const handleFacultySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMsg('');
 
     if (!facultyRollNo.trim()) {
@@ -105,23 +115,30 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
       return;
     }
 
-    onAddFaculty({
-      rollno: facultyRollNo,
-      name: facultyName,
-      department: facultyDept,
-      designation: facultyDesignation,
-      email: `${facultyName.toLowerCase().replace(/\s+/g, '.')}@college.edu`,
-    });
+    try {
+      setIsSubmitting(true);
+      await onAddFaculty({
+        rollno: facultyRollNo.trim(),
+        name: facultyName.trim(),
+        department: facultyDept.trim(),
+        designation: facultyDesignation.trim(),
+        email: `${facultyName.toLowerCase().replace(/\s+/g, '.')}@college.edu`,
+      });
 
-    setLastAdded({
-      type: 'faculty',
-      name: facultyName.trim(),
-      roll: facultyRollNo.toUpperCase().trim(),
-    });
+      setLastAdded({
+        type: 'faculty',
+        name: facultyName.trim(),
+        roll: facultyRollNo.toUpperCase().trim(),
+      });
 
-    // Reset Form
-    setFacultyRollNo('');
-    setFacultyName('');
+      // Reset Form
+      setFacultyRollNo('');
+      setFacultyName('');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to provision faculty to TiDB Cloud');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -306,10 +323,20 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </span>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
                 >
-                  <UserPlus size={16} strokeWidth={2.4} />
-                  Add Student
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
+                      <span>Saving to DB...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={16} strokeWidth={2.4} />
+                      <span>Add Student</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -385,10 +412,20 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </span>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-60"
                 >
-                  <UserPlus size={16} strokeWidth={2.4} />
-                  Add Faculty
+                  {isSubmitting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1" />
+                      <span>Saving to DB...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus size={16} strokeWidth={2.4} />
+                      <span>Add Faculty</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

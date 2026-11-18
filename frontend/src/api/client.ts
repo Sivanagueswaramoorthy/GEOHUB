@@ -19,16 +19,32 @@ export function resolveApiBaseUrl(): string {
     return envUrl.trim().replace(/\/+$/, '');
   }
 
-  // Detect Android APK wrapper environment
-  const isApk =
+  // Detect Android APK wrapper environment or mobile / file / standalone web context
+  const isApkOrMobile =
     typeof navigator !== 'undefined' &&
     (navigator.userAgent.includes('GeoHubMobileApp') ||
-      (typeof window !== 'undefined' && window.location.hostname === 'appassets.androidplatform.net'));
+      (typeof window !== 'undefined' && (
+        window.location.hostname === 'appassets.androidplatform.net' ||
+        window.location.protocol === 'file:' ||
+        !window.location.hostname ||
+        Boolean((window as any).AndroidBridge)
+      )));
 
-  if (isApk) {
-    // In APK, relative '/api' resolves to Android local assets which 404s.
+  if (isApkOrMobile) {
+    // In APK or mobile file sandbox, relative '/api' resolves to Android local assets which 404s.
     // Fall back to active default cloud API tunnel.
     return DEFAULT_CLOUD_API;
+  }
+
+  // If in browser: if origin is not localhost/127.0.0.1 and not the ngrok tunnel itself,
+  // relative '/api' will fail (e.g. GitHub Pages or static host). Route to cloud API tunnel.
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const isLocalhost = host === 'localhost' || host === '127.0.0.1';
+    const isOriginNgrok = host.includes('ngrok-free.dev') || host.includes('ngrok.io') || host.includes('onrender.com');
+    if (!isLocalhost && !isOriginNgrok) {
+      return DEFAULT_CLOUD_API;
+    }
   }
 
   return '/api';
@@ -132,7 +148,7 @@ class ApiClient {
 
     const isTest = typeof import.meta !== 'undefined' && import.meta.env?.MODE === 'test';
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), isTest ? 100 : 8000);
+    const timeoutId = setTimeout(() => controller.abort(), isTest ? 100 : 30000);
 
     try {
       const response = await fetch(url, {
@@ -168,6 +184,10 @@ class ApiClient {
 
       return await response.json();
     } catch (err: any) {
+      clearTimeout(timeoutId);
+      if (err?.name === 'AbortError') {
+        throw new Error('Connection timed out. Please check your internet connection.');
+      }
       if (typeof import.meta !== 'undefined' && import.meta.env?.MODE !== 'test') {
         console.warn(`[GeoHub API Client] Request to ${url} failed:`, err?.message);
       }

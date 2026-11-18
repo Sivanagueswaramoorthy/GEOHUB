@@ -1,12 +1,12 @@
 {
-  "version": "1.6.40",
-  "version_code": 59,
+  "version": "1.6.41",
+  "version_code": 60,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Direct TiDB Cloud persistence and real-time cross-device synchronization for SuperAdmin staff and student management. Replaced disconnected local state callbacks with direct database operations and live SSE event stream.",
+  "release_notes": "Resilient direct TiDB Cloud persistence with extended 30-second mobile timeout, PyMySQL pool recycling, and instant Features tab provisioning for student and faculty onboarding.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-18",
-  "file_size_bytes": 6892492,
-  "file_size_mb": "6.57 MB",
-  "sha256": "17A0FF9F91AD59C166D633162CEA07C3B44FA99F2F0EFA29770A9357F4E1F2D5"
+  "file_size_bytes": 7197513,
+  "file_size_mb": "6.86 MB",
+  "sha256": "8BC5F08A462B65FC74415E9DE5279572C8C05CC15EE514AB54A49F5C8D41AA2E"
 }

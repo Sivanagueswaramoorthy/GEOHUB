@@ -12,14 +12,17 @@ def create_db_engine():
             # Apply SSL CA if connecting to remote TiDB Cloud gateway
             if "tidbcloud.com" in settings.DATABASE_URL or settings.SSL_CA:
                 connect_args["ssl"] = {"ca": settings.SSL_CA}
-                connect_args["connect_timeout"] = 10
+                connect_args["connect_timeout"] = 15
+                connect_args["read_timeout"] = 30
+                connect_args["write_timeout"] = 30
 
             eng = create_engine(
                 settings.DATABASE_URL,
                 connect_args=connect_args,
                 pool_size=10,
                 max_overflow=20,
-                pool_recycle=300,
+                pool_recycle=60,
+                pool_timeout=30,
                 pool_pre_ping=True
             )
             # Test connection

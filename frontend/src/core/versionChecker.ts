@@ -120,7 +120,7 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
   // Tier 1: Primary API server check
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(`${baseUrl}/app/version${cacheBuster}`, {
       method: 'GET',
@@ -143,7 +143,7 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
   // Tier 2: Global GitHub CDN fallback check (with cache busting)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     const res = await fetch(`${FALLBACK_VERSION_URL}${cacheBuster}`, {
       method: 'GET',
