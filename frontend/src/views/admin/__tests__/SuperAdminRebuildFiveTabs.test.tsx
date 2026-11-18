@@ -453,10 +453,10 @@ describe('SuperAdmin Rebuilt 5 Tabs Unit & Integration Suite', () => {
       expect(screen.getByText('Alex Rivera')).toBeInTheDocument();
       expect(screen.getByText('Dr. Sarah Jenkins')).toBeInTheDocument();
 
-      // Filter chips exist
-      expect(screen.getByRole('button', { name: /All Members/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Students/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Faculty/i })).toBeInTheDocument();
+      // Filter dropdown triggers exist on the right side
+      expect(screen.getByRole('button', { name: /Filter by Department/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Filter by Role/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Filter by Year/i })).toBeInTheDocument();
 
       // Click Alex Rivera card to open full dossier modal
       fireEvent.click(screen.getByText('Alex Rivera'));

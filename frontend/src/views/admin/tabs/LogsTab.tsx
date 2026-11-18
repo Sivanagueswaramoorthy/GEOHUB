@@ -294,23 +294,23 @@ export const LogsTab: React.FC<LogsTabProps> = ({
       {/* 2. Dedicated Directory Filter Deck (Separately with Premium Botanical UI) */}
       <div
         style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
-        className="cockpit-card rounded-2xl p-4 sm:p-4.5 border shadow-xs space-y-3.5 select-none"
+        className="cockpit-card rounded-2xl p-4 sm:p-4.5 border shadow-xs select-none"
       >
-        {/* Header: Title, Live Record Count & Reset Action */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+          {/* Left Column: Icon, Title, Record Count & Reset Action */}
+          <div className="flex items-start gap-3 min-w-0">
             <div
               style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs mt-0.5"
             >
-              <Filter size={15} strokeWidth={2.2} />
+              <Filter size={16} strokeWidth={2.2} />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span style={{ color: '#051F20' }} className="text-xs sm:text-sm font-bold tracking-tight">
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span style={{ color: '#051F20' }} className="text-sm font-bold tracking-tight">
                   Directory Filters
                 </span>
-                {isAnyFilterActive && (
+                {isAdvancedFilterActive && (
                   <span
                     style={{ backgroundColor: '#163832', color: '#FFFFFF' }}
                     className="px-2 py-0.5 rounded-full text-xs font-bold font-mono"
@@ -322,203 +322,66 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               <p style={{ color: '#235347' }} className="text-xs font-medium">
                 Showing {filteredMembers.length} of {counts.all} campus records
               </p>
+              {isAdvancedFilterActive && (
+                <button
+                  type="button"
+                  onClick={handleResetAdvancedFilters}
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="mt-1 min-h-[30px] px-2.5 py-1 rounded-lg border text-xs font-bold inline-flex items-center gap-1.5 transition hover:bg-[#DAF1DE] active:scale-95 cursor-pointer shadow-2xs"
+                  title="Reset all directory filters"
+                >
+                  <RotateCcw size={11} className="text-[#235347]" />
+                  <span>Reset Filters</span>
+                </button>
+              )}
             </div>
           </div>
 
-          {isAnyFilterActive && (
-            <button
-              type="button"
-              onClick={handleResetAllFilters}
-              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-              className="min-h-[36px] px-3 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition hover:bg-[#DAF1DE] active:scale-95 cursor-pointer shadow-2xs"
-              title="Reset all directory filters"
-            >
-              <RotateCcw size={12} className="text-[#235347]" />
-              <span>Reset Filters</span>
-            </button>
-          )}
-        </div>
+          {/* Right Column: Filters stacked vertically one by one (Department, Role, Year) */}
+          <div className="flex flex-col gap-2 w-full sm:w-[220px] shrink-0">
+            {/* Department Dropdown Menu */}
+            <FilterDropdownMenu
+              label="Department"
+              prefix="Dept"
+              value={deptFilter}
+              options={availableDepartments}
+              onChange={setDeptFilter}
+              icon={<Building size={13} strokeWidth={2.2} />}
+              allLabel="All Departments"
+              align="right"
+              className="w-full"
+              buttonClassName="w-full justify-between"
+            />
 
-        {/* Primary Scope / Role Category Segmented Bar (Replacing image 2 with clean styling) */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
-          <button
-            type="button"
-            onClick={() => setActiveFilter('all')}
-            style={{
-              backgroundColor: activeFilter === 'all' ? '#163832' : '#FFFFFF',
-              color: activeFilter === 'all' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'all' ? '#163832' : '#DAF1DE',
-            }}
-            className="min-h-[36px] px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95 flex items-center gap-1.5"
-          >
-            <span>All Members</span>
-            <span
-              style={{
-                backgroundColor: activeFilter === 'all' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
-                color: activeFilter === 'all' ? '#FFFFFF' : '#163832',
-              }}
-              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
-            >
-              {counts.all}
-            </span>
-          </button>
+            {/* Role Dropdown Menu */}
+            <FilterDropdownMenu
+              label="Role"
+              prefix="Role"
+              value={roleFilter}
+              options={availableRoles}
+              onChange={setRoleFilter}
+              icon={<Shield size={13} strokeWidth={2.2} />}
+              allLabel="All Roles"
+              align="right"
+              className="w-full"
+              buttonClassName="w-full justify-between"
+            />
 
-          <button
-            type="button"
-            onClick={() => setActiveFilter('student')}
-            style={{
-              backgroundColor: activeFilter === 'student' ? '#163832' : '#FFFFFF',
-              color: activeFilter === 'student' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'student' ? '#163832' : '#DAF1DE',
-            }}
-            className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
-          >
-            <GraduationCap size={13} className={activeFilter === 'student' ? 'text-white' : 'text-[#163832]'} />
-            <span>Students</span>
-            <span
-              style={{
-                backgroundColor: activeFilter === 'student' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
-                color: activeFilter === 'student' ? '#FFFFFF' : '#163832',
-              }}
-              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
-            >
-              {counts.student}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveFilter('faculty')}
-            style={{
-              backgroundColor: activeFilter === 'faculty' ? '#163832' : '#FFFFFF',
-              color: activeFilter === 'faculty' ? '#FFFFFF' : '#051F20',
-              borderColor: activeFilter === 'faculty' ? '#163832' : '#DAF1DE',
-            }}
-            className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
-          >
-            <Briefcase size={13} className={activeFilter === 'faculty' ? 'text-white' : 'text-[#163832]'} />
-            <span>Faculty</span>
-            <span
-              style={{
-                backgroundColor: activeFilter === 'faculty' ? 'rgba(255,255,255,0.2)' : '#DAF1DE',
-                color: activeFilter === 'faculty' ? '#FFFFFF' : '#163832',
-              }}
-              className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
-            >
-              {counts.faculty}
-            </span>
-          </button>
-
-          {counts.suspended > 0 && (
-            <button
-              type="button"
-              onClick={() => setActiveFilter('suspended')}
-              style={{
-                backgroundColor: activeFilter === 'suspended' ? '#D9534F' : '#FFFFFF',
-                color: activeFilter === 'suspended' ? '#FFFFFF' : '#D9534F',
-                borderColor: activeFilter === 'suspended' ? '#D9534F' : '#DAF1DE',
-              }}
-              className="min-h-[36px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer shrink-0 shadow-2xs active:scale-95"
-            >
-              <AlertOctagon size={13} />
-              <span>Suspended</span>
-              <span
-                style={{
-                  backgroundColor: activeFilter === 'suspended' ? 'rgba(255,255,255,0.2)' : '#F6FBF7',
-                  color: activeFilter === 'suspended' ? '#FFFFFF' : '#D9534F',
-                }}
-                className="px-1.5 py-0.5 rounded-full font-mono text-xs font-bold"
-              >
-                {counts.suspended}
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Dropdown Menus Row: Department, Role, Year */}
-        <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <FilterDropdownMenu
-            label="Department"
-            prefix="Dept"
-            value={deptFilter}
-            options={availableDepartments}
-            onChange={setDeptFilter}
-            icon={<Building size={13} strokeWidth={2.2} />}
-            allLabel="All Departments"
-          />
-
-          <FilterDropdownMenu
-            label="Role"
-            prefix="Role"
-            value={roleFilter}
-            options={availableRoles}
-            onChange={setRoleFilter}
-            icon={<Shield size={13} strokeWidth={2.2} />}
-            allLabel="All Roles"
-          />
-
-          <FilterDropdownMenu
-            label="Year of Study"
-            prefix="Year"
-            value={yearFilter}
-            options={availableYears}
-            onChange={setYearFilter}
-            icon={<GraduationCap size={13} strokeWidth={2.2} />}
-            allLabel="All Years"
-          />
-        </div>
-
-        {/* Section: Active Filter Tags (when any non-All is active) */}
-        {isAdvancedFilterActive && (
-          <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs font-bold text-[#235347]">Active:</span>
-            {deptFilter !== 'All' && (
-              <button
-                type="button"
-                onClick={() => setDeptFilter('All')}
-                style={{
-                  backgroundColor: '#DAF1DE',
-                  color: '#051F20',
-                  borderColor: '#8EB69B',
-                }}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
-              >
-                <span>Dept: {deptFilter}</span>
-                <X size={11} strokeWidth={2.5} />
-              </button>
-            )}
-            {roleFilter !== 'All' && (
-              <button
-                type="button"
-                onClick={() => setRoleFilter('All')}
-                style={{
-                  backgroundColor: '#DAF1DE',
-                  color: '#051F20',
-                  borderColor: '#8EB69B',
-                }}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
-              >
-                <span>Role: {roleFilter}</span>
-                <X size={11} strokeWidth={2.5} />
-              </button>
-            )}
-            {yearFilter !== 'All' && (
-              <button
-                type="button"
-                onClick={() => setYearFilter('All')}
-                style={{
-                  backgroundColor: '#DAF1DE',
-                  color: '#051F20',
-                  borderColor: '#8EB69B',
-                }}
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border transition cursor-pointer hover:bg-rose-100"
-              >
-                <span>Year: {yearFilter}</span>
-                <X size={11} strokeWidth={2.5} />
-              </button>
-            )}
+            {/* Year Dropdown Menu */}
+            <FilterDropdownMenu
+              label="Year of Study"
+              prefix="Year"
+              value={yearFilter}
+              options={availableYears}
+              onChange={setYearFilter}
+              icon={<GraduationCap size={13} strokeWidth={2.2} />}
+              allLabel="All Years"
+              align="right"
+              className="w-full"
+              buttonClassName="w-full justify-between"
+            />
           </div>
-        )}
+        </div>
       </div>
 
       {/* Member Records List (Cards in Clean Mint Grid) */}

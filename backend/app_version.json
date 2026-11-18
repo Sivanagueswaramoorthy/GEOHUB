@@ -2,7 +2,7 @@
   "version": "1.6.50",
   "version_code": 69,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Streamlined SuperAdmin Home metrics strip by removing redundant 'Enrolled', 'Advisors', and 'Campus Total' labels for an ultra-clean, minimalist layout.",
-  "sha256": "6efd4885419ba9b50497ca21253f28816dbf255856da3dc093b14d72bdd5045b",
-  "file_size": 6916766
+  "release_notes": "Removed redundant Active filter tags from Directory view for a cleaner, unified experience.",
+  "sha256": "bc68d4e959d7c74d9c270fd35ebcf3f4b653654b819e26c3360789b4560c3052",
+  "file_size": 7226615
 }
