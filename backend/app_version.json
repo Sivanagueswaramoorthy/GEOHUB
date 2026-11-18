@@ -1,8 +1,8 @@
 {
-  "version": "1.6.51",
-  "version_code": 70,
+  "version": "1.6.52",
+  "version_code": 71,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Removed active filter count badge and tags from scholar and directory filters for a cleaner, unified UI.",
-  "sha256": "91963fd282a4bcdc766174fe7532731c633149a826e9dab75bbc7274aece3f44",
-  "file_size": 8202204
+  "release_notes": "Added tactical Reset Filters button in bottom right corner of Directory Filters card.",
+  "sha256": "9d457f4119415f4b95ef2439a0a1661cc43fe892fdc6021e5b1edc293dc738ed",
+  "file_size": 7929435
 }

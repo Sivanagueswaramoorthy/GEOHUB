@@ -308,18 +308,6 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               <p style={{ color: '#235347' }} className="text-xs font-medium">
                 Showing {filteredMembers.length} of {counts.all} campus records
               </p>
-              {isAdvancedFilterActive && (
-                <button
-                  type="button"
-                  onClick={handleResetAdvancedFilters}
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-                  className="mt-1 min-h-[30px] px-2.5 py-1 rounded-lg border text-xs font-bold inline-flex items-center gap-1.5 transition hover:bg-[#DAF1DE] active:scale-95 cursor-pointer shadow-2xs"
-                  title="Reset all directory filters"
-                >
-                  <RotateCcw size={11} className="text-[#235347]" />
-                  <span>Reset Filters</span>
-                </button>
-              )}
             </div>
           </div>
 
@@ -366,6 +354,23 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               className="w-full"
               buttonClassName="w-full justify-between"
             />
+
+            {/* Down Right Corner: Reset Filters with proper tactile UI */}
+            {isAdvancedFilterActive && (
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleResetAdvancedFilters}
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="min-h-[36px] px-3.5 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-xs self-end"
+                  title="Reset all directory filters"
+                  aria-label="Reset all directory filters"
+                >
+                  <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
+                  <span>Reset Filters</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

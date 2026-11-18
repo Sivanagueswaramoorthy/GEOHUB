@@ -130,36 +130,36 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         {/* Subtle Cyber Grid Watermark Overlay */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.035] bg-[radial-gradient(#163832_1px,transparent_1px)] [background-size:12px_12px]" />
 
-        <div className="relative z-10 flex items-center justify-between gap-2.5 sm:gap-4">
+        <div className="relative z-10 flex items-start justify-between gap-3 sm:gap-4">
           {/* Left Column: Command & Health Information */}
-          <div className="min-w-0 flex-1 space-y-2">
-            {/* Title & Authority Avatar */}
-            <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1 space-y-2.5">
+            {/* Title & Authority Avatar (Full display, zero truncation) */}
+            <div className="flex items-center gap-2.5">
               <div
                 style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
-                className="w-8 h-8 rounded-xl border flex items-center justify-center font-black text-xs shadow-2xs shrink-0"
+                className="w-7 h-7 rounded-lg border flex items-center justify-center font-black text-xs shadow-2xs shrink-0"
               >
                 SA
               </div>
               <div className="min-w-0">
-                <h1 style={{ color: '#051F20' }} className="text-xs sm:text-sm font-black tracking-tight truncate">
+                <h1 style={{ color: '#051F20' }} className="text-xs sm:text-sm font-black tracking-tight leading-snug">
                   System Overview & Health
                 </h1>
-                <p style={{ color: '#235347' }} className="text-xs font-medium truncate">
+                <p style={{ color: '#235347' }} className="text-xs font-semibold leading-none mt-0.5">
                   SuperAdmin Root Authority
                 </p>
               </div>
             </div>
 
             {/* Badges & Operations Pill */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               <span
                 style={{
                   backgroundColor: '#DAF1DE',
                   borderColor: '#8EB69B',
                   color: '#163832',
                 }}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-extrabold border shrink-0 shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 shadow-2xs"
               >
                 <span
                   style={{ backgroundColor: '#163832' }}
@@ -168,10 +168,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <span>{activeBackend ? 'Live Operations' : 'Maintenance Mode Active'}</span>
               </span>
 
-              <span
-                style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#163832' }}
-                className="hidden xs:inline-flex items-center px-1.5 py-0.5 rounded-md border text-xs font-mono font-bold"
-              >
+              <span style={{ color: '#235347' }} className="text-xs font-mono font-bold">
                 SA01 ROOT
               </span>
             </div>
@@ -183,7 +180,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 onClick={() => onPingDatabase()}
                 disabled={isPinging || !activeDb}
                 style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-[#DAF1DE] hover:border-[#163832]"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold shadow-2xs transition-all disabled:opacity-40 cursor-pointer shrink-0 active:scale-95 border hover:bg-[#DAF1DE] hover:border-[#163832]"
               >
                 <RefreshCw size={12} className={isPinging ? 'animate-spin text-[#163832]' : 'text-[#163832]'} />
                 <span className="text-xs whitespace-nowrap">
@@ -193,8 +190,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Animated Hacker with Laptop Illustration */}
-          <div className="shrink-0 flex items-center justify-center pl-1 sm:pl-2">
+          {/* Right Column: Clean Hacker with Laptop Illustration (Zero moving lines) */}
+          <div className="shrink-0 flex items-end justify-center self-end pl-1 sm:pl-2">
             <AnimatedHackerIllustration isPinging={isPinging} />
           </div>
         </div>
