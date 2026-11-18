@@ -92,6 +92,7 @@ export async function checkForAppUpdate(): Promise<CheckUpdateResult> {
       method: 'GET',
       headers: {
         Accept: 'application/json',
+        'ngrok-skip-browser-warning': 'true',
       },
       signal: controller.signal,
     });
