@@ -1,8 +1,8 @@
 {
-  "version": "1.6.54",
-  "version_code": 73,
+  "version": "1.6.55",
+  "version_code": 74,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Latest release v1.6.54 (Build 73) with cross-device real-time system maintenance & database toggle sync, down-right corner Reset Filters with proper UI, and zero design violations.",
-  "sha256": "C9D87416F47B0FDF08AF732D59E1DFC47AE1393A6A7B0B5224F13F77E4937E5B",
-  "file_size": 7570130
+  "release_notes": "Latest release v1.6.55 (Build 74) with direct TiDB Cloud gateway tunnel routing, eliminated dead Render fallback, resilient SuperAdmin roster caching, and instant cross-device database synchronization.",
+  "sha256": "1E7333A04054D35B98733653B741960A8470DAB81930E6179C007B5887BB6B0F",
+  "file_size": 7256161
 }

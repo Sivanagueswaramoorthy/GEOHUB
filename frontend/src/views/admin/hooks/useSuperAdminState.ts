@@ -162,8 +162,78 @@ export function useSuperAdminState() {
   const [roleModuleAccess, setRoleModuleAccess] = useState<Record<string, Record<string, boolean>>>(
     DEFAULT_ROLE_MODULE_ACCESS
   );
-  const [faculty, setFaculty] = useState<FacultyAdvisorItem[]>(isTestEnv ? INITIAL_FACULTY : []);
-  const [students, setStudents] = useState<SuperAdminUserItem[]>(isTestEnv ? INITIAL_STUDENTS : []);
+  const [faculty, setFaculty] = useState<FacultyAdvisorItem[]>(() => {
+    if (isTestEnv) return INITIAL_FACULTY;
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem('geohub_store_admin_faculty');
+        if (raw) return JSON.parse(raw);
+        // Fallback to global users cache if available
+        const rawUsers = localStorage.getItem('geohub_store_users');
+        if (rawUsers) {
+          const parsed = JSON.parse(rawUsers);
+          if (Array.isArray(parsed)) {
+            return parsed
+              .filter((u: any) => u.role === 'faculty')
+              .map((f: any) => ({
+                id: f.uid || f.id,
+                roll_no: f.rollNo || f.roll_no || 'FAC01',
+                name: f.name,
+                designation: f.post || 'Faculty Advisor',
+                department: f.department || 'Geoinformatics',
+                email: f.email,
+                phone: f.phone || '+91 94420 18820',
+                status: f.status || 'active',
+                last_login_at: new Date().toISOString(),
+                last_seen_at: new Date().toISOString(),
+                last_platform: 'Android',
+                last_app_version: '1.6.55',
+              }));
+          }
+        }
+      }
+    } catch {}
+    return [];
+  });
+
+  const [students, setStudents] = useState<SuperAdminUserItem[]>(() => {
+    if (isTestEnv) return INITIAL_STUDENTS;
+    try {
+      if (typeof window !== 'undefined') {
+        const raw = localStorage.getItem('geohub_store_admin_students');
+        if (raw) return JSON.parse(raw);
+        // Fallback to global users cache if available
+        const rawUsers = localStorage.getItem('geohub_store_users');
+        if (rawUsers) {
+          const parsed = JSON.parse(rawUsers);
+          if (Array.isArray(parsed)) {
+            return parsed
+              .filter((u: any) => u.role !== 'faculty' && u.role !== 'super_admin')
+              .map((u: any) => ({
+                id: u.uid || u.id,
+                roll_no: u.rollNo || u.roll_no || 'N/A',
+                name: u.name,
+                role: u.role || 'student',
+                department: u.department || 'Geoinformatics',
+                year_of_study: u.yearOfStudy || u.year_of_study || '4th Year',
+                team: u.team || 'General',
+                post: u.post || u.teamRole || 'Student Member',
+                team_role: u.teamRole || u.post || 'Member',
+                email: u.email,
+                status: u.status || 'active',
+                last_login_at: new Date().toISOString(),
+                last_seen_at: new Date().toISOString(),
+                last_platform: 'Android',
+                last_app_version: '1.6.55',
+                events_attended: 0,
+                tasks_completed: 0,
+              }));
+          }
+        }
+      }
+    } catch {}
+    return [];
+  });
   const [onlineSessions, setOnlineSessions] = useState<OnlineSessionUser[]>([]);
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [rolesCredentials, setRolesCredentials] = useState<RoleMeta[]>(CANONICAL_ROLES);
@@ -362,22 +432,26 @@ export function useSuperAdminState() {
       }
 
       if (facultyRes.status === 'fulfilled' && Array.isArray(facultyRes.value)) {
-        setFaculty(
-          facultyRes.value.map((f: any) => ({
-            id: f.id,
-            roll_no: f.roll_no || 'FAC01',
-            name: f.name,
-            designation: f.post || f.designation || 'Faculty Advisor',
-            department: f.department || 'Geoinformatics',
-            email: f.email,
-            phone: f.phone || '+91 94420 18820',
-            status: f.status || 'active',
-            last_login_at: f.last_login_at || new Date().toISOString(),
-            last_seen_at: f.last_seen_at || new Date().toISOString(),
-            last_platform: f.last_platform || 'Web',
-            last_app_version: f.last_app_version || '1.6.26',
-          }))
-        );
+        const facList = facultyRes.value.map((f: any) => ({
+          id: f.id,
+          roll_no: f.roll_no || 'FAC01',
+          name: f.name,
+          designation: f.post || f.designation || 'Faculty Advisor',
+          department: f.department || 'Geoinformatics',
+          email: f.email,
+          phone: f.phone || '+91 94420 18820',
+          status: f.status || 'active',
+          last_login_at: f.last_login_at || new Date().toISOString(),
+          last_seen_at: f.last_seen_at || new Date().toISOString(),
+          last_platform: f.last_platform || 'Web',
+          last_app_version: f.last_app_version || '1.6.55',
+        }));
+        setFaculty(facList);
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('geohub_store_admin_faculty', JSON.stringify(facList));
+          }
+        } catch {}
       }
 
       if (usersRes.status === 'fulfilled' && Array.isArray(usersRes.value)) {
@@ -398,11 +472,16 @@ export function useSuperAdminState() {
             last_login_at: u.last_login_at || new Date().toISOString(),
             last_seen_at: u.last_seen_at || new Date().toISOString(),
             last_platform: u.last_platform || 'Android',
-            last_app_version: u.last_app_version || '1.6.26',
+            last_app_version: u.last_app_version || '1.6.55',
             events_attended: u.events_attended || 0,
             tasks_completed: u.tasks_completed || 0,
           }));
         setStudents(stdList);
+        try {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('geohub_store_admin_students', JSON.stringify(stdList));
+          }
+        } catch {}
       }
 
       if (rolesRes.status === 'fulfilled' && Array.isArray(rolesRes.value) && rolesRes.value.length > 0) {

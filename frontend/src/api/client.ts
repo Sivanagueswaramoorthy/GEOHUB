@@ -9,14 +9,9 @@ export const DEFAULT_CLOUD_API = 'https://roping-udder-unsaid.ngrok-free.dev/api
 export function resolveApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const customUrl = localStorage.getItem('geohub_api_base_url');
-    if (customUrl && customUrl.trim()) {
+    if (customUrl && customUrl.trim() && !customUrl.includes('onrender.com')) {
       return customUrl.trim().replace(/\/+$/, '');
     }
-  }
-
-  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) || '';
-  if (envUrl && envUrl.trim()) {
-    return envUrl.trim().replace(/\/+$/, '');
   }
 
   // Detect Android APK wrapper environment or mobile / file / standalone web context
@@ -32,8 +27,13 @@ export function resolveApiBaseUrl(): string {
 
   if (isApkOrMobile) {
     // In APK or mobile file sandbox, relative '/api' resolves to Android local assets which 404s.
-    // Fall back to active default cloud API tunnel.
+    // Route directly to active TiDB Cloud gateway tunnel.
     return DEFAULT_CLOUD_API;
+  }
+
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL) || '';
+  if (envUrl && envUrl.trim() && !envUrl.includes('onrender.com')) {
+    return envUrl.trim().replace(/\/+$/, '');
   }
 
   // If in browser: if origin is not localhost/127.0.0.1 and not the ngrok tunnel itself,
@@ -41,7 +41,7 @@ export function resolveApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     const isLocalhost = host === 'localhost' || host === '127.0.0.1';
-    const isOriginNgrok = host.includes('ngrok-free.dev') || host.includes('ngrok.io') || host.includes('onrender.com');
+    const isOriginNgrok = host.includes('ngrok-free.dev') || host.includes('ngrok.io');
     if (!isLocalhost && !isOriginNgrok) {
       return DEFAULT_CLOUD_API;
     }
@@ -1015,9 +1015,10 @@ class ApiClient {
   public async pingTiDbHealth(): Promise<{ ok: boolean; latencyMs: number; status: string; database?: string }> {
     const start = performance.now();
     try {
-      const res = await this.request<{ status: string; database: string; latency_ms: number }>('/v1/health');
+      const res = await this.request<{ status: string; database: string; latency_ms: number; database_connected?: boolean }>('/v1/health');
       const elapsed = Math.round(performance.now() - start);
-      return { ok: true, latencyMs: res.latency_ms || elapsed, status: res.status, database: res.database };
+      const isOk = res.status === 'healthy' || res.status === 'online' || res.database_connected === true;
+      return { ok: isOk, latencyMs: res.latency_ms || elapsed, status: res.status, database: res.database };
     } catch {
       const elapsed = Math.round(performance.now() - start);
       return { ok: false, latencyMs: elapsed, status: 'offline' };

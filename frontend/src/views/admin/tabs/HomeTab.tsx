@@ -415,12 +415,25 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </span>
                 <span className="sr-only">Backend Connectivity</span>
               </div>
-              <p
-                style={{ color: '#235347' }}
-                className="text-xs font-mono truncate max-w-[170px] sm:max-w-md block mt-0.5"
-              >
-                /api/v1/health · v{APP_VERSION}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <p
+                  style={{ color: '#235347' }}
+                  className="text-xs font-mono truncate max-w-[160px] sm:max-w-md block"
+                >
+                  /api/v1/health · v{APP_VERSION}
+                </p>
+                {app?.setIsServerModalOpen && (
+                  <button
+                    type="button"
+                    onClick={() => app.setIsServerModalOpen(true)}
+                    style={{ color: '#163832', backgroundColor: '#DAF1DE', borderColor: '#8EB69B' }}
+                    className="px-2 py-0.5 rounded-lg border text-xs font-bold cursor-pointer hover:bg-[#DAF1DE]/70 active:scale-95 transition-all shadow-2xs"
+                    title="Configure Server Connection URL"
+                  >
+                    Server URL
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
