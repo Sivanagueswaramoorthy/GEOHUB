@@ -1,12 +1,12 @@
 {
-  "version": "1.6.61",
-  "version_code": 80,
+  "version": "1.6.62",
+  "version_code": 81,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Release v1.6.61 (Build 80): Earth and Nature Living Biosphere sanctuary splash screen with ambient wildlife silhouettes (stag, deer, birds, hare, butterflies), topographic elevation contours, and mindful glassmorphic status card.",
+  "release_notes": "Release v1.6.62 (Build 81): Realistic nature and wildlife splash screen with center-down loading card, showcasing majestic stag, grazing deer, evergreen pines, and misty mountains.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-19",
-  "file_size_bytes": 6959064,
-  "file_size_mb": "6.64 MB",
-  "sha256": "97B10AC9B8649021B3C340118A2680CB39CBA0A4A82E78EB68CBA3F3A5787428"
+  "file_size_bytes": 7734876,
+  "file_size_mb": "7.38 MB",
+  "sha256": "9AC948975C98417036E4C4220DFEA771815465133F20140DE4A7C67CA07303A9"
 }

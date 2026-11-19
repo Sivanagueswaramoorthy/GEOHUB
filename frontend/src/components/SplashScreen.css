@@ -1,9 +1,9 @@
 /* ==========================================================================
-   GeoHub - Earth & Nature Mindful Living Biosphere Splash Screen
-   Forest & Mint Luxury Palette • Ambient Wildlife & Natural Sanctuary
+   GeoHub - Realistic Nature & Wildlife Living Biosphere Splash Screen
+   Forest & Mint Luxury Palette • Hyper-Realistic Scenic Mountain Landscape
    ========================================================================== */
 
-/* Splash Viewport Overlay: Living Nature Dawn Gradient */
+/* Splash Viewport Overlay */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -11,11 +11,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(180deg, #F6FBF7 0%, #F6FBF7 30%, #DAF1DE 75%, #8EB69B 100%);
+  justify-content: flex-start;
+  background-color: #F6FBF7;
   overflow: hidden;
   user-select: none;
-  padding: 44px 16px 24px;
+  padding: 38px 16px 20px;
   transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
@@ -27,19 +27,57 @@
   pointer-events: none;
 }
 
-/* Ambient Radial Sun & Biosphere Glow (Behind Branding) */
+/* Hyper-Realistic Photographic Nature Backdrop */
+.nature-realistic-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.nature-realistic-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  filter: contrast(1.05) saturate(1.1);
+  transform: scale(1.01);
+  transition: transform 12s ease-out;
+}
+
+/* Cinematic Atmospheric Mist Gradient Overlay */
+.nature-mist-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(246, 251, 247, 0.97) 0%,
+    rgba(246, 251, 247, 0.90) 24%,
+    rgba(246, 251, 247, 0.58) 46%,
+    rgba(246, 251, 247, 0.12) 60%,
+    rgba(5, 31, 32, 0.05) 80%,
+    rgba(5, 31, 32, 0.24) 100%
+  );
+  pointer-events: none;
+}
+
+/* Ambient Radial Sun Glow Behind Emblem */
 .nature-sun-aura {
   position: absolute;
-  top: 140px;
+  top: 130px;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 420px;
-  height: 420px;
+  width: 400px;
+  height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(142, 182, 155, 0.35) 0%, rgba(218, 241, 222, 0.2) 45%, transparent 72%);
+  background: radial-gradient(circle, rgba(142, 182, 155, 0.35) 0%, rgba(218, 241, 222, 0.18) 45%, transparent 72%);
   filter: blur(34px);
   pointer-events: none;
   animation: nature-glow-breathe 5s ease-in-out infinite alternate;
+  z-index: 2;
 }
 
 @keyframes nature-glow-breathe {
@@ -48,12 +86,12 @@
     opacity: 0.75;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: translate(-50%, -50%) scale(1.08);
     opacity: 1;
   }
 }
 
-/* Float Animation for GeoHub Emblem (4s subtle oscillation) */
+/* 4.2s Gentle Oscillation for Emblem */
 @keyframes emblem-float {
   0%, 100% {
     transform: translateY(-4px);
@@ -72,88 +110,25 @@
   filter: drop-shadow(0 14px 28px rgba(5, 31, 32, 0.16)) drop-shadow(0 4px 10px rgba(22, 56, 50, 0.1));
 }
 
-/* Nature Canvas & Layered Wildlife Scenery */
-.nature-sanctuary-canvas {
-  position: absolute;
-  inset: 0;
+/* Central Content Container: Center branding and status card */
+.splash-content-column {
+  position: relative;
+  z-index: 10;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
 }
 
-.nature-sanctuary-svg {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  min-width: 850px;
-  max-width: 1400px;
-  height: 72%;
-  object-fit: cover;
+/* Mindful Earth Pill Badge */
+.nature-mindful-pill {
+  animation: emblem-float 4.2s ease-in-out infinite;
+  animation-delay: 0.3s;
 }
 
-/* Soaring Birds Flight Animation */
-@keyframes soar-glide {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-  50% {
-    transform: translateY(-7px) translateX(10px);
-  }
-}
-
-.animate-nature-soar {
-  animation: soar-glide 8s ease-in-out infinite;
-}
-
-/* Butterfly Gentle Flutter */
-@keyframes butterfly-flutter {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-5px) rotate(4deg);
-  }
-  75% {
-    transform: translateY(3px) rotate(-3deg);
-  }
-}
-
-.animate-butterfly-float {
-  animation: butterfly-flutter 4.5s ease-in-out infinite;
-}
-
-/* Floating Nature Spores & Bioluminescent Dust */
-@keyframes spore-drift {
-  0% {
-    transform: translateY(0) translateX(0) scale(0.8);
-    opacity: 0;
-  }
-  30% {
-    opacity: 0.75;
-  }
-  80% {
-    opacity: 0.55;
-  }
-  100% {
-    transform: translateY(-240px) translateX(24px) scale(1.15);
-    opacity: 0;
-  }
-}
-
-.nature-spore {
-  position: absolute;
-  border-radius: 50%;
-  background-color: #8EB69B;
-  box-shadow: 0 0 10px #DAF1DE;
-  pointer-events: none;
-  animation: spore-drift 8s infinite ease-in-out;
-}
-
-/* Bottom Glassmorphic Status Sheet */
+/* Status Sheet Floating in Center Little Down */
 .splash-status-sheet {
   width: 100%;
   max-width: 380px;
@@ -163,10 +138,11 @@
   border-radius: 24px;
   padding: 16px 18px;
   border: 1.5px solid #DAF1DE;
-  box-shadow: 0 20px 48px -12px rgba(5, 31, 32, 0.12),
+  box-shadow: 0 18px 44px -10px rgba(5, 31, 32, 0.14),
               0 2px 8px rgba(5, 31, 32, 0.04);
   text-align: left;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 20px;
 }
 
 .splash-status-sheet-error {
@@ -178,10 +154,11 @@
   border-radius: 24px;
   padding: 16px 18px;
   border: 1.5px solid rgba(217, 83, 79, 0.35);
-  box-shadow: 0 20px 48px -12px rgba(217, 83, 79, 0.15),
+  box-shadow: 0 18px 44px -10px rgba(217, 83, 79, 0.16),
               0 2px 8px rgba(217, 83, 79, 0.05);
   text-align: left;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 20px;
 }
 
 /* 8px Rounded Botanical Progress Bar */
@@ -246,10 +223,42 @@
   transform: scale(0.97);
 }
 
-/* Mindful Earth Pill Badge */
-.nature-mindful-pill {
-  animation: emblem-float 4.2s ease-in-out infinite;
-  animation-delay: 0.3s;
+/* Floating Nature Spores & Bioluminescent Dust */
+@keyframes spore-drift {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.75;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-240px) translateX(24px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+.nature-spore {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #8EB69B;
+  box-shadow: 0 0 10px #DAF1DE;
+  pointer-events: none;
+  animation: spore-drift 8s infinite ease-in-out;
+  z-index: 3;
+}
+
+/* Bottom Watermark Tag */
+.splash-bottom-watermark {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: nowrap;
 }
 
 /* Reduced Motion Support */
@@ -258,8 +267,6 @@
   .nature-sun-aura,
   .animate-float,
   .nature-mindful-pill,
-  .animate-nature-soar,
-  .animate-butterfly-float,
   .nature-spore,
   .splash-progress-fill,
   .splash-progress-fill-active::after {
