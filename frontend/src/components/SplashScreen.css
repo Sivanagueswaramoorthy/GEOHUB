@@ -1,9 +1,9 @@
 /* ==========================================================================
-   GeoHub - Cartoon Nature Living Biosphere Splash Screen
-   Faded Pastel Palette • Soft Cartoon Animals & Rolling Hills
+   GeoHub - Premium Living Biosphere Splash Screen
+   Forest & Mint Luxury Palette • Glassmorphic Cockpit & Faded Pastel Nature
    ========================================================================== */
 
-/* Splash Viewport: Faded Pastel Canvas */
+/* Splash Viewport: Faded Pastel Living Canvas */
 .splash-overlay {
   position: fixed;
   inset: 0;
@@ -15,7 +15,7 @@
   background-color: #F6FBF7;
   overflow: hidden;
   user-select: none;
-  padding: 44px 18px 24px;
+  padding: 40px 16px 22px;
   transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: opacity, transform;
@@ -27,7 +27,7 @@
   pointer-events: none;
 }
 
-/* Faded Cartoon Backdrop */
+/* Faded Cartoon Nature Backdrop */
 .nature-cartoon-backdrop {
   position: absolute;
   inset: 0;
@@ -42,38 +42,38 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 50%;
+  object-position: center 52%;
   opacity: 0.94;
   filter: saturate(0.96) brightness(1.02);
 }
 
-/* Soft Faded Mist Gradient Blending */
+/* Soft Faded Mist Gradient Blending (Fades cleanly at top and bottom) */
 .nature-faded-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(246, 251, 247, 0.96) 0%,
-    rgba(246, 251, 247, 0.78) 18%,
-    rgba(246, 251, 247, 0.12) 36%,
-    rgba(246, 251, 247, 0.05) 58%,
-    rgba(246, 251, 247, 0.65) 82%,
-    rgba(246, 251, 247, 0.96) 100%
+    rgba(246, 251, 247, 0.97) 0%,
+    rgba(246, 251, 247, 0.85) 16%,
+    rgba(246, 251, 247, 0.14) 34%,
+    rgba(246, 251, 247, 0.04) 56%,
+    rgba(246, 251, 247, 0.65) 80%,
+    rgba(246, 251, 247, 0.97) 100%
   );
   pointer-events: none;
 }
 
-/* Soft Ambient Radial Glow Behind Logo */
+/* Luxury Radial Sun Aura Behind Emblem */
 .nature-sun-aura {
   position: absolute;
   top: 130px;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(142, 182, 155, 0.28) 0%, rgba(218, 241, 222, 0.14) 45%, transparent 70%);
-  filter: blur(30px);
+  background: radial-gradient(circle, rgba(142, 182, 155, 0.32) 0%, rgba(218, 241, 222, 0.16) 45%, transparent 72%);
+  filter: blur(32px);
   pointer-events: none;
   animation: nature-glow-breathe 5s ease-in-out infinite alternate;
   z-index: 2;
@@ -85,12 +85,12 @@
     opacity: 0.75;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1.06);
+    transform: translate(-50%, -50%) scale(1.08);
     opacity: 1;
   }
 }
 
-/* Float Animation for Emblem */
+/* 4.2s Smooth Float for Emblem */
 @keyframes emblem-float {
   0%, 100% {
     transform: translateY(-3px);
@@ -104,12 +104,12 @@
   animation: emblem-float 4.2s ease-in-out infinite;
 }
 
-/* Soft Elevation Shadow for Emblem */
+/* Luxury Multi-Layer Elevation Shadow for Emblem */
 .emblem-shadow {
-  filter: drop-shadow(0 12px 24px rgba(5, 31, 32, 0.12)) drop-shadow(0 3px 8px rgba(22, 56, 50, 0.06));
+  filter: drop-shadow(0 16px 32px rgba(5, 31, 32, 0.14)) drop-shadow(0 4px 10px rgba(22, 56, 50, 0.08));
 }
 
-/* Top Branding Group */
+/* Top Branding Group: Guaranteed No-Wrap & No-Clip */
 .splash-branding-group {
   position: relative;
   z-index: 10;
@@ -118,6 +118,8 @@
   align-items: center;
   text-align: center;
   width: 100%;
+  max-width: 420px;
+  padding: 0 12px;
 }
 
 /* Mindful Earth Pill Badge */
@@ -136,45 +138,50 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  padding: 0 4px;
 }
 
-/* Status Sheet in Correct Lower Ergonomic Position */
+/* Luxury Glassmorphic Cockpit Status Sheet */
 .splash-status-sheet {
   width: 100%;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 251, 247, 0.90) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 24px;
+  padding: 16px 20px;
   border: 1.5px solid #DAF1DE;
-  box-shadow: 0 16px 36px -10px rgba(5, 31, 32, 0.12),
-              0 2px 6px rgba(5, 31, 32, 0.03);
+  box-shadow: 0 20px 48px -12px rgba(5, 31, 32, 0.12),
+              0 4px 12px rgba(5, 31, 32, 0.04),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
   text-align: left;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .splash-status-sheet-error {
   width: 100%;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 251, 247, 0.92) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 24px;
+  padding: 16px 20px;
   border: 1.5px solid rgba(217, 83, 79, 0.35);
-  box-shadow: 0 16px 36px -10px rgba(217, 83, 79, 0.14),
-              0 2px 6px rgba(217, 83, 79, 0.04);
+  box-shadow: 0 20px 48px -12px rgba(217, 83, 79, 0.15),
+              0 4px 12px rgba(217, 83, 79, 0.04),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
   text-align: left;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 7px Rounded Botanical Progress Bar */
+/* 8px Precision Botanical Progress Bar */
 .splash-progress-track {
   width: 100%;
-  height: 7px;
+  height: 8px;
   background-color: #DAF1DE;
   border-radius: 9999px;
   overflow: hidden;
   position: relative;
+  border: 1px solid rgba(142, 182, 155, 0.3);
+  box-shadow: inset 0 1px 2px rgba(5, 31, 32, 0.05);
 }
 
 .splash-progress-fill {
@@ -193,7 +200,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.7) 50%, transparent 100%);
   animation: splash-shimmer-sweep 1.8s infinite;
 }
 
@@ -215,11 +222,11 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #FFFFFF;
-  box-shadow: 0 0 6px #DAF1DE;
+  box-shadow: 0 0 6px #DAF1DE, 0 0 2px #FFFFFF;
 }
 
 .pressable {
@@ -236,10 +243,10 @@
     opacity: 0;
   }
   30% {
-    opacity: 0.7;
+    opacity: 0.75;
   }
   80% {
-    opacity: 0.5;
+    opacity: 0.55;
   }
   100% {
     transform: translateY(-200px) translateX(20px) scale(1.1);

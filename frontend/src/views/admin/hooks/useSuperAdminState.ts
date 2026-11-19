@@ -167,13 +167,16 @@ export function useSuperAdminState() {
     try {
       if (typeof window !== 'undefined') {
         const raw = localStorage.getItem('geohub_store_admin_faculty');
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
         // Fallback to global users cache if available
         const rawUsers = localStorage.getItem('geohub_store_users');
         if (rawUsers) {
           const parsed = JSON.parse(rawUsers);
-          if (Array.isArray(parsed)) {
-            return parsed
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const fac = parsed
               .filter((u: any) => u.role === 'faculty')
               .map((f: any) => ({
                 id: f.uid || f.id,
@@ -189,11 +192,12 @@ export function useSuperAdminState() {
                 last_platform: 'Android',
                 last_app_version: '1.6.55',
               }));
+            if (fac.length > 0) return fac;
           }
         }
       }
     } catch {}
-    return [];
+    return INITIAL_FACULTY;
   });
 
   const [students, setStudents] = useState<SuperAdminUserItem[]>(() => {
@@ -201,13 +205,16 @@ export function useSuperAdminState() {
     try {
       if (typeof window !== 'undefined') {
         const raw = localStorage.getItem('geohub_store_admin_students');
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
         // Fallback to global users cache if available
         const rawUsers = localStorage.getItem('geohub_store_users');
         if (rawUsers) {
           const parsed = JSON.parse(rawUsers);
-          if (Array.isArray(parsed)) {
-            return parsed
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const std = parsed
               .filter((u: any) => u.role !== 'faculty' && u.role !== 'super_admin')
               .map((u: any) => ({
                 id: u.uid || u.id,
@@ -228,11 +235,12 @@ export function useSuperAdminState() {
                 events_attended: 0,
                 tasks_completed: 0,
               }));
+            if (std.length > 0) return std;
           }
         }
       }
     } catch {}
-    return [];
+    return INITIAL_STUDENTS;
   });
   const [onlineSessions, setOnlineSessions] = useState<OnlineSessionUser[]>([]);
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
@@ -478,10 +486,17 @@ export function useSuperAdminState() {
           last_platform: f.last_platform || 'Web',
           last_app_version: f.last_app_version || '1.6.55',
         }));
-        setFaculty(facList);
+        // Merge with canonical faculty so roster is always complete
+        const mergedFaculty: FacultyAdvisorItem[] = [...facList];
+        INITIAL_FACULTY.forEach((initF) => {
+          if (!mergedFaculty.some((f) => f.roll_no === initF.roll_no || f.id === initF.id)) {
+            mergedFaculty.push(initF);
+          }
+        });
+        setFaculty(mergedFaculty);
         try {
           if (typeof window !== 'undefined') {
-            localStorage.setItem('geohub_store_admin_faculty', JSON.stringify(facList));
+            localStorage.setItem('geohub_store_admin_faculty', JSON.stringify(mergedFaculty));
           }
         } catch {}
       }
@@ -508,10 +523,17 @@ export function useSuperAdminState() {
             events_attended: u.events_attended || 0,
             tasks_completed: u.tasks_completed || 0,
           }));
-        setStudents(stdList);
+        // Merge with canonical students so roster is always complete
+        const mergedStudents: SuperAdminUserItem[] = [...stdList];
+        INITIAL_STUDENTS.forEach((initS) => {
+          if (!mergedStudents.some((s) => s.roll_no === initS.roll_no || s.id === initS.id)) {
+            mergedStudents.push(initS);
+          }
+        });
+        setStudents(mergedStudents);
         try {
           if (typeof window !== 'undefined') {
-            localStorage.setItem('geohub_store_admin_students', JSON.stringify(stdList));
+            localStorage.setItem('geohub_store_admin_students', JSON.stringify(mergedStudents));
           }
         } catch {}
       }

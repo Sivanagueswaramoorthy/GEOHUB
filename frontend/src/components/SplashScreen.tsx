@@ -4,6 +4,7 @@ import {
   RefreshCw,
   Leaf,
   Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import {
   checkNetworkStability,
@@ -214,7 +215,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       <div className="nature-spore" style={{ width: 5, height: 5, left: '45%', bottom: '44%', animationDelay: '2.5s' }} />
       <div className="nature-spore" style={{ width: 3, height: 3, left: '78%', bottom: '36%', animationDelay: '4.2s' }} />
 
-      {/* 4. Top Branding Group */}
+      {/* 4. Top Branding Group (Clean, Luxury, Guaranteed No-Clip) */}
       <div className="splash-branding-group">
         {/* Emblem 100dp with soft elevation shadow and float animation */}
         <div className="w-[100px] h-[100px] mb-2.5 emblem-shadow animate-float flex items-center justify-center">
@@ -241,31 +242,36 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
           <span style={{ color: '#163832' }}>Hub</span>
         </div>
 
-        {/* Tagline: GREEN ECO ORGANIZATION, 12sp Bold, letter-spacing 0.24em */}
-        <div
-          style={{
-            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-            fontSize: '12px',
-            fontWeight: 700,
-            letterSpacing: '0.24em',
-            color: '#235347',
-            textTransform: 'uppercase',
-          }}
-        >
-          GREEN ECO ORGANIZATION
+        {/* Tagline: GREEN ECO ORGANIZATION, 12sp Bold, Clean Balanced Spacing */}
+        <div className="flex items-center justify-center gap-2 max-w-full">
+          <span className="w-3 h-[1px] bg-[#8EB69B]/60 shrink-0" />
+          <span
+            style={{
+              fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+              fontSize: '12px',
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              color: '#235347',
+              textTransform: 'uppercase',
+            }}
+            className="truncate"
+          >
+            GREEN ECO ORGANIZATION
+          </span>
+          <span className="w-3 h-[1px] bg-[#8EB69B]/60 shrink-0" />
         </div>
 
-        {/* Mindful Earth & Biosphere Pill Badge */}
+        {/* Mindful Earth & Biosphere Micro-Pill Badge */}
         <div
-          className="nature-mindful-pill mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border shadow-2xs backdrop-blur-xs"
+          className="nature-mindful-pill mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full border shadow-2xs backdrop-blur-md max-w-full"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backgroundColor: 'rgba(255, 255, 255, 0.90)',
             borderColor: '#DAF1DE',
             color: '#163832',
           }}
         >
           <Leaf size={12} className="text-[#235347] animate-pulse shrink-0" />
-          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.02em' }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.02em' }} className="truncate">
             Living Biosphere • Earth Sanctuary
           </span>
         </div>
@@ -278,13 +284,13 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
         {status !== 'error' ? (
           <div className="splash-status-sheet">
             {/* Row 1: Step Label and Tabular Percentage */}
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-1.5 min-w-0">
-                <Sparkles size={13} className="text-[#235347] shrink-0" />
+                <Sparkles size={14} className="text-[#163832] shrink-0 animate-pulse" />
                 <span
                   style={{
-                    fontSize: '12px',
-                    fontWeight: 700,
+                    fontSize: '13px',
+                    fontWeight: 800,
                     color: '#051F20',
                     letterSpacing: '-0.01em',
                   }}
@@ -295,18 +301,20 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               </div>
               <span
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 800,
-                  color: '#163832',
-                  fontVariantNumeric: 'tabular-nums',
+                  fontSize: '12px',
+                  fontWeight: 900,
+                  color: '#051F20',
+                  backgroundColor: '#DAF1DE',
+                  borderColor: '#8EB69B',
                 }}
+                className="px-2 py-0.5 rounded-md font-mono border shadow-2xs tabular-nums shrink-0"
               >
                 {progress}%
               </span>
             </div>
 
-            {/* Row 2: 7dp rounded botanical progress bar with glowing leading particle */}
-            <div className="splash-progress-track mb-2">
+            {/* Row 2: 8dp rounded precision botanical progress bar with glowing leading particle */}
+            <div className="splash-progress-track mb-2.5">
               <div
                 className={`splash-progress-fill ${
                   status === 'stable'
@@ -319,7 +327,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               </div>
             </div>
 
-            {/* Row 3: Helper text and Active mint status chip */}
+            {/* Row 3: Helper text and Luxury Mint status chip */}
             <div className="flex items-center justify-between gap-2">
               <span
                 className="truncate mr-2"
@@ -332,7 +340,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 {helperText}
               </span>
               <span
-                className="px-2.5 py-0.5 rounded-full shrink-0 border inline-flex items-center gap-1.5"
+                className="px-2.5 py-0.5 rounded-full shrink-0 border inline-flex items-center gap-1.5 shadow-2xs"
                 style={{
                   fontSize: '12px',
                   fontWeight: 700,
@@ -343,6 +351,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               >
                 {status === 'checking' && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#163832] animate-pulse" />
+                )}
+                {status === 'stable' && (
+                  <CheckCircle2 size={12} className="text-[#163832]" />
                 )}
                 <span>{chipInfo.text}</span>
               </span>
@@ -428,9 +439,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
 
         {/* Watermark Pill */}
         <div
-          className="px-3 py-1 rounded-full border shadow-2xs backdrop-blur-md tracking-[0.16em] uppercase font-bold text-xs flex items-center justify-center gap-1.5"
+          className="px-3.5 py-1 rounded-full border shadow-2xs backdrop-blur-md tracking-[0.16em] uppercase font-bold text-xs flex items-center justify-center gap-1.5"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
             borderColor: '#DAF1DE',
             color: '#163832',
           }}

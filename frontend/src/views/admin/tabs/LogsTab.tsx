@@ -382,7 +382,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
                 style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
                 className="w-11 h-11 rounded-xl flex items-center justify-center"
               >
-                {searchQuery.trim() ? (
+                {searchQuery.trim().length > 0 ? (
                   <Search size={22} strokeWidth={2.4} />
                 ) : isAdvancedFilterActive || activeFilter !== 'all' ? (
                   <SlidersHorizontal size={22} strokeWidth={2.4} />
@@ -396,14 +396,14 @@ export const LogsTab: React.FC<LogsTabProps> = ({
           {/* Heading & Contextual Subtitle */}
           <div className="space-y-1.5 max-w-md mx-auto">
             <h2 style={{ color: '#051F20' }} className="text-base sm:text-lg font-black tracking-tight">
-              {searchQuery.trim()
+              {searchQuery.trim().length > 0
                 ? 'No Records Found'
                 : isAdvancedFilterActive || activeFilter !== 'all'
                 ? 'No Matching Members'
                 : 'Campus Directory is Empty'}
             </h2>
             <p style={{ color: '#235347' }} className="text-xs sm:text-sm font-medium leading-relaxed">
-              {searchQuery.trim() ? (
+              {searchQuery.trim().length > 0 ? (
                 <>
                   No scholars match the search criteria{' '}
                   <span className="font-bold text-[#051F20]">&apos;{searchQuery.trim()}&apos;</span>. Check for

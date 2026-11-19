@@ -1,12 +1,12 @@
 {
-  "version": "1.6.63",
-  "version_code": 82,
+  "version": "1.6.66",
+  "version_code": 85,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Release v1.6.63 (Build 82): Soft faded pastel cartoon nature splash screen with stylized friendly deer, bunny, trees, and ergonomic bottom loading capsule.",
+  "release_notes": "Routine performance improvements and stability updates.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-19",
-  "file_size_bytes": 8626672,
+  "file_size_bytes": 8629260,
   "file_size_mb": "8.23 MB",
-  "sha256": "3BBAA584F978E4D3763CF21348696E35F5386F42258754038A41E6DED9B40605"
+  "sha256": "052E925B13ADABE27AEF30AEAC77966CA41F808D90093E84595831F92D6C7E79"
 }
