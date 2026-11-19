@@ -63,34 +63,7 @@
   pointer-events: none;
 }
 
-/* Luxury Radial Sun Aura Behind Emblem */
-.nature-sun-aura {
-  position: absolute;
-  top: 130px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(142, 182, 155, 0.32) 0%, rgba(218, 241, 222, 0.16) 45%, transparent 72%);
-  filter: blur(32px);
-  pointer-events: none;
-  animation: nature-glow-breathe 5s ease-in-out infinite alternate;
-  z-index: 2;
-}
-
-@keyframes nature-glow-breathe {
-  0% {
-    transform: translate(-50%, -50%) scale(0.94);
-    opacity: 0.75;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.08);
-    opacity: 1;
-  }
-}
-
-/* 4.2s Smooth Float for Emblem */
+/* Clean Emblem Float Animation */
 @keyframes emblem-float {
   0%, 100% {
     transform: translateY(-3px);
@@ -104,9 +77,9 @@
   animation: emblem-float 4.2s ease-in-out infinite;
 }
 
-/* Luxury Multi-Layer Elevation Shadow for Emblem */
+/* Zero Muddy Shadow for Ultra-Clean UI/UX */
 .emblem-shadow {
-  filter: drop-shadow(0 16px 32px rgba(5, 31, 32, 0.14)) drop-shadow(0 4px 10px rgba(22, 56, 50, 0.08));
+  filter: none !important;
 }
 
 /* Top Branding Group: Guaranteed No-Wrap & No-Clip */
@@ -267,7 +240,6 @@
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .splash-overlay,
-  .nature-sun-aura,
   .animate-float,
   .nature-mindful-pill,
   .nature-spore,

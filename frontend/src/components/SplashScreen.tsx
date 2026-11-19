@@ -207,18 +207,15 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
         <div className="nature-faded-overlay" />
       </div>
 
-      {/* 2. Soft Ambient Breathing Radial Sun Glow */}
-      <div className="nature-sun-aura" />
-
-      {/* 3. Floating Nature Spores & Bioluminescent Dust */}
+      {/* 2. Floating Nature Spores & Bioluminescent Dust */}
       <div className="nature-spore" style={{ width: 4, height: 4, left: '16%', bottom: '38%', animationDelay: '0s' }} />
       <div className="nature-spore" style={{ width: 5, height: 5, left: '45%', bottom: '44%', animationDelay: '2.5s' }} />
       <div className="nature-spore" style={{ width: 3, height: 3, left: '78%', bottom: '36%', animationDelay: '4.2s' }} />
 
-      {/* 4. Top Branding Group (Clean, Luxury, Guaranteed No-Clip) */}
+      {/* 3. Top Branding Group (Clean, Luxury, Guaranteed No-Clip) */}
       <div className="splash-branding-group">
-        {/* Emblem 100dp with soft elevation shadow and float animation */}
-        <div className="w-[100px] h-[100px] mb-2.5 emblem-shadow animate-float flex items-center justify-center">
+        {/* Crisp Emblem Squircle without box shadow for a clean, modern UI/UX */}
+        <div className="w-[100px] h-[100px] mb-2.5 animate-float flex items-center justify-center">
           <img
             src="/geohub-emblem.svg"
             width={100}
