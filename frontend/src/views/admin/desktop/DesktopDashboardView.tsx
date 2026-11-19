@@ -674,3 +674,5 @@ export const DesktopDashboardView: React.FC<DesktopDashboardViewProps> = ({
     </div>
   );
 };
+
+export default DesktopDashboardView;

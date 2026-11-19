@@ -613,3 +613,5 @@ export const SuperAdminDesktopStudio: React.FC<SuperAdminDesktopStudioProps> = (
     </div>
   );
 };
+
+export default SuperAdminDesktopStudio;

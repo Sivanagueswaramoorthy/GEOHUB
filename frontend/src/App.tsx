@@ -358,9 +358,7 @@ const MainAppContent: React.FC = () => {
         {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
         {activeTab !== 'scan_qr' && activeTab !== 'profile' && (
           isSuperAdmin ? (
-            <div className={isPhoneFrame ? '' : 'lg:hidden'}>
-              <SuperAdminTopNav />
-            </div>
+            <SuperAdminTopNav className={isPhoneFrame ? '' : 'lg:hidden'} />
           ) : (
             <TopBar />
           )
@@ -390,9 +388,7 @@ const MainAppContent: React.FC = () => {
 
         {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
         {isSuperAdmin ? (
-          <div className={isPhoneFrame ? '' : 'lg:hidden'}>
-            <SuperAdminBottomNav />
-          </div>
+          <SuperAdminBottomNav className={isPhoneFrame ? '' : 'lg:hidden'} />
         ) : (
           !activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />
         )}

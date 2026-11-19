@@ -11,7 +11,6 @@ import { FacultyFormModal } from './modals/FacultyFormModal';
 import { StudentFormModal } from './modals/StudentFormModal';
 import { useApp } from '../../context/AppContext';
 import { apiClient } from '../../api/client';
-import { SuperAdminDesktopStudio } from './desktop/SuperAdminDesktopStudio';
 
 // The 5 Rebuilt Executive Tabs for SuperAdmin
 import { HomeTab } from './tabs/HomeTab';
@@ -19,15 +18,18 @@ import { AccessTab } from './tabs/AccessTab';
 import { FeaturesTab } from './tabs/FeaturesTab';
 import { LogsTab } from './tabs/LogsTab';
 import { ProfileTab } from './tabs/ProfileTab';
+import { SuperAdminDesktopStudio } from './desktop/SuperAdminDesktopStudio';
 
 export interface Props {
   onBack?: () => void;
   isHomeCockpit?: boolean;
+  forceMode?: 'desktop' | 'mobile';
 }
 
 export const SuperAdminOperationsView: React.FC<Props> = ({
   onBack,
   isHomeCockpit = true,
+  forceMode,
 }) => {
   const { currentUser, setCurrentUser, isPhoneFrame } = useApp();
   const state = useSuperAdminState();
@@ -36,16 +38,29 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
 
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === 'undefined') return false;
+    if (forceMode === 'desktop') return true;
+    if (forceMode === 'mobile') return false;
+    if (isTestEnv) {
+      return false;
+    }
     return window.innerWidth >= 1024;
   });
 
   useEffect(() => {
     const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
+      if (forceMode === 'desktop') {
+        setIsDesktop(true);
+      } else if (forceMode === 'mobile') {
+        setIsDesktop(false);
+      } else if (isTestEnv) {
+        setIsDesktop(false);
+      } else {
+        setIsDesktop(window.innerWidth >= 1024);
+      }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [forceMode, isTestEnv]);
 
   const [isAddFacultyModalOpen, setIsAddFacultyModalOpen] = useState(false);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
@@ -70,7 +85,7 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
   };
 
   // Modern Desktop Glassmorphism Studio Mode (Screen >= 1024px and not in Phone Frame mode)
-  if (!isTestEnv && isDesktop && !isPhoneFrame) {
+  if (isDesktop && !isPhoneFrame) {
     return (
       <div className="w-full min-h-screen">
         <SuperAdminDesktopStudio state={state} />

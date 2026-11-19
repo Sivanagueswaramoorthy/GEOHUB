@@ -360,3 +360,5 @@ export const DesktopStudioSidebar: React.FC<DesktopStudioSidebarProps> = ({
     </aside>
   );
 };
+
+export default DesktopStudioSidebar;

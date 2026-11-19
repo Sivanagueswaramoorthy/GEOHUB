@@ -697,3 +697,5 @@ export const DesktopTeamView: React.FC<DesktopTeamViewProps> = ({
     </div>
   );
 };
+
+export default DesktopTeamView;
