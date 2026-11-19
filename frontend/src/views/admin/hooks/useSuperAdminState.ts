@@ -325,6 +325,38 @@ export function useSuperAdminState() {
     });
   }, [showToast]);
 
+  // Multi-tab and multi-device listener for real-time toggle synchronization
+  useEffect(() => {
+    const handleSystemSync = () => {
+      try {
+        const dbVal = localStorage.getItem('geohub_db_connected');
+        if (dbVal !== null) {
+          const connected = dbVal === 'true';
+          setIsDbConnected(connected);
+          setDiagnostics((d) => ({
+            ...d,
+            status: connected ? 'Connected' : 'Disconnected',
+            health: connected ? '100% Operational' : 'Disconnected (Offline)',
+            latency_ms: connected ? 22 : 0,
+          }));
+        }
+        const beVal = localStorage.getItem('geohub_backend_active');
+        if (beVal !== null) {
+          setIsBackendActive(beVal === 'true');
+        }
+      } catch {}
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('geohub_system_state_change', handleSystemSync);
+      window.addEventListener('storage', handleSystemSync);
+      return () => {
+        window.removeEventListener('geohub_system_state_change', handleSystemSync);
+        window.removeEventListener('storage', handleSystemSync);
+      };
+    }
+  }, []);
+
   // Online sessions (users seen in last 5 min)
   const onlineUsers = useMemo<OnlineSessionUser[]>(() => {
     if (isTestEnv) {

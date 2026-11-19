@@ -215,6 +215,44 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
+      {/* Global Maintenance Alert for SuperAdmin */}
+      {!activeBackend && (
+        <div
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+          className="p-3 sm:p-3.5 rounded-2xl border flex items-start gap-3 shadow-xs animate-fadeIn"
+        >
+          <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-700 border border-amber-300 flex items-center justify-center shrink-0 mt-0.5">
+            <AlertTriangle size={18} strokeWidth={2.2} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <h4 style={{ color: '#051F20' }} className="text-xs font-black tracking-tight uppercase">
+                Backend Offline • Maintenance Mode Active
+              </h4>
+              <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
+                Other Users Blocked
+              </span>
+            </div>
+            <p style={{ color: '#235347' }} className="text-xs font-medium mt-1 leading-relaxed">
+              You turned off backend services. Students and faculty are currently routed to the Under Maintenance screen. Your SuperAdmin Cockpit remains active. Toggle the switch below to resume live operations.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* TiDB Offline Alert for SuperAdmin */}
+      {!activeDb && (
+        <div
+          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+          className="p-3 rounded-2xl border text-xs flex items-center gap-2.5 animate-fadeIn font-medium"
+        >
+          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+          <span style={{ color: '#235347' }}>
+            <strong style={{ color: '#051F20' }}>TiDB Cloud Disconnected:</strong> System is operating in offline cached mode across all client devices.
+          </span>
+        </div>
+      )}
+
       {/* Top 3 Core Metrics (Clean Mint 3-Column Strip) */}
       <div className="grid grid-cols-3 gap-2">
         {/* Students Card */}

@@ -118,18 +118,14 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
         paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 24px)',
       }}
     >
-      <div className="w-full max-w-md bg-white border border-[#DAF1DE] rounded-3xl p-6 sm:p-7 shadow-[0_20px_45px_rgba(5,31,32,0.07)] flex flex-col items-center text-center relative overflow-hidden animate-fadeIn">
-        {/* Top Decorative Glow */}
-        <div className="absolute -top-16 -right-16 w-36 h-36 bg-amber-100 rounded-full blur-2xl opacity-60 pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-[#DAF1DE] rounded-full blur-2xl opacity-50 pointer-events-none" />
-
-        {/* Mascot / Icon Emblem */}
-        <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center shadow-xs mb-4 relative z-10">
-          <Wrench size={30} strokeWidth={2.2} className="animate-bounce" />
+      <div className="w-full max-w-md bg-white border border-[#DAF1DE] rounded-3xl p-6 sm:p-7 shadow-[0_12px_32px_rgba(5,31,32,0.06)] flex flex-col items-center text-center relative overflow-hidden animate-fadeIn">
+        {/* Mascot / Icon Emblem (Clean, perfectly centered, zero overlapping) */}
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-300 text-amber-700 flex items-center justify-center shadow-2xs mb-3 relative z-10">
+          <Wrench size={26} strokeWidth={2.2} className="animate-pulse" />
         </div>
 
         {/* Status Pill Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/80 text-amber-900 border border-amber-300 text-xs font-extrabold tracking-wide uppercase mb-3">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/90 text-amber-900 border border-amber-300 text-xs font-extrabold tracking-wide uppercase mb-3">
           <span className="w-2 h-2 rounded-full bg-amber-600 animate-pulse" />
           <span>Scheduled Maintenance</span>
         </div>
@@ -138,7 +134,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
         <h1 className="text-xl sm:text-2xl font-black text-[#051F20] tracking-tight">
           System Under Maintenance
         </h1>
-        <p className="text-xs sm:text-sm text-[#235347] font-medium leading-relaxed mt-2 max-w-sm">
+        <p className="text-xs sm:text-sm text-[#235347] font-medium leading-relaxed mt-2 max-w-sm mx-auto">
           GeoHub backend services are temporarily offline for routine cluster upgrades and database maintenance.
           Access will resume automatically as soon as operations complete.
         </p>
@@ -146,34 +142,34 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
         {/* Real-time Infrastructure Status Breakdown */}
         <div className="w-full bg-[#F6FBF7] rounded-2xl p-4 border border-[#DAF1DE] mt-5 mb-5 text-left text-xs space-y-2.5">
           <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
-            <span className="text-slate-600 font-semibold flex items-center gap-1.5">
-              <Server size={14} className="text-amber-600" />
+            <span className="text-[#235347] font-bold flex items-center gap-1.5">
+              <Server size={14} className="text-amber-700" />
               Backend REST API
             </span>
-            <span className="font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">
+            <span className="font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300">
               ● Offline (Maintenance)
             </span>
           </div>
 
           <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
-            <span className="text-slate-600 font-semibold flex items-center gap-1.5">
-              <Database size={14} className={isDbConnected ? 'text-emerald-600' : 'text-rose-600'} />
+            <span className="text-[#235347] font-bold flex items-center gap-1.5">
+              <Database size={14} className={isDbConnected ? 'text-emerald-700' : 'text-rose-700'} />
               TiDB Cloud Database
             </span>
             <span
               className={`font-bold px-2 py-0.5 rounded-md border ${
                 isDbConnected
-                  ? 'text-emerald-800 bg-emerald-100 border-emerald-200'
-                  : 'text-rose-800 bg-rose-100 border-rose-200'
+                  ? 'text-emerald-900 bg-emerald-100 border-emerald-300'
+                  : 'text-rose-900 bg-rose-100 border-rose-300'
               }`}
             >
               {isDbConnected ? '● Online (Standby)' : '● Disconnected'}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5">
+          <div className="flex items-center justify-between text-xs text-[#235347] pt-0.5 font-medium">
             <span>Production Version</span>
-            <span className="font-mono font-bold text-slate-700">v{APP_VERSION} Production</span>
+            <span className="font-mono font-bold text-[#051F20]">v{APP_VERSION} Production</span>
           </div>
         </div>
 
@@ -190,7 +186,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
 
         {/* SuperAdmin Authority Controls (Direct when SuperAdmin is recognized) */}
         {isSuperAdmin && (
-          <div className="w-full mt-4 p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex flex-col gap-2.5 animate-fadeIn">
+          <div className="w-full mt-4 p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex flex-col gap-2.5 animate-fadeIn">
             <div className="flex items-center justify-between text-xs text-emerald-900 font-bold">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck size={14} className="text-emerald-700" />
@@ -229,12 +225,12 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
 
         {/* SuperAdmin Override for guest sessions / when not authenticated */}
         {!isSuperAdmin && (
-          <div className="w-full mt-4 pt-3 border-t border-slate-100 flex flex-col items-center">
+          <div className="w-full mt-4 pt-3 border-t border-[#DAF1DE] flex flex-col items-center">
             {!showAdminUnlock ? (
               <button
                 type="button"
                 onClick={() => setShowAdminUnlock(true)}
-                className="text-xs font-bold text-slate-500 hover:text-[#051F20] transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#235347] hover:text-[#051F20] transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Lock size={12} />
                 <span>SuperAdmin Maintenance Bypass</span>
@@ -250,11 +246,11 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
                       setPinError('');
                     }}
                     placeholder="Enter SuperAdmin PIN (geohub)"
-                    className="flex-1 min-h-[38px] px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-600"
+                    className="flex-1 min-h-[38px] px-3 bg-white border border-[#DAF1DE] rounded-xl text-xs font-semibold text-[#051F20] focus:outline-none focus:border-emerald-600"
                   />
                   <button
                     type="submit"
-                    className="min-h-[38px] px-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold cursor-pointer transition shadow-2xs"
+                    className="min-h-[38px] px-3.5 bg-[#051F20] hover:bg-[#163832] text-white rounded-xl text-xs font-bold cursor-pointer transition shadow-2xs"
                   >
                     Unlock
                   </button>
@@ -266,7 +262,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
         )}
       </div>
 
-      <p className="text-xs font-medium text-slate-400 mt-4">
+      <p className="text-xs font-medium text-[#235347] mt-4">
         Green Eco Organization • Institutional Governance Portal
       </p>
     </div>

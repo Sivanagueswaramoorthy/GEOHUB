@@ -64,10 +64,13 @@ async def maintenance_middleware(request, call_next):
         is_exempt = (
             path in ["/health", "/api/v1/health", "/api/health"]
             or path.startswith("/api/v1/sync")
+            or path.startswith("/api/sync")
             or path.startswith("/sync")
             or path.startswith("/api/v1/auth")
+            or path.startswith("/api/auth")
             or path.startswith("/auth")
             or path.startswith("/api/v1/admin")
+            or path.startswith("/api/admin")
             or path.startswith("/admin")
             or path.startswith("/superadmin")
             or path.startswith("/static")

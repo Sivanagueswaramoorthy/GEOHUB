@@ -313,7 +313,9 @@ const MainAppContent: React.FC = () => {
   };
 
   // If backend module is turned off (Maintenance Mode), render the Under Maintenance screen
-  if (!isBackendActive && !isBypassedBySuperAdmin) {
+  // ONLY for non-superadmin users and unauthenticated guests.
+  // SuperAdmin retains uninterrupted access to the SuperAdmin Cockpit to control and resume services.
+  if (!isBackendActive && !isBypassedBySuperAdmin && !isSuperAdmin) {
     return (
       <UnderMaintenanceScreen
         onRefresh={async () => {
