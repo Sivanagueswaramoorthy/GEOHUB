@@ -1801,3 +1801,14 @@ button,
 .space-y-4\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 18px; }
 .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 20px; }
 .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 24px; }
+
+/* Backdrop Blur & Grid Studio Utilities */
+.backdrop-blur-xs { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.backdrop-blur-sm { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.backdrop-blur-md { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.backdrop-blur-lg { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.backdrop-blur-xl { -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); }
+
+.grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+

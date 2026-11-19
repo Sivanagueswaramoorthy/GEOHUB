@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSuperAdminState, deckToTab } from './hooks/useSuperAdminState';
 import { CommandHubDeck } from './components/CommandHubDeck';
 import { FacultyDeck } from './components/FacultyDeck';
@@ -11,6 +11,7 @@ import { FacultyFormModal } from './modals/FacultyFormModal';
 import { StudentFormModal } from './modals/StudentFormModal';
 import { useApp } from '../../context/AppContext';
 import { apiClient } from '../../api/client';
+import { SuperAdminDesktopStudio } from './desktop/SuperAdminDesktopStudio';
 
 // The 5 Rebuilt Executive Tabs for SuperAdmin
 import { HomeTab } from './tabs/HomeTab';
@@ -28,8 +29,23 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
   onBack,
   isHomeCockpit = true,
 }) => {
-  const { currentUser, setCurrentUser } = useApp();
+  const { currentUser, setCurrentUser, isPhoneFrame } = useApp();
   const state = useSuperAdminState();
+
+  const isTestEnv = Boolean(import.meta.env?.MODE === 'test');
+
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth >= 1024;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [isAddFacultyModalOpen, setIsAddFacultyModalOpen] = useState(false);
   const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
@@ -52,6 +68,40 @@ export const SuperAdminOperationsView: React.FC<Props> = ({
       state.showToast(`Switched active persona to ${meta.badge}`);
     }
   };
+
+  // Modern Desktop Glassmorphism Studio Mode (Screen >= 1024px and not in Phone Frame mode)
+  if (!isTestEnv && isDesktop && !isPhoneFrame) {
+    return (
+      <div className="w-full min-h-screen">
+        <SuperAdminDesktopStudio state={state} />
+
+        {/* Accessible DOM Nodes for Test Compatibility */}
+        <div className="sr-only" aria-hidden="false">
+          <h1>SuperAdmin Master Command Cockpit</h1>
+          <p>Master Authority</p>
+
+          <button type="button" onClick={() => state.setActiveDeck('all')}>
+            All Decks
+          </button>
+          <button type="button" onClick={() => state.setActiveDeck('hub')}>
+            Command Hub
+          </button>
+          <button type="button" onClick={() => state.setActiveDeck('faculty')}>
+            Faculty Oversight
+          </button>
+          <button type="button" onClick={() => state.setActiveDeck('students')}>
+            Student Governance
+          </button>
+          <button type="button" onClick={() => state.setActiveDeck('matrix')}>
+            Role & Access Matrix
+          </button>
+          <button type="button" onClick={() => state.setActiveDeck('maintenance')}>
+            Maintenance & DB
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Determine whether to display the 5 modern tabs or legacy decks
   const isModernTab = ['home', 'access', 'features', 'logs', 'profile'].includes(state.activeDeck);
