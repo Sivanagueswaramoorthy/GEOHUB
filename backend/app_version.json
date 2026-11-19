@@ -1,8 +1,8 @@
 {
-  "version": "1.6.53",
-  "version_code": 72,
+  "version": "1.6.54",
+  "version_code": 73,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Latest release v1.6.53 (Build 72) with horizontal filter layout, tactical Reset Filters positioning, and improved UI styling.",
-  "sha256": "6c4490049bbfa691c4f2d4a02d73b2d7de58666ab64932b6eef6fd3a1f5d9d84",
-  "file_size": 6941324
+  "release_notes": "Latest release v1.6.54 (Build 73) with cross-device real-time system maintenance & database toggle sync, down-right corner Reset Filters with proper UI, and zero design violations.",
+  "sha256": "C9D87416F47B0FDF08AF732D59E1DFC47AE1393A6A7B0B5224F13F77E4937E5B",
+  "file_size": 7570130
 }

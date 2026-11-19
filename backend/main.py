@@ -52,7 +52,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+
+@app.middleware("http")
+async def maintenance_middleware(request, call_next):
+    from system_state import GLOBAL_SYSTEM_STATUS
+    # If backend is marked inactive (maintenance mode)
+    if not GLOBAL_SYSTEM_STATUS.get("is_backend_active", True):
+        path = request.url.path
+        # Allow health checks, SSE sync, auth, admin controls, and static assets
+        is_exempt = (
+            path in ["/health", "/api/v1/health", "/api/health"]
+            or path.startswith("/api/v1/sync")
+            or path.startswith("/sync")
+            or path.startswith("/api/v1/auth")
+            or path.startswith("/auth")
+            or path.startswith("/api/v1/admin")
+            or path.startswith("/admin")
+            or path.startswith("/superadmin")
+            or path.startswith("/static")
+            or path.startswith("/assets")
+            or path.startswith("/downloads")
+            or path.startswith("/uploads")
+            or path in ["/", "/docs", "/openapi.json"]
+            or "." in path.split("/")[-1]
+        )
+        if not is_exempt and request.method != "OPTIONS":
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "System is currently under maintenance. Access temporarily paused by SuperAdmin.",
+                    "status": "maintenance",
+                    "is_backend_active": False,
+                    "is_db_connected": GLOBAL_SYSTEM_STATUS.get("is_db_connected", True),
+                    "maintenance_mode": True,
+                }
+            )
+    return await call_next(request)
 
 # Static Web Application Files
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -156,29 +192,49 @@ def get_my_effective_modules(
 @app.get("/api/v1/health")
 def health_check(db: Session = Depends(get_db)):
     start = time.perf_counter()
-    try:
-        db.execute(text("SELECT 1"))
-        latency_ms = max(1, round((time.perf_counter() - start) * 1000))
-        db_ok = True
-    except Exception:
-        latency_ms = 0
+    from system_state import GLOBAL_SYSTEM_STATUS
+    backend_active = GLOBAL_SYSTEM_STATUS.get("is_backend_active", True)
+    db_connected = GLOBAL_SYSTEM_STATUS.get("is_db_connected", True)
+
+    if not db_connected:
         db_ok = False
+        latency_ms = 0
+    else:
+        try:
+            db.execute(text("SELECT 1"))
+            latency_ms = max(1, round((time.perf_counter() - start) * 1000))
+            db_ok = True
+        except Exception:
+            latency_ms = 0
+            db_ok = False
+
+    status_str = "healthy" if (db_ok and backend_active) else ("maintenance" if not backend_active else "degraded")
+
     return {
-        "status": "healthy" if db_ok else "degraded",
+        "status": status_str,
         "app": settings.PROJECT_NAME,
         "version": settings.VERSION,
-        "database": "TiDB Cloud MySQL Distributed" if "mysql" in engine.name else engine.name,
-        "database_connected": db_ok,
+        "database": ("TiDB Cloud MySQL Distributed" if "mysql" in engine.name else engine.name) if db_connected else "Disconnected (Offline Mode)",
+        "database_connected": bool(db_ok and db_connected),
+        "is_backend_active": backend_active,
+        "is_db_connected": db_connected,
+        "maintenance_mode": not backend_active,
         "latency_ms": latency_ms,
+        "updated_at": GLOBAL_SYSTEM_STATUS.get("updated_at"),
     }
 
 @app.on_event("startup")
 def on_startup():
     from init_db import init_database
+    from system_state import load_system_status_from_db
     try:
         init_database()
     except Exception as e:
         print(f"[Startup Warning] init_database error: {e}")
+    try:
+        load_system_status_from_db()
+    except Exception as e:
+        print(f"[Startup Warning] load_system_status_from_db error: {e}")
 
 @app.get("/geo-hub-logo.png")
 def get_logo():

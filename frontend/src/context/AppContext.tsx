@@ -551,6 +551,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('geohub_db_connected', String(connected));
       window.dispatchEvent(new Event('geohub_system_state_change'));
     } catch {}
+    // Push update to central cloud server to synchronize across all devices
+    apiClient.setSystemStatus({ is_db_connected: connected }).catch((err) => {
+      console.warn('[AppContext] Failed to sync db state across devices:', err);
+    });
   }, []);
 
   const setIsBackendActive = useCallback((active: boolean) => {
@@ -559,6 +563,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       localStorage.setItem('geohub_backend_active', String(active));
       window.dispatchEvent(new Event('geohub_system_state_change'));
     } catch {}
+    // Push update to central cloud server to synchronize across all devices
+    apiClient.setSystemStatus({ is_backend_active: active }).catch((err) => {
+      console.warn('[AppContext] Failed to sync backend state across devices:', err);
+    });
   }, []);
 
   useEffect(() => {
@@ -985,6 +993,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               showToast('✓ Chapter records updated', 'info');
             } else if (type === 'MEMBER_CLEARANCE_UPDATED') {
               showToast('Member permissions updated', 'info');
+            } else if (type === 'SYSTEM_STATUS_CHANGED' && data) {
+              if (typeof data.is_backend_active === 'boolean') {
+                setIsBackendActiveState(data.is_backend_active);
+                try {
+                  localStorage.setItem('geohub_backend_active', String(data.is_backend_active));
+                } catch {}
+              }
+              if (typeof data.is_db_connected === 'boolean') {
+                setIsDbConnectedState(data.is_db_connected);
+                try {
+                  localStorage.setItem('geohub_db_connected', String(data.is_db_connected));
+                } catch {}
+              }
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event('geohub_system_state_change'));
+              }
+              if (data.is_backend_active === false) {
+                showToast('System is now under maintenance mode across all devices.', 'info');
+              } else if (data.is_backend_active === true) {
+                showToast('System maintenance completed. Live operations resumed.', 'success');
+              }
             }
 
             // Always synchronize latest full authoritative state from backend
@@ -1019,18 +1048,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 2. Adaptive Polling & On-Focus Lifecycle Synchronization
   useEffect(() => {
+    const pollSystemStatus = async () => {
+      try {
+        const health = await apiClient.testServerHealth();
+        if (health) {
+          if (typeof health.is_backend_active === 'boolean') {
+            setIsBackendActiveState((prev) => {
+              if (prev !== health.is_backend_active) {
+                try {
+                  localStorage.setItem('geohub_backend_active', String(health.is_backend_active));
+                  window.dispatchEvent(new Event('geohub_system_state_change'));
+                } catch {}
+                return health.is_backend_active!;
+              }
+              return prev;
+            });
+          }
+          if (typeof health.is_db_connected === 'boolean') {
+            setIsDbConnectedState((prev) => {
+              if (prev !== health.is_db_connected) {
+                try {
+                  localStorage.setItem('geohub_db_connected', String(health.is_db_connected));
+                  window.dispatchEvent(new Event('geohub_system_state_change'));
+                } catch {}
+                return health.is_db_connected!;
+              }
+              return prev;
+            });
+          }
+        }
+      } catch {}
+    };
+
+    pollSystemStatus();
     syncWithBackend();
 
-    // Fast foreground polling every 8s when active
+    // Fast foreground polling every 6s when active
     const pollInterval = setInterval(() => {
       if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        pollSystemStatus();
         syncWithBackend();
       }
-    }, 8000);
+    }, 6000);
 
     // On-focus & visibility change: immediately pull updates when user unlocks phone or switches back
     const handleVisibilityOrFocus = () => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        pollSystemStatus();
         syncWithBackend();
       }
     };

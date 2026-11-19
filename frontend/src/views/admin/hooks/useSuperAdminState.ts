@@ -225,10 +225,12 @@ export function useSuperAdminState() {
         health: newVal ? '100% Operational' : 'Disconnected (Offline)',
         latency_ms: newVal ? 22 : 0,
       }));
-      showToast(newVal ? 'TiDB Cloud database connected' : 'TiDB Cloud database disconnected');
+      showToast(newVal ? 'TiDB Cloud database connected' : 'TiDB Cloud database disconnected across all devices');
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('geohub_system_state_change'));
       }
+      // Broadcast to central cloud server to synchronize all devices
+      apiClient.setSystemStatus({ is_db_connected: newVal }).catch(() => {});
       return newVal;
     });
   }, [showToast]);
@@ -241,12 +243,14 @@ export function useSuperAdminState() {
       } catch {}
       showToast(
         newVal
-          ? 'Backend module operational. Maintenance mode lifted.'
-          : 'Backend module disabled. System is now Under Maintenance.'
+          ? 'Backend module operational. Maintenance mode lifted across all devices.'
+          : 'Backend module disabled. System is now Under Maintenance across all devices.'
       );
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('geohub_system_state_change'));
       }
+      // Broadcast to central cloud server to synchronize all devices
+      apiClient.setSystemStatus({ is_backend_active: newVal }).catch(() => {});
       return newVal;
     });
   }, [showToast]);

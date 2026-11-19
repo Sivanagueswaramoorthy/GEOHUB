@@ -958,6 +958,67 @@ def get_system_diagnostics(db: Session = Depends(get_db)):
         "recent_audits": recent_audits,
     }
 
+class SystemStatusPayload(BaseModel):
+    is_backend_active: Optional[bool] = None
+    is_db_connected: Optional[bool] = None
+
+@router.get("/system/status")
+def get_system_status():
+    """
+    Returns current platform backend active and database connectivity state.
+    """
+    from system_state import GLOBAL_SYSTEM_STATUS
+    return GLOBAL_SYSTEM_STATUS
+
+@router.post("/system/status")
+@router.put("/system/status")
+def update_system_status(
+    payload: SystemStatusPayload,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(auth.get_optional_user)
+):
+    """
+    Updates platform backend active and database connectivity state.
+    Synchronizes across all connected client devices in real-time via SSE and TiDB Cloud.
+    """
+    from system_state import save_system_status
+    from routers.sync_router import broadcast_sync_event
+
+    actor = current_user.name if current_user else "SuperAdmin"
+    updated = save_system_status(
+        is_backend_active=payload.is_backend_active,
+        is_db_connected=payload.is_db_connected,
+        updated_by=actor
+    )
+
+    # Log audit entry
+    details = []
+    if payload.is_backend_active is not None:
+        details.append(f"Backend Active -> {payload.is_backend_active}")
+    if payload.is_db_connected is not None:
+        details.append(f"TiDB Database Connected -> {payload.is_db_connected}")
+
+    if details:
+        try:
+            audit = models.AuditLog(
+                action="TOGGLE_SYSTEM_STATUS",
+                actor_name=actor,
+                target_name="System Infrastructure",
+                details="; ".join(details)
+            )
+            db.add(audit)
+            db.commit()
+        except Exception:
+            db.rollback()
+
+    # Instant multi-device push notification via Server-Sent Events (SSE)
+    broadcast_sync_event("SYSTEM_STATUS_CHANGED", updated)
+
+    return {
+        "status": "success",
+        "system_status": updated
+    }
+
 @router.post("/broadcast-alert")
 def broadcast_admin_alert(
     payload: BroadcastAlertPayload,

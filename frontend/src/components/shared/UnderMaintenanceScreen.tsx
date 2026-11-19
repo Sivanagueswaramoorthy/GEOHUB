@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Wrench,
   Server,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { APP_VERSION } from '../../config/version';
+import { apiClient } from '../../api/client';
 
 export interface UnderMaintenanceScreenProps {
   onRefresh?: () => void;
@@ -26,7 +27,7 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
   onBypassToCockpit,
   isDbConnected = true,
 }) => {
-  const { currentUser, setActiveTab } = useApp();
+  const { currentUser, setActiveTab, setIsBackendActive, setIsDbConnected } = useApp();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAdminUnlock, setShowAdminUnlock] = useState(false);
   const [adminPin, setAdminPin] = useState('');
@@ -34,18 +35,62 @@ export const UnderMaintenanceScreen: React.FC<UnderMaintenanceScreenProps> = ({
 
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
+  // Real-time polling: automatically resumes when SuperAdmin turns backend back on from any device!
+  useEffect(() => {
+    let isCancelled = false;
+    const interval = setInterval(async () => {
+      try {
+        const health = await apiClient.testServerHealth();
+        if (isCancelled) return;
+        if (health && typeof health.is_db_connected === 'boolean') {
+          setIsDbConnected(health.is_db_connected);
+        }
+        if (health && health.is_backend_active === true) {
+          if (onResumeBackend) {
+            onResumeBackend();
+          } else {
+            setIsBackendActive(true);
+            try {
+              localStorage.setItem('geohub_backend_active', 'true');
+            } catch {}
+          }
+        }
+      } catch {}
+    }, 3000);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(interval);
+    };
+  }, [onResumeBackend, setIsBackendActive, setIsDbConnected]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    if (onRefresh) {
-      await onRefresh();
-    } else {
-      // Check if backend was resumed in localStorage
+    try {
+      if (onRefresh) {
+        await onRefresh();
+      }
+      const health = await apiClient.testServerHealth();
+      if (typeof health.is_db_connected === 'boolean') {
+        setIsDbConnected(health.is_db_connected);
+      }
+      if (health.is_backend_active === true) {
+        if (onResumeBackend) {
+          onResumeBackend();
+        } else {
+          setIsBackendActive(true);
+        }
+        return;
+      }
+    } catch {}
+
+    if (!onRefresh) {
       const active = localStorage.getItem('geohub_backend_active') !== 'false';
       if (active) {
         window.location.reload();
       }
     }
-    setTimeout(() => setIsRefreshing(false), 600);
+    setTimeout(() => setIsRefreshing(false), 500);
   };
 
   const handleAdminPinSubmit = (e: React.FormEvent) => {

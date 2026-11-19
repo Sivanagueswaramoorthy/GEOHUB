@@ -70,7 +70,7 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
     <div
       className={`bg-white border border-[#DAF1DE] rounded-2xl p-3 sm:p-3.5 shadow-xs space-y-3 ${className}`}
     >
-      {/* 1. Header Row: Filter Title + Result Count + Reset Button */}
+      {/* 1. Header Row: Filter Title + Result Count */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
@@ -87,19 +87,6 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
             </p>
           </div>
         </div>
-
-        {isAnyFilterActive && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="min-h-[44px] px-3 rounded-xl bg-[#F6FBF7] hover:bg-[#DAF1DE] text-[#051F20] border border-[#DAF1DE] text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shrink-0 active:scale-95"
-            aria-label="Reset all filters"
-            title="Reset all filters"
-          >
-            <RotateCcw size={13} className="text-[#235347]" />
-            <span>Reset Filters</span>
-          </button>
-        )}
       </div>
 
       {/* 2. Quick Status Segmented Pills (All, Active, Suspended) */}
@@ -219,6 +206,23 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
           buttonClassName="w-full justify-between"
         />
       </div>
+
+      {/* Down Right Corner: Reset Filters Action Button */}
+      {isAnyFilterActive && (
+        <div className="flex justify-end pt-1">
+          <button
+            type="button"
+            onClick={onReset}
+            style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+            className="min-h-[34px] px-3.5 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-2xs"
+            aria-label="Reset all filters"
+            title="Reset all filters"
+          >
+            <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
+            <span>Reset Filters</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

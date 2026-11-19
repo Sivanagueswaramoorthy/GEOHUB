@@ -76,7 +76,15 @@ class ApiClient {
     }
   }
 
-  public async testServerHealth(): Promise<{ ok: boolean; latencyMs?: number; message?: string }> {
+  public async testServerHealth(): Promise<{
+    ok: boolean;
+    latencyMs?: number;
+    message?: string;
+    is_backend_active?: boolean;
+    is_db_connected?: boolean;
+    database_connected?: boolean;
+    maintenance_mode?: boolean;
+  }> {
     const baseUrl = this.getBaseUrl();
     const startTime = performance.now();
     try {
@@ -91,11 +99,47 @@ class ApiClient {
           'ngrok-skip-browser-warning': 'true',
         },
       });
+      const data = await res.json().catch(() => ({}));
       const latencyMs = Math.round(performance.now() - startTime);
-      return { ok: res.ok, latencyMs, message: res.ok ? 'Connected' : `HTTP ${res.status}` };
+      return {
+        ok: res.ok,
+        latencyMs,
+        message: res.ok ? 'Connected' : `HTTP ${res.status}`,
+        is_backend_active: data.is_backend_active,
+        is_db_connected: data.is_db_connected,
+        database_connected: data.database_connected,
+        maintenance_mode: data.maintenance_mode,
+      };
     } catch (e: any) {
       return { ok: false, message: e?.message || 'Connection refused' };
     }
+  }
+
+  public async getSystemStatus(): Promise<{
+    is_backend_active: boolean;
+    is_db_connected: boolean;
+    updated_at?: string;
+    updated_by?: string;
+  }> {
+    try {
+      return await this.request('/admin/system/status');
+    } catch {
+      const health = await this.testServerHealth();
+      return {
+        is_backend_active: health.is_backend_active ?? true,
+        is_db_connected: health.is_db_connected ?? true,
+      };
+    }
+  }
+
+  public async setSystemStatus(status: {
+    is_backend_active?: boolean;
+    is_db_connected?: boolean;
+  }): Promise<{ status: string; system_status: any }> {
+    return await this.request('/admin/system/status', {
+      method: 'POST',
+      body: JSON.stringify(status),
+    });
   }
 
   public setToken(token: string | null) {
@@ -171,6 +215,19 @@ class ApiClient {
               })
             );
           }
+        }
+
+        if (response.status === 503) {
+          try {
+            const errorClone = response.clone();
+            const errorJson = await errorClone.json();
+            if (errorJson.maintenance_mode || errorJson.is_backend_active === false) {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('geohub_backend_active', 'false');
+                window.dispatchEvent(new Event('geohub_system_state_change'));
+              }
+            }
+          } catch {}
         }
         let errorDetail = 'API request failed';
         try {

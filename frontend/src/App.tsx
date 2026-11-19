@@ -48,6 +48,7 @@ import { ModulePausedNotice } from './components/shared/ModulePausedNotice';
 import { UnderMaintenanceScreen } from './components/shared/UnderMaintenanceScreen';
 import { SuperAdminTopNav } from './components/navigation/SuperAdminTopNav';
 import { SuperAdminBottomNav } from './components/navigation/SuperAdminBottomNav';
+import { apiClient } from './api/client';
 
 import { getRoleNavTabs } from './core/nav';
 
@@ -315,10 +316,16 @@ const MainAppContent: React.FC = () => {
   if (!isBackendActive && !isBypassedBySuperAdmin) {
     return (
       <UnderMaintenanceScreen
-        onRefresh={() => {
-          const active = localStorage.getItem('geohub_backend_active') !== 'false';
-          if (active) {
+        onRefresh={async () => {
+          const health = await apiClient.testServerHealth();
+          if (health?.is_backend_active === true) {
             setIsBackendActive(true);
+            showToast('Backend services resumed successfully.', 'success');
+          } else {
+            const active = localStorage.getItem('geohub_backend_active') !== 'false';
+            if (active) {
+              setIsBackendActive(true);
+            }
           }
         }}
         onResumeBackend={() => {

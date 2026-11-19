@@ -283,7 +283,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
         style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
         className="cockpit-card rounded-2xl p-3.5 sm:p-4 border shadow-xs space-y-3 select-none"
       >
-        {/* Top Header: Title, Live Record Count & Reset Action */}
+        {/* Top Header: Title & Live Record Count */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2.5 min-w-0">
             <div
@@ -301,21 +301,6 @@ export const LogsTab: React.FC<LogsTabProps> = ({
               </p>
             </div>
           </div>
-
-          {/* Reset Filters Action Button */}
-          {isAdvancedFilterActive && (
-            <button
-              type="button"
-              onClick={handleResetAdvancedFilters}
-              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-              className="min-h-[32px] px-3 py-1 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-2xs shrink-0"
-              title="Reset all directory filters"
-              aria-label="Reset all directory filters"
-            >
-              <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
-              <span>Reset</span>
-            </button>
-          )}
         </div>
 
         {/* Horizontal Filters: 3-Column Grid without horizontal scrollbar */}
@@ -362,6 +347,23 @@ export const LogsTab: React.FC<LogsTabProps> = ({
             buttonClassName="w-full justify-between"
           />
         </div>
+
+        {/* Down Right Corner: Reset Filters Action Button */}
+        {isAdvancedFilterActive && (
+          <div className="flex justify-end pt-1">
+            <button
+              type="button"
+              onClick={handleResetAdvancedFilters}
+              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+              className="min-h-[34px] px-3.5 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-2xs"
+              title="Reset all directory filters"
+              aria-label="Reset all directory filters"
+            >
+              <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Member Records List (Cards in Clean Mint Grid) */}
