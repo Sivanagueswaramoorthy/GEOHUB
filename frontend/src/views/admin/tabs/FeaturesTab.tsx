@@ -416,12 +416,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
 
                 <div
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                  className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                  style={{
+                    backgroundColor: '#F6FBF7',
+                    borderColor: '#DAF1DE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                  className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                 >
                   <div
-                    style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                    className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                    style={{
+                      backgroundColor: '#DAF1DE',
+                      color: '#163832',
+                      width: '28px',
+                      height: '28px',
+                      minWidth: '28px',
+                      minHeight: '28px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
                     <Hash size={14} strokeWidth={2.4} />
                   </div>
@@ -430,8 +447,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     placeholder="e.g. 24GEO055"
                     value={studentRollNo}
                     onChange={(e) => setStudentRollNo(e.target.value.toUpperCase())}
-                    style={{ color: '#051F20' }}
-                    className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-black uppercase placeholder:text-[#8EB69B] placeholder:font-semibold"
+                    style={{
+                      color: '#051F20',
+                      flex: 1,
+                      minWidth: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      paddingLeft: '4px',
+                    }}
+                    className="text-xs sm:text-sm font-black uppercase placeholder:text-[#8EB69B] placeholder:font-semibold"
                     required
                   />
                 </div>
@@ -474,12 +501,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
 
                 <div
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                  className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                  style={{
+                    backgroundColor: '#F6FBF7',
+                    borderColor: '#DAF1DE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                  className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                 >
                   <div
-                    style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                    className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                    style={{
+                      backgroundColor: '#DAF1DE',
+                      color: '#163832',
+                      width: '28px',
+                      height: '28px',
+                      minWidth: '28px',
+                      minHeight: '28px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
                     <User size={14} strokeWidth={2.4} />
                   </div>
@@ -488,8 +532,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     placeholder="e.g. Kavya Sharma"
                     value={studentName}
                     onChange={(e) => setStudentName(e.target.value)}
-                    style={{ color: '#051F20' }}
-                    className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
+                    style={{
+                      color: '#051F20',
+                      flex: 1,
+                      minWidth: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      paddingLeft: '4px',
+                    }}
+                    className="text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
                     required
                   />
                 </div>
@@ -502,20 +556,47 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     YEAR OF STUDY *
                   </label>
                   <div
-                    style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                    className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs relative"
+                    style={{
+                      backgroundColor: '#F6FBF7',
+                      borderColor: '#DAF1DE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                    className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs relative"
                   >
                     <div
-                      style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                      className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                      style={{
+                        backgroundColor: '#DAF1DE',
+                        color: '#163832',
+                        width: '28px',
+                        height: '28px',
+                        minWidth: '28px',
+                        minHeight: '28px',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
                     >
                       <Calendar size={14} strokeWidth={2.4} />
                     </div>
                     <select
                       value={studentYear}
                       onChange={(e) => setStudentYear(e.target.value)}
-                      style={{ color: '#051F20' }}
-                      className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold cursor-pointer appearance-none pr-6"
+                      style={{
+                        color: '#051F20',
+                        flex: 1,
+                        minWidth: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        paddingLeft: '4px',
+                      }}
+                      className="text-xs sm:text-sm font-bold cursor-pointer appearance-none pr-6"
                     >
                       <option value="1st Year">1st Year (Fresher)</option>
                       <option value="2nd Year">2nd Year (Sophomore)</option>
@@ -531,12 +612,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     DEPARTMENT
                   </label>
                   <div
-                    style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                    className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                    style={{
+                      backgroundColor: '#F6FBF7',
+                      borderColor: '#DAF1DE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                    className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                   >
                     <div
-                      style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                      className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                      style={{
+                        backgroundColor: '#DAF1DE',
+                        color: '#163832',
+                        width: '28px',
+                        height: '28px',
+                        minWidth: '28px',
+                        minHeight: '28px',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
                     >
                       <Building2 size={14} strokeWidth={2.4} />
                     </div>
@@ -545,8 +643,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                       placeholder="e.g. Geoinformatics"
                       value={studentDept}
                       onChange={(e) => setStudentDept(e.target.value)}
-                      style={{ color: '#051F20' }}
-                      className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
+                      style={{
+                        color: '#051F20',
+                        flex: 1,
+                        minWidth: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        paddingLeft: '4px',
+                      }}
+                      className="text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
                     />
                   </div>
                 </div>
@@ -653,12 +761,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
 
                 <div
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                  className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                  style={{
+                    backgroundColor: '#F6FBF7',
+                    borderColor: '#DAF1DE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                  className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                 >
                   <div
-                    style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                    className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                    style={{
+                      backgroundColor: '#DAF1DE',
+                      color: '#163832',
+                      width: '28px',
+                      height: '28px',
+                      minWidth: '28px',
+                      minHeight: '28px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
                     <Hash size={14} strokeWidth={2.4} />
                   </div>
@@ -667,8 +792,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     placeholder="e.g. FAC05"
                     value={facultyRollNo}
                     onChange={(e) => setFacultyRollNo(e.target.value.toUpperCase())}
-                    style={{ color: '#051F20' }}
-                    className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-black uppercase placeholder:text-[#8EB69B] placeholder:font-semibold"
+                    style={{
+                      color: '#051F20',
+                      flex: 1,
+                      minWidth: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      paddingLeft: '4px',
+                    }}
+                    className="text-xs sm:text-sm font-black uppercase placeholder:text-[#8EB69B] placeholder:font-semibold"
                     required
                   />
                 </div>
@@ -689,12 +824,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                 </div>
 
                 <div
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                  className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                  style={{
+                    backgroundColor: '#F6FBF7',
+                    borderColor: '#DAF1DE',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                  className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                 >
                   <div
-                    style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                    className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                    style={{
+                      backgroundColor: '#DAF1DE',
+                      color: '#163832',
+                      width: '28px',
+                      height: '28px',
+                      minWidth: '28px',
+                      minHeight: '28px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
                   >
                     <User size={14} strokeWidth={2.4} />
                   </div>
@@ -703,8 +855,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     placeholder="e.g. Dr. Rajesh Kumar"
                     value={facultyName}
                     onChange={(e) => setFacultyName(e.target.value)}
-                    style={{ color: '#051F20' }}
-                    className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
+                    style={{
+                      color: '#051F20',
+                      flex: 1,
+                      minWidth: 0,
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      outline: 'none',
+                      paddingLeft: '4px',
+                    }}
+                    className="text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
                     required
                   />
                 </div>
@@ -717,12 +879,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     DEPARTMENT *
                   </label>
                   <div
-                    style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                    className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                    style={{
+                      backgroundColor: '#F6FBF7',
+                      borderColor: '#DAF1DE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                    className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                   >
                     <div
-                      style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                      className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                      style={{
+                        backgroundColor: '#DAF1DE',
+                        color: '#163832',
+                        width: '28px',
+                        height: '28px',
+                        minWidth: '28px',
+                        minHeight: '28px',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
                     >
                       <Building2 size={14} strokeWidth={2.4} />
                     </div>
@@ -731,7 +910,17 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                       placeholder="e.g. Geoinformatics Engineering"
                       value={facultyDept}
                       onChange={(e) => setFacultyDept(e.target.value)}
-                      style={{ color: '#051F20' }}
+                      style={{
+                        color: '#051F20',
+                        flex: 1,
+                        minWidth: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        paddingLeft: '4px',
+                      }}
                       className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
                       required
                     />
@@ -743,12 +932,29 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                     Designation
                   </label>
                   <div
-                    style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-                    className="flex items-center gap-2.5 px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
+                    style={{
+                      backgroundColor: '#F6FBF7',
+                      borderColor: '#DAF1DE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                    className="px-3.5 h-12 rounded-2xl border transition-all focus-within:border-[#163832] focus-within:bg-white focus-within:ring-3 focus-within:ring-[#8EB69B]/20 shadow-2xs"
                   >
                     <div
-                      style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-                      className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
+                      style={{
+                        backgroundColor: '#DAF1DE',
+                        color: '#163832',
+                        width: '28px',
+                        height: '28px',
+                        minWidth: '28px',
+                        minHeight: '28px',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
                     >
                       <Award size={14} strokeWidth={2.4} />
                     </div>
@@ -757,8 +963,18 @@ export const FeaturesTab: React.FC<FeaturesTabProps> = ({
                       placeholder="e.g. Faculty Advisor"
                       value={facultyDesignation}
                       onChange={(e) => setFacultyDesignation(e.target.value)}
-                      style={{ color: '#051F20' }}
-                      className="flex-1 h-full bg-transparent border-0 outline-none text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
+                      style={{
+                        color: '#051F20',
+                        flex: 1,
+                        minWidth: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        paddingLeft: '4px',
+                      }}
+                      className="text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
                     />
                   </div>
                 </div>

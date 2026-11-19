@@ -6,11 +6,10 @@ import {
   Sparkles,
   CheckCircle2,
 } from 'lucide-react';
-import {
-  checkNetworkStability,
-  NetworkStabilityResult,
-} from '../core/networkStability';
+import { checkNetworkStability, NetworkStabilityResult } from '../core/networkStability';
 import { APP_VERSION } from '../config/version';
+import geohubEmblemSvg from '../assets/geohub-emblem.svg';
+import natureSplashNew from '../assets/nature-splash-new.jpg';
 import './SplashScreen.css';
 
 interface SplashScreenProps {
@@ -197,11 +196,11 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       aria-label="GeoHub Network Verification & Splash"
       className={`splash-overlay ${isClosing ? 'splash-closing' : ''}`}
     >
-      {/* 1. Faded Pastel Cartoon Nature Backdrop (Friendly Deer, Bunny, Birds, Rolling Hills & Pine Trees) */}
+      {/* 1. Serene Nature & Biosphere Sanctuary Backdrop */}
       <div className="nature-cartoon-backdrop" aria-hidden="true">
         <img
-          src="/nature-splash-cartoon.jpg"
-          alt="Cartoon Nature Landscape with Friendly Deer, Bunny, Trees, and Mountains"
+          src={natureSplashNew}
+          alt="Peaceful Nature Sanctuary with Mountain Stream, Stag, Pine Trees, and Misty Hills"
           className="nature-cartoon-img"
         />
         <div className="nature-faded-overlay" />
@@ -217,7 +216,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
         {/* Crisp Emblem Squircle without box shadow for a clean, modern UI/UX */}
         <div className="w-[100px] h-[100px] mb-2.5 animate-float flex items-center justify-center">
           <img
-            src="/geohub-emblem.svg"
+            src={geohubEmblemSvg}
             width={100}
             height={100}
             alt="GeoHub Emblem"

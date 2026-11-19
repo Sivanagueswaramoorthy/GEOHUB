@@ -27,7 +27,7 @@ describe('SplashScreen Component', () => {
     // Emblem image
     const emblem = screen.getByAltText('GeoHub Emblem');
     expect(emblem).toBeInTheDocument();
-    expect(emblem).toHaveAttribute('src', '/geohub-emblem.svg');
+    expect(emblem.getAttribute('src')).toMatch(/geohub-emblem\.svg/);
 
     // Initial Step & Progress
     expect(screen.getByText('Checking network…')).toBeInTheDocument();

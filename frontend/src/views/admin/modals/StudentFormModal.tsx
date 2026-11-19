@@ -110,8 +110,31 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
             <span className="text-xs font-semibold text-[#8EB69B]">Primary Unique Key</span>
           </div>
 
-          <div className="flex items-center gap-2.5 px-3.5 h-11 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] focus-within:border-[#163832] focus-within:bg-white shadow-2xs">
-            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+          <div
+            style={{
+              backgroundColor: '#F6FBF7',
+              borderColor: '#DAF1DE',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+            className="px-3.5 h-11 rounded-xl border focus-within:border-[#163832] focus-within:bg-white shadow-2xs"
+          >
+            <div
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                width: '26px',
+                height: '26px',
+                minWidth: '26px',
+                minHeight: '26px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               <Hash size={13} strokeWidth={2.4} />
             </div>
             <input
@@ -120,7 +143,18 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               value={rollNo}
               onChange={(e) => setRollNo(e.target.value.toUpperCase())}
               placeholder="e.g. 24GEO055"
-              className="flex-1 bg-transparent border-0 outline-hidden text-xs sm:text-sm font-mono font-bold uppercase text-[#051F20] placeholder:text-[#8EB69B]"
+              style={{
+                color: '#051F20',
+                flex: 1,
+                minWidth: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                paddingLeft: '4px',
+              }}
+              className="text-xs sm:text-sm font-mono font-bold uppercase placeholder:text-[#8EB69B]"
             />
           </div>
 
@@ -148,8 +182,31 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
           <label className="block text-xs font-bold uppercase tracking-wider text-[#235347]">
             STUDENT FULL NAME *
           </label>
-          <div className="flex items-center gap-2.5 px-3.5 h-11 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] focus-within:border-[#163832] focus-within:bg-white shadow-2xs">
-            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+          <div
+            style={{
+              backgroundColor: '#F6FBF7',
+              borderColor: '#DAF1DE',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+            className="px-3.5 h-11 rounded-xl border focus-within:border-[#163832] focus-within:bg-white shadow-2xs"
+          >
+            <div
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                width: '26px',
+                height: '26px',
+                minWidth: '26px',
+                minHeight: '26px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               <User size={13} strokeWidth={2.4} />
             </div>
             <input
@@ -158,7 +215,18 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Priya Sharma"
-              className="flex-1 bg-transparent border-0 outline-hidden text-xs sm:text-sm font-semibold text-[#051F20] placeholder:text-[#8EB69B]"
+              style={{
+                color: '#051F20',
+                flex: 1,
+                minWidth: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                paddingLeft: '4px',
+              }}
+              className="text-xs sm:text-sm font-semibold placeholder:text-[#8EB69B]"
             />
           </div>
         </div>
@@ -168,14 +236,48 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
           <label className="block text-xs font-bold uppercase tracking-wider text-[#235347]">
             YEAR OF STUDY *
           </label>
-          <div className="flex items-center gap-2.5 px-3.5 h-11 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] focus-within:border-[#163832] focus-within:bg-white shadow-2xs">
-            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+          <div
+            style={{
+              backgroundColor: '#F6FBF7',
+              borderColor: '#DAF1DE',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+            className="px-3.5 h-11 rounded-xl border focus-within:border-[#163832] focus-within:bg-white shadow-2xs"
+          >
+            <div
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                width: '26px',
+                height: '26px',
+                minWidth: '26px',
+                minHeight: '26px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               <Calendar size={13} strokeWidth={2.4} />
             </div>
             <select
               value={yearOfStudy}
               onChange={(e) => setYearOfStudy(e.target.value)}
-              className="flex-1 bg-transparent border-0 outline-hidden text-xs sm:text-sm font-bold text-[#051F20] cursor-pointer"
+              style={{
+                color: '#051F20',
+                flex: 1,
+                minWidth: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                paddingLeft: '4px',
+              }}
+              className="text-xs sm:text-sm font-bold cursor-pointer"
             >
               {YEARS.map((y) => (
                 <option key={y} value={y}>
@@ -191,8 +293,31 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
           <label className="block text-xs font-bold uppercase tracking-wider text-[#235347]">
             DEPARTMENT
           </label>
-          <div className="flex items-center gap-2.5 px-3.5 h-11 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] focus-within:border-[#163832] focus-within:bg-white shadow-2xs">
-            <div className="w-6 h-6 rounded-lg bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0">
+          <div
+            style={{
+              backgroundColor: '#F6FBF7',
+              borderColor: '#DAF1DE',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+            className="px-3.5 h-11 rounded-xl border focus-within:border-[#163832] focus-within:bg-white shadow-2xs"
+          >
+            <div
+              style={{
+                backgroundColor: '#DAF1DE',
+                color: '#163832',
+                width: '26px',
+                height: '26px',
+                minWidth: '26px',
+                minHeight: '26px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               <Building size={13} strokeWidth={2.4} />
             </div>
             <input
@@ -200,7 +325,18 @@ export const StudentFormModal: React.FC<StudentFormModalProps> = ({
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               placeholder="e.g. Geoinformatics"
-              className="flex-1 bg-transparent border-0 outline-hidden text-xs sm:text-sm font-bold text-[#051F20] placeholder:text-[#8EB69B]"
+              style={{
+                color: '#051F20',
+                flex: 1,
+                minWidth: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
+                border: 'none',
+                outline: 'none',
+                paddingLeft: '4px',
+              }}
+              className="text-xs sm:text-sm font-bold placeholder:text-[#8EB69B]"
             />
           </div>
 
