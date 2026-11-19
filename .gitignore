@@ -60,4 +60,5 @@ dist/
 functions/node_modules/
 firebase-debug.log
 firebase-debug.*.log
+frontend/src/views/admin/desktop/
 

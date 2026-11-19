@@ -1303,8 +1303,17 @@ export const moduleAccess = (
  * Member Directory: Only Faculty can remove members.
  * President has WRITE, but CANNOT remove members.
  */
-export const canRemoveMember = (actor: UserModel | null | undefined): boolean => {
+export const canRemoveMember = (
+  actor: UserModel | null | undefined,
+  target?: { role?: string; rollNo?: string } | null
+): boolean => {
   if (!actor) return false;
+  if (target) {
+    const targetRole = normalizeRole(target.role);
+    if (targetRole === 'super_admin' || target.rollNo === 'SA01') {
+      return false; // Invariant: SuperAdmin CAN NEVER be deleted by any role member, including Faculty
+    }
+  }
   const role = normalizeRole(actor.role);
   const hubRole = normalizeHubRole(actor.role);
   return role === 'super_admin' || hubRole === 'faculty';
@@ -1312,7 +1321,7 @@ export const canRemoveMember = (actor: UserModel | null | undefined): boolean =>
 
 /**
  * President cannot edit Faculty accounts.
- * Faculty can edit all accounts.
+ * Faculty can edit all accounts (except SuperAdmin).
  * SuperAdmin has unconditional master authority over all accounts.
  */
 export const canEditMember = (
@@ -1320,15 +1329,19 @@ export const canEditMember = (
   target: UserModel | null | undefined
 ): boolean => {
   if (!actor || !target) return false;
+  const targetRole = normalizeRole(target.role);
+  if (targetRole === 'super_admin' || target.rollNo === 'SA01') {
+    return normalizeRole(actor.role) === 'super_admin';
+  }
   const role = normalizeRole(actor.role);
   if (role === 'super_admin') return true;
   const actorRole = normalizeHubRole(actor.role);
-  const targetRole = normalizeHubRole(target.role);
+  const targetRoleHub = normalizeHubRole(target.role);
 
   if (actorRole === 'faculty') return true;
 
   if (actorRole === 'president' || actorRole === 'coordinator') {
-    if (targetRole === 'faculty') return false;
+    if (targetRoleHub === 'faculty') return false;
     return true;
   }
 

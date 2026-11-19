@@ -13,7 +13,7 @@ import {
 import { AnimatedNumber, ConfirmDialog, EmptyState } from '../../../components/shared';
 import { canAssignSquadLead } from '../../../core/permissions';
 import { useApp } from '../../../context/AppContext';
-import { ScholarRecord, OFFICIAL_POSTS, matchPostOption } from './MemberDirectoryScreen';
+import { ScholarRecord, OFFICIAL_POSTS, matchPostOption, isSuperAdminAccount } from './MemberDirectoryScreen';
 import { apiClient } from '../../../api/client';
 
 export interface SquadLeadsScreenProps {
@@ -47,8 +47,9 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
     return (users || [])
       .filter(
         (u) =>
-          u.squadMemberships?.some((m) => m.isLead) ||
-          (u.post && u.post.toLowerCase().includes('lead'))
+          !isSuperAdminAccount(u) &&
+          (u.squadMemberships?.some((m) => m.isLead) ||
+            (u.post && u.post.toLowerCase().includes('lead')))
       )
       .map((u) => {
         const leadMembership = u.squadMemberships?.find((m) => m.isLead);
@@ -462,7 +463,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                 >
                   <option value="">Choose Roll Number...</option>
                   {(users || [])
-                    .filter((u) => u.rollNo)
+                    .filter((u) => u.rollNo && !isSuperAdminAccount(u))
                     .map((u) => (
                       <option key={u.uid} value={u.rollNo}>
                         {u.rollNo} — {u.name} ({u.team || 'Member'})

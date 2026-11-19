@@ -13,16 +13,13 @@ export interface SuperAdminTopNavProps extends TopBarProps {
 export const SuperAdminTopNav: React.FC<SuperAdminTopNavProps> = ({
   onOpenNotifications,
   onNotifications,
-  className = '',
   ...props
 }) => {
   return (
-    <div className={className}>
-      <TopBar
-        onNotifications={onOpenNotifications || onNotifications}
-        {...props}
-      />
-    </div>
+    <TopBar
+      onNotifications={onOpenNotifications || onNotifications}
+      {...props}
+    />
   );
 };
 

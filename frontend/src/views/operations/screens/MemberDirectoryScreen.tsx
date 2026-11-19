@@ -149,6 +149,27 @@ export const matchPostOption = (post?: string, role?: string): OfficialPostOptio
   return OFFICIAL_POSTS[0];
 };
 
+export const isSuperAdminAccount = (u: any): boolean => {
+  if (!u) return false;
+  const role = (u.role || '').toLowerCase().trim();
+  const roll = (u.rollNo || '').toUpperCase().trim();
+  const uid = (u.uid || '').toLowerCase().trim();
+  const email = (u.email || '').toLowerCase().trim();
+  const name = (u.name || '').toLowerCase().trim();
+  const post = (u.post || '').toLowerCase().trim();
+
+  return (
+    role === 'super_admin' ||
+    roll === 'SA01' ||
+    uid === 'sa01' ||
+    uid.includes('sa01') ||
+    email.includes('superadmin') ||
+    name.includes('superadmin') ||
+    post.includes('superadmin') ||
+    post.includes('system admin')
+  );
+};
+
 export interface MemberDirectoryScreenProps {
   readOnly: boolean;
   onLogAudit: (event: string, action: string) => void;
@@ -204,29 +225,35 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
   const { users, setUsers, enrollScholar, showToast, setCurrentUser } = useApp();
   const [members, setMembers] = useState<ScholarRecord[]>(() => {
-    return (users || []).map((u) => ({
-      uid: u.uid,
-      name: u.name,
-      role: u.role,
-      squad: u.team || 'General',
-      isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
-      post: u.post || 'Chapter Member',
-      email: u.email,
-      rollNo: u.rollNo || u.uid,
-    }));
+    return (users || [])
+      .filter((u) => !isSuperAdminAccount(u))
+      .map((u) => ({
+        uid: u.uid,
+        name: u.name,
+        role: u.role,
+        squad: u.team || 'General',
+        isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
+        post: u.post || 'Chapter Member',
+        email: u.email,
+        rollNo: u.rollNo || u.uid,
+      }));
   });
 
   useEffect(() => {
-    setMembers((users || []).map((u) => ({
-      uid: u.uid,
-      name: u.name,
-      role: u.role,
-      squad: u.team || 'General',
-      isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
-      post: u.post || 'Chapter Member',
-      email: u.email,
-      rollNo: u.rollNo || u.uid,
-    })));
+    setMembers(
+      (users || [])
+        .filter((u) => !isSuperAdminAccount(u))
+        .map((u) => ({
+          uid: u.uid,
+          name: u.name,
+          role: u.role,
+          squad: u.team || 'General',
+          isLead: Boolean(u.squadMemberships?.some((s) => s.isLead) || u.post?.includes('Lead') || u.post?.includes('Advisor')),
+          post: u.post || 'Chapter Member',
+          email: u.email,
+          rollNo: u.rollNo || u.uid,
+        }))
+    );
   }, [users]);
 
   // Synchronize top-bar header with ExploreActivitiesView: single back button and title
@@ -247,6 +274,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const squads = ['All', 'Management', 'Promotion', 'Treasury', 'Documentation'];
 
   const filteredMembers = members.filter((m) => {
+    if (isSuperAdminAccount(m)) return false;
     if (selectedSquad !== 'All' && m.squad.toLowerCase() !== selectedSquad.toLowerCase()) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
@@ -259,6 +287,12 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   });
 
   const handleOpenEdit = (m: ScholarRecord) => {
+    if (isSuperAdminAccount(m) && currentUser?.role !== 'super_admin') {
+      if (showToast) {
+        showToast('Protection Invariant: SuperAdmin profile cannot be modified from Member Directory.');
+      }
+      return;
+    }
     setSelectedMemberToEdit(m);
     setEditName(m.name);
     const matched = matchPostOption(m.post, m.role);
@@ -339,7 +373,14 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
   const handleConfirmRemove = () => {
     if (!selectedMemberToRemove) return;
-    setUsers((prev) => prev.filter((u) => u.uid !== selectedMemberToRemove.uid));
+    if (isSuperAdminAccount(selectedMemberToRemove)) {
+      if (showToast) {
+        showToast('Protection Invariant: SuperAdmin root authority cannot be deleted by any role.');
+      }
+      setSelectedMemberToRemove(null);
+      return;
+    }
+    setUsers((prev) => prev.filter((u) => u.uid !== selectedMemberToRemove.uid && !isSuperAdminAccount(u)));
     setMembers((prev) => prev.filter((m) => m.uid !== selectedMemberToRemove.uid));
     onLogAudit('Member Directory', `Removed member ${selectedMemberToRemove.name} (${selectedMemberToRemove.squad})`);
     setNotice(`Removed ${selectedMemberToRemove.name} from directory.`);
@@ -947,7 +988,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
                 {/* Actions */}
                 <div className="flex items-center gap-1.5 shrink-0">
-                  {!readOnly && (
+                  {!readOnly && !isSuperAdminAccount(m) && (
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(m)}
@@ -959,17 +1000,21 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
                     </button>
                   )}
 
-                  {canRemove && m.role !== 'faculty' && m.role !== 'coordinator' && (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedMemberToRemove(m)}
-                      className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
-                      data-testid={`btn-remove-member-${m.uid}`}
-                      title="Remove Scholar"
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  )}
+                  {canRemove &&
+                    m.role !== 'faculty' &&
+                    m.role !== 'coordinator' &&
+                    m.role !== 'super_admin' &&
+                    !isSuperAdminAccount(m) && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMemberToRemove(m)}
+                        className="w-8 h-8 rounded-xl bg-white border border-[#D9534F] text-[#D9534F] hover:bg-[#D9534F]/10 flex items-center justify-center cursor-pointer shadow-2xs"
+                        data-testid={`btn-remove-member-${m.uid}`}
+                        title="Remove Scholar"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                 </div>
               </div>
             ))

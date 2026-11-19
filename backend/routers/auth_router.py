@@ -186,6 +186,14 @@ def set_user_role(
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found.")
 
+    # Protection Rule 0: SuperAdmin cannot be modified or demoted by any role member, including Faculty
+    if target_user.roll_no == "SA01" or target_user.role == "super_admin":
+        if auth.normalize_role(actor.role) != "super_admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Protection Rule: SuperAdmin root authority cannot be modified or deleted by any role member, including Faculty."
+            )
+
     # Protection Rule 1: No self-escalation
     auth.verify_no_self_escalation(actor, target_user.id)
 

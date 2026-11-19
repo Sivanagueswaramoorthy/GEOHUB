@@ -1,8 +1,8 @@
 {
-  "version": "1.6.57",
-  "version_code": 76,
+  "version": "1.6.58",
+  "version_code": 77,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Latest release v1.6.57 (Build 76) featuring Official Post / Designation dropdown selection with auto squad mapping, multi-role interface switching (Club President -> Coordinator cockpit, Vice President -> Management desk, Documentation Lead, Treasurer, Promotion, Volunteer gate scanner, and Student), backend clearance synchronization, and TiDB cloud role persistence.",
-  "sha256": "BD3A6E722DB05026149044EF98717CFA2BE0BA8D8E545480AA3F17A3E9ACB82B",
-  "file_size": 7277851
+  "release_notes": "Release v1.6.58 (Build 77): Exclude SuperAdmin root account from Member Directory and Squad Leads directory, enforce strict invariant preventing deletion or modification of SuperAdmin by any role members including Faculty across both frontend and backend.",
+  "sha256": "7B49AF2DB1B0EEDE1877631F7931B2A7B021FAC3276E3916B596662851CF30D4",
+  "file_size": 6944624
 }
