@@ -196,35 +196,34 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
       aria-label="GeoHub Network Verification & Splash"
       className={`splash-overlay ${isClosing ? 'splash-closing' : ''}`}
     >
-      {/* 1. Realistic Photographic Mountain, Trees & Wildlife Backdrop */}
-      <div className="nature-realistic-backdrop" aria-hidden="true">
+      {/* 1. Faded Pastel Cartoon Nature Backdrop (Friendly Deer, Bunny, Birds, Rolling Hills & Pine Trees) */}
+      <div className="nature-cartoon-backdrop" aria-hidden="true">
         <img
-          src="/nature-splash-realistic.jpg"
-          alt="Realistic Mountain Sanctuary Landscape with Stag and Evergreen Pines"
-          className="nature-realistic-img"
+          src="/nature-splash-cartoon.jpg"
+          alt="Cartoon Nature Landscape with Friendly Deer, Bunny, Trees, and Mountains"
+          className="nature-cartoon-img"
         />
-        <div className="nature-mist-overlay" />
+        <div className="nature-faded-overlay" />
       </div>
 
-      {/* 2. Soft Ambient Radial Sun Glow Behind Emblem */}
+      {/* 2. Soft Ambient Breathing Radial Sun Glow */}
       <div className="nature-sun-aura" />
 
       {/* 3. Floating Nature Spores & Bioluminescent Dust */}
-      <div className="nature-spore" style={{ width: 4, height: 4, left: '20%', bottom: '38%', animationDelay: '0s' }} />
-      <div className="nature-spore" style={{ width: 5, height: 5, left: '46%', bottom: '42%', animationDelay: '2.5s' }} />
-      <div className="nature-spore" style={{ width: 3, height: 3, left: '72%', bottom: '36%', animationDelay: '4.2s' }} />
-      <div className="nature-spore" style={{ width: 4, height: 4, left: '84%', bottom: '44%', animationDelay: '1.2s' }} />
+      <div className="nature-spore" style={{ width: 4, height: 4, left: '16%', bottom: '38%', animationDelay: '0s' }} />
+      <div className="nature-spore" style={{ width: 5, height: 5, left: '45%', bottom: '44%', animationDelay: '2.5s' }} />
+      <div className="nature-spore" style={{ width: 3, height: 3, left: '78%', bottom: '36%', animationDelay: '4.2s' }} />
 
-      {/* 4. Central Content Column: Packs Branding and Loading Card in the Center Little Down */}
-      <div className="splash-content-column">
-        {/* Emblem 104dp with soft green drop shadow and 4.2s float animation */}
-        <div className="w-[104px] h-[104px] mb-3 emblem-shadow animate-float flex items-center justify-center">
+      {/* 4. Top Branding Group */}
+      <div className="splash-branding-group">
+        {/* Emblem 100dp with soft elevation shadow and float animation */}
+        <div className="w-[100px] h-[100px] mb-2.5 emblem-shadow animate-float flex items-center justify-center">
           <img
             src="/geohub-emblem.svg"
-            width={104}
-            height={104}
+            width={100}
+            height={100}
             alt="GeoHub Emblem"
-            className="w-[104px] h-[104px] object-contain select-none"
+            className="w-[100px] h-[100px] object-contain select-none"
           />
         </div>
 
@@ -270,12 +269,16 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             Living Biosphere • Earth Sanctuary
           </span>
         </div>
+      </div>
 
-        {/* 5. Center-Down Floating Glassmorphic Status Sheet Card */}
+      {/* 5. Center Meadow Area: The friendly cartoon deer, bunny, trees, and rolling hills remain completely visible and unobstructed */}
+
+      {/* 6. Bottom Ergonomic Loading Container */}
+      <div className="splash-bottom-container">
         {status !== 'error' ? (
           <div className="splash-status-sheet">
             {/* Row 1: Step Label and Tabular Percentage */}
-            <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Sparkles size={13} className="text-[#235347] shrink-0" />
                 <span
@@ -302,8 +305,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               </span>
             </div>
 
-            {/* Row 2: 8dp rounded botanical progress bar with glowing leading particle */}
-            <div className="splash-progress-track mb-2.5">
+            {/* Row 2: 7dp rounded botanical progress bar with glowing leading particle */}
+            <div className="splash-progress-track mb-2">
               <div
                 className={`splash-progress-fill ${
                   status === 'stable'
@@ -422,12 +425,8 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             </button>
           </div>
         )}
-      </div>
 
-      {/* 6. Lower Landscape Sanctuary is completely visible and unobstructed below the card */}
-
-      {/* 7. Bottom Elegant Watermark Pill */}
-      <div className="splash-bottom-watermark">
+        {/* Watermark Pill */}
         <div
           className="px-3 py-1 rounded-full border shadow-2xs backdrop-blur-md tracking-[0.16em] uppercase font-bold text-xs flex items-center justify-center gap-1.5"
           style={{

@@ -1,12 +1,12 @@
 {
-  "version": "1.6.62",
-  "version_code": 81,
+  "version": "1.6.63",
+  "version_code": 82,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Release v1.6.62 (Build 81): Realistic nature and wildlife splash screen with center-down loading card, showcasing majestic stag, grazing deer, evergreen pines, and misty mountains.",
+  "release_notes": "Release v1.6.63 (Build 82): Soft faded pastel cartoon nature splash screen with stylized friendly deer, bunny, trees, and ergonomic bottom loading capsule.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-19",
-  "file_size_bytes": 7734876,
-  "file_size_mb": "7.38 MB",
-  "sha256": "9AC948975C98417036E4C4220DFEA771815465133F20140DE4A7C67CA07303A9"
+  "file_size_bytes": 8626672,
+  "file_size_mb": "8.23 MB",
+  "sha256": "3BBAA584F978E4D3763CF21348696E35F5386F42258754038A41E6DED9B40605"
 }
