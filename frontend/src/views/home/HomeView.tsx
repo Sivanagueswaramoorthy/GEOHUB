@@ -20,34 +20,55 @@ export const HomeView: React.FC = () => {
   }
 
   const postLower = (currentUser.post || '').toLowerCase();
-  const isFaculty = currentUser.role === 'faculty';
+  const teamLower = ((currentUser as any).squad || currentUser.team || '').toLowerCase();
+  const isFaculty =
+    currentUser.role === 'faculty' ||
+    postLower.includes('faculty') ||
+    postLower.includes('advisor');
+
   const isCoordinator =
     !isFaculty &&
     (currentUser.role === 'admin' ||
       currentUser.role === 'coordinator' ||
       (postLower.includes('president') && !postLower.includes('vice')));
+
   const isManagement =
     !isFaculty &&
     !isCoordinator &&
     (currentUser.role === 'management' ||
       postLower.includes('vice president') ||
-      (currentUser.team === 'Management' && !isFaculty && !isCoordinator));
+      teamLower === 'management');
+
   const isDocLead =
     !isFaculty &&
     !isCoordinator &&
-    (currentUser.role === 'documentation' || postLower.includes('documentation'));
+    !isManagement &&
+    (currentUser.role === 'documentation' ||
+      postLower.includes('documentation') ||
+      teamLower === 'documentation');
+
   const isTreasurer =
     !isFaculty &&
     !isCoordinator &&
-    (currentUser.role === 'treasurer' || postLower.includes('treasurer'));
+    !isManagement &&
+    !isDocLead &&
+    (currentUser.role === 'treasurer' ||
+      postLower.includes('treasurer') ||
+      teamLower === 'treasury');
+
   const isPromotion =
     !isFaculty &&
     !isCoordinator &&
+    !isManagement &&
+    !isDocLead &&
+    !isTreasurer &&
     (currentUser.role === 'promotion' ||
       currentUser.role === 'social_media' ||
       (currentUser.role === 'team_admin' &&
-        (currentUser.team === 'Promotion' || postLower.includes('promotion'))) ||
-      postLower.includes('promotion'));
+        (teamLower === 'promotion' || postLower.includes('promotion'))) ||
+      postLower.includes('promotion') ||
+      teamLower === 'promotion');
+
   const isStudent =
     !isFaculty && !isCoordinator && !isDocLead && !isTreasurer && !isPromotion && !isManagement;
 

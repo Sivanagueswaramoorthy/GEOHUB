@@ -13,7 +13,7 @@ import {
 import { AnimatedNumber, ConfirmDialog, EmptyState } from '../../../components/shared';
 import { canAssignSquadLead } from '../../../core/permissions';
 import { useApp } from '../../../context/AppContext';
-import { ScholarRecord, OFFICIAL_POSTS, matchPostOption, isSuperAdminAccount } from './MemberDirectoryScreen';
+import { ScholarRecord, OFFICIAL_POSTS, OFFICIAL_SQUADS, resolveRoleAndUI, matchPostOption, isSuperAdminAccount } from './MemberDirectoryScreen';
 import { apiClient } from '../../../api/client';
 
 export interface SquadLeadsScreenProps {
@@ -35,13 +35,13 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
 
   // Form states for Appoint
   const [appointName, setAppointName] = useState('');
-  const [appointSquad, setAppointSquad] = useState('Promotion');
-  const [appointPost, setAppointPost] = useState('Promotion Lead');
+  const [appointSquad, setAppointSquad] = useState('Management');
+  const [appointPost, setAppointPost] = useState('Member');
   const [appointRoll, setAppointRoll] = useState('');
 
   // Form states for Edit
-  const [editPost, setEditPost] = useState('');
-  const [editSquad, setEditSquad] = useState('Promotion');
+  const [editPost, setEditPost] = useState('Member');
+  const [editSquad, setEditSquad] = useState('Management');
 
   const initialLeads: ScholarRecord[] = React.useMemo(() => {
     return (users || [])
@@ -74,8 +74,8 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
     e.preventDefault();
     if (!appointName.trim()) return;
 
-    const matched = OFFICIAL_POSTS.find((p) => p.post === appointPost) || matchPostOption(appointPost);
-    const targetRole = matched.role;
+    const resolved = resolveRoleAndUI(appointPost, appointSquad);
+    const targetRole = resolved.role;
 
     const newLead: ScholarRecord = {
       uid: `u-lead-${Date.now()}`,
@@ -109,7 +109,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
     setAppointRoll('');
     setNotice(`Appointed ${newLead.name} as ${newLead.post}.`);
     if (showToast) {
-      showToast(`✓ Appointed ${newLead.name} as ${newLead.post}! UI Role: ${matched.uiTitle}`);
+      showToast(`✓ Appointed ${newLead.name} as ${newLead.post}! UI Role: ${resolved.uiTitle}`);
     }
     setTimeout(() => setNotice(null), 3500);
   };
@@ -118,8 +118,8 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
     e.preventDefault();
     if (!editingLead) return;
 
-    const matched = OFFICIAL_POSTS.find((p) => p.post === editPost) || matchPostOption(editPost);
-    const targetRole = matched.role;
+    const resolved = resolveRoleAndUI(editPost, editSquad);
+    const targetRole = resolved.role;
 
     const updated: ScholarRecord = {
       ...editingLead,
@@ -146,7 +146,7 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
     setEditingLead(null);
     setNotice(`Updated Squad Lead record for ${updated.name}.`);
     if (showToast) {
-      showToast(`✓ Updated ${updated.name} to ${updated.post}! UI Role: ${matched.uiTitle}`);
+      showToast(`✓ Updated ${updated.name} to ${updated.post}! UI Role: ${resolved.uiTitle}`);
     }
     setTimeout(() => setNotice(null), 3500);
   };
@@ -343,8 +343,8 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                   onChange={(e) => {
                     setEditPost(e.target.value);
                     const matched = OFFICIAL_POSTS.find((p) => p.post === e.target.value);
-                    if (matched) {
-                      setEditSquad(matched.squad);
+                    if (matched && matched.post !== 'Member') {
+                      setEditSquad(matched.defaultSquad);
                     }
                   }}
                   className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
@@ -366,17 +366,17 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                   onChange={(e) => setEditSquad(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
                 >
-                  <option value="General">General</option>
-                  <option value="Management">Management</option>
-                  <option value="Promotion">Promotion</option>
-                  <option value="Treasury">Treasury</option>
-                  <option value="Documentation">Documentation</option>
+                  {OFFICIAL_SQUADS.map((sq) => (
+                    <option key={sq} value={sq}>
+                      {sq}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Dynamic Role UI Interface Preview */}
               {(() => {
-                const opt = OFFICIAL_POSTS.find((p) => p.post === editPost) || matchPostOption(editPost);
+                const resolved = resolveRoleAndUI(editPost, editSquad);
                 return (
                   <div className="p-3 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B]/40 flex items-center justify-between gap-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -385,15 +385,15 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                       </div>
                       <div className="min-w-0">
                         <span className="text-xs font-black text-[#051F20] block truncate">
-                          {opt.uiTitle}
+                          {resolved.uiTitle}
                         </span>
                         <span className="text-xs font-medium text-[#235347] block truncate">
-                          Assigned Clearance: <strong className="font-bold uppercase">{opt.role}</strong> • Squad: {editSquad}
+                          Assigned Clearance: <strong className="font-bold uppercase">{resolved.role}</strong> • Squad: {editSquad}
                         </span>
                       </div>
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-[#163832] text-white text-xs font-black uppercase tracking-wider shrink-0">
-                      {opt.role}
+                      {resolved.role}
                     </span>
                   </div>
                 );
@@ -487,8 +487,8 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                   onChange={(e) => {
                     setAppointPost(e.target.value);
                     const matched = OFFICIAL_POSTS.find((p) => p.post === e.target.value);
-                    if (matched) {
-                      setAppointSquad(matched.squad);
+                    if (matched && matched.post !== 'Member') {
+                      setAppointSquad(matched.defaultSquad);
                     }
                   }}
                   className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
@@ -510,17 +510,17 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                   onChange={(e) => setAppointSquad(e.target.value)}
                   className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
                 >
-                  <option value="General">General</option>
-                  <option value="Promotion">Promotion</option>
-                  <option value="Management">Management</option>
-                  <option value="Treasury">Treasury</option>
-                  <option value="Documentation">Documentation</option>
+                  {OFFICIAL_SQUADS.map((sq) => (
+                    <option key={sq} value={sq}>
+                      {sq}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Dynamic Role UI Interface Preview */}
               {(() => {
-                const opt = OFFICIAL_POSTS.find((p) => p.post === appointPost) || matchPostOption(appointPost);
+                const resolved = resolveRoleAndUI(appointPost, appointSquad);
                 return (
                   <div className="p-3 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B]/40 flex items-center justify-between gap-2.5">
                     <div className="flex items-center gap-2.5 min-w-0">
@@ -529,15 +529,15 @@ export const SquadLeadsScreen: React.FC<SquadLeadsScreenProps> = ({
                       </div>
                       <div className="min-w-0">
                         <span className="text-xs font-black text-[#051F20] block truncate">
-                          {opt.uiTitle}
+                          {resolved.uiTitle}
                         </span>
                         <span className="text-xs font-medium text-[#235347] block truncate">
-                          Clearance: <strong className="font-bold uppercase">{opt.role}</strong> • Squad: {appointSquad}
+                          Clearance: <strong className="font-bold uppercase">{resolved.role}</strong> • Squad: {appointSquad}
                         </span>
                       </div>
                     </div>
                     <span className="px-2.5 py-1 rounded-full bg-[#163832] text-white text-xs font-black uppercase tracking-wider shrink-0">
-                      {opt.role}
+                      {resolved.role}
                     </span>
                   </div>
                 );
