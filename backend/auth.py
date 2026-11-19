@@ -224,6 +224,17 @@ def require_permission(flag: str):
         return current_user
     return dependency
 
+def require_any_permission(flags: Any):
+    """FastAPI route dependency checking that active user has at least one of the specified flags."""
+    def dependency(current_user: models.User = Depends(get_current_active_user)) -> models.User:
+        if not any(has_permission(current_user, flag) for flag in flags):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied: Requires at least one of {flags} permissions."
+            )
+        return current_user
+    return dependency
+
 def require_admin(current_user: models.User = Depends(get_current_active_user)) -> models.User:
     """Dependency requiring coordinator or faculty role."""
     if normalize_role(current_user.role) not in ["coordinator", "faculty", "super_admin", "admin"]:
@@ -311,10 +322,10 @@ def require_event_scanner(event_id: str, db: Session, scanner: models.User) -> m
     return scanner
 
 def verify_no_self_escalation(actor, target_id: str):
-    """Protection rule: A user can never change their own role or posts (except SuperAdmin)."""
+    """Protection rule: A user can never change their own role or posts (except SuperAdmin / Faculty / Coordinator)."""
     actor_id = actor.id if hasattr(actor, "id") else (actor.get("id") if isinstance(actor, dict) else str(actor))
     actor_role = actor.role if hasattr(actor, "role") else (actor.get("role") if isinstance(actor, dict) else "")
-    if normalize_role(actor_role) == "super_admin":
+    if normalize_role(actor_role) in ["super_admin", "faculty", "coordinator"]:
         return
     if actor_id == target_id:
         raise HTTPException(

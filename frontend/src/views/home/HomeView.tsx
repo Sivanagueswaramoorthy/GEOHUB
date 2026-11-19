@@ -19,32 +19,52 @@ export const HomeView: React.FC = () => {
     return <SuperAdminOperationsView onBack={() => {}} isHomeCockpit={true} />;
   }
 
+  const postLower = (currentUser.post || '').toLowerCase();
   const isFaculty = currentUser.role === 'faculty';
   const isCoordinator =
-    currentUser.role === 'admin' ||
-    currentUser.role === 'coordinator' ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('president'));
-  const isDocLead =
-    currentUser.role === 'documentation' ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('documentation'));
-  const isTreasurer =
-    currentUser.role === 'treasurer' ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('treasurer'));
-  const isPromotion =
-    currentUser.role === 'promotion' ||
-    currentUser.role === 'social_media' ||
-    (currentUser.role === 'team_admin' &&
-      (currentUser.team === 'Promotion' ||
-        Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion')))) ||
-    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('promotion'));
+    !isFaculty &&
+    (currentUser.role === 'admin' ||
+      currentUser.role === 'coordinator' ||
+      (postLower.includes('president') && !postLower.includes('vice')));
   const isManagement =
-    currentUser.role === 'management' ||
-    (currentUser.team === 'Management' && !isFaculty && !isCoordinator);
+    !isFaculty &&
+    !isCoordinator &&
+    (currentUser.role === 'management' ||
+      postLower.includes('vice president') ||
+      (currentUser.team === 'Management' && !isFaculty && !isCoordinator));
+  const isDocLead =
+    !isFaculty &&
+    !isCoordinator &&
+    (currentUser.role === 'documentation' || postLower.includes('documentation'));
+  const isTreasurer =
+    !isFaculty &&
+    !isCoordinator &&
+    (currentUser.role === 'treasurer' || postLower.includes('treasurer'));
+  const isPromotion =
+    !isFaculty &&
+    !isCoordinator &&
+    (currentUser.role === 'promotion' ||
+      currentUser.role === 'social_media' ||
+      (currentUser.role === 'team_admin' &&
+        (currentUser.team === 'Promotion' || postLower.includes('promotion'))) ||
+      postLower.includes('promotion'));
   const isStudent =
     !isFaculty && !isCoordinator && !isDocLead && !isTreasurer && !isPromotion && !isManagement;
 
-  if (isPromotion) {
-    return <PromotionHomeView showToast={showToast} />;
+  if (isFaculty) {
+    return <FacultyHomeView />;
+  }
+
+  if (isCoordinator) {
+    return <CoordinatorHomeView />;
+  }
+
+  if (isManagement) {
+    return <ManagementHomeView />;
+  }
+
+  if (isDocLead) {
+    return <DocumentationHomeView />;
   }
 
   if (isTreasurer) {
@@ -56,12 +76,8 @@ export const HomeView: React.FC = () => {
     );
   }
 
-  if (isDocLead) {
-    return <DocumentationHomeView />;
-  }
-
-  if (isManagement) {
-    return <ManagementHomeView />;
+  if (isPromotion) {
+    return <PromotionHomeView showToast={showToast} />;
   }
 
   if (isStudent) {
@@ -72,10 +88,6 @@ export const HomeView: React.FC = () => {
         registerForEvent={registerForEvent}
       />
     );
-  }
-
-  if (isFaculty) {
-    return <FacultyHomeView />;
   }
 
   // Default chapter leadership / coordinator

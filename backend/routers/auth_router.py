@@ -169,7 +169,7 @@ def get_me(current_user: models.User = Depends(auth.get_current_user)):
 def set_user_role(
     req: schemas.RoleAssignRequest,
     db: Session = Depends(get_db),
-    actor: models.User = Depends(auth.require_permission("canAssignPosts"))
+    actor: models.User = Depends(auth.require_any_permission(["canAssignPosts", "canManageMembers"]))
 ):
     """Assign or modify user roles and posts.
     Enforces:
@@ -178,7 +178,11 @@ def set_user_role(
     - Last faculty account protection
     - Audit logging
     """
-    target_user = db.query(models.User).filter(models.User.id == req.user_id).first()
+    target_user = db.query(models.User).filter(
+        (models.User.id == req.user_id) |
+        (models.User.roll_no == req.user_id.upper()) |
+        (models.User.email == req.user_id.lower())
+    ).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found.")
 
@@ -216,6 +220,19 @@ def set_user_role(
         details=f"Faculty updated role to {target_user.role} and post to {target_user.post}"
     )
 
+    try:
+        from routers.sync_router import broadcast_sync_event
+        broadcast_sync_event("MEMBER_CLEARANCE_UPDATED", {
+            "user_id": target_user.id,
+            "roll_no": target_user.roll_no,
+            "name": target_user.name,
+            "role": target_user.role,
+            "post": target_user.post,
+            "team": target_user.team
+        })
+    except Exception:
+        pass
+
     return {"success": True, "message": f"Updated role to {target_user.role}"}
 
 @router.post("/assign-team-admin")
@@ -228,7 +245,11 @@ def assign_team_admin(
     Only Faculty can assign posts.
     team_admin is a squad-level post, not a distinct identity role.
     """
-    target_user = db.query(models.User).filter(models.User.id == req.user_id).first()
+    target_user = db.query(models.User).filter(
+        (models.User.id == req.user_id) |
+        (models.User.roll_no == req.user_id.upper()) |
+        (models.User.email == req.user_id.lower())
+    ).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="User not found.")
 

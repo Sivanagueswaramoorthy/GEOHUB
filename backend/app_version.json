@@ -1,8 +1,8 @@
 {
-  "version": "1.6.56",
-  "version_code": 75,
+  "version": "1.6.57",
+  "version_code": 76,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Latest release v1.6.56 (Build 75) with SuperAdmin Cockpit maintenance bypass, clean institutional UnderMaintenance screen, 503 admin middleware exemption, and real-time TiDB/backend toggle synchronization.",
-  "sha256": "73B0D1A2374E4FFBAD82EA15F72842FA0BC40946C8FF837B004C67548E66A43C",
-  "file_size": 6942768
+  "release_notes": "Latest release v1.6.57 (Build 76) featuring Official Post / Designation dropdown selection with auto squad mapping, multi-role interface switching (Club President -> Coordinator cockpit, Vice President -> Management desk, Documentation Lead, Treasurer, Promotion, Volunteer gate scanner, and Student), backend clearance synchronization, and TiDB cloud role persistence.",
+  "sha256": "BD3A6E722DB05026149044EF98717CFA2BE0BA8D8E545480AA3F17A3E9ACB82B",
+  "file_size": 7277851
 }

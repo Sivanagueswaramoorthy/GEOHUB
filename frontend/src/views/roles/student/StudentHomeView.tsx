@@ -60,6 +60,8 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
   const nextEvent = events.length > 0 ? events[0] : null;
 
   const isAssignedScanner =
+    currentUser.role === 'volunteer' ||
+    Boolean(currentUser.post && currentUser.post.toLowerCase().includes('volunteer')) ||
     events.some((ev) => ev.assignedScannerUserIds?.includes(currentUser.uid));
 
   const upcomingEvents = events.slice(0, 3);
@@ -110,8 +112,8 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
         }
       />
 
-      {/* 2) Scanner Assignment Entry Card (if assigned) */}
-      {isAssignedScanner && nextEvent && (
+      {/* 2) Scanner Assignment Entry Card (if assigned or volunteer role) */}
+      {isAssignedScanner && (
         <PastelCard
           variant="sage"
           showArrow
@@ -121,10 +123,10 @@ export const StudentHomeView: React.FC<StudentHomeViewProps> = ({
             <Mascot name="camera" size="sm" />
             <div className="flex flex-col min-w-0">
               <span className="text-xs font-bold text-[#235347] uppercase tracking-wider">
-                Gate Scanner
+                Gate Scanner Active
               </span>
               <h3 className="font-bold text-sm text-[#051F20] truncate">
-                Scan for {nextEvent.title}
+                {nextEvent ? `Scan for ${nextEvent.title}` : 'Launch Attendance Gate Scanner'}
               </h3>
             </div>
           </div>

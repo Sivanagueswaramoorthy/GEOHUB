@@ -295,10 +295,10 @@ class ApiClient {
     });
   }
 
-  public async setUserRole(userId: string, role: string, post?: string) {
+  public async setUserRole(userId: string, role: string, post?: string, team?: string) {
     return await this.request<any>('/auth/set-role', {
       method: 'POST',
-      body: JSON.stringify({ user_id: userId, role, post }),
+      body: JSON.stringify({ user_id: userId, role, post, team }),
     });
   }
 

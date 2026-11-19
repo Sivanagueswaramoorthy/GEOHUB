@@ -34,6 +34,121 @@ export interface ScholarRecord {
   rollNo?: string;
 }
 
+export interface OfficialPostOption {
+  post: string;
+  role: string;
+  squad: string;
+  label: string;
+  uiTitle: string;
+}
+
+export const OFFICIAL_POSTS: OfficialPostOption[] = [
+  {
+    post: 'Student Member',
+    role: 'student',
+    squad: 'General',
+    label: 'Student Member (Default Scholar)',
+    uiTitle: 'Campus Scholar Portal & Digital Pass',
+  },
+  {
+    post: 'Club President',
+    role: 'coordinator',
+    squad: 'Management',
+    label: 'Club President (Executive Head)',
+    uiTitle: 'Chapter President & Executive Operations',
+  },
+  {
+    post: 'Vice President',
+    role: 'management',
+    squad: 'Management',
+    label: 'Vice President (Operations Lead)',
+    uiTitle: 'Operations & Squad Lead Management',
+  },
+  {
+    post: 'Documentation Lead',
+    role: 'documentation',
+    squad: 'Documentation',
+    label: 'Documentation Lead (Archival)',
+    uiTitle: 'Documentation Studio, Minutes & Archival',
+  },
+  {
+    post: 'Treasurer',
+    role: 'treasurer',
+    squad: 'Treasury',
+    label: 'Treasurer (Finance & Ledger)',
+    uiTitle: 'Finance Desk, Budget Approvals & Ledger',
+  },
+  {
+    post: 'Promotion Lead',
+    role: 'promotion',
+    squad: 'Promotion',
+    label: 'Promotion Lead (Campaigns & Media)',
+    uiTitle: 'Campaigns, Media & Public Broadcasts',
+  },
+  {
+    post: 'Lead Volunteer',
+    role: 'volunteer',
+    squad: 'General',
+    label: 'Lead Volunteer (Events & Gate Scanner)',
+    uiTitle: 'Event Operations & Gate Scanner Active',
+  },
+  {
+    post: 'Senior Technical Associate',
+    role: 'coordinator',
+    squad: 'General',
+    label: 'Senior Technical Associate (Tech Lead)',
+    uiTitle: 'Technical Operations & System Integration',
+  },
+  {
+    post: 'Executive Committee Member',
+    role: 'management',
+    squad: 'Management',
+    label: 'Executive Committee Member',
+    uiTitle: 'Executive Council & Governance',
+  },
+  {
+    post: 'Faculty Advisor',
+    role: 'faculty',
+    squad: 'Management',
+    label: 'Faculty Advisor (Institutional Head)',
+    uiTitle: 'Institutional Oversight & Sign-offs',
+  },
+];
+
+export const matchPostOption = (post?: string, role?: string): OfficialPostOption => {
+  const p = (post || '').toLowerCase().trim();
+  const r = (role || '').toLowerCase().trim();
+
+  if (p === 'club president' || (p.includes('president') && !p.includes('vice'))) {
+    return OFFICIAL_POSTS[1];
+  }
+  if (p === 'vice president' || p.includes('vice president')) {
+    return OFFICIAL_POSTS[2];
+  }
+  if (p.includes('documentation') || r === 'documentation') {
+    return OFFICIAL_POSTS[3];
+  }
+  if (p.includes('treasurer') || r === 'treasurer') {
+    return OFFICIAL_POSTS[4];
+  }
+  if (p.includes('promotion') || r === 'promotion' || r === 'social_media') {
+    return OFFICIAL_POSTS[5];
+  }
+  if (p.includes('volunteer') || r === 'volunteer') {
+    return OFFICIAL_POSTS[6];
+  }
+  if (p.includes('technical') || p.includes('tech associate')) {
+    return OFFICIAL_POSTS[7];
+  }
+  if (p.includes('executive')) {
+    return OFFICIAL_POSTS[8];
+  }
+  if (p.includes('faculty') || p.includes('advisor') || r === 'faculty') {
+    return OFFICIAL_POSTS[9];
+  }
+  return OFFICIAL_POSTS[0];
+};
+
 export interface MemberDirectoryScreenProps {
   readOnly: boolean;
   onLogAudit: (event: string, action: string) => void;
@@ -63,7 +178,8 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const [newDept, setNewDept] = useState('Geoinformatics');
   const [newYear, setNewYear] = useState('2nd Year');
   const [newEmail, setNewEmail] = useState('');
-  const [newRole] = useState('student');
+  const [newPost, setNewPost] = useState('Student Member');
+  const [newSquad, setNewSquad] = useState('General');
 
   // Form states for Add Student (Bulk Batch)
   const [bulkPrefix, setBulkPrefix] = useState('24GEO');
@@ -83,10 +199,10 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
 
   // Form states for Edit
   const [editName, setEditName] = useState('');
-  const [editPost, setEditPost] = useState('');
-  const [editSquad, setEditSquad] = useState('Promotion');
+  const [editPost, setEditPost] = useState('Student Member');
+  const [editSquad, setEditSquad] = useState('General');
 
-  const { users, setUsers, enrollScholar, showToast } = useApp();
+  const { users, setUsers, enrollScholar, showToast, setCurrentUser } = useApp();
   const [members, setMembers] = useState<ScholarRecord[]>(() => {
     return (users || []).map((u) => ({
       uid: u.uid,
@@ -145,33 +261,79 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   const handleOpenEdit = (m: ScholarRecord) => {
     setSelectedMemberToEdit(m);
     setEditName(m.name);
-    setEditPost(m.post);
-    setEditSquad(m.squad);
+    const matched = matchPostOption(m.post, m.role);
+    setEditPost(matched.post);
+    setEditSquad(m.squad || matched.squad);
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleEditPostChange = (chosenPost: string) => {
+    setEditPost(chosenPost);
+    const matched = OFFICIAL_POSTS.find((p) => p.post === chosenPost);
+    if (matched) {
+      setEditSquad(matched.squad);
+    }
+  };
+
+  const handleNewPostChange = (chosenPost: string) => {
+    setNewPost(chosenPost);
+    const matched = OFFICIAL_POSTS.find((p) => p.post === chosenPost);
+    if (matched) {
+      setNewSquad(matched.squad);
+    }
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMemberToEdit) return;
+
+    const matched = OFFICIAL_POSTS.find((p) => p.post === editPost) || matchPostOption(editPost);
+    const targetRole = matched.role;
+    const finalPost = editPost.trim() || matched.post;
+    const finalSquad = editSquad || matched.squad;
 
     const updated: ScholarRecord = {
       ...selectedMemberToEdit,
       name: editName.trim() || selectedMemberToEdit.name,
-      post: editPost.trim() || selectedMemberToEdit.post,
-      squad: editSquad,
+      post: finalPost,
+      role: targetRole,
+      squad: finalSquad,
     };
 
     setUsers((prev) =>
       prev.map((u) =>
         u.uid === selectedMemberToEdit.uid
-          ? { ...u, name: updated.name, post: updated.post, team: updated.squad }
+          ? { ...u, name: updated.name, post: updated.post, team: updated.squad, role: targetRole as any }
           : u
       )
     );
+
+    if (currentUser?.uid === selectedMemberToEdit.uid || currentUser?.rollNo === selectedMemberToEdit.rollNo) {
+      if (setCurrentUser) {
+        setCurrentUser({
+          ...currentUser,
+          name: updated.name,
+          post: updated.post,
+          team: updated.squad,
+          role: targetRole as any,
+        });
+      }
+    }
+
     setMembers((prev) => prev.map((m) => (m.uid === selectedMemberToEdit.uid ? updated : m)));
-    onLogAudit('Member Directory', `Updated scholar profile for ${updated.name} (${updated.squad})`);
+    onLogAudit('Member Directory', `Updated scholar profile for ${updated.name} to ${updated.post} (${targetRole}) in ${updated.squad}`);
+
+    try {
+      const targetId = selectedMemberToEdit.rollNo || selectedMemberToEdit.uid;
+      await apiClient.setUserRole(targetId, targetRole, updated.post, updated.squad);
+    } catch (err: any) {
+      console.warn('[MemberDirectory] Cloud role sync notice:', err?.message || err);
+    }
 
     setSelectedMemberToEdit(null);
-    setNotice(`Updated record for ${updated.name}.`);
+    setNotice(`Updated record for ${updated.name} to ${updated.post}.`);
+    if (showToast) {
+      showToast(`✓ Updated ${updated.name} to ${updated.post}! UI Role: ${matched.uiTitle}`);
+    }
     setTimeout(() => setNotice(null), 3500);
   };
 
@@ -185,7 +347,7 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
     setTimeout(() => setNotice(null), 3500);
   };
 
-  const handleAddMember = (e: React.FormEvent) => {
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRollNo.trim() || !newName.trim()) return;
 
@@ -193,26 +355,38 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
     const cleanName = newName.trim();
     const cleanEmail = newEmail.trim() || `${cleanRoll.toLowerCase()}@geohub.edu`;
 
+    const matched = OFFICIAL_POSTS.find((p) => p.post === newPost) || matchPostOption(newPost);
+    const assignedRole = matched.role as any;
+    const assignedSquad = newSquad || matched.squad;
+
     const enrolled = enrollScholar({
       name: cleanName,
       rollNo: cleanRoll,
       email: cleanEmail,
-      role: 'student',
-      squad: 'Member',
-      post: 'Member',
+      role: assignedRole,
+      squad: assignedSquad,
+      post: matched.post,
       department: newDept.trim() || 'Geoinformatics',
       yearOfStudy: newYear,
     });
 
-    onLogAudit('Member Directory', `Enrolled student: ${enrolled.name} (${cleanRoll}) as Member`);
+    try {
+      await apiClient.setUserRole(cleanRoll, assignedRole, matched.post, assignedSquad);
+    } catch (err: any) {
+      console.warn('[MemberDirectory] Cloud role sync notice:', err?.message || err);
+    }
+
+    onLogAudit('Member Directory', `Enrolled scholar: ${enrolled.name} (${cleanRoll}) as ${matched.post} (${assignedRole})`);
 
     setShowAddModal(false);
     setNewRollNo('');
     setNewName('');
     setNewEmail('');
-    setNotice(`Enrolled ${enrolled.name} (${cleanRoll}). Login: ${cleanRoll} | Password: geohub`);
+    setNewPost('Student Member');
+    setNewSquad('General');
+    setNotice(`Enrolled ${enrolled.name} (${cleanRoll}) as ${matched.post}. Login: ${cleanRoll} | Password: geohub`);
     if (showToast) {
-      showToast(`✓ Student ${enrolled.name} (${cleanRoll}) enrolled as Member! Login: ${cleanRoll} | Password: geohub`);
+      showToast(`✓ Scholar ${enrolled.name} enrolled as ${matched.post}! Access: ${matched.uiTitle}`);
     }
     setTimeout(() => setNotice(null), 4000);
   };
@@ -399,6 +573,74 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
                   className="w-full h-11 px-3.5 rounded-xl border border-[#DAF1DE] text-xs font-medium text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
                 />
               </div>
+
+              {/* Role & Post Designation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1.5">
+                    Official Post / Designation
+                  </label>
+                  <select
+                    value={newPost}
+                    onChange={(e) => handleNewPostChange(e.target.value)}
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
+                  >
+                    {OFFICIAL_POSTS.map((opt) => (
+                      <option key={opt.post} value={opt.post}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-[#235347] mt-1 block">
+                    Defines platform clearance & assigned UI
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#051F20] mb-1.5">
+                    Assigned Squad
+                  </label>
+                  <select
+                    value={newSquad}
+                    onChange={(e) => setNewSquad(e.target.value)}
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
+                  >
+                    <option value="General">General</option>
+                    <option value="Management">Management</option>
+                    <option value="Promotion">Promotion</option>
+                    <option value="Treasury">Treasury</option>
+                    <option value="Documentation">Documentation</option>
+                  </select>
+                  <span className="text-xs text-[#235347] mt-1 block">
+                    Operating division for tasks & budget
+                  </span>
+                </div>
+              </div>
+
+              {/* Dynamic UI Access Preview Card */}
+              {(() => {
+                const opt = OFFICIAL_POSTS.find((p) => p.post === newPost) || matchPostOption(newPost);
+                return (
+                  <div className="p-3 sm:p-3.5 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B]/40 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#8EB69B]/50 flex items-center justify-center text-[#163832] shrink-0">
+                        <Shield size={16} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-black text-[#051F20] block truncate">
+                          {opt.uiTitle}
+                        </span>
+                        <span className="text-xs font-medium text-[#235347] block truncate">
+                          Assigned Portal Clearance: <strong className="font-bold uppercase">{opt.role}</strong>
+                        </span>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-[#163832] text-white text-xs font-black uppercase tracking-wider shrink-0">
+                      {opt.role}
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* Integrated Action Deck */}
               <div className="pt-3 border-t border-[#DAF1DE] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -790,13 +1032,17 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
                 <label className="block text-xs font-semibold text-[#051F20] mb-1">
                   Official Post / Designation
                 </label>
-                <input
-                  type="text"
-                  required
+                <select
                   value={editPost}
-                  onChange={(e) => setEditPost(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
-                />
+                  onChange={(e) => handleEditPostChange(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
+                >
+                  {OFFICIAL_POSTS.map((opt) => (
+                    <option key={opt.post} value={opt.post}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -806,14 +1052,40 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
                 <select
                   value={editSquad}
                   onChange={(e) => setEditSquad(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7]"
+                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none"
                 >
+                  <option value="General">General</option>
                   <option value="Management">Management</option>
                   <option value="Promotion">Promotion</option>
                   <option value="Treasury">Treasury</option>
                   <option value="Documentation">Documentation</option>
                 </select>
               </div>
+
+              {/* Dynamic Role UI Interface Preview Card */}
+              {(() => {
+                const opt = OFFICIAL_POSTS.find((p) => p.post === editPost) || matchPostOption(editPost);
+                return (
+                  <div className="p-3 rounded-2xl bg-[#DAF1DE]/60 border border-[#8EB69B]/40 flex items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#8EB69B]/50 flex items-center justify-center text-[#163832] shrink-0">
+                        <Shield size={16} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-xs font-black text-[#051F20] block truncate">
+                          {opt.uiTitle}
+                        </span>
+                        <span className="text-xs font-medium text-[#235347] block truncate">
+                          Assigned Clearance: <strong className="font-bold uppercase">{opt.role}</strong> • Squad: {editSquad}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full bg-[#163832] text-white text-xs font-black uppercase tracking-wider shrink-0">
+                      {opt.role}
+                    </span>
+                  </div>
+                );
+              })()}
 
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button
