@@ -73,18 +73,18 @@ export const FilterDropdownMenu: React.FC<FilterDropdownMenuProps> = ({
           color: isFiltered ? '#051F20' : '#235347',
           borderColor: isFiltered ? '#163832' : '#DAF1DE',
         }}
-        className={`min-h-[36px] h-9 px-3 rounded-xl border text-xs font-bold flex items-center justify-between gap-2 transition cursor-pointer shadow-2xs hover:border-[#163832] active:scale-95 select-none ${buttonClassName}`}
+        className={`min-h-[36px] h-9 px-2 sm:px-3 rounded-xl border text-xs font-bold flex items-center justify-between gap-1 sm:gap-1.5 transition cursor-pointer shadow-2xs hover:border-[#163832] active:scale-95 select-none ${buttonClassName}`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Filter by ${label}`}
         title={`Filter by ${label}`}
       >
-        <span className="flex items-center gap-1.5 truncate">
+        <span className="flex items-center gap-1 min-w-0 flex-1 truncate">
           <span className="text-[#163832] shrink-0 flex items-center">{icon}</span>
           <span className="truncate">{displayLabel}</span>
         </span>
         <ChevronDown
-          size={13}
+          size={12}
           strokeWidth={2.4}
           className={`text-[#235347] transition-transform duration-200 shrink-0 ${
             isOpen ? 'rotate-180' : ''

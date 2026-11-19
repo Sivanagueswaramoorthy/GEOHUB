@@ -250,27 +250,20 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 
   return (
     <div className="space-y-4 sm:space-y-5 animate-fadeIn pb-16 font-sans">
-      {/* Page Header (Clean Mint Design Tokens) */}
-      <div
-        style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-        className="cockpit-card rounded-2xl p-4 sm:p-5 border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
+      {/* Page Header: Clean People Typography */}
+      <div className="pt-1 px-0.5 flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <h1 style={{ color: '#051F20' }} className="text-2xl sm:text-3xl font-black tracking-tight">
+              People
+            </h1>
             <span
-              style={{ backgroundColor: '#DAF1DE', borderColor: '#8EB69B', color: '#163832' }}
-              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border"
+              style={{ backgroundColor: '#DAF1DE', color: '#163832', borderColor: '#8EB69B' }}
+              className="text-xs font-bold px-2.5 py-0.5 rounded-full border shadow-2xs"
             >
-              <UserCheck size={13} className="text-emerald-700" />
-              Member Directory & Logs
-            </span>
-            <span style={{ color: '#235347' }} className="text-xs font-semibold">
               {filteredMembers.length} records shown
             </span>
           </div>
-          <h1 style={{ color: '#051F20' }} className="text-xl sm:text-2xl font-black tracking-tight">
-            Campus Directory & Member Logs
-          </h1>
           <p style={{ color: '#235347' }} className="text-xs sm:text-sm font-medium mt-1">
             Click any member to inspect credentials, assign leadership posts, suspend, or configure access.
           </p>
@@ -285,112 +278,212 @@ export const LogsTab: React.FC<LogsTabProps> = ({
         resultsCount={searchQuery ? filteredMembers.length : undefined}
       />
 
-      {/* 2. Dedicated Directory Filter Deck (Separately with Premium Botanical UI) */}
+      {/* 2. Dedicated Directory Filter Deck (Horizontal 3-Column Layout without scrollbar) */}
       <div
         style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
-        className="cockpit-card rounded-2xl p-4 sm:p-4.5 border shadow-xs select-none"
+        className="cockpit-card rounded-2xl p-3.5 sm:p-4 border shadow-xs space-y-3 select-none"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-          {/* Left Column: Icon, Title, Record Count & Reset Action */}
-          <div className="flex items-start gap-3 min-w-0">
+        {/* Top Header: Title, Live Record Count & Reset Action */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div
               style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs mt-0.5"
+              className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
             >
-              <Filter size={16} strokeWidth={2.2} />
+              <Filter size={15} strokeWidth={2.2} />
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span style={{ color: '#051F20' }} className="text-sm font-bold tracking-tight">
-                  Directory Filters
-                </span>
-              </div>
-              <p style={{ color: '#235347' }} className="text-xs font-medium">
-                Showing {filteredMembers.length} of {counts.all} campus records
+            <div className="min-w-0">
+              <span style={{ color: '#051F20' }} className="text-xs sm:text-sm font-bold tracking-tight block truncate">
+                Directory Filters
+              </span>
+              <p style={{ color: '#235347' }} className="text-xs font-medium truncate">
+                Showing {filteredMembers.length} of {counts.all} records
               </p>
             </div>
           </div>
 
-          {/* Right Column: Filters stacked vertically one by one (Department, Role, Year) */}
-          <div className="flex flex-col gap-2 w-full sm:w-[220px] shrink-0">
-            {/* Department Dropdown Menu */}
-            <FilterDropdownMenu
-              label="Department"
-              prefix="Dept"
-              value={deptFilter}
-              options={availableDepartments}
-              onChange={setDeptFilter}
-              icon={<Building size={13} strokeWidth={2.2} />}
-              allLabel="All Departments"
-              align="right"
-              className="w-full"
-              buttonClassName="w-full justify-between"
-            />
+          {/* Reset Filters Action Button */}
+          {isAdvancedFilterActive && (
+            <button
+              type="button"
+              onClick={handleResetAdvancedFilters}
+              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+              className="min-h-[32px] px-3 py-1 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-2xs shrink-0"
+              title="Reset all directory filters"
+              aria-label="Reset all directory filters"
+            >
+              <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
+              <span>Reset</span>
+            </button>
+          )}
+        </div>
 
-            {/* Role Dropdown Menu */}
-            <FilterDropdownMenu
-              label="Role"
-              prefix="Role"
-              value={roleFilter}
-              options={availableRoles}
-              onChange={setRoleFilter}
-              icon={<Shield size={13} strokeWidth={2.2} />}
-              allLabel="All Roles"
-              align="right"
-              className="w-full"
-              buttonClassName="w-full justify-between"
-            />
+        {/* Horizontal Filters: 3-Column Grid without horizontal scrollbar */}
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full pt-2 border-t border-[#DAF1DE]/70">
+          {/* Department Dropdown Menu */}
+          <FilterDropdownMenu
+            label="Department"
+            prefix="Dept"
+            value={deptFilter}
+            options={availableDepartments}
+            onChange={setDeptFilter}
+            icon={<Building size={12} strokeWidth={2.2} />}
+            allLabel="All Depts"
+            align="left"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
 
-            {/* Year Dropdown Menu */}
-            <FilterDropdownMenu
-              label="Year of Study"
-              prefix="Year"
-              value={yearFilter}
-              options={availableYears}
-              onChange={setYearFilter}
-              icon={<GraduationCap size={13} strokeWidth={2.2} />}
-              allLabel="All Years"
-              align="right"
-              className="w-full"
-              buttonClassName="w-full justify-between"
-            />
+          {/* Role Dropdown Menu */}
+          <FilterDropdownMenu
+            label="Role"
+            prefix="Role"
+            value={roleFilter}
+            options={availableRoles}
+            onChange={setRoleFilter}
+            icon={<Shield size={12} strokeWidth={2.2} />}
+            allLabel="All Roles"
+            align="left"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
 
-            {/* Down Right Corner: Reset Filters with proper tactile UI */}
-            {isAdvancedFilterActive && (
-              <div className="flex justify-end pt-1">
-                <button
-                  type="button"
-                  onClick={handleResetAdvancedFilters}
-                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
-                  className="min-h-[36px] px-3.5 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-xs self-end"
-                  title="Reset all directory filters"
-                  aria-label="Reset all directory filters"
-                >
-                  <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
-                  <span>Reset Filters</span>
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Year Dropdown Menu */}
+          <FilterDropdownMenu
+            label="Year of Study"
+            prefix="Year"
+            value={yearFilter}
+            options={availableYears}
+            onChange={setYearFilter}
+            icon={<GraduationCap size={12} strokeWidth={2.2} />}
+            allLabel="All Years"
+            align="right"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
         </div>
       </div>
 
       {/* Member Records List (Cards in Clean Mint Grid) */}
       {filteredMembers.length === 0 ? (
         <div
-          style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
-          className="cockpit-card rounded-2xl p-8 border text-center space-y-2 shadow-sm"
+          style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE' }}
+          className="cockpit-card rounded-3xl p-6 sm:p-8 border text-center shadow-xs space-y-4 select-none animate-fadeIn"
         >
-          <div
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#DAF1DE', color: '#235347' }}
-            className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto border"
-          >
-            <Search size={22} />
+          {/* Dual-halo Icon Emblem */}
+          <div className="flex items-center justify-center">
+            <div
+              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE' }}
+              className="w-16 h-16 rounded-2xl border flex items-center justify-center shadow-2xs"
+            >
+              <div
+                style={{ backgroundColor: '#DAF1DE', color: '#163832' }}
+                className="w-11 h-11 rounded-xl flex items-center justify-center"
+              >
+                {searchQuery.trim() ? (
+                  <Search size={22} strokeWidth={2.4} />
+                ) : isAdvancedFilterActive || activeFilter !== 'all' ? (
+                  <SlidersHorizontal size={22} strokeWidth={2.4} />
+                ) : (
+                  <Users size={22} strokeWidth={2.4} />
+                )}
+              </div>
+            </div>
           </div>
-          <h2 style={{ color: '#051F20' }} className="text-base font-bold">No Records Found</h2>
-          <p style={{ color: '#235347' }} className="text-xs max-w-sm mx-auto">
-            No scholars match the search criteria &apos;{searchQuery}&apos;. Check for typos or clear filters.
-          </p>
+
+          {/* Heading & Contextual Subtitle */}
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h2 style={{ color: '#051F20' }} className="text-base sm:text-lg font-black tracking-tight">
+              {searchQuery.trim()
+                ? 'No Records Found'
+                : isAdvancedFilterActive || activeFilter !== 'all'
+                ? 'No Matching Members'
+                : 'Campus Directory is Empty'}
+            </h2>
+            <p style={{ color: '#235347' }} className="text-xs sm:text-sm font-medium leading-relaxed">
+              {searchQuery.trim() ? (
+                <>
+                  No scholars match the search criteria{' '}
+                  <span className="font-bold text-[#051F20]">&apos;{searchQuery.trim()}&apos;</span>. Check for
+                  typos or clear filters.
+                </>
+              ) : isAdvancedFilterActive || activeFilter !== 'all' ? (
+                'No members match the currently selected filter combination. Adjust your filters or reset to view all campus records.'
+              ) : (
+                'No student scholars or faculty advisors have been enrolled into the directory yet.'
+              )}
+            </p>
+          </div>
+
+          {/* Active Filter Pill Strip */}
+          {(activeFilter !== 'all' || deptFilter !== 'All' || roleFilter !== 'All' || yearFilter !== 'All') && (
+            <div className="flex items-center justify-center gap-1.5 flex-wrap pt-0.5">
+              {activeFilter !== 'all' && (
+                <span
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
+                >
+                  <span style={{ color: '#235347' }} className="font-medium">Type:</span> {activeFilter}
+                </span>
+              )}
+              {deptFilter !== 'All' && (
+                <span
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
+                >
+                  <span style={{ color: '#235347' }} className="font-medium">Dept:</span> {deptFilter}
+                </span>
+              )}
+              {roleFilter !== 'All' && (
+                <span
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
+                >
+                  <span style={{ color: '#235347' }} className="font-medium">Role:</span> {roleFilter}
+                </span>
+              )}
+              {yearFilter !== 'All' && (
+                <span
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold border shadow-2xs"
+                >
+                  <span style={{ color: '#235347' }} className="font-medium">Year:</span> {yearFilter}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Interactive Action Buttons */}
+          {(searchQuery.trim() || isAdvancedFilterActive || activeFilter !== 'all') && (
+            <div className="pt-2 flex items-center justify-center gap-2 flex-wrap">
+              {searchQuery.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+                  className="min-h-[40px] px-3.5 py-2 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] active:scale-95 cursor-pointer shadow-2xs"
+                  title="Clear search text"
+                  aria-label="Clear search"
+                >
+                  <X size={13} strokeWidth={2.4} className="text-[#235347]" />
+                  <span>Clear Search</span>
+                </button>
+              )}
+              {(isAdvancedFilterActive || activeFilter !== 'all') && (
+                <button
+                  type="button"
+                  onClick={handleResetAllFilters}
+                  style={{ backgroundColor: '#163832', color: '#FFFFFF' }}
+                  className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#235347] active:scale-95 cursor-pointer shadow-xs"
+                  title="Reset all filters to show all members"
+                  aria-label="Reset all filters"
+                >
+                  <RotateCcw size={13} strokeWidth={2.4} className="text-[#DAF1DE]" />
+                  <span>Reset All Filters</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5">

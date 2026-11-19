@@ -178,16 +178,19 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
         </button>
       </div>
 
-      {/* 3. Dropdown Menus for Refined Filtering */}
-      <div className="pt-2 border-t border-[#DAF1DE]/70 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      {/* 3. Dropdown Menus for Refined Filtering: HORIZONTAL WITHOUT SCROLLBAR */}
+      <div className="pt-2 border-t border-[#DAF1DE]/70 grid grid-cols-3 gap-1.5 sm:gap-2 w-full">
         <FilterDropdownMenu
           label="Department"
           prefix="Dept"
           value={filterState.department}
           options={departments}
           onChange={handleDeptSelect}
-          icon={<Building size={13} strokeWidth={2.2} />}
+          icon={<Building size={12} strokeWidth={2.2} />}
           allLabel="All Depts"
+          align="left"
+          className="w-full min-w-0"
+          buttonClassName="w-full justify-between"
         />
 
         <FilterDropdownMenu
@@ -196,8 +199,11 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
           value={filterState.role}
           options={roles}
           onChange={handleRoleSelect}
-          icon={<Shield size={13} strokeWidth={2.2} />}
+          icon={<Shield size={12} strokeWidth={2.2} />}
           allLabel="All Roles"
+          align="left"
+          className="w-full min-w-0"
+          buttonClassName="w-full justify-between"
         />
 
         <FilterDropdownMenu
@@ -206,8 +212,11 @@ export const StudentFilterBar: React.FC<StudentFilterBarProps> = ({
           value={filterState.year}
           options={years}
           onChange={handleYearSelect}
-          icon={<GraduationCap size={13} strokeWidth={2.2} />}
+          icon={<GraduationCap size={12} strokeWidth={2.2} />}
           allLabel="All Years"
+          align="right"
+          className="w-full min-w-0"
+          buttonClassName="w-full justify-between"
         />
       </div>
     </div>

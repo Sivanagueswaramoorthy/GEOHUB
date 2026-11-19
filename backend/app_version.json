@@ -1,8 +1,8 @@
 {
-  "version": "1.6.52",
-  "version_code": 71,
+  "version": "1.6.53",
+  "version_code": 72,
   "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Added tactical Reset Filters button in bottom right corner of Directory Filters card.",
-  "sha256": "9d457f4119415f4b95ef2439a0a1661cc43fe892fdc6021e5b1edc293dc738ed",
-  "file_size": 7929435
+  "release_notes": "Latest release v1.6.53 (Build 72) with horizontal filter layout, tactical Reset Filters positioning, and improved UI styling.",
+  "sha256": "6c4490049bbfa691c4f2d4a02d73b2d7de58666ab64932b6eef6fd3a1f5d9d84",
+  "file_size": 6941324
 }
