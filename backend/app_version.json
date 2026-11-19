@@ -1,8 +1,12 @@
 {
-  "version": "1.6.59",
-  "version_code": 78,
-  "apk_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
-  "release_notes": "Release v1.6.59 (Build 78): SuperAdmin Desktop Glassmorphism Studio Cockpit with frosted collapsible sidebar, Code XR style dashboard hero with circular progress and orbiting squad avatars, interactive schedule card, 4 KPI cards with sparklines, and Code XR style Team directory with dual-action member cards.",
-  "sha256": "571C9183E0AEEF0E3E3A0AF783AF8786EF949E4D326A9578B96C3A62290856F5",
-  "file_size": 8111110
+  "version": "1.6.60",
+  "version_code": 79,
+  "apk_filename": "geohub-app.apk",
+  "release_notes": "Release v1.6.60 (Build 79): SuperAdmin Desktop Glassmorphism Studio Cockpit with Code XR layout, dual-path component architecture, horizontal multi-attribute directory filters (Dept, Role, Year) without scrollbars, and premium responsive student management.",
+  "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
+  "min_supported_version": "1.0.0",
+  "released_at": "2026-11-19",
+  "file_size_bytes": 6955344,
+  "file_size_mb": "6.63 MB",
+  "sha256": "4AB24479D681BD4EF0D76502E57B8E0E44B8393F5F0000BBCDB33EEF4B00582C"
 }

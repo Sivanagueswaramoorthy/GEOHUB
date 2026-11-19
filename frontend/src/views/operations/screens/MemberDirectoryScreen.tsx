@@ -17,8 +17,15 @@ import {
   Key,
   Layers,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
-import { AnimatedNumber, ConfirmDialog, SearchField, EmptyState } from '../../../components/shared';
+import {
+  AnimatedNumber,
+  ConfirmDialog,
+  SearchField,
+  EmptyState,
+  FilterDropdownMenu,
+} from '../../../components/shared';
 import { canAddSquadMember, canRemoveMember } from '../../../core/permissions';
 import { useApp } from '../../../context/AppContext';
 import { apiClient } from '../../../api/client';
@@ -32,6 +39,8 @@ export interface ScholarRecord {
   post: string;
   email: string;
   rollNo?: string;
+  department?: string;
+  yearOfStudy?: string;
 }
 
 export interface OfficialPostOption {
@@ -202,7 +211,9 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
   currentUser,
   onSubViewChange,
 }) => {
-  const [selectedSquad, setSelectedSquad] = useState<string>('All');
+  const [deptFilter, setDeptFilter] = useState('All');
+  const [roleFilter, setRoleFilter] = useState('All');
+  const [yearFilter, setYearFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedMemberToEdit, setSelectedMemberToEdit] = useState<ScholarRecord | null>(null);
@@ -255,6 +266,8 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
         post: u.post || 'Member',
         email: u.email,
         rollNo: u.rollNo || u.uid,
+        department: u.department || 'Geoinformatics',
+        yearOfStudy: u.yearOfStudy || (u as any).year_of_study || '2nd Year',
       }));
   });
 
@@ -271,6 +284,8 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
           post: u.post || 'Member',
           email: u.email,
           rollNo: u.rollNo || u.uid,
+          department: u.department || 'Geoinformatics',
+          yearOfStudy: u.yearOfStudy || (u as any).year_of_study || '2nd Year',
         }))
     );
   }, [users]);
@@ -287,31 +302,118 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
     };
   }, [showAddModal, onSubViewChange]);
 
-  const canRemove = canRemoveMember(currentUser);
-  const canAdd = canAddSquadMember(currentUser, selectedSquad === 'All' ? 'Promotion' : selectedSquad);
+  const availableDepartments = useMemo(() => {
+    const list = Array.from(
+      new Set(
+        members
+          .map((m) => m.department)
+          .filter(Boolean) as string[]
+      )
+    );
+    return [
+      'All',
+      ...Array.from(
+        new Set([
+          ...list,
+          'Geoinformatics',
+          'Computer Science',
+          'Information Technology',
+          'Civil Engineering',
+          'AI & Data Science',
+        ])
+      ),
+    ];
+  }, [members]);
 
-  const squads = ['All', 'No Squad', 'Management', 'Promotion', 'Treasury', 'Documentation'];
+  const availableRoles = useMemo(() => {
+    const list = Array.from(
+      new Set(
+        members
+          .filter((m) => !isSuperAdminAccount(m))
+          .flatMap((m) => [m.post, m.squad])
+          .filter(Boolean) as string[]
+      )
+    );
+    return [
+      'All',
+      ...Array.from(
+        new Set([
+          'Member',
+          'Club President',
+          'Faculty Advisor',
+          'Documentation',
+          'Promotion',
+          'Treasury',
+          'Management',
+          'No Squad',
+          ...list,
+        ])
+      ),
+    ];
+  }, [members]);
+
+  const availableYears = ['All', '1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+  const isAdvancedFilterActive =
+    deptFilter !== 'All' || roleFilter !== 'All' || yearFilter !== 'All';
+
+  const handleResetFilters = () => {
+    setDeptFilter('All');
+    setRoleFilter('All');
+    setYearFilter('All');
+    setSearchQuery('');
+  };
+
+  const canRemove = canRemoveMember(currentUser);
+  const canAdd = canAddSquadMember(currentUser, 'Management');
 
   const filteredMembers = members.filter((m) => {
     if (isSuperAdminAccount(m)) return false;
-    if (selectedSquad !== 'All') {
-      const sLower = selectedSquad.toLowerCase();
-      const mSquadLower = (m.squad || '').toLowerCase();
-      if (sLower === 'no squad') {
-        if (mSquadLower && mSquadLower !== 'no squad' && mSquadLower !== 'general' && mSquadLower !== 'none') {
-          return false;
-        }
-      } else if (mSquadLower !== sLower) {
+
+    // 1. Department Filter
+    if (deptFilter !== 'All') {
+      const dLower = deptFilter.toLowerCase();
+      const mDeptLower = (m.department || '').toLowerCase();
+      if (mDeptLower !== dLower && !mDeptLower.includes(dLower)) {
         return false;
       }
     }
+
+    // 2. Role / Post / Squad Filter
+    if (roleFilter !== 'All') {
+      const rLower = roleFilter.toLowerCase();
+      const mPostLower = (m.post || '').toLowerCase();
+      const mRoleLower = (m.role || '').toLowerCase();
+      const mSquadLower = (m.squad || '').toLowerCase();
+
+      const matchesPost = mPostLower === rLower || mPostLower.includes(rLower);
+      const matchesRole = mRoleLower === rLower;
+      const matchesSquad = mSquadLower === rLower;
+
+      if (!matchesPost && !matchesRole && !matchesSquad) {
+        return false;
+      }
+    }
+
+    // 3. Year of Study Filter
+    if (yearFilter !== 'All') {
+      const yLower = yearFilter.toLowerCase();
+      const mYearLower = (m.yearOfStudy || '').toLowerCase();
+      if (mYearLower !== yLower && !mYearLower.includes(yLower)) {
+        return false;
+      }
+    }
+
+    // 4. Search Query Filter
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase().trim();
     return (
       m.name.toLowerCase().includes(q) ||
       (m.rollNo || '').toLowerCase().includes(q) ||
       m.post.toLowerCase().includes(q) ||
-      m.squad.toLowerCase().includes(q)
+      m.squad.toLowerCase().includes(q) ||
+      (m.department || '').toLowerCase().includes(q) ||
+      (m.yearOfStudy || '').toLowerCase().includes(q)
     );
   });
 
@@ -964,26 +1066,64 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
           </div>
         </div>
 
-        {/* Squad Filter Chips */}
-        <div
-          className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full no-scrollbar scrollbar-none"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {squads.map((sq) => (
-            <button
-              key={sq}
-              type="button"
-              onClick={() => setSelectedSquad(sq)}
-              className={`h-7 px-3 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                selectedSquad === sq
-                  ? 'bg-[#163832] text-white shadow-xs'
-                  : 'bg-[#F6FBF7] text-[#235347] border border-[#DAF1DE] hover:bg-[#DAF1DE]'
-              }`}
-            >
-              {sq}
-            </button>
-          ))}
+        {/* 3 Dropdown Filter Menus: Department, Role, Year */}
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 w-full pt-0.5">
+          <FilterDropdownMenu
+            label="Department"
+            prefix="Dept"
+            value={deptFilter}
+            options={availableDepartments}
+            onChange={setDeptFilter}
+            icon={<Building size={12} strokeWidth={2.2} />}
+            allLabel="All Depts"
+            align="left"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
+
+          <FilterDropdownMenu
+            label="Role"
+            prefix="Role"
+            value={roleFilter}
+            options={availableRoles}
+            onChange={setRoleFilter}
+            icon={<Shield size={12} strokeWidth={2.2} />}
+            allLabel="All Roles"
+            align="left"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
+
+          <FilterDropdownMenu
+            label="Year of Study"
+            prefix="Year"
+            value={yearFilter}
+            options={availableYears}
+            onChange={setYearFilter}
+            icon={<GraduationCap size={12} strokeWidth={2.2} />}
+            allLabel="All Years"
+            align="right"
+            className="w-full min-w-0"
+            buttonClassName="w-full justify-between"
+          />
         </div>
+
+        {/* Reset Filters Action Button */}
+        {isAdvancedFilterActive && (
+          <div className="flex justify-end pt-0.5">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              style={{ backgroundColor: '#F6FBF7', borderColor: '#DAF1DE', color: '#051F20' }}
+              className="min-h-[34px] px-3 py-1.5 rounded-xl border text-xs font-bold inline-flex items-center gap-1.5 transition-all hover:bg-[#DAF1DE] hover:border-[#8EB69B] active:scale-95 cursor-pointer shadow-2xs"
+              title="Reset all directory filters"
+              aria-label="Reset all directory filters"
+            >
+              <RotateCcw size={12} strokeWidth={2.2} className="text-[#235347]" />
+              <span>Reset Filters</span>
+            </button>
+          </div>
+        )}
 
         {/* Members Cards List (Grid on desktop, clean rows on mobile) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
@@ -1059,7 +1199,13 @@ export const MemberDirectoryScreen: React.FC<MemberDirectoryScreenProps> = ({
               <EmptyState
                 mascot="leaf"
                 title="No Members Found"
-                description={searchQuery ? `No scholars match "${searchQuery}".` : 'No scholars are enrolled in the selected squad.'}
+                description={
+                  searchQuery
+                    ? `No scholars match "${searchQuery}".`
+                    : isAdvancedFilterActive
+                    ? 'No scholars match the selected filter criteria.'
+                    : 'No scholars are currently enrolled in the directory.'
+                }
               />
             </div>
           )}
