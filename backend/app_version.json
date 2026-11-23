@@ -1,12 +1,12 @@
 {
-  "version": "1.6.70",
-  "version_code": 89,
+  "version": "1.6.71",
+  "version_code": 90,
   "apk_filename": "geohub-app.apk",
   "release_notes": "Routine performance improvements and stability updates.",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-23",
-  "file_size_bytes": 10947498,
+  "file_size_bytes": 10951174,
   "file_size_mb": "10.44 MB",
-  "sha256": "9EAE0FF579D6A2BF6714FE7998866D594B453A33BDFE8E7A2CD6BE64AF62B4D8"
+  "sha256": "E8EABAA8E440EEE395043093E6627552C04433FD7B3D4934E5D7BF52B98AF031"
 }

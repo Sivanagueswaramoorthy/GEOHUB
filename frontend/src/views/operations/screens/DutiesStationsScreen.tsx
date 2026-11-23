@@ -17,6 +17,13 @@ import {
   Edit2,
   Radio,
   ChevronDown,
+  X,
+  Scan,
+  Package,
+  HeartPulse,
+  Camera,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { AnimatedNumber, EmptyState, SearchField } from '../../../components/shared';
 import { useApp } from '../../../context/AppContext';
@@ -50,7 +57,6 @@ export interface DutiesStationsScreenProps {
 
 const STORAGE_KEY = 'geohub_store_duty_stations';
 
-// Preset selective work categories for rapid duty allocation
 export const DEFAULT_SCHOLARS = [
   { rollNo: '24GEO101', name: 'Ananya Sharma', team: 'Management' },
   { rollNo: '24GEO102', name: 'Maya Patel', team: 'Operations' },
@@ -63,6 +69,7 @@ export const DEFAULT_SCHOLARS = [
   { rollNo: '24GEO109', name: 'Sneha Kulkarni', team: 'Support' },
 ];
 
+// Preset selective work categories for rapid duty allocation
 export const PRESET_DUTIES = [
   'Gate & Turnstile QR Verification',
   'Participant Kit & Badge Distribution',
@@ -75,6 +82,16 @@ export const PRESET_DUTIES = [
   'Logistics & Equipment Desk',
   'Custom Duty Work...',
 ] as const;
+
+// Quick 1-tap duty chips
+const QUICK_DUTY_CHIPS = [
+  { label: 'Gate QR Scan', duty: 'Gate & Turnstile QR Verification', icon: Scan },
+  { label: 'Kit Handout', duty: 'Participant Kit & Badge Distribution', icon: Package },
+  { label: 'Queue Marshal', duty: 'Crowd Flow & Queue Marshal', icon: Shield },
+  { label: 'Drone Arena', duty: 'Field Drone Telemetry & Safety Zone', icon: Radio },
+  { label: 'First Aid', duty: 'Hydration & Emergency First-Aid', icon: HeartPulse },
+  { label: 'Media Team', duty: 'Official Media & Photography Coverage', icon: Camera },
+];
 
 export const DEFAULT_DUTY_STATIONS: DutyStation[] = [
   {
@@ -266,7 +283,7 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'needs_volunteers' | 'full'>('all');
   const [notice, setNotice] = useState<string | null>(null);
 
-  // Modals
+  // Modals (Bottom Sheet)
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showStationModal, setShowStationModal] = useState(false);
   const [targetStationForAssign, setTargetStationForAssign] = useState<DutyStation | null>(null);
@@ -385,9 +402,9 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
     }
 
     // Set initial person if not set
-    if (!formRollNo && users && users.length > 0) {
-      const u = users.find((usr) => usr.rollNo) || users[0];
-      setFormRollNo(u.rollNo || '');
+    if (!formRollNo && selectableUsers.length > 0) {
+      const u = selectableUsers.find((usr) => usr.rollNo) || selectableUsers[0];
+      setFormRollNo(u.rollNo || '24GEO102');
       setFormPersonName(u.name);
     }
 
@@ -487,9 +504,9 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
 
     setShowStationModal(false);
     setNewStationName('');
-    setNewStationLocation('');
-    setNewStationScope('');
-    setNewStationLead('');
+    setNewStationLocation('Campus Operations Sector');
+    setNewStationScope('Station checkpoint and verification operations.');
+    setNewStationLead('Maya Patel (Lead)');
     setNotice(`Station "${newStation.name}" added to duty board.`);
     setTimeout(() => setNotice(null), 4000);
   };
@@ -790,7 +807,7 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
                         st.assignedVolunteers.map((vol) => (
                           <div
                             key={vol.id}
-                            className="p-2 rounded-xl bg-white border border-[#DAF1DE] flex flex-col gap-1 text-xs"
+                            className="p-2.5 rounded-xl bg-white border border-[#DAF1DE] flex flex-col gap-1.5 text-xs shadow-2xs"
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1.5 min-w-0">
@@ -883,196 +900,294 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
         </div>
       </div>
 
-      {/* 4. MODAL: Assign Duty for Selective Person & Selective Work */}
+      {/* 4. BOTTOM SHEET MODAL: Assign Duty for Selective Person & Selective Work */}
       {showAssignModal && (
         <div
           data-testid="modal-assign-duty"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAssignModal(false);
+          }}
         >
-          <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center">
-                  <Briefcase size={16} />
+          <div
+            className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-3xl p-5 sm:p-6 shadow-2xl border-t sm:border border-[#DAF1DE] space-y-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col"
+            style={{
+              paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+              animation: 'slideUp 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {/* Grab Handle for Bottom Sheet on Mobile */}
+            <div
+              className="w-full flex justify-center pt-0.5 pb-2 sm:hidden cursor-pointer"
+              onClick={() => setShowAssignModal(false)}
+            >
+              <div className="w-12 h-1.5 rounded-full bg-[#8EB69B]/40 hover:bg-[#8EB69B] transition-colors" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#DAF1DE]/70">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0 shadow-2xs">
+                  <ShieldCheck size={20} strokeWidth={2.2} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#051F20] text-base">
+                  <h3 className="font-bold text-[#051F20] text-base leading-tight">
                     Assign Duty to Person & Work
                   </h3>
-                  <p className="text-[11px] text-[#235347]">
-                    Grant operational access for selective person and specific work.
+                  <p className="text-xs text-[#235347] mt-0.5">
+                    Deploy scholar to selective operational duty checkpoint.
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAssignModal(false)}
-                className="w-8 h-8 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer text-xs font-bold"
+                className="w-8 h-8 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer text-xs font-bold transition-colors"
+                aria-label="Close"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleAssignDutySubmit} className="space-y-3.5">
-              {/* Target Station Selection */}
-              <div>
-                <label className="block text-xs font-bold text-[#051F20] mb-1">
-                  1. Operational Station / Checkpoint *
-                </label>
-                <select
-                  data-testid="select-target-station"
-                  required
-                  value={formStationId}
-                  onChange={(e) => {
-                    const sid = e.target.value;
-                    setFormStationId(sid);
-                    const found = stations.find((s) => s.id === sid);
-                    setTargetStationForAssign(found || null);
-                  }}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                >
-                  <option value="">Select Destination Station...</option>
-                  {stations.map((st) => (
-                    <option key={st.id} value={st.id}>
-                      {st.name} ({st.event}) — {st.assignedVolunteers.length}/{st.requiredVolunteers}
-                    </option>
-                  ))}
-                </select>
+            {/* Form */}
+            <form onSubmit={handleAssignDutySubmit} className="space-y-4">
+              {/* Card 1: Target Station Selection */}
+              <div className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#163832] uppercase tracking-wider flex items-center gap-1.5">
+                    <MapPin size={13} className="text-[#235347]" />
+                    <span>Duty Station Checkpoint *</span>
+                  </label>
+                  {targetStationForAssign && (
+                    <span className="text-[11px] font-bold text-[#235347] bg-[#DAF1DE] px-2 py-0.5 rounded-full border border-[#8EB69B]/40">
+                      {targetStationForAssign.assignedVolunteers.length}/{targetStationForAssign.requiredVolunteers} Assigned
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <select
+                    data-testid="select-target-station"
+                    required
+                    value={formStationId}
+                    onChange={(e) => {
+                      const sid = e.target.value;
+                      setFormStationId(sid);
+                      const found = stations.find((s) => s.id === sid);
+                      setTargetStationForAssign(found || null);
+                    }}
+                    className="w-full h-10 pl-3 pr-8 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="">Select Destination Station...</option>
+                    {stations.map((st) => (
+                      <option key={st.id} value={st.id}>
+                        {st.name} ({st.event})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] pointer-events-none"
+                  />
+                </div>
+
                 {targetStationForAssign && (
-                  <p className="mt-1 text-[11px] text-[#235347]">
-                    Location: <strong>{targetStationForAssign.location}</strong> • Scope:{' '}
-                    {targetStationForAssign.workScope}
-                  </p>
+                  <div className="p-2 rounded-xl bg-white border border-[#DAF1DE]/70 text-[11px] text-[#235347] flex items-center justify-between gap-2">
+                    <span className="truncate">
+                      <strong>Location:</strong> {targetStationForAssign.location}
+                    </span>
+                    <span className="text-[#163832] font-semibold shrink-0">
+                      Lead: {targetStationForAssign.stationLead}
+                    </span>
+                  </div>
                 )}
               </div>
 
-              {/* Selective Person Selection */}
-              <div>
-                <label className="block text-xs font-bold text-[#051F20] mb-1">
-                  2. Selective Person (Scholar / Volunteer) *
+              {/* Card 2: Selective Person Selection */}
+              <div className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-2">
+                <label className="text-xs font-bold text-[#163832] uppercase tracking-wider flex items-center gap-1.5">
+                  <UserCheck size={13} className="text-[#235347]" />
+                  <span>Selective Person (Scholar / Volunteer) *</span>
                 </label>
-                <select
-                  data-testid="select-volunteer-person"
-                  required
-                  value={formRollNo}
-                  onChange={(e) => {
-                    const roll = e.target.value;
-                    setFormRollNo(roll);
-                    const found = selectableUsers.find(
-                      (u) => u.rollNo === roll || u.email?.startsWith(roll.toLowerCase())
-                    );
-                    if (found) {
-                      setFormPersonName(found.name);
-                    }
-                  }}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                >
-                  <option value="">Choose Selective Person...</option>
-                  {selectableUsers
-                    .filter((u) => u.rollNo)
-                    .map((u) => (
-                      <option key={u.uid} value={u.rollNo}>
-                        {u.rollNo} — {u.name} ({u.team || 'Scholar'})
-                      </option>
-                    ))}
-                </select>
 
-                <div className="mt-1.5 p-2 rounded-xl bg-[#DAF1DE]/50 border border-[#8EB69B]/40 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <UserCheck size={14} className="text-[#163832]" />
-                    <span className="text-[#235347]">Assigned Person:</span>
+                <div className="relative">
+                  <select
+                    data-testid="select-volunteer-person"
+                    required
+                    value={formRollNo}
+                    onChange={(e) => {
+                      const roll = e.target.value;
+                      setFormRollNo(roll);
+                      const found = selectableUsers.find(
+                        (u) => u.rollNo === roll || u.email?.startsWith(roll.toLowerCase())
+                      );
+                      if (found) {
+                        setFormPersonName(found.name);
+                      }
+                    }}
+                    className="w-full h-10 pl-3 pr-8 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="">Choose Selective Person...</option>
+                    {selectableUsers
+                      .filter((u) => u.rollNo)
+                      .map((u) => (
+                        <option key={u.uid} value={u.rollNo}>
+                          {u.rollNo} — {u.name} ({u.team || 'Scholar'})
+                        </option>
+                      ))}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] pointer-events-none"
+                  />
+                </div>
+
+                {/* Identity Preview Card */}
+                <div className="p-2.5 rounded-xl bg-[#DAF1DE]/60 border border-[#8EB69B]/50 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-[#163832] text-white text-[11px] font-bold flex items-center justify-center shrink-0">
+                      {formPersonName.slice(0, 1).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-[#051F20] text-xs truncate">
+                        {formPersonName}
+                      </div>
+                      <div className="text-[10px] text-[#235347] font-mono">
+                        Roll: {formRollNo}
+                      </div>
+                    </div>
                   </div>
-                  <strong className="text-[#051F20] font-bold">
-                    {formPersonName} ({formRollNo})
-                  </strong>
+                  <span className="px-2 py-0.5 rounded-full bg-white text-[#163832] border border-[#8EB69B] text-[10px] font-bold shrink-0">
+                    Verified
+                  </span>
                 </div>
               </div>
 
-              {/* Selective Work Selection */}
-              <div>
-                <label className="block text-xs font-bold text-[#051F20] mb-1">
-                  3. Selective Work / Duty Responsibility *
+              {/* Card 3: Selective Work / Duty Responsibility */}
+              <div className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-2.5">
+                <label className="text-xs font-bold text-[#163832] uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase size={13} className="text-[#235347]" />
+                  <span>Selective Work / Duty Responsibility *</span>
                 </label>
-                <select
-                  data-testid="select-duty-preset"
-                  value={formDutyPreset}
-                  onChange={(e) => setFormDutyPreset(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                >
-                  {PRESET_DUTIES.map((duty) => (
-                    <option key={duty} value={duty}>
-                      {duty}
-                    </option>
-                  ))}
-                </select>
+
+                {/* Quick 1-tap Duty Chips */}
+                <div className="flex flex-wrap gap-1.5">
+                  {QUICK_DUTY_CHIPS.map((chip) => {
+                    const isSelected = formDutyPreset === chip.duty;
+                    const Icon = chip.icon;
+                    return (
+                      <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => {
+                          setFormDutyPreset(chip.duty);
+                          setFormCustomDuty('');
+                        }}
+                        className={`h-7 px-2.5 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                          isSelected
+                            ? 'bg-[#163832] text-white border-[#163832] shadow-xs'
+                            : 'bg-white text-[#235347] border-[#DAF1DE] hover:border-[#8EB69B]'
+                        }`}
+                      >
+                        <Icon size={12} />
+                        <span>{chip.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Full Dropdown Selector */}
+                <div className="relative">
+                  <select
+                    data-testid="select-duty-preset"
+                    value={formDutyPreset}
+                    onChange={(e) => setFormDutyPreset(e.target.value)}
+                    className="w-full h-10 pl-3 pr-8 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all cursor-pointer appearance-none"
+                  >
+                    {PRESET_DUTIES.map((duty) => (
+                      <option key={duty} value={duty}>
+                        {duty}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={14}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] pointer-events-none"
+                  />
+                </div>
 
                 {formDutyPreset === 'Custom Duty Work...' && (
-                  <div className="mt-2">
+                  <div className="pt-1">
                     <input
                       type="text"
                       required
                       data-testid="input-custom-duty"
-                      placeholder="Specify custom duty task (e.g. VIP Speaker Escort)..."
+                      placeholder="Specify custom duty task (e.g. VIP Speaker Protocol)..."
                       value={formCustomDuty}
                       onChange={(e) => setFormCustomDuty(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832]"
+                      className="w-full p-2.5 rounded-xl border border-[#163832] text-xs text-[#051F20] bg-white outline-none"
                     />
                   </div>
                 )}
               </div>
 
-              {/* Operational Shift & Clearance */}
+              {/* Card 4: Shift & Access Clearance Level */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    4. Assigned Shift
+                {/* Shift Selector */}
+                <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-1.5">
+                  <label className="text-[11px] font-bold text-[#163832] uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock size={12} className="text-[#235347]" />
+                    <span>Assigned Shift</span>
                   </label>
                   <select
                     value={formShift}
                     onChange={(e) => setFormShift(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none"
+                    className="w-full h-9 px-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none"
                   >
-                    <option value="08:30 AM - 01:00 PM">Morning Shift (08:30 - 13:00)</option>
-                    <option value="01:00 PM - 05:30 PM">Afternoon Shift (13:00 - 17:30)</option>
+                    <option value="08:30 AM - 01:00 PM">Morning (08:30 - 13:00)</option>
+                    <option value="01:00 PM - 05:30 PM">Afternoon (13:00 - 17:30)</option>
                     <option value="Full Day (08:30 - 17:30)">Full Day (08:30 - 17:30)</option>
                     <option value="Evening Relay (17:00 - 20:30)">Evening Relay (17:00 - 20:30)</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    5. Access Clearance Level
+                {/* Clearance Level */}
+                <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-1.5">
+                  <label className="text-[11px] font-bold text-[#163832] uppercase tracking-wider flex items-center gap-1.5">
+                    <Shield size={12} className="text-[#235347]" />
+                    <span>Access Clearance</span>
                   </label>
                   <select
                     value={formAccessLevel}
                     onChange={(e) =>
                       setFormAccessLevel(e.target.value as 'lead' | 'scanner' | 'support')
                     }
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none"
+                    className="w-full h-9 px-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none"
                   >
                     <option value="support">Duty Support (Roster)</option>
-                    <option value="scanner">Authorized QR Scanner</option>
+                    <option value="scanner">Authorized Pass Scanner</option>
                     <option value="lead">Station Lead / Officer</option>
                   </select>
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons (Sticky Footer) */}
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#DAF1DE]">
                 <button
                   type="button"
                   onClick={() => setShowAssignModal(false)}
-                  className="h-10 px-4 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] cursor-pointer"
+                  className="h-11 px-5 rounded-2xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   data-testid="btn-submit-duty"
-                  className="h-10 px-5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 cursor-pointer shadow-xs transition-all"
+                  className="h-11 px-6 rounded-2xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 cursor-pointer shadow-md transition-all flex items-center justify-center gap-2"
                 >
-                  Confirm & Deploy Duty
+                  <CheckCircle2 size={16} />
+                  <span>Confirm & Deploy Duty</span>
                 </button>
               </div>
             </form>
@@ -1080,146 +1195,176 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
         </div>
       )}
 
-      {/* 5. MODAL: Create New Duty Station */}
+      {/* 5. BOTTOM SHEET MODAL: Create New Duty Station */}
       {showStationModal && (
         <div
           data-testid="modal-create-station"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowStationModal(false);
+          }}
         >
-          <div className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-[#DAF1DE] space-y-4 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center">
-                  <Building2 size={16} />
+          <div
+            className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-3xl p-5 sm:p-6 shadow-2xl border-t sm:border border-[#DAF1DE] space-y-4 max-h-[92vh] sm:max-h-[88vh] overflow-y-auto flex flex-col"
+            style={{
+              paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+              animation: 'slideUp 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            {/* Grab Handle for Bottom Sheet on Mobile */}
+            <div
+              className="w-full flex justify-center pt-0.5 pb-2 sm:hidden cursor-pointer"
+              onClick={() => setShowStationModal(false)}
+            >
+              <div className="w-12 h-1.5 rounded-full bg-[#8EB69B]/40 hover:bg-[#8EB69B] transition-colors" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#DAF1DE]/70">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#DAF1DE] text-[#163832] flex items-center justify-center shrink-0 shadow-2xs">
+                  <Building2 size={20} strokeWidth={2.2} />
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#051F20] text-base">
-                    Configure New Duty Station
+                  <h3 className="font-bold text-[#051F20] text-base leading-tight">
+                    Configure Duty Station
                   </h3>
-                  <p className="text-[11px] text-[#235347]">
-                    Setup checkpoint location, scope of work, and required strength.
+                  <p className="text-xs text-[#235347] mt-0.5">
+                    Setup checkpoint location, venue, and volunteer capacity.
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowStationModal(false)}
-                className="w-8 h-8 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer text-xs font-bold"
+                className="w-8 h-8 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer text-xs font-bold transition-colors"
+                aria-label="Close"
               >
-                ✕
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateStationSubmit} className="space-y-3.5">
-              <div>
-                <label className="block text-xs font-bold text-[#051F20] mb-1">
-                  Station Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  data-testid="input-station-name"
-                  placeholder="e.g. South Pavilion Entry Turnstile"
-                  value={newStationName}
-                  onChange={(e) => setNewStationName(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Form */}
+            <form onSubmit={handleCreateStationSubmit} className="space-y-4">
+              <div className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    Venue / Location *
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Station Name *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Gate 3 South"
-                    value={newStationLocation}
-                    onChange={(e) => setNewStationLocation(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
+                    data-testid="input-station-name"
+                    placeholder="e.g. South Pavilion Entry Turnstile"
+                    value={newStationName}
+                    onChange={(e) => setNewStationName(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    Associated Event *
-                  </label>
-                  <select
-                    value={newStationEvent}
-                    onChange={(e) => setNewStationEvent(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                  >
-                    {availableEvents
-                      .filter((e) => e !== 'All Operations')
-                      .map((evt) => (
-                        <option key={evt} value={evt}>
-                          {evt}
-                        </option>
-                      ))}
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-[#163832] mb-1">
+                      Venue / Location *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Gate 3 South"
+                      value={newStationLocation}
+                      onChange={(e) => setNewStationLocation(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#163832] mb-1">
+                      Associated Event *
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={newStationEvent}
+                        onChange={(e) => setNewStationEvent(e.target.value)}
+                        className="w-full h-10 pl-3 pr-8 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all cursor-pointer appearance-none"
+                      >
+                        {availableEvents
+                          .filter((e) => e !== 'All Operations')
+                          .map((evt) => (
+                            <option key={evt} value={evt}>
+                              {evt}
+                            </option>
+                          ))}
+                      </select>
+                      <ChevronDown
+                        size={14}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#235347] pointer-events-none"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-bold text-[#051F20] mb-1">
-                  Operational Scope / Duty Description *
-                </label>
-                <textarea
-                  rows={2}
-                  required
-                  placeholder="Describe the operational responsibilities at this station..."
-                  value={newStationScope}
-                  onChange={(e) => setNewStationScope(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    Required Personnel Count *
+                  <label className="block text-xs font-bold text-[#163832] mb-1">
+                    Operational Scope / Duty Description *
                   </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={20}
+                  <textarea
+                    rows={2}
                     required
-                    value={newStationRequired}
-                    onChange={(e) => setNewStationRequired(Number(e.target.value))}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
+                    placeholder="Describe the operational responsibilities at this station..."
+                    value={newStationScope}
+                    onChange={(e) => setNewStationScope(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-[#051F20] mb-1">
-                    Station Officer / Lead
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Lead Officer Name"
-                    value={newStationLead}
-                    onChange={(e) => setNewStationLead(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-[#F6FBF7] outline-none focus:border-[#163832]"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-[#163832] mb-1">
+                      Required Strength *
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={20}
+                      required
+                      value={newStationRequired}
+                      onChange={(e) => setNewStationRequired(Number(e.target.value))}
+                      className="w-full h-10 px-3 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[#163832] mb-1">
+                      Station Lead / Officer
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Lead Officer Name"
+                      value={newStationLead}
+                      onChange={(e) => setNewStationLead(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-[#DAF1DE] text-xs text-[#051F20] bg-white outline-none focus:border-[#163832] transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* Action Buttons (Sticky Footer) */}
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#DAF1DE]">
                 <button
                   type="button"
                   onClick={() => setShowStationModal(false)}
-                  className="h-10 px-4 rounded-xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] cursor-pointer"
+                  className="h-11 px-5 rounded-2xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   data-testid="btn-submit-station"
-                  className="h-10 px-5 rounded-xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 cursor-pointer shadow-xs transition-all"
+                  className="h-11 px-6 rounded-2xl bg-[#163832] text-white text-xs font-bold hover:bg-[#0B2B26] active:scale-95 cursor-pointer shadow-md transition-all flex items-center justify-center gap-2"
                 >
-                  Create Station
+                  <Plus size={16} />
+                  <span>Create Station</span>
                 </button>
               </div>
             </form>
