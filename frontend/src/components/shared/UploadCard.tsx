@@ -70,8 +70,11 @@ export const UploadCard: React.FC<UploadCardProps> = ({
         ref={inputRef}
         type="file"
         accept={accept}
-        onChange={handleFileChange}
+        style={{ display: 'none' }}
         className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
+        onChange={handleFileChange}
       />
 
       <div

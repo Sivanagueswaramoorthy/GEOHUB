@@ -317,7 +317,10 @@ export const ReleaseCalendarScreen: React.FC<ReleaseCalendarScreenProps> = ({
         ref={fileInputRef}
         type="file"
         accept=".xlsx,.xls,.csv"
+        style={{ display: 'none' }}
         className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
         onChange={handleExcelUpload}
       />
 
@@ -385,47 +388,49 @@ export const ReleaseCalendarScreen: React.FC<ReleaseCalendarScreenProps> = ({
       {/* 2. Main Functions & Release Timeline Card (FILTERS REMOVED) */}
       <div className="p-4 sm:p-5 bg-white rounded-3xl border border-[#E2EBE5] shadow-[0_4px_20px_rgba(5,31,32,0.03)] space-y-3.5">
         {/* Header Strip with Title & Excel Import / Manual Add Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EDF3EF]">
-          <div className="flex items-center gap-2">
-            <h2 className="font-bold text-[#051F20] text-sm sm:text-base">
-              Campaign & Release Timeline
-            </h2>
-            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60">
-              {campaigns.length} Functions
-            </span>
+        <div className="flex flex-col gap-2.5 pb-3 border-b border-[#EDF3EF]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="font-bold text-[#051F20] text-sm sm:text-base">
+                Campaign & Release Timeline
+              </h2>
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60">
+                {campaigns.length} Functions
+              </span>
+            </div>
           </div>
 
-          {/* Action buttons: Import Excel, Download Template, and + Add Button */}
+          {/* Clean Unified Action Toolbar */}
           {!readOnly && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="grid grid-cols-3 gap-2 w-full pt-1">
+              <button
+                type="button"
+                onClick={() => setShowScheduleModal(true)}
+                className="h-9 px-3 rounded-xl bg-[#163832] text-white hover:bg-[#0B2B26] active:scale-95 transition-all text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                title="Add single function manually"
+              >
+                <Plus size={14} strokeWidth={2.5} />
+                <span>+ Add</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="h-8 px-3 rounded-xl bg-[#FAFCFA] border border-[#DDE7DF] text-[#163832] hover:bg-[#EAF3EC] active:scale-95 transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                className="h-9 px-3 rounded-xl bg-[#FAFCFA] border border-[#DDE7DF] text-[#163832] hover:bg-[#EAF3EC] active:scale-95 transition-all text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                 title="Import Excel spreadsheet (.xlsx, .xls, .csv)"
               >
                 <Upload size={13} strokeWidth={2.2} />
-                <span>Import Excel</span>
+                <span>Import</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadSample}
-                className="h-8 px-2.5 rounded-xl bg-[#FAFCFA] border border-[#DDE7DF] text-[#235347] hover:bg-[#EAF3EC] active:scale-95 transition-all text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                className="h-9 px-2.5 rounded-xl bg-[#FAFCFA] border border-[#DDE7DF] text-[#235347] hover:bg-[#EAF3EC] active:scale-95 transition-all text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                 title="Download sample template for Excel import"
               >
                 <Download size={13} strokeWidth={2.2} />
-                <span className="hidden sm:inline">Template</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowScheduleModal(true)}
-                className="h-8 px-3 rounded-xl bg-[#163832] text-white hover:bg-[#0B2B26] active:scale-95 transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
-                title="Add single function manually"
-              >
-                <Plus size={14} strokeWidth={2.5} />
-                <span>Add</span>
+                <span>Template</span>
               </button>
             </div>
           )}

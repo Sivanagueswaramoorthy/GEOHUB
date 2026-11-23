@@ -1426,7 +1426,10 @@ export const QuickActionsSheet: React.FC<QuickActionsSheetProps> = ({
                 <input
                   type="file"
                   accept="image/*"
+                  style={{ display: 'none' }}
                   className="hidden"
+                  aria-hidden="true"
+                  tabIndex={-1}
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
                       const reader = new FileReader();

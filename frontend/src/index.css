@@ -292,6 +292,11 @@ a {
   border-width: 0 !important;
 }
 
+/* Strictly hide elements such as native file inputs */
+.hidden {
+  display: none !important;
+}
+
 /* ==========================================================================
    Layout Shell & Viewport Wrappers
    ========================================================================== */

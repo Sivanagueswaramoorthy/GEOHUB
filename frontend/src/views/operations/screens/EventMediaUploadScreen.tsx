@@ -127,7 +127,10 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
         type="file"
         multiple
         accept="image/*,video/*"
+        style={{ display: 'none' }}
         className="hidden"
+        aria-hidden="true"
+        tabIndex={-1}
         onChange={handleFileChange}
       />
 
@@ -219,24 +222,26 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
       {/* 3. Media Gallery Feed (Category Pills Removed; Event Filter & Sort Maintained) */}
       <div className="p-4 sm:p-6 bg-white rounded-3xl border border-[#E2EBE5] shadow-[0_4px_20px_rgba(5,31,32,0.03)] space-y-4">
         {/* Header with Title and Event Name Filter & Sort Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EDF3EF]">
-          <div>
-            <h2 className="font-bold text-[#051F20] text-base sm:text-lg tracking-tight">
-              Event Media Repository
-            </h2>
-            <span className="text-xs text-[#235347]">
-              {filteredAndSortedMedia.length} assets available
-            </span>
+        <div className="flex flex-col gap-3 pb-3 border-b border-[#EDF3EF]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-[#051F20] text-base sm:text-lg tracking-tight">
+                Event Media Repository
+              </h2>
+              <span className="text-xs text-[#235347]">
+                {filteredAndSortedMedia.length} assets available
+              </span>
+            </div>
           </div>
 
-          {/* Event Filter Dropdown & Sort by Event Name Button */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Clean Unified Event Filter & Sort Toolbar */}
+          <div className="grid grid-cols-2 gap-2 w-full pt-1">
             {/* Filter by Event Name Dropdown */}
-            <div className="relative">
+            <div className="relative w-full">
               <select
                 value={selectedEvent}
                 onChange={(e) => setSelectedEvent(e.target.value)}
-                className="h-9 pl-3 pr-8 rounded-xl border border-[#DDE7DF] text-xs font-semibold text-[#051F20] bg-[#FAFCFA] outline-none focus:border-[#163832] focus:ring-1 focus:ring-[#163832]/20 cursor-pointer appearance-none shadow-2xs"
+                className="w-full h-9 pl-3 pr-8 rounded-xl border border-[#DDE7DF] text-xs font-semibold text-[#051F20] bg-[#FAFCFA] outline-none focus:border-[#163832] focus:ring-1 focus:ring-[#163832]/20 cursor-pointer appearance-none shadow-2xs truncate"
                 aria-label="Filter by Event Name"
               >
                 <option value="All">All Events</option>
@@ -256,12 +261,12 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
             <button
               type="button"
               onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-              className="h-9 px-3 rounded-xl border border-[#DDE7DF] text-xs font-bold text-[#163832] bg-[#FAFCFA] hover:bg-[#EAF3EC] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="w-full h-9 px-3 rounded-xl border border-[#DDE7DF] text-xs font-bold text-[#163832] bg-[#FAFCFA] hover:bg-[#EAF3EC] active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs truncate"
               title={`Sort by Event Name (${sortOrder === 'asc' ? 'Ascending A-Z' : 'Descending Z-A'})`}
               aria-label="Sort by Event Name"
             >
-              <ArrowUpDown size={13} strokeWidth={2.2} />
-              <span>Event Name ({sortOrder === 'asc' ? 'A-Z' : 'Z-A'})</span>
+              <ArrowUpDown size={13} strokeWidth={2.2} className="shrink-0" />
+              <span className="truncate">Sort ({sortOrder === 'asc' ? 'A-Z' : 'Z-A'})</span>
             </button>
           </div>
         </div>
