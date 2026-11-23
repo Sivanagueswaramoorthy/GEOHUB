@@ -310,30 +310,21 @@ export const DutiesAssignmentScreen: React.FC<DutiesAssignmentScreenProps> = ({
         </div>
       </div>
 
-      {/* 3. Bottom Sheet Modal: Assign Duty */}
+      {/* 3. TOP-CENTER FLOATING MODAL: Assign Duty */}
       {showAssignModal && (
         <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-14 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowAssignModal(false);
           }}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-3xl p-5 sm:p-6 shadow-2xl border-t sm:border border-[#DAF1DE] space-y-3.5 max-h-[92vh] sm:max-h-[86vh] overflow-y-auto flex flex-col"
+            className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_60px_rgba(5,31,32,0.22)] border border-[#DAF1DE] space-y-3.5 max-h-[88vh] overflow-y-auto flex flex-col"
             style={{
-              paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
-              animation: 'slideUp 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+              animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
-            {/* Grab Handle */}
-            <div
-              className="w-full flex justify-center pt-0 pb-1.5 sm:hidden cursor-pointer"
-              onClick={() => setShowAssignModal(false)}
-            >
-              <div className="w-10 h-1 rounded-full bg-[#8EB69B]/40 hover:bg-[#8EB69B] transition-colors" />
-            </div>
-
             {/* Header */}
             <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]/70">
               <div className="flex items-center gap-2.5">
