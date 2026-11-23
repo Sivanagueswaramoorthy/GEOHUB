@@ -46,6 +46,14 @@ def purge_database():
         db.query(models.JoinRequest).delete(synchronize_session=False)
         db.query(models.Document).delete(synchronize_session=False)
         db.query(models.AppDevice).delete(synchronize_session=False)
+        db.query(models.Meeting).delete(synchronize_session=False)
+        db.query(models.ForumMessage).delete(synchronize_session=False)
+        db.query(models.StockItem).delete(synchronize_session=False)
+        db.query(models.GalleryItem).delete(synchronize_session=False)
+        db.query(models.SocialPost).delete(synchronize_session=False)
+        db.query(models.CampaignPlan).delete(synchronize_session=False)
+        db.query(models.DailyNewsItem).delete(synchronize_session=False)
+        db.query(models.MemberCustomClearance).delete(synchronize_session=False)
         db.query(models.AuditLog).delete(synchronize_session=False)
         db.query(models.Event).delete(synchronize_session=False)
         db.commit()
@@ -138,7 +146,9 @@ def purge_database():
             "events", "event_registrations", "tasks", "qr_sessions",
             "attendance", "documents", "audit_logs", "budget_requests",
             "expenses", "notifications", "join_requests",
-            "role_permission_overrides", "app_devices",
+            "role_permission_overrides", "app_devices", "meetings",
+            "forum_messages", "stock_items", "gallery_items", "social_posts",
+            "campaigns", "daily_news", "member_custom_clearances",
         ]
 
         for tbl in tables_to_clear:

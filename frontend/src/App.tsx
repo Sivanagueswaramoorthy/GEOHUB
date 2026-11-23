@@ -8,6 +8,7 @@ import { Toast } from './components/Toast';
 import { SplashScreen } from './components/SplashScreen';
 import { UpdateAvailableModal } from './components/modals/UpdateAvailableModal';
 import { ServerConnectionModal } from './components/modals/ServerConnectionModal';
+import { FirstTimeProfileSetupModal } from './components/modals/FirstTimeProfileSetupModal';
 import { checkForAppUpdate, registerDeviceTelemetry, AppVersionManifest } from './core/versionChecker';
 
 // Five Primary Screens
@@ -412,6 +413,38 @@ const GlobalServerModal: React.FC = () => {
   );
 };
 
+const GlobalProfileSetupModal: React.FC = () => {
+  const { currentUser, isAuthenticated } = useApp();
+
+  const isOpen = React.useMemo(() => {
+    if (!isAuthenticated || !currentUser) return false;
+    if (currentUser.status === 'pending') return false;
+    if (currentUser.mustChangePassword) return false;
+    if (currentUser.hasCompletedProfileSetup) return false;
+
+    // Check persistent storage to ensure second time login never shows popup
+    try {
+      if (typeof window !== 'undefined') {
+        if (localStorage.getItem(`geohub_profile_setup_completed_${currentUser.uid}`) === 'true') {
+          return false;
+        }
+        if (
+          currentUser.rollNo &&
+          localStorage.getItem(`geohub_profile_setup_completed_${currentUser.rollNo.toUpperCase()}`) === 'true'
+        ) {
+          return false;
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+
+    return true;
+  }, [isAuthenticated, currentUser]);
+
+  return <FirstTimeProfileSetupModal isOpen={isOpen} />;
+};
+
 const AppContentWithSplash: React.FC = () => {
   const { checkForUpdates } = useApp();
   const [showSplash, setShowSplash] = React.useState(() => {
@@ -465,6 +498,7 @@ const AppContentWithSplash: React.FC = () => {
       )}
       <GlobalUpdateModal />
       <GlobalServerModal />
+      <GlobalProfileSetupModal />
       <MainAppContent />
     </>
   );

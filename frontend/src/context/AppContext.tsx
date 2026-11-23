@@ -206,6 +206,7 @@ interface AppContextType {
     yearOfStudy?: string;
     isLead?: boolean;
   }) => UserModel;
+  completeProfileSetup: (phone: string, email: string) => Promise<boolean>;
   setUsers: React.Dispatch<React.SetStateAction<UserModel[]>>;
   setExpenses: React.Dispatch<React.SetStateAction<ExpenseItem[]>>;
   setBudgetRequests: React.Dispatch<React.SetStateAction<BudgetChangeRequest[]>>;
@@ -978,12 +979,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 localStorage.removeItem('geohub_store_expenses');
                 localStorage.removeItem('geohub_store_budgetRequests');
                 localStorage.removeItem('geohub_store_auditLogs');
+                localStorage.removeItem('geohub_store_gallery');
+                localStorage.removeItem('geohub_store_attendance');
+                localStorage.removeItem('geohub_store_approvals');
+                localStorage.removeItem('geohub_store_users');
               } catch {}
               setEvents([]);
               setTasks([]);
               setExpenses([]);
               setBudgetRequests([]);
               setAuditLogs([]);
+              setGallery([]);
+              setAttendance([]);
+              setApprovals([]);
+              setPosts([]);
+              setCampaigns([]);
+              setDailyNews([]);
               syncWithBackend();
               showToast('Platform clean slate synchronized across devices', 'info');
               return;
@@ -1165,9 +1176,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [isPhoneFrame]);
 
   const loginWithUser = (user: UserModel) => {
-    setCurrentUser(user);
+    let effectiveUser = user;
+    try {
+      if (typeof window !== 'undefined') {
+        const isCompleted =
+          user.hasCompletedProfileSetup ||
+          localStorage.getItem(`geohub_profile_setup_completed_${user.uid}`) === 'true' ||
+          (user.rollNo && localStorage.getItem(`geohub_profile_setup_completed_${user.rollNo.toUpperCase()}`) === 'true');
+        if (isCompleted && !effectiveUser.hasCompletedProfileSetup) {
+          effectiveUser = { ...effectiveUser, hasCompletedProfileSetup: true };
+        }
+      }
+    } catch {}
+
+    setCurrentUser(effectiveUser);
     setIsAuthenticated(true);
-    setUsers((prev) => (prev.some((u) => u.uid === user.uid) ? prev : [user, ...prev]));
+    setUsers((prev) => (prev.some((u) => u.uid === effectiveUser.uid) ? prev.map((u) => u.uid === effectiveUser.uid ? { ...u, ...effectiveUser } : u) : [effectiveUser, ...prev]));
     
     // Ensure auth session is safely mirrored in localStorage
     try {
@@ -1175,8 +1199,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const existing = localStorage.getItem('geohub_auth_session');
         if (!existing) {
           localStorage.setItem('geohub_auth_session', JSON.stringify({
-            user,
-            token: apiClient.getToken() || `geohub_jwt_token_${user.uid}`,
+            user: effectiveUser,
+            token: apiClient.getToken() || `geohub_jwt_token_${effectiveUser.uid}`,
             rememberMe: true,
             createdAt: Date.now(),
           }));
@@ -1186,7 +1210,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // ignore
     }
 
-    switch (user.role) {
+    switch (effectiveUser.role) {
       case 'super_admin':
       case 'admin':
       case 'coordinator':
@@ -1916,6 +1940,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isVolunteer: false,
       post: studentData.post || 'Student Member',
       teamRole: studentData.teamRole || 'Student',
+      hasCompletedProfileSetup: false,
       status: 'active',
       createdAt: new Date().toISOString(),
     };
@@ -2009,6 +2034,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       department: data.department || 'Geoinformatics Engineering',
       yearOfStudy: data.yearOfStudy || '2nd Year',
       isVolunteer: true,
+      hasCompletedProfileSetup: false,
       status: 'active',
       createdAt: new Date().toISOString(),
     };
@@ -2053,6 +2079,72 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }).catch(() => {});
 
     return newScholar;
+  };
+
+  const completeProfileSetup = async (phone: string, email: string): Promise<boolean> => {
+    const trimmedPhone = phone.trim();
+    const trimmedEmail = email.trim();
+
+    const updatedUser: UserModel = {
+      ...currentUser,
+      phone: trimmedPhone,
+      email: trimmedEmail,
+      hasCompletedProfileSetup: true,
+    };
+
+    setCurrentUser(updatedUser);
+
+    setUsers((prev) =>
+      prev.map((u) => {
+        if (u.uid === updatedUser.uid || (updatedUser.rollNo && u.rollNo === updatedUser.rollNo)) {
+          return { ...u, phone: trimmedPhone, email: trimmedEmail, hasCompletedProfileSetup: true };
+        }
+        return u;
+      })
+    );
+
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`geohub_profile_setup_completed_${updatedUser.uid}`, 'true');
+        if (updatedUser.rollNo) {
+          localStorage.setItem(`geohub_profile_setup_completed_${updatedUser.rollNo.toUpperCase()}`, 'true');
+        }
+
+        const rawSession = localStorage.getItem('geohub_auth_session');
+        if (rawSession) {
+          try {
+            const sess = JSON.parse(rawSession);
+            sess.user = updatedUser;
+            localStorage.setItem('geohub_auth_session', JSON.stringify(sess));
+          } catch {}
+        }
+
+        const rawStore = localStorage.getItem('geohub_store_users');
+        if (rawStore) {
+          try {
+            const storedList: UserModel[] = JSON.parse(rawStore);
+            const updatedList = storedList.map((u) =>
+              u.uid === updatedUser.uid || (updatedUser.rollNo && u.rollNo === updatedUser.rollNo)
+                ? { ...u, phone: trimmedPhone, email: trimmedEmail, hasCompletedProfileSetup: true }
+                : u
+            );
+            localStorage.setItem('geohub_store_users', JSON.stringify(updatedList));
+          } catch {}
+        }
+      }
+    } catch {}
+
+    try {
+      apiClient
+        .updateAdminUser(updatedUser.uid, {
+          phone: trimmedPhone,
+          email: trimmedEmail,
+        })
+        .catch(() => {});
+    } catch {}
+
+    showToast(`✓ Profile details verified! Welcome to GeoHub, ${updatedUser.name.split(' ')[0] || updatedUser.name}.`, 'success');
+    return true;
   };
 
   const changeStudentPost = (
@@ -2740,6 +2832,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         auditLogs,
         addAuditLog,
         enrollScholar,
+        completeProfileSetup,
         setUsers,
         setExpenses,
         setBudgetRequests,

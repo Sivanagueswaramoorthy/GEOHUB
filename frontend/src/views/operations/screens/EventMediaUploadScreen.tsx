@@ -146,6 +146,7 @@ export const EventMediaUploadScreen: React.FC<EventMediaUploadScreenProps> = ({
     }));
 
     if (fromGallery.length > 0) return fromGallery;
+    if (!events || events.length === 0) return [];
     return DEFAULT_SAMPLE_MEDIA;
   });
 

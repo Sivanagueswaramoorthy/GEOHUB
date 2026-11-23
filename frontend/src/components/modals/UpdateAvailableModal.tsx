@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { DownloadCloud, Sparkles, ShieldCheck, ArrowRight, X, Loader2 } from 'lucide-react';
-import { AppVersionManifest, triggerApkInstallation, onApkDownloadProgress, getInstalledVersion } from '../../core/versionChecker';
-import { APP_VERSION } from '../../config/version';
+import {
+  DownloadCloud,
+  Sparkles,
+  ShieldCheck,
+  ArrowRight,
+  X,
+  Loader2,
+  CheckCircle2,
+  Zap,
+} from 'lucide-react';
+import {
+  AppVersionManifest,
+  triggerApkInstallation,
+  onApkDownloadProgress,
+  getInstalledVersion,
+} from '../../core/versionChecker';
 
-interface UpdateAvailableModalProps {
+export interface UpdateAvailableModalProps {
   isOpen: boolean;
   updateInfo: AppVersionManifest | null;
   isMandatory?: boolean;
@@ -18,13 +31,13 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
 }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
-  const [statusMessage, setStatusMessage] = useState('Ready to download');
+  const [statusMessage, setStatusMessage] = useState('Ready to install');
 
   useEffect(() => {
     if (!isOpen) {
       setIsDownloading(false);
       setDownloadProgress(0);
-      setStatusMessage('Ready to download');
+      setStatusMessage('Ready to install');
       return;
     }
 
@@ -69,46 +82,45 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
         .split('\n')
         .map((line) => line.replace(/^[\s*\-•]+/, '').trim())
         .filter(Boolean)
-    : ['Routine stability improvements and general optimizations.'];
+    : ['Routine stability improvements and UI optimizations.'];
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="update-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md animate-fade-in"
+      data-testid="modal-update-available"
+      className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-10 sm:pt-16 bg-[#051F20]/65 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
       style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+      onClick={(e) => {
+        if (!isMandatory && !isDownloading && e.target === e.currentTarget) {
+          handleDismiss();
+        }
+      }}
     >
       <div
-        className="w-full max-w-md bg-[#F6FBF7] border border-[#DAF1DE] rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col gap-5 text-[#051F20]"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.25)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20]"
         style={{
-          boxShadow: '0 20px 40px -15px rgba(5, 31, 32, 0.25)',
+          animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        {/* Ambient Top Glow */}
-        <div className="absolute -top-16 -right-16 w-40 h-40 bg-[#DAF1DE] rounded-full blur-2xl opacity-60 pointer-events-none" />
+        {/* Soft Ambient Radiance */}
+        <div className="absolute -top-12 -right-12 w-36 h-36 bg-[#DAF1DE] rounded-full blur-2xl opacity-70 pointer-events-none" />
+        <div className="absolute -top-8 -left-8 w-28 h-28 bg-[#8EB69B]/20 rounded-full blur-xl opacity-60 pointer-events-none" />
 
-        {/* Header Section */}
-        <div className="flex items-start justify-between relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] border border-[#8EB69B]/40 flex items-center justify-center text-[#235347] shadow-sm">
-              <DownloadCloud size={24} strokeWidth={2.2} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#235347] bg-[#DAF1DE] px-2 py-0.5 rounded-full border border-[#8EB69B]/30">
-                  New Release
-                </span>
-                {isMandatory && (
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
-                    Mandatory
-                  </span>
-                )}
-              </div>
-              <h2 id="update-modal-title" className="text-lg font-bold text-[#051F20] mt-0.5">
-                GeoHub v{updateInfo.version} Available
-              </h2>
-            </div>
+        {/* Top Header Pill Bar */}
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              <span>Update Ready</span>
+            </span>
+
+            {isMandatory && (
+              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#D9534F]/10 text-[#D9534F] border border-[#D9534F]/30">
+                Required
+              </span>
+            )}
           </div>
 
           {!isMandatory && (
@@ -117,79 +129,102 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
               onClick={handleDismiss}
               disabled={isDownloading}
               aria-label="Close update modal"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-[#235347] hover:bg-[#DAF1DE] transition-colors disabled:opacity-50"
+              className="w-7 h-7 rounded-full bg-[#F6FBF7] text-[#235347] hover:bg-[#DAF1DE] flex items-center justify-center cursor-pointer transition-colors disabled:opacity-40"
             >
-              <X size={18} />
+              <X size={15} />
             </button>
           )}
         </div>
 
-        {/* Version Transition Chip */}
-        <div className="flex items-center justify-between bg-white/80 border border-[#DAF1DE] rounded-2xl p-3 text-xs text-[#163832]">
-          <div className="flex items-center gap-2">
-            <span className="text-[#235347] font-medium">Installed:</span>
-            <span className="font-bold text-[#051F20] bg-[#F6FBF7] px-2 py-0.5 rounded-lg border border-[#DAF1DE]">
+        {/* Hero Section: Title & Icon */}
+        <div className="flex items-center gap-3.5 pt-1">
+          <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40 flex items-center justify-center shadow-xs shrink-0">
+            <Zap size={22} className="text-[#163832]" strokeWidth={2.4} />
+          </div>
+          <div className="min-w-0">
+            <h2 id="update-modal-title" className="text-base sm:text-lg font-bold text-[#051F20] truncate leading-snug">
+              GeoHub v{updateInfo.version}
+            </h2>
+            <p className="text-xs text-[#235347] font-medium truncate">
+              New build with features & stability updates
+            </p>
+          </div>
+        </div>
+
+        {/* Version Leap Card */}
+        <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[#235347] text-[11px] font-medium">Installed</span>
+            <span className="font-bold text-[#051F20] bg-white px-2 py-0.5 rounded-lg border border-[#DAF1DE]">
               v{getInstalledVersion()}
             </span>
           </div>
-          <ArrowRight size={14} className="text-[#8EB69B]" />
-          <div className="flex items-center gap-2">
-            <span className="text-[#235347] font-medium">Latest:</span>
-            <span className="font-bold text-[#235347] bg-[#DAF1DE] px-2 py-0.5 rounded-lg border border-[#8EB69B]/40">
+
+          <ArrowRight size={13} className="text-[#8EB69B] shrink-0" />
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-[#235347] text-[11px] font-medium">Target</span>
+            <span className="font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-lg border border-[#8EB69B]/50">
               v{updateInfo.version}
             </span>
           </div>
         </div>
 
-        {/* What's New Section */}
-        <div className="bg-white/90 border border-[#DAF1DE] rounded-2xl p-4 flex flex-col gap-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#235347]">
-            <Sparkles size={14} />
-            <span>What's New in this Release</span>
+        {/* What's New Box */}
+        <div className="p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-[#235347]">
+            <span className="flex items-center gap-1.5">
+              <Sparkles size={12} className="text-[#163832]" />
+              <span>Release Notes</span>
+            </span>
+            <span className="text-[10px] text-[#8EB69B] lowercase font-normal">
+              {updateInfo.file_size_mb || '10.4 MB'}
+            </span>
           </div>
-          <ul className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+
+          <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
             {releaseNotesList.map((note, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-xs text-[#163832] leading-relaxed">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#235347] mt-1.5 shrink-0" />
-                <span>{note}</span>
+              <li key={idx} className="flex items-start gap-2 text-xs text-[#051F20] leading-snug">
+                <CheckCircle2 size={13} className="text-[#163832] mt-0.5 shrink-0" />
+                <span className="flex-1">{note}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Telemetry info row */}
-        <div className="flex items-center justify-between text-xs text-[#235347] px-1">
+        {/* Security & Verification Metadata */}
+        <div className="flex items-center justify-between text-[11px] text-[#235347] px-1">
           <div className="flex items-center gap-1.5">
-            <ShieldCheck size={14} />
-            <span>Verified package ({updateInfo.file_size_mb || '6.5 MB'})</span>
+            <ShieldCheck size={13} className="text-[#163832]" />
+            <span>Verified Package</span>
           </div>
-          <span>Released {updateInfo.released_at}</span>
+          <span>{updateInfo.released_at}</span>
         </div>
 
-        {/* Download Progress Bar (shown when downloading) */}
+        {/* Download Progress (if active) */}
         {isDownloading && (
-          <div className="flex flex-col gap-1.5 bg-white border border-[#DAF1DE] rounded-2xl p-3 animate-fade-in">
+          <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] space-y-1.5 animate-fadeIn">
             <div className="flex items-center justify-between text-xs font-semibold text-[#163832]">
-              <span>{statusMessage}</span>
-              <span>{Math.max(0, downloadProgress)}%</span>
+              <span className="truncate">{statusMessage}</span>
+              <span className="font-mono">{Math.max(0, downloadProgress)}%</span>
             </div>
             <div className="w-full h-2 bg-[#DAF1DE] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#235347] transition-all duration-300 rounded-full"
-                style={{ width: `${Math.max(5, downloadProgress)}%` }}
+                className="h-full bg-gradient-to-r from-[#163832] to-[#235347] rounded-full transition-all duration-300"
+                style={{ width: `${Math.max(8, downloadProgress)}%` }}
               />
             </div>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 pt-1">
+        <div className="flex items-center gap-2 pt-1 border-t border-[#DAF1DE]/70">
           {!isMandatory && (
             <button
               type="button"
               onClick={handleDismiss}
               disabled={isDownloading}
-              className="flex-1 py-3 rounded-2xl border border-[#8EB69B] text-xs font-bold text-[#235347] bg-white hover:bg-[#DAF1DE]/40 transition-colors disabled:opacity-50"
+              className="flex-1 h-11 rounded-2xl border border-[#DAF1DE] text-xs font-bold text-[#235347] hover:bg-[#F6FBF7] transition-colors cursor-pointer disabled:opacity-40"
             >
               Later
             </button>
@@ -199,7 +234,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
             type="button"
             onClick={handleStartDownload}
             disabled={isDownloading}
-            className="flex-1 py-3 rounded-2xl bg-[#235347] hover:bg-[#163832] active:bg-[#0B2B26] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all disabled:opacity-75"
+            className="flex-1 h-11 rounded-2xl bg-[#163832] hover:bg-[#0B2B26] active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-75"
           >
             {isDownloading ? (
               <>
@@ -209,7 +244,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
             ) : (
               <>
                 <DownloadCloud size={16} />
-                <span>Download & Install</span>
+                <span>Update Now</span>
               </>
             )}
           </button>
@@ -219,3 +254,4 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
   );
 };
 
+export default UpdateAvailableModal;

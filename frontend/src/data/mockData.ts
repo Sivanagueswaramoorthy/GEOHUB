@@ -28,6 +28,7 @@ export const demoSuperAdmin: UserModel = {
   department: 'Platform Governance & IT',
   yearOfStudy: 'System Administrator',
   phone: '+1 (555) 010-0001',
+  hasCompletedProfileSetup: true,
   createdAt: '2025-08-01T09:00:00Z',
 };
 
@@ -46,6 +47,7 @@ export const demoFaculty: UserModel = {
   department: 'Geography & Geomatics',
   yearOfStudy: 'Faculty Staff',
   phone: '+1 (555) 019-2831',
+  hasCompletedProfileSetup: true,
   createdAt: '2025-08-01T09:00:00Z',
 };
 
@@ -64,6 +66,7 @@ export const demoAdmin: UserModel = {
   department: 'Geoinformatics Engineering',
   yearOfStudy: 'Final Year (4th)',
   phone: '+1 (555) 014-9921',
+  hasCompletedProfileSetup: true,
   createdAt: '2025-08-15T10:00:00Z',
 };
 export const demoCoordinator = demoAdmin;
@@ -86,6 +89,7 @@ export const demoTeamAdmin: UserModel = {
   department: 'Earth Science & Media',
   yearOfStudy: '3rd Year (Junior)',
   phone: '+1 (555) 018-7734',
+  hasCompletedProfileSetup: true,
   createdAt: '2025-09-01T11:00:00Z',
 };
 export const demoPromotion = demoTeamAdmin;
@@ -107,6 +111,7 @@ export const demoMember: UserModel = {
   department: 'Cartography & Geography',
   yearOfStudy: '2nd Year',
   phone: '+1 (555) 012-3489',
+  hasCompletedProfileSetup: true,
   createdAt: '2025-09-10T14:30:00Z',
 };
 export const demoStudent = demoMember;

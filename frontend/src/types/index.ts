@@ -46,6 +46,7 @@ export interface UserModel {
   teamRole?: string;
   squadMemberships?: SquadMembership[];
   mustChangePassword?: boolean;
+  hasCompletedProfileSetup?: boolean;
   isVolunteer: boolean;
   status: UserStatus;
   avatarUrl?: string;
