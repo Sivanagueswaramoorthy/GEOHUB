@@ -83,14 +83,14 @@ export const Toast: React.FC<ToastProps> = ({
       {/* Message Text */}
       <span
         style={{
-          fontSize: '13px',
-          fontWeight: 600,
+          fontSize: '12.5px',
+          fontWeight: 700,
           color: '#FFFFFF',
-          letterSpacing: '0.01em',
+          letterSpacing: '0.015em',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          maxWidth: '280px',
+          maxWidth: 'calc(100vw - 110px)',
         }}
       >
         {cleanMessage || message}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { SuperAdminOperationsView } from '../admin/SuperAdminOperationsView';
 import {
   StudentHomeView,
   CoordinatorHomeView,
@@ -14,9 +13,9 @@ import {
 export const HomeView: React.FC = () => {
   const { currentUser, showToast, setSelectedEventId, registerForEvent } = useApp();
 
-  // SuperAdmin Master Command Cockpit
+  // Fallback if role is super_admin: display the standard Coordinator executive home
   if (currentUser.role === 'super_admin') {
-    return <SuperAdminOperationsView onBack={() => {}} isHomeCockpit={true} />;
+    return <CoordinatorHomeView />;
   }
 
   const postLower = (currentUser.post || '').toLowerCase();

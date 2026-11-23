@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import {
   ChevronLeft,
-  ArrowLeft,
   RefreshCw,
   Calendar,
   QrCode,
@@ -10,7 +9,9 @@ import {
   CheckCircle2,
   Clock,
   Search,
-  ShieldCheck,
+  ChevronDown,
+  Check,
+  Sparkles,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import {
@@ -44,6 +45,24 @@ export const MyQrView: React.FC = () => {
   const [otp, setOtp] = useState<string>(() => Math.floor(100000 + Math.random() * 900000).toString());
   const [attendanceTab, setAttendanceTab] = useState<'marked' | 'not_marked'>('marked');
   const [rosterSearch, setRosterSearch] = useState<string>('');
+
+  // Rebuilt Custom Event Selector State
+  const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
+  const eventDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (eventDropdownRef.current && !eventDropdownRef.current.contains(e.target as Node)) {
+        setIsEventDropdownOpen(false);
+      }
+    };
+    if (isEventDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isEventDropdownOpen]);
 
   const chosenEvent =
     events.find((e) => e.id === chosenEventId) ||
@@ -83,7 +102,7 @@ export const MyQrView: React.FC = () => {
     setOtp(generateNewOtp());
     setSecondsLeft(20);
     setIsPopupOpen(true);
-    showToast('✓ Attendance QR & 6-digit OTP generated (valid 20s)');
+    showToast('OTP Active (20s)', 'success');
   };
 
   const handleCloseQrPopup = () => {
@@ -94,7 +113,7 @@ export const MyQrView: React.FC = () => {
     setTokenSeed(Date.now().toString(36));
     setOtp(generateNewOtp());
     setSecondsLeft(20);
-    showToast('✓ Token & OTP refreshed (valid 20s)');
+    showToast('OTP Refreshed (20s)', 'success');
   };
 
   const handleEventChange = (newId: string) => {
@@ -104,7 +123,7 @@ export const MyQrView: React.FC = () => {
     }
     setRosterSearch('');
     const target = events.find((e) => e.id === newId);
-    showToast(`✓ Selected event: ${target?.title || 'Selected Event'}`);
+    showToast(target?.title ? `Event: ${target.title}` : 'Event Selected', 'info');
   };
 
   // Compute registered scholars and attendance for chosen event
@@ -175,112 +194,239 @@ export const MyQrView: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col items-center gap-3.5 px-3 sm:px-4 py-3 select-none animate-fadeIn pb-36"
+      className="flex flex-col items-center gap-4 px-3 sm:px-4 py-3 select-none animate-fadeIn pb-36 min-h-screen"
       style={{
-        background: 'radial-gradient(circle at 50% 20%, rgba(218, 241, 222, 0.7) 0%, rgba(246, 251, 247, 0) 65%), #F6FBF7',
-        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #F0F6F2 0%, #F7FAF8 140px, #F7FAF8 100%)',
       }}
     >
-      {/* 1) Top Bar: Premium Back Button (top left) + Live Security Chip */}
-      <div className="w-full max-w-sm flex items-center justify-between">
+      {/* 1) Top Bar: Clean Nav Header with Back Button, Center Title, and Live Token Pill */}
+      <div className="w-full max-w-sm flex items-center justify-between pt-1">
         <button
           type="button"
           onClick={() => setActiveTab('home')}
-          className="w-10 h-10 bg-transparent border-0 active:scale-95 text-[#051F20] flex items-center justify-center transition-all cursor-pointer touch-target-44 p-0"
+          className="w-10 h-10 rounded-full bg-white border border-[#E2EBE5] text-[#051F20] flex items-center justify-center shadow-[0_2px_8px_rgba(5,31,32,0.04)] hover:bg-[#F0F5F2] active:scale-95 transition-all cursor-pointer touch-target-44"
           aria-label="Back to Home"
           data-testid="btn-back-qr"
         >
-          <ChevronLeft size={26} strokeWidth={2.5} />
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
 
-        <StatusChip status="live" label="Live Token" />
-      </div>
-
-      {/* 2) Header: Title "Attendance" (no subtitle) */}
-      <div className="text-center max-w-sm">
-        <h1
-          className="font-heading font-bold text-[#051F20] tracking-tight"
-          style={{ fontSize: '24px', lineHeight: '28px' }}
-        >
+        <h1 className="font-heading font-bold text-lg text-[#051F20] tracking-tight">
           Attendance
         </h1>
+
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#163832] text-white shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-[#8EB69B] animate-pulse shrink-0" />
+          <span className="text-[11px] font-bold tracking-wide">Live Token</span>
+        </div>
       </div>
 
-      {/* 3) Event Selector Card: Choose event + Generate QR Button */}
-      <div
-        className="w-full max-w-sm bg-white p-4 rounded-3xl border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.04)] flex flex-col gap-3"
-      >
-        <div className="flex items-center justify-between text-[12px]">
-          <span className="font-bold text-[#051F20] flex items-center gap-1.5">
-            <Calendar size={14} className="text-[#163832]" />
+      {/* 2) Event Selector Card: Custom Rebuilt UI */}
+      <div className="w-full max-w-sm bg-white p-4 rounded-3xl border border-[#E2EBE5] shadow-[0_4px_20px_rgba(5,31,32,0.03)] flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-[#051F20] flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-[#EAF3EC] text-[#163832] flex items-center justify-center shrink-0">
+              <Calendar size={13} strokeWidth={2.2} />
+            </div>
             Choose Event:
           </span>
-          <span className="text-[#235347] font-semibold">
+          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60">
             {events.length} Available
           </span>
         </div>
 
-        <select
-          value={chosenEventId}
-          onChange={(e) => handleEventChange(e.target.value)}
-          className="w-full p-2.5 rounded-xl border border-[#8EB69B] text-[13px] font-semibold text-[#051F20] bg-[#F6FBF7] outline-none focus:ring-1 focus:ring-[#163832] cursor-pointer"
-          data-testid="event-selector-qr"
-        >
-          {events.map((ev) => (
-            <option key={ev.id} value={ev.id}>
-              {ev.title} ({ev.status.toUpperCase()})
-            </option>
-          ))}
-        </select>
+        {/* Rebuilt Custom Event Filter Dropdown */}
+        <div className="relative w-full" ref={eventDropdownRef}>
+          <button
+            type="button"
+            onClick={() => setIsEventDropdownOpen((prev) => !prev)}
+            aria-expanded={isEventDropdownOpen}
+            aria-haspopup="listbox"
+            className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer select-none ${
+              isEventDropdownOpen
+                ? 'bg-[#F2F8F4] border-[#163832] ring-2 ring-[#163832]/10 shadow-sm'
+                : 'bg-[#FAFCFA] border-[#DDE7DF] hover:bg-[#F2F7F4] hover:border-[#8EB69B]'
+            }`}
+          >
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="w-8 h-8 rounded-xl bg-[#EAF3EC] text-[#163832] flex items-center justify-center shrink-0">
+                <Sparkles size={15} strokeWidth={2.2} />
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <span className="text-xs font-bold text-[#051F20] truncate">
+                  {chosenEvent?.title || 'Select an Event'}
+                </span>
+                <span className="text-[10.5px] font-medium text-[#235347] truncate flex items-center gap-1.5">
+                  <span>
+                    {chosenEvent?.startDate || (chosenEvent as any)?.date
+                      ? new Date(chosenEvent.startDate || (chosenEvent as any).date).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })
+                      : 'Scheduled'}
+                  </span>
+                  <span>•</span>
+                  <span>{chosenEvent?.venue || (chosenEvent as any)?.location || 'Campus Hub'}</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                  chosenEvent?.status === 'approved' || chosenEvent?.status === 'live'
+                    ? 'bg-[#EAF3EC] text-[#163832] border-[#8EB69B]/60'
+                    : chosenEvent?.status === 'cancelled'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                }`}
+              >
+                {((chosenEvent?.status || 'approved') as string).toUpperCase()}
+              </span>
+              <ChevronDown
+                size={16}
+                className={`text-[#235347] transition-transform duration-200 ${
+                  isEventDropdownOpen ? 'rotate-180 text-[#163832]' : ''
+                }`}
+              />
+            </div>
+          </button>
+
+          {/* Hidden native select for test & accessibility compatibility */}
+          <select
+            value={chosenEventId}
+            onChange={(e) => handleEventChange(e.target.value)}
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden="true"
+            data-testid="event-selector-qr"
+          >
+            {events.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.title} ({ev.status.toUpperCase()})
+              </option>
+            ))}
+          </select>
+
+          {/* Animated Dropdown Menu List */}
+          {isEventDropdownOpen && (
+            <div
+              className="absolute top-full left-0 right-0 mt-2 z-40 bg-white rounded-2xl border border-[#DAF1DE] shadow-[0_12px_36px_rgba(5,31,32,0.14)] p-1.5 flex flex-col gap-1 max-h-60 overflow-y-auto no-scrollbar animate-fadeIn"
+              role="listbox"
+            >
+              {events.map((ev) => {
+                const isSelected = ev.id === chosenEventId;
+                const isApproved = ev.status === 'approved' || ev.status === 'live';
+                return (
+                  <button
+                    key={ev.id}
+                    type="button"
+                    onClick={() => {
+                      handleEventChange(ev.id);
+                      setIsEventDropdownOpen(false);
+                    }}
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`w-full p-2.5 rounded-xl text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#EAF3EC] text-[#163832]'
+                        : 'hover:bg-[#F7FAF8] text-[#051F20]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <div
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                          isSelected
+                            ? 'border-[#163832] bg-[#163832] text-white'
+                            : 'border-[#CBDAD0] bg-white'
+                        }`}
+                      >
+                        {isSelected && <Check size={10} strokeWidth={3} />}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span
+                          className={`text-xs truncate ${
+                            isSelected ? 'font-bold text-[#163832]' : 'font-semibold text-[#051F20]'
+                          }`}
+                        >
+                          {ev.title}
+                        </span>
+                        <span className="text-[10px] text-[#235347] truncate">
+                          {ev.startDate || (ev as any).date
+                            ? new Date(ev.startDate || (ev as any).date).toLocaleDateString(undefined, {
+                                month: 'short',
+                                day: 'numeric',
+                              })
+                            : 'Scheduled'}{' '}
+                          {ev.venue || (ev as any).location ? `• ${ev.venue || (ev as any).location}` : ''}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full shrink-0 border ${
+                        isApproved
+                          ? 'bg-[#DAF1DE]/70 text-[#163832] border-[#8EB69B]/50'
+                          : ev.status === 'cancelled'
+                          ? 'bg-rose-50 text-rose-700 border-rose-200'
+                          : 'bg-gray-100 text-gray-600 border-gray-200'
+                      }`}
+                    >
+                      {ev.status.toUpperCase()}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Generate QR Button directly below Choosing Event */}
         <button
           type="button"
           onClick={handleOpenQrPopup}
-          className="w-full h-11 px-5 rounded-full bg-[#163832] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(22,56,50,0.2)] hover:bg-[#0B2B26] active:scale-[0.98] transition-all cursor-pointer touch-target-44"
+          className="w-full h-11 px-5 rounded-2xl bg-[#163832] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(22,56,50,0.18)] hover:bg-[#0B2B26] active:scale-[0.98] transition-all cursor-pointer touch-target-44"
           aria-label="Generate QR"
           data-testid="btn-generate-qr"
         >
-          <QrCode size={18} strokeWidth={2} />
+          <QrCode size={17} strokeWidth={2.2} />
           <span>Generate QR</span>
         </button>
       </div>
 
-      {/* 4) Event Attendance Roster: Tab Bars for Marked & Not Marked */}
-      <div
-        className="w-full max-w-sm bg-white p-4 sm:p-5 flex flex-col border border-[#DAF1DE] shadow-[0_8px_24px_rgba(5,31,32,0.05)] rounded-3xl"
-      >
+      {/* 3) Event Attendance Roster: Tab Bars for Marked & Not Marked */}
+      <div className="w-full max-w-sm bg-white p-4 sm:p-5 flex flex-col border border-[#E2EBE5] shadow-[0_4px_20px_rgba(5,31,32,0.03)] rounded-3xl gap-3">
         {/* Roster Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <div className="flex flex-col min-w-0 pr-2">
-            <h3 className="text-base font-bold text-[#051F20] truncate">
+            <h2 className="text-sm font-bold text-[#051F20] truncate">
               Event Attendance
-            </h3>
-            <span className="text-xs font-medium text-[#235347] truncate">
+            </h2>
+            <span className="text-[11px] font-medium text-[#235347] truncate">
               {chosenEvent.title}
             </span>
           </div>
 
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#DAF1DE] text-[#051F20] shrink-0">
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60 shrink-0">
             {registeredScholars.length} Registered
           </span>
         </div>
 
         {/* Segmented Tab Bars */}
-        <div className="w-full grid grid-cols-2 p-1 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] gap-1 mb-3">
+        <div className="w-full grid grid-cols-2 p-1 rounded-2xl bg-[#EEF4F0] border border-[#E0EAE2] gap-1">
           <button
             type="button"
             onClick={() => setAttendanceTab('marked')}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 ${
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 cursor-pointer ${
               attendanceTab === 'marked'
-                ? 'bg-[#163832] text-white shadow-xs'
+                ? 'bg-[#163832] text-white shadow-[0_2px_8px_rgba(22,56,50,0.25)]'
                 : 'text-[#235347] hover:text-[#051F20]'
             }`}
             aria-label={`Marked Attendance (${markedList.length})`}
           >
             <CheckCircle2
-              size={15}
-              className={attendanceTab === 'marked' ? 'text-[#DAF1DE]' : 'text-[#8EB69B]'}
+              size={14}
+              className={attendanceTab === 'marked' ? 'text-[#8EB69B]' : 'text-[#8EB69B]'}
             />
             <span>Marked ({markedList.length})</span>
           </button>
@@ -288,32 +434,32 @@ export const MyQrView: React.FC = () => {
           <button
             type="button"
             onClick={() => setAttendanceTab('not_marked')}
-            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 ${
+            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 touch-target-44 cursor-pointer ${
               attendanceTab === 'not_marked'
-                ? 'bg-[#163832] text-white shadow-xs'
+                ? 'bg-[#163832] text-white shadow-[0_2px_8px_rgba(22,56,50,0.25)]'
                 : 'text-[#235347] hover:text-[#051F20]'
             }`}
             aria-label={`Not Marked Attendance (${unmarkedList.length})`}
           >
             <Clock
-              size={15}
-              className={attendanceTab === 'not_marked' ? 'text-[#DAF1DE]' : 'text-[#8EB69B]'}
+              size={14}
+              className={attendanceTab === 'not_marked' ? 'text-[#8EB69B]' : 'text-[#8EB69B]'}
             />
             <span>Not Marked ({unmarkedList.length})</span>
           </button>
         </div>
 
         {/* Search within tab */}
-        {currentTabList.length > 4 && (
-          <div className="w-full relative mb-3">
+        {currentTabList.length > 3 && (
+          <div className="w-full relative">
             <input
               type="text"
               value={rosterSearch}
               onChange={(e) => setRosterSearch(e.target.value)}
               placeholder="Search scholar by name or roll..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#DAF1DE] bg-[#F6FBF7] text-xs font-medium text-[#051F20] outline-none focus:border-[#8EB69B]"
+              className="w-full h-10 pl-9 pr-3 rounded-xl border border-[#DDE7DF] bg-[#FAFCFA] text-xs font-medium text-[#051F20] outline-none focus:border-[#163832] transition-all"
             />
-            <Search size={14} className="absolute left-2.5 top-2.5 text-[#8EB69B]" />
+            <Search size={14} className="absolute left-3 top-3 text-[#8EB69B]" />
           </div>
         )}
 
@@ -323,59 +469,66 @@ export const MyQrView: React.FC = () => {
           style={{ maxHeight: '260px' }}
         >
           {filteredRoster.length === 0 ? (
-            <div className="p-6 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] text-center flex flex-col items-center">
-              <span className="text-xs font-bold text-[#051F20] mb-0.5">
-                {attendanceTab === 'marked'
-                  ? 'No Check-ins Yet'
-                  : 'All Scholars Checked In'}
-              </span>
-              <span className="text-xs font-medium text-[#235347]">
-                {attendanceTab === 'marked'
-                  ? 'Registered scholars who scan will appear here.'
-                  : 'All registered scholars have marked attendance!'}
-              </span>
+            <div className="py-7 px-4 rounded-2xl bg-[#FAFCFA] border border-dashed border-[#DAF1DE] text-center flex flex-col items-center justify-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-[#EAF3EC] text-[#163832] flex items-center justify-center shadow-xs">
+                {attendanceTab === 'marked' ? (
+                  <QrCode size={18} strokeWidth={2} />
+                ) : (
+                  <CheckCircle2 size={18} strokeWidth={2} />
+                )}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-[#051F20]">
+                  {attendanceTab === 'marked'
+                    ? 'No Check-ins Yet'
+                    : 'All Scholars Checked In'}
+                </span>
+                <span className="text-[11px] text-[#235347] max-w-[220px] leading-relaxed">
+                  {attendanceTab === 'marked'
+                    ? 'Registered scholars who scan will appear here in real time.'
+                    : 'All registered scholars have marked attendance!'}
+                </span>
+              </div>
             </div>
           ) : (
             filteredRoster.map((scholar) => (
               <div
                 key={scholar.uid}
-                className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex items-center justify-between gap-2.5"
+                className="p-3 rounded-2xl bg-[#FAFCFA] border border-[#E4EBE6] flex items-center justify-between gap-2.5 hover:border-[#8EB69B]/70 transition-all"
               >
-                <div className="flex flex-col min-w-0 pr-1">
-                  <span className="text-sm font-bold text-[#051F20] truncate">
-                    {scholar.name}
-                  </span>
-                  <div className="flex items-center gap-1.5 text-xs text-[#235347] truncate">
-                    <span className="font-semibold text-[#163832]">
-                      {scholar.rollNo}
+                <div className="flex items-center gap-2.5 min-w-0 pr-1">
+                  <div className="w-8 h-8 rounded-full bg-[#EAF3EC] text-[#163832] font-bold text-xs flex items-center justify-center shrink-0">
+                    {scholar.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold text-[#051F20] truncate">
+                      {scholar.name}
                     </span>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#235347] truncate">
+                      <span className="font-semibold text-[#163832]">
+                        {scholar.rollNo}
+                      </span>
+                      <span>•</span>
+                      <span className="truncate">{scholar.department}</span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col items-end shrink-0 gap-0.5">
-                  {scholar.isMarked ? (
-                    <>
-                      <StatusChip
-                        status="done"
-                        label={scholar.status === 'Entered' ? 'Entered' : 'Marked'}
-                      />
-                      <span className="text-[12px] font-medium text-[#235347]">
-                        {scholar.checkInTime
-                          ? new Date(scholar.checkInTime).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          : 'Checked in'}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <StatusChip status="pending" label="Not Marked" />
-                      <span className="text-[12px] font-medium text-[#235347]">
-                        Pending
-                      </span>
-                    </>
-                  )}
+                  <StatusChip
+                    status={scholar.isMarked ? 'done' : 'pending'}
+                    label={scholar.isMarked ? (scholar.status === 'Entered' ? 'Entered' : 'Marked') : 'Not Marked'}
+                  />
+                  <span className="text-[10px] font-medium text-[#235347]">
+                    {scholar.isMarked && scholar.checkInTime
+                      ? new Date(scholar.checkInTime).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : scholar.isMarked
+                      ? 'Marked'
+                      : 'Pending'}
+                  </span>
                 </div>
               </div>
             ))
@@ -383,28 +536,28 @@ export const MyQrView: React.FC = () => {
         </div>
 
         {/* Scholar Identification Strip */}
-        <div className="w-full pt-3 mt-3 border-t border-[#DAF1DE] flex items-center justify-between text-[12px]">
-          <div className="flex flex-col text-left">
+        <div className="w-full pt-3 mt-1 border-t border-[#EDF3EF] flex items-center justify-between text-xs">
+          <div className="flex flex-col text-left min-w-0">
             <span className="font-bold text-[#051F20] tracking-wide">
               {currentUser.rollNo || 'FAC01'}
             </span>
-            <span className="text-[12px] text-[#235347] font-medium">
-              {currentUser.department || 'Geography & Geomatics'}
+            <span className="text-[11px] text-[#235347] font-medium truncate max-w-[150px]">
+              {currentUser.department || 'Geoinformatics'}
             </span>
           </div>
 
-          <div className="flex flex-col text-right items-end">
-            <span className="font-bold text-[#051F20]">
+          <div className="flex flex-col text-right items-end shrink-0">
+            <span className="font-bold text-[#051F20] truncate max-w-[140px]">
               {currentUser.name}
             </span>
-            <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[12px] font-bold bg-[#DAF1DE] text-[#051F20]">
-              {currentUser.role.toUpperCase()}
+            <span className="inline-flex items-center mt-0.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60 uppercase tracking-wider">
+              {currentUser.role}
             </span>
           </div>
         </div>
       </div>
 
-      {/* 5) QR Code & OTP Modal Popup */}
+      {/* 4) QR Code & OTP Modal Popup */}
       {isPopupOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
@@ -414,19 +567,19 @@ export const MyQrView: React.FC = () => {
           aria-label="Attendance QR Code and OTP"
         >
           <div
-            className="w-full max-w-sm bg-white rounded-3xl p-5 border border-[#DAF1DE] shadow-[0_24px_60px_rgba(5,31,32,0.25)] flex flex-col items-center animate-scaleUp relative max-h-[92vh] overflow-y-auto no-scrollbar"
+            className="w-full max-w-sm bg-white rounded-3xl p-5 border border-[#E2EBE5] shadow-[0_24px_60px_rgba(5,31,32,0.25)] flex flex-col items-center animate-scaleUp relative max-h-[92vh] overflow-y-auto no-scrollbar gap-3"
           >
             {/* Modal Header: Event Badge + Close Button */}
-            <div className="w-full flex items-center justify-between mb-3 gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold bg-[#163832] text-white shadow-xs max-w-[240px] truncate">
-                <span className="w-2 h-2 rounded-full bg-[#DAF1DE] animate-pulse shrink-0" />
+            <div className="w-full flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#163832] text-white shadow-xs max-w-[240px] truncate">
+                <span className="w-2 h-2 rounded-full bg-[#8EB69B] animate-pulse shrink-0" />
                 <span className="truncate">{chosenEvent.title}</span>
               </span>
 
               <button
                 type="button"
                 onClick={handleCloseQrPopup}
-                className="w-8 h-8 rounded-full bg-[#F6FBF7] border border-[#DAF1DE] text-[#163832] flex items-center justify-center hover:bg-[#DAF1DE] active:scale-95 transition-all cursor-pointer touch-target-44"
+                className="w-8 h-8 rounded-full bg-[#FAFCFA] border border-[#DDE7DF] text-[#163832] flex items-center justify-center hover:bg-[#EAF3EC] active:scale-95 transition-all cursor-pointer touch-target-44"
                 aria-label="Close QR Modal"
                 data-testid="btn-close-qr-modal"
               >
@@ -434,8 +587,16 @@ export const MyQrView: React.FC = () => {
               </button>
             </div>
 
+            {/* Top Center Live Indicator */}
+            <div className="w-full flex items-center justify-center -mt-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF3EC] border border-[#8EB69B]/50 text-[#163832] text-xs font-bold shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-[#163832] animate-pulse shrink-0" />
+                <span>OTP Active • Refreshes in {secondsLeft}s</span>
+              </div>
+            </div>
+
             {/* QR Code Frame */}
-            <div className="relative p-3.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] shadow-[0_4px_16px_rgba(5,31,32,0.05)] mb-3">
+            <div className="p-4 rounded-2xl bg-[#FAFCFA] border border-[#E2EBE5] shadow-[0_4px_16px_rgba(5,31,32,0.04)]">
               <QRCodeSVG
                 value={dynamicQrPayload}
                 size={180}
@@ -446,41 +607,41 @@ export const MyQrView: React.FC = () => {
             </div>
 
             {/* 6-Digit OTP Section */}
-            <div className="w-full flex flex-col items-center p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] mb-3 text-center">
-              <span className="text-[12px] font-bold uppercase tracking-wider text-[#235347] mb-1.5">
+            <div className="w-full flex flex-col items-center p-3 rounded-2xl bg-[#FAFCFA] border border-[#E2EBE5] text-center gap-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#235347]">
                 6-Digit Attendance OTP
               </span>
 
-              <div className="flex items-center justify-center gap-1.5 my-0.5">
+              <div className="flex items-center justify-center gap-1.5 my-1">
                 {otp.split('').map((digit, idx) => (
                   <span
                     key={idx}
-                    className="w-9 h-11 flex items-center justify-center rounded-xl bg-white border border-[#8EB69B] text-[#051F20] font-mono font-extrabold text-xl shadow-xs"
+                    className="w-9 h-11 flex items-center justify-center rounded-xl bg-white border border-[#DDE7DF] text-[#051F20] font-mono font-bold text-xl shadow-xs"
                   >
                     {digit}
                   </span>
                 ))}
               </div>
 
-              <span className="text-[12px] font-medium text-[#235347] mt-1.5">
+              <span className="text-[11px] font-medium text-[#235347]">
                 Provide to scanner or enter on check-in desk
               </span>
             </div>
 
             {/* 20-Second Countdown & Refresh Row */}
-            <div className="w-full flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] mb-3">
+            <div className="w-full flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-[#FAFCFA] border border-[#E2EBE5]">
               <div className="flex items-center gap-3">
                 <ProgressRing
                   progress={progressPercent}
-                  size={42}
+                  size={40}
                   strokeWidth={4}
                   label={`${secondsLeft}s`}
                 />
                 <div className="flex flex-col text-left">
-                  <span className="text-[12px] font-bold text-[#051F20]">
+                  <span className="text-xs font-bold text-[#051F20]">
                     20-Second Validity
                   </span>
-                  <span className="text-[12px] font-medium text-[#235347]">
+                  <span className="text-[11px] font-medium text-[#235347]">
                     {secondsLeft > 0 ? `Refreshes in ${secondsLeft}s` : 'Token expired • Refreshing'}
                   </span>
                 </div>
@@ -489,32 +650,32 @@ export const MyQrView: React.FC = () => {
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="p-2.5 rounded-xl bg-white border border-[#8EB69B]/50 text-[#163832] hover:bg-[#DAF1DE] active:scale-95 transition-all shadow-xs touch-target-44 flex items-center justify-center"
+                className="p-2.5 rounded-xl bg-white border border-[#DDE7DF] text-[#163832] hover:bg-[#EAF3EC] active:scale-95 transition-all shadow-xs touch-target-44 flex items-center justify-center cursor-pointer"
                 title="Refresh Token & OTP"
                 aria-label="Refresh token and OTP"
               >
-                <RefreshCw size={16} strokeWidth={2.2} />
+                <RefreshCw size={15} strokeWidth={2.2} />
               </button>
             </div>
 
             {/* Scholar Identity in Modal */}
-            <div className="w-full pt-2.5 border-t border-[#DAF1DE] flex items-center justify-between text-[12px] mb-3">
+            <div className="w-full pt-2.5 border-t border-[#EDF3EF] flex items-center justify-between text-xs">
               <div className="flex flex-col text-left">
                 <span className="font-bold text-[#051F20]">
                   {currentUser.rollNo || '21GEO001'}
                 </span>
-                <span className="text-[12px] text-[#235347]">
+                <span className="text-[11px] text-[#235347]">
                   {currentUser.name}
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded-full text-[12px] font-bold bg-[#DAF1DE] text-[#051F20]">
-                {currentUser.role.toUpperCase()}
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EAF3EC] text-[#163832] border border-[#DAF1DE]/60 uppercase tracking-wider">
+                {currentUser.role}
               </span>
             </div>
 
             {/* Done / Dismiss Button */}
             <PillButton
-              variant="secondary"
+              variant="primary"
               fullWidth
               onClick={handleCloseQrPopup}
               aria-label="Done"

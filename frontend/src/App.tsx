@@ -46,8 +46,6 @@ import { DesignSystemView } from './views/design/DesignSystemView';
 import { SuperAdminOperationsView } from './views/admin/SuperAdminOperationsView';
 import { ModulePausedNotice } from './components/shared/ModulePausedNotice';
 import { UnderMaintenanceScreen } from './components/shared/UnderMaintenanceScreen';
-import { SuperAdminTopNav } from './components/navigation/SuperAdminTopNav';
-import { SuperAdminBottomNav } from './components/navigation/SuperAdminBottomNav';
 import { apiClient } from './api/client';
 
 import { getRoleNavTabs } from './core/nav';
@@ -355,13 +353,9 @@ const MainAppContent: React.FC = () => {
           transition: 'max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner and Profile page) */}
-        {activeTab !== 'scan_qr' && activeTab !== 'profile' && (
-          isSuperAdmin ? (
-            <SuperAdminTopNav className={isPhoneFrame ? '' : 'lg:hidden'} />
-          ) : (
-            <TopBar />
-          )
+        {/* Top Sticky Header (Hidden on immersive fullscreen QR Scanner, Profile page, and standalone Turnstile QR pass) */}
+        {activeTab !== 'scan_qr' && activeTab !== 'profile' && activeTab !== 'my_qr' && (
+          <TopBar />
         )}
 
         {/* Global Security / Notification Toast (Floating gracefully below TopBar) */}
@@ -386,12 +380,8 @@ const MainAppContent: React.FC = () => {
           </PageTransition>
         </main>
 
-        {/* Floating Pill Bottom Nav (5 role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
-        {isSuperAdmin ? (
-          <SuperAdminBottomNav className={isPhoneFrame ? '' : 'lg:hidden'} />
-        ) : (
-          !activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />
-        )}
+        {/* Floating Pill Bottom Nav (role-based tabs, hidden on dedicated full-page audit views and immersive QR scanner) */}
+        {!activeTab.startsWith('audits') && activeTab !== 'scan_qr' && <FloatingNav />}
 
         {/* Role Switcher Modal */}
         <RoleSwitcherModal />

@@ -39,10 +39,10 @@ async function verify() {
   await page.goto('http://localhost:4185/#operations?module=attendance_desk', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
-  const artifactDir = 'C:/Users/SIVANAGU/.gemini/antigravity/brain/b6200dad-855f-4d8c-86eb-afedf4aca689';
+  const artifactDir = 'C:/Users/SIVANAGU/.gemini/antigravity/brain/a650e5f5-2c8d-4e36-829c-bf6726252e0c';
 
   // Capture rebuilt Attendance Desk fitted perfectly to the screen
-  const fittedShot = path.join(artifactDir, 'rebuilt_attendance_desk_fitted.png');
+  const fittedShot = path.join(artifactDir, 'attendance_desk_rebuilt.png');
   await page.screenshot({ path: fittedShot, fullPage: false });
   console.log('Saved fitted Attendance Desk screenshot to:', fittedShot);
 

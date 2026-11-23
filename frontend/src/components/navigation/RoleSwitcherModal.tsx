@@ -14,19 +14,14 @@ export const RoleSwitcherModal: React.FC = () => {
     icon: React.ReactNode;
   }[] = [
     {
-      role: 'super_admin',
-      defaultTitle: 'Super Admin • System Administrator',
-      icon: <ShieldCheck size={18} color="#051F20" />,
+      role: 'coordinator',
+      defaultTitle: 'Coordinator • Club President',
+      icon: <Shield size={18} color="#163832" />,
     },
     {
       role: 'faculty',
       defaultTitle: 'Faculty • Faculty Advisor',
       icon: <ShieldCheck size={18} color="#163832" />,
-    },
-    {
-      role: 'coordinator',
-      defaultTitle: 'Coordinator • Club President',
-      icon: <Shield size={18} color="#163832" />,
     },
     {
       role: 'management',

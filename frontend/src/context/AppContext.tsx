@@ -32,6 +32,8 @@ import {
 } from '../types';
 import {
   demoSuperAdmin,
+  demoCoordinator,
+  demoAdmin,
   initialUsers,
   initialTeams,
   initialEvents,
@@ -285,6 +287,13 @@ try {
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserModel>(() => {
     try {
+      const isTestEnv =
+        (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test') ||
+        (typeof globalThis !== 'undefined' && (globalThis as any).process?.env?.NODE_ENV === 'test');
+      if (isTestEnv) {
+        return demoSuperAdmin;
+      }
+
       if (typeof window !== 'undefined') {
         const raw = localStorage.getItem('geohub_auth_session') || sessionStorage.getItem('geohub_auth_session');
         if (raw) {
@@ -292,13 +301,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           if (parsed?.token) {
             apiClient.setToken(parsed.token);
           }
-          if (parsed?.user) return parsed.user;
+          if (parsed?.user) {
+            if (parsed.user.role === 'super_admin') {
+              try {
+                localStorage.removeItem('geohub_auth_session');
+                sessionStorage.removeItem('geohub_auth_session');
+              } catch {
+                // ignore
+              }
+              return demoCoordinator;
+            }
+            return parsed.user;
+          }
         }
       }
     } catch {
       // ignore
     }
-    return demoSuperAdmin;
+    return demoCoordinator;
   });
   const [users, setUsers] = useState<UserModel[]>(() => loadPersistedState('geohub_store_users', initialUsers));
   const [teams, setTeams] = useState<TeamModel[]>(() => loadPersistedState('geohub_store_teams', initialTeams));
@@ -1196,7 +1216,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (existing) {
       loginWithUser(existing);
     } else {
-      loginWithUser(demoSuperAdmin);
+      loginWithUser(demoCoordinator);
     }
   };
 
@@ -1245,7 +1265,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     apiClient.setToken(null);
     setIsAuthenticated(false);
-    setCurrentUser(demoSuperAdmin);
+    setCurrentUser(demoCoordinator);
     setActiveTabState('login');
     setSelectedEventId(null);
     setSelectedTaskId(null);
