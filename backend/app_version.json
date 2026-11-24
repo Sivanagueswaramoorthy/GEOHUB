@@ -1,12 +1,12 @@
 {
-  "version": "1.6.75",
-  "version_code": 94,
+  "version": "1.6.76",
+  "version_code": 95,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Premium top-center push update UI/UX, verified release integrity, SuperAdmin master isolation, and real-time OTA synchronization",
+  "release_notes": "Fix profile setup modal stacking context, solid z-index, and screen overlap; clean UI/UX",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-24",
-  "file_size_bytes": 10952690,
+  "file_size_bytes": 10952710,
   "file_size_mb": "10.45 MB",
-  "sha256": "AD13AFFF44214CD1CBEAC966B82C540F9AA02D08392A4CACD6B94044767071C1"
+  "sha256": "B49F2CBAD32B427B479E06CA240C71C64CE4262DF027B39CD70613785A726439"
 }

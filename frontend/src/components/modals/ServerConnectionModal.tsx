@@ -95,7 +95,10 @@ export const ServerConnectionModal: React.FC<Props> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+    <div
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn"
+      style={{ zIndex: 9998 }}
+    >
       <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">

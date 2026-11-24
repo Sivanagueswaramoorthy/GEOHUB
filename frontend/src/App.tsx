@@ -422,6 +422,29 @@ const GlobalProfileSetupModal: React.FC = () => {
     if (currentUser.mustChangePassword) return false;
     if (currentUser.hasCompletedProfileSetup) return false;
 
+    // If the user already has a valid phone and email, profile setup is already complete
+    const hasValidPhone = Boolean(
+      currentUser.phone && currentUser.phone.replace(/\D/g, '').length >= 10
+    );
+    const hasValidEmail = Boolean(
+      currentUser.email &&
+      currentUser.email.includes('@') &&
+      !currentUser.email.endsWith('@placeholder.com')
+    );
+    if (hasValidPhone && hasValidEmail) {
+      return false;
+    }
+
+    // Only prompt student / member / volunteer roles for initial scholar profile onboarding
+    // Faculty advisors, coordinators, super admins already have verified institutional records
+    const isScholar =
+      currentUser.role === 'student' ||
+      currentUser.role === 'member' ||
+      Boolean(currentUser.isVolunteer);
+    if (!isScholar) {
+      return false;
+    }
+
     // Check persistent storage to ensure second time login never shows popup
     try {
       if (typeof window !== 'undefined') {
@@ -487,6 +510,10 @@ const AppContentWithSplash: React.FC = () => {
 
   return (
     <>
+      <MainAppContent />
+      <GlobalServerModal />
+      <GlobalUpdateModal />
+      <GlobalProfileSetupModal />
       {showSplash && (
         <SplashScreen
           onFinish={() => {
@@ -496,10 +523,6 @@ const AppContentWithSplash: React.FC = () => {
           }}
         />
       )}
-      <GlobalUpdateModal />
-      <GlobalServerModal />
-      <GlobalProfileSetupModal />
-      <MainAppContent />
     </>
   );
 };

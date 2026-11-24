@@ -176,4 +176,53 @@ describe('FirstTimeProfileSetupModal Suite', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByText(/complete your profile/i)).not.toBeInTheDocument();
   });
+
+  it('does not trigger setup popup for coordinator or user with existing valid contact info', () => {
+    const coordinatorUser: Partial<UserModel> = {
+      uid: 'u_coord_sivanagu',
+      rollNo: 'COORD01',
+      name: 'Sivanagu',
+      role: 'coordinator',
+      email: 'coordinator@college.edu',
+      phone: '+91 9442018800',
+      hasCompletedProfileSetup: false,
+    };
+
+    const TestAppIntegration: React.FC = () => {
+      const { currentUser, setCurrentUser } = useApp();
+      React.useEffect(() => {
+        setCurrentUser(coordinatorUser as UserModel);
+      }, []);
+
+      const hasValidPhone = Boolean(
+        currentUser?.phone && currentUser.phone.replace(/\D/g, '').length >= 10
+      );
+      const hasValidEmail = Boolean(
+        currentUser?.email &&
+        currentUser.email.includes('@') &&
+        !currentUser.email.endsWith('@placeholder.com')
+      );
+      const isScholar =
+        currentUser?.role === 'student' ||
+        currentUser?.role === 'member' ||
+        Boolean(currentUser?.isVolunteer);
+
+      const isOpen = Boolean(
+        currentUser &&
+        !currentUser.hasCompletedProfileSetup &&
+        isScholar &&
+        (!hasValidPhone || !hasValidEmail)
+      );
+
+      return <FirstTimeProfileSetupModal isOpen={isOpen} />;
+    };
+
+    render(
+      <AppProvider>
+        <TestAppIntegration />
+      </AppProvider>
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });

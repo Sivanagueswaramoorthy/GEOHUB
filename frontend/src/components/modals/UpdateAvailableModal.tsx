@@ -90,8 +90,8 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
       aria-modal="true"
       aria-labelledby="update-modal-title"
       data-testid="modal-update-available"
-      className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-10 sm:pt-16 bg-[#051F20]/65 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
-      style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
+      className="fixed inset-0 z-[9999] flex items-start justify-center p-3 sm:p-4 pt-10 sm:pt-16 bg-[#051F20]/65 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
+      style={{ zIndex: 9999, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       onClick={(e) => {
         if (!isMandatory && !isDownloading && e.target === e.currentTarget) {
           handleDismiss();

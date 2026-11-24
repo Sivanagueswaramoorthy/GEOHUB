@@ -8,7 +8,6 @@ import {
   AlertCircle,
   CheckCircle2,
   GraduationCap,
-  Building,
   Loader2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -29,14 +28,12 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
   // Initialize values from currentUser whenever the modal opens
   useEffect(() => {
     if (isOpen && currentUser) {
-      // If user has an existing email, pre-fill it (unless it's an unformatted mock string)
       if (currentUser.email && currentUser.email.includes('@')) {
         setEmail(currentUser.email);
       } else if (currentUser.rollNo) {
         setEmail(`${currentUser.rollNo.toLowerCase()}@geohub.edu`);
       }
 
-      // If user has a valid phone, pre-fill it stripped of +91
       if (currentUser.phone) {
         const clean = currentUser.phone.replace(/[^\d]/g, '');
         const last10 = clean.slice(-10);
@@ -47,7 +44,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
     }
   }, [isOpen, currentUser]);
 
-  // Suppress Escape key dismissal to enforce required submission
+  // Suppress Escape key dismissal to enforce required submission for new scholars
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -133,77 +130,95 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
     }
   };
 
+  const scholarRoleDisplay = currentUser.role ? currentUser.role.toUpperCase() : 'STUDENT';
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="first-time-setup-title"
-      className="fixed inset-0 z-99999 flex items-center justify-center p-4 bg-[#051F20]/75 backdrop-blur-md animate-fade-in"
-      style={{ touchAction: 'none' }}
+      data-testid="modal-first-time-setup"
+      className="fixed inset-0 z-[99999] flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-14 bg-[#051F20]/75 backdrop-blur-md overflow-y-auto select-none transition-all duration-300 animate-fadeIn"
+      style={{
+        zIndex: 99999,
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        touchAction: 'pan-y',
+      }}
       onClick={(e) => {
-        // Prevent dismissal on backdrop click
+        // Enforce required submission: prevent dismissal on backdrop click
         e.stopPropagation();
       }}
     >
       <div
-        className="relative w-full max-w-md bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_24px_60px_rgba(5,31,32,0.3)] overflow-hidden flex flex-col"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.35)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20] my-auto sm:my-0"
+        style={{
+          animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Decorative Header Accent */}
-        <div className="bg-gradient-to-r from-[#163832] via-[#235347] to-[#163832] p-5 text-white flex flex-col gap-2 relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/5 pointer-events-none" />
-          <div className="flex items-center justify-between">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-xs border border-white/15 text-[11px] font-bold tracking-wider uppercase text-[#DAF1DE]">
-              <Sparkles size={12} className="text-[#8EB69B]" />
-              First Time Scholar Setup
-            </div>
-            <div className="flex items-center gap-1 text-[11px] font-bold text-[#8EB69B]">
-              <ShieldCheck size={14} />
-              Required
-            </div>
+        {/* Soft Ambient Radiance */}
+        <div className="absolute -top-12 -right-12 w-36 h-36 bg-[#DAF1DE] rounded-full blur-2xl opacity-70 pointer-events-none" />
+        <div className="absolute -top-8 -left-8 w-28 h-28 bg-[#8EB69B]/20 rounded-full blur-xl opacity-60 pointer-events-none" />
+
+        {/* Top Header Pill Bar */}
+        <div className="flex items-center justify-between relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span>Profile Verification</span>
           </div>
 
-          <div>
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200">
+            Required
+          </span>
+        </div>
+
+        {/* Hero Section: Title & Icon */}
+        <div className="flex items-center gap-3.5 pt-1 relative z-10">
+          <div className="w-12 h-12 rounded-2xl bg-[#DAF1DE] text-[#163832] border border-[#8EB69B]/40 flex items-center justify-center shadow-xs shrink-0">
+            <GraduationCap size={22} className="text-[#163832]" strokeWidth={2.2} />
+          </div>
+          <div className="min-w-0">
             <h2
               id="first-time-setup-title"
-              className="text-xl sm:text-2xl font-black tracking-tight text-white mt-1"
+              className="text-base sm:text-lg font-bold text-[#051F20] truncate leading-snug"
             >
               Complete Your Profile
             </h2>
-            <p className="text-xs text-[#DAF1DE]/90 mt-1 leading-relaxed">
-              Welcome, <strong className="text-white font-bold">{currentUser.name}</strong>! Please enter your official contact details to activate your chapter account.
+            <p className="text-xs text-[#235347] font-medium truncate">
+              Welcome, <strong className="text-[#051F20] font-bold">{currentUser.name}</strong>! Enter contact details.
             </p>
           </div>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} noValidate className="p-5 flex flex-col gap-4">
-          {/* Scholar Information Dossier (Read-Only Confirmation) */}
-          <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-[#235347] flex items-center gap-1.5">
-                <GraduationCap size={14} className="text-[#163832]" />
-                Scholar Identity
-              </span>
-              <span className="font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full text-[11px] border border-[#8EB69B]">
-                {currentUser.role ? currentUser.role.toUpperCase() : 'STUDENT'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#DAF1DE]/60 text-xs">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-[#235347]/75">Reg Number</span>
-                <p className="font-mono font-bold text-[#051F20]">{currentUser.rollNo || 'Not Assigned'}</p>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-bold text-[#235347]/75">Department</span>
-                <p className="font-semibold text-[#051F20] truncate" title={currentUser.department || 'Geoinformatics'}>
-                  {currentUser.department || 'Geoinformatics'}
-                </p>
-              </div>
-            </div>
+        {/* Scholar Information Dossier (Read-Only Confirmation) */}
+        <div className="p-3 rounded-2xl bg-[#F6FBF7] border border-[#DAF1DE] flex flex-col gap-2 relative z-10">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-[#235347] flex items-center gap-1.5">
+              <Sparkles size={13} className="text-[#163832]" />
+              Scholar Identity
+            </span>
+            <span className="font-bold text-[#163832] bg-[#DAF1DE] px-2 py-0.5 rounded-full text-[10px] border border-[#8EB69B]/50">
+              {scholarRoleDisplay}
+            </span>
           </div>
 
+          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#DAF1DE]/60 text-xs">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-[#235347]/75">Reg Number</span>
+              <p className="font-mono font-bold text-[#051F20]">{currentUser.rollNo || 'Not Assigned'}</p>
+            </div>
+            <div>
+              <span className="text-[10px] uppercase font-bold text-[#235347]/75">Department</span>
+              <p className="font-semibold text-[#051F20] truncate" title={currentUser.department || 'Geoinformatics'}>
+                {currentUser.department || 'Geoinformatics Engineering'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3.5 relative z-10">
           {/* Email ID Field */}
           <div className="flex flex-col gap-1.5">
             <label htmlFor="setup-email-input" className="text-xs font-bold text-[#051F20] flex items-center gap-1.5">
@@ -219,7 +234,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 onChange={handleEmailChange}
                 onBlur={() => validateEmail(email)}
                 placeholder="e.g. 24geo181@geohub.edu"
-                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-medium text-[#051F20] transition-all outline-hidden ${
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-medium text-[#051F20] transition-all outline-hidden min-h-[44px] ${
                   emailError
                     ? 'border-red-400 bg-red-50/40 focus:border-red-500 focus:ring-2 focus:ring-red-100'
                     : 'border-[#DAF1DE] bg-white focus:border-[#163832] focus:ring-2 focus:ring-[#DAF1DE]'
@@ -228,7 +243,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 required
               />
               {email && !emailError && (
-                <CheckCircle2 size={16} className="absolute right-3 top-3 text-[#163832]" />
+                <CheckCircle2 size={16} className="absolute right-3 top-3 text-emerald-600" />
               )}
             </div>
             {emailError ? (
@@ -237,7 +252,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 {emailError}
               </p>
             ) : (
-              <p className="text-[11px] text-[#235347]/75">
+              <p className="text-[10px] sm:text-[11px] text-[#235347]/75">
                 Used for official notifications, attendance certificates, and workshop passes.
               </p>
             )}
@@ -261,7 +276,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 onChange={handlePhoneChange}
                 onBlur={() => validatePhone(phone)}
                 placeholder="98765 43210"
-                className={`w-full pl-16 pr-3.5 py-2.5 rounded-xl border text-sm font-mono font-medium text-[#051F20] tracking-wide transition-all outline-hidden ${
+                className={`w-full pl-16 pr-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-mono font-medium text-[#051F20] tracking-wide transition-all outline-hidden min-h-[44px] ${
                   phoneError
                     ? 'border-red-400 bg-red-50/40 focus:border-red-500 focus:ring-2 focus:ring-red-100'
                     : 'border-[#DAF1DE] bg-white focus:border-[#163832] focus:ring-2 focus:ring-[#DAF1DE]'
@@ -271,7 +286,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 required
               />
               {phone && phone.length === 10 && !phoneError && (
-                <CheckCircle2 size={16} className="absolute right-3 top-3 text-[#163832]" />
+                <CheckCircle2 size={16} className="absolute right-3 top-3 text-emerald-600" />
               )}
             </div>
             {phoneError ? (
@@ -280,15 +295,15 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
                 {phoneError}
               </p>
             ) : (
-              <p className="text-[11px] text-[#235347]/75">
+              <p className="text-[10px] sm:text-[11px] text-[#235347]/75">
                 Required for SMS OTP authentication, emergency attendance, and squad alerts.
               </p>
             )}
           </div>
 
           {/* Submission Notice */}
-          <div className="p-2.5 rounded-xl bg-[#DAF1DE]/40 border border-[#8EB69B]/40 flex items-start gap-2 text-[11px] text-[#163832]">
-            <ShieldCheck size={15} className="text-[#163832] shrink-0 mt-0.5" />
+          <div className="p-2.5 rounded-xl bg-[#DAF1DE]/40 border border-[#8EB69B]/40 flex items-start gap-2 text-[10.5px] sm:text-[11px] text-[#163832]">
+            <ShieldCheck size={14} className="text-[#163832] shrink-0 mt-0.5" />
             <span>
               All details are saved securely to your institutional record. This setup popup will <strong>not</strong> appear again on your next login.
             </span>
@@ -299,8 +314,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
             type="submit"
             data-testid="first-time-submit-btn"
             disabled={isSubmitting}
-            className="w-full mt-1 py-3 px-4 rounded-2xl bg-[#163832] hover:bg-[#051F20] text-white font-bold text-sm tracking-wide shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
-            style={{ minHeight: '48px' }}
+            className="w-full mt-1 h-12 rounded-2xl bg-[#163832] hover:bg-[#0B2B26] active:scale-[0.98] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-75 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
