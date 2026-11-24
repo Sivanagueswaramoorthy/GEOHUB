@@ -138,7 +138,7 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
       aria-modal="true"
       aria-labelledby="first-time-setup-title"
       data-testid="modal-first-time-setup"
-      className="fixed inset-0 z-[99999] flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-14 bg-[#051F20]/75 backdrop-blur-md overflow-y-auto select-none transition-all duration-300 animate-fadeIn"
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 bg-[#051F20]/75 backdrop-blur-md overflow-y-auto select-none transition-all duration-300 animate-fadeIn"
       style={{
         zIndex: 99999,
         backdropFilter: 'blur(16px)',
@@ -151,9 +151,9 @@ export const FirstTimeProfileSetupModal: React.FC<FirstTimeProfileSetupModalProp
       }}
     >
       <div
-        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.35)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20] my-auto sm:my-0"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.35)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20]"
         style={{
-          animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+          animation: 'geohubModalPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
         onClick={(e) => e.stopPropagation()}
       >

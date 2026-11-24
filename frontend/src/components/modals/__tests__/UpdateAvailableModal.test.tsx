@@ -66,7 +66,7 @@ describe('UpdateAvailableModal Component', () => {
     // Modal dialog
     const modal = screen.getByTestId('modal-update-available');
     expect(modal).toBeInTheDocument();
-    expect(modal.className).toContain('items-start');
+    expect(modal.className).toContain('items-center');
     expect(modal.className).toContain('justify-center');
 
     // Headers & Badges

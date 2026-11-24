@@ -96,10 +96,13 @@ export const ServerConnectionModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn"
-      style={{ zIndex: 9998 }}
+      className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-[#051F20]/75 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn"
+      style={{ zIndex: 9998, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
     >
-      <div className="bg-white rounded-3xl border border-[#DAF1DE] shadow-2xl w-full max-w-md p-5 sm:p-6 flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
+      <div
+        className="bg-white rounded-3xl border border-[#DAF1DE] shadow-[0_24px_64px_rgba(5,31,32,0.30)] w-full max-w-md p-5 sm:p-6 flex flex-col gap-4 max-h-[92vh] overflow-y-auto"
+        style={{ animation: 'geohubModalPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1)' }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#DAF1DE] pb-3">
           <div className="flex items-center gap-2.5">

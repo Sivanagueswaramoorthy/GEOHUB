@@ -2293,7 +2293,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       channelId: msgData.channelId,
       authorId: currentUser.uid,
       authorName: currentUser.name,
-      authorRole: currentUser.teamRole || currentUser.post || (currentUser.role === 'super_admin' ? 'Faculty Advisor' : currentUser.role === 'admin' ? 'President' : 'Member'),
+      authorRole: currentUser.teamRole || currentUser.post || (currentUser.role === 'super_admin' ? 'SuperAdmin' : currentUser.role === 'admin' ? 'President' : 'Member'),
       authorAvatar: currentUser.avatarUrl,
       title: msgData.title,
       content: msgData.content,

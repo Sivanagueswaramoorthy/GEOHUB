@@ -90,7 +90,7 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
       aria-modal="true"
       aria-labelledby="update-modal-title"
       data-testid="modal-update-available"
-      className="fixed inset-0 z-[9999] flex items-start justify-center p-3 sm:p-4 pt-10 sm:pt-16 bg-[#051F20]/65 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-[#051F20]/75 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
       style={{ zIndex: 9999, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
       onClick={(e) => {
         if (!isMandatory && !isDownloading && e.target === e.currentTarget) {
@@ -99,9 +99,9 @@ export const UpdateAvailableModal: React.FC<UpdateAvailableModalProps> = ({
       }}
     >
       <div
-        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.25)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20]"
+        className="w-full max-w-md bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.30)] border border-[#DAF1DE] relative overflow-hidden flex flex-col gap-4 text-[#051F20]"
         style={{
-          animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+          animation: 'geohubModalPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         {/* Soft Ambient Radiance */}

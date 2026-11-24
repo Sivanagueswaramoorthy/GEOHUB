@@ -1,12 +1,12 @@
 {
-  "version": "1.6.76",
-  "version_code": 95,
+  "version": "1.6.77",
+  "version_code": 96,
   "apk_filename": "geohub-app.apk",
-  "release_notes": "Fix profile setup modal stacking context, solid z-index, and screen overlap; clean UI/UX",
+  "release_notes": "SuperAdmin SA01/SA101 routing and cockpit home; center-screen popups with blurred backdrop",
   "download_url": "https://raw.githubusercontent.com/Sivanagueswaramoorthy/GEOHUB/master/geohub-app.apk",
   "min_supported_version": "1.0.0",
   "released_at": "2026-11-24",
-  "file_size_bytes": 10952710,
+  "file_size_bytes": 10953214,
   "file_size_mb": "10.45 MB",
-  "sha256": "B49F2CBAD32B427B479E06CA240C71C64CE4262DF027B39CD70613785A726439"
+  "sha256": "EBB10E7BAA3F3196954F2BAC4FC8DA87290B103EBC6A9C9A6CBDFE09E6C7CD6A"
 }

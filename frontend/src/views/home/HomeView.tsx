@@ -9,13 +9,14 @@ import {
   PromotionHomeView,
   ManagementHomeView,
 } from '../roles';
+import { SuperAdminOperationsView } from '../admin/SuperAdminOperationsView';
 
 export const HomeView: React.FC = () => {
   const { currentUser, showToast, setSelectedEventId, registerForEvent } = useApp();
 
-  // Fallback if role is super_admin: display the standard Coordinator executive home
+  // SuperAdmin: Render dedicated Master Governance Cockpit with 5-deck architecture
   if (currentUser.role === 'super_admin') {
-    return <CoordinatorHomeView />;
+    return <SuperAdminOperationsView isHomeCockpit={true} />;
   }
 
   const postLower = (currentUser.post || '').toLowerCase();

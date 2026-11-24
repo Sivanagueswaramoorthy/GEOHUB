@@ -804,20 +804,20 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
         </div>
       </div>
 
-      {/* 4. TOP-CENTER FLOATING MODAL: Assign Duty */}
+      {/* 4. CENTER FLOATING MODAL: Assign Duty */}
       {showAssignModal && (
         <div
           data-testid="modal-assign-duty"
-          className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-14 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#051F20]/75 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowAssignModal(false);
           }}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_60px_rgba(5,31,32,0.22)] border border-[#DAF1DE] space-y-3.5 max-h-[88vh] overflow-y-auto flex flex-col"
+            className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.30)] border border-[#DAF1DE] space-y-3.5 max-h-[88vh] overflow-y-auto flex flex-col"
             style={{
-              animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+              animation: 'geohubModalPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
             {/* Header */}
@@ -1047,20 +1047,20 @@ export const DutiesStationsScreen: React.FC<DutiesStationsScreenProps> = ({
         </div>
       )}
 
-      {/* 5. TOP-CENTER FLOATING MODAL: Create Station */}
+      {/* 5. CENTER FLOATING MODAL: Create Station */}
       {showStationModal && (
         <div
           data-testid="modal-create-station"
-          className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 pt-8 sm:pt-14 bg-[#051F20]/60 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#051F20]/75 backdrop-blur-md select-none transition-all duration-300 animate-fadeIn overflow-y-auto"
           style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowStationModal(false);
           }}
         >
           <div
-            className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_60px_rgba(5,31,32,0.22)] border border-[#DAF1DE] space-y-3.5 max-h-[88vh] overflow-y-auto flex flex-col"
+            className="w-full max-w-lg bg-white rounded-3xl p-5 sm:p-6 shadow-[0_24px_64px_rgba(5,31,32,0.30)] border border-[#DAF1DE] space-y-3.5 max-h-[88vh] overflow-y-auto flex flex-col"
             style={{
-              animation: 'topModalEnter 240ms cubic-bezier(0.16, 1, 0.3, 1)',
+              animation: 'geohubModalPopIn 220ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
             <div className="flex items-center justify-between pb-2 border-b border-[#DAF1DE]/70">

@@ -73,14 +73,16 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
         (models.User.email == ident_lower) | (models.User.roll_no == ident_upper)
     ).first()
 
-    # 2. Canonical SuperAdmin alias match (SA01, superadmin, sa01)
+    # 2. Canonical SuperAdmin alias match (SA01, SA101, superadmin, sa01, sa101)
     if not user:
-        sa_aliases = {"super_admin", "superadmin", "sa01", "super"}
+        sa_aliases = {"super_admin", "superadmin", "sa01", "sa101", "sa-01", "sa-101", "super"}
         if ident_lower in sa_aliases:
-            user = db.query(models.User).filter(models.User.roll_no == "SA01").first()
+            user = db.query(models.User).filter(
+                (models.User.roll_no == "SA01") | (models.User.roll_no == "SA101") | (models.User.role == "super_admin")
+            ).first()
 
-    # 3. Fail-safe SuperAdmin self-healing: if SA01 is missing from database, provision it
-    if not user and ident_upper == "SA01":
+    # 3. Fail-safe SuperAdmin self-healing: if SA01/SA101 is missing from database, provision it
+    if not user and ident_upper in ["SA01", "SA101", "SUPERADMIN"]:
         user = models.User(
             id="u_super_admin_sa01",
             roll_no="SA01",

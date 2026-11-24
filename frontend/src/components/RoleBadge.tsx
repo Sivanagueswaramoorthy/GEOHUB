@@ -57,8 +57,8 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({
   }
 
   let displayName = friendlyName;
-  if (isSmall && isSuperAdmin) {
-    displayName = 'Faculty Advisor';
+  if (isSuperAdmin) {
+    displayName = 'SuperAdmin';
   } else if (isSmall && (role === 'admin' || role === 'coordinator')) {
     displayName = 'President';
   }

@@ -267,9 +267,13 @@ export const useLogin = (options?: UseLoginOptions) => {
         if (!found) {
           if (
             id === 'sa01' ||
+            id === 'sa101' ||
+            id === 'sa001' ||
             id === 'superadmin' ||
             id === 'super' ||
-            id.includes('superadmin')
+            id.includes('superadmin') ||
+            cleanRawId === 'SA01' ||
+            cleanRawId === 'SA101'
           ) {
             found = demoSuperAdmin;
           }
